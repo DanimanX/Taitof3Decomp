@@ -60,6 +60,15 @@ int main(void)
     /* captured with F3_EXIT=ret at the routine entry */
     bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
     bad += run_a1("ObjMove 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);
+    /* every script opcode forced through a synthetic script at 0x41E000:
+       F3_POKE32=41E000=<op>0010,41E004=00100000,41E008=0 F3_POKEA0B=44=00,45=41,46=E0,47=00
+       (ops 17/24/25 jump back by their parameter: captured with parameter 0) */
+    for (int op = 0; op < 29; op++) {
+        char pfx[64], name[32];
+        snprintf(pfx, sizeof pfx, "work/ram/vmop_CF1E4_%02d", op);
+        snprintf(name, sizeof name, "ObjScript_CF1E4 op %2d", op);
+        bad += run(name, pfx, ObjScript_CF1E4, rom);
+    }
     /* every movement mode forced: F3_POKEA0B=20=<mode> (CF4B8 dispatches on obj+0x20) */
     for (int op = 0; op < 29; op++) {
         char pfx[64], name[32];

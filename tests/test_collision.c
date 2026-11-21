@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < pairs; i++) {
         const uint8_t *pre = cap + (size_t)i * 2 * F3_WRAM_SIZE, *post = pre + F3_WRAM_SIZE;
         memcpy(work, pre, F3_WRAM_SIZE);
-        f3mem_t m = { work, NULL, NULL, NULL };
+        f3mem_t m = { work, NULL, NULL, NULL, NULL };
         Task_Collision_Body(&m);
         /* ignore the task's own stack (registers saved by the trap) */
         int diffs = 0;

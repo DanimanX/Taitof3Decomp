@@ -15,7 +15,7 @@ static int run(const char *pfx, int *total)
     for (int i = 0; i < c.pairs; i++) {
         memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
         memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
-        f3mem_t m = { w, rom, NULL, s };
+        f3mem_t m = { w, rom, NULL, s, NULL };
         uint32_t obj = c.pre[i][CR_A0], cur = rd32(&m, SPR_CURSOR);
         if (rd32(&m, rd32(&m, obj + 0x10)) == 0x00010001u) single++; else { multi++; flips[rd8(&m, obj + 0x1C) & 3]++; }
         Obj_DrawSprite(&m, obj);

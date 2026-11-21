@@ -93,7 +93,8 @@ Drafts by agy (Gemini), verified here with per-object captures (`F3_COND="a1==<f
 | 0x0CABF4 | Obj_CABF4_Tick | VERIFIED (MAME) | 300/300 ticks (no state changes seen) |
 | 0x0CF1E4 | ObjScript_CF1E4 (object script interpreter, 6-byte opcodes at obj+0x44) | VERIFIED (all 29 opcodes) | `src/objects/objscript_CF1E4.c`; 20/20 natural calls + every opcode forced through a synthetic script at 0x41E000 (always-zero RAM) via `F3_POKE32`/`F3_POKEA0B=44..47` (3/3 each; jump-back ops 17/24/25 with offset 0) |
 | 0x0CF4B8 | ObjScript_CF4B8 (per-frame movement step, dispatch on mode obj+0x20, table 0xCF4C8; takes caller A1 = aim offset) | VERIFIED (all 29 modes) | 300/300 natural calls + every mode forced with `F3_POKEA0B=20=<mode>` (6/6 each). The 51-way scale table 0xD4F26 is modelled as a multiply and only verified for the speeds seen |
-| 0x0EAD28 | (enemy using the script VMs) | TODO | redo the agy draft now that the VMs are exposed in headers |
+| 0x0EAD28 | Obj_EAD28_Tick (formation enemy using the script VMs; aims and fires at the nearer player) | VERIFIED (MAME) | 202/202 ticks incl. 4 deaths and 2 spawns. Draft by codewhale (agy auth expired, hermes out of context); fire decision 0xD09B8, angle helper 0xD0E52 table index, 0xD0C9E table base and the death tails 0xCEE48..0xCEEEE (A0 vs A1, live D0 low-byte spawn arg) fixed by Claude |
+| 0x1027B4 / 0x102860 | Obj_1027B4_Tick / Obj_102860_Tick | VERIFIED (MAME) | 114/114 ticks each; drafts by hermes |
 
 Delegation workflow: `scripts/export_bundle.sh <addr>` writes `work/disasm/bundle_<addr>.s` (flow-following disassembly incl. callees and PC-relative jump tables, stopping at routines declared in `src/**/*.h`) → agy drafts the C → `F3_SPR=1 F3_COND="a1==<addr>" scripts/capture_fn.sh 104EE 104F0 300 work/ram/obj_<ADDR>` → `tests/test_objects.c`.
 

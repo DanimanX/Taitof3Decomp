@@ -8,6 +8,9 @@
 #include "../src/player/player_shot.h"
 #include "../src/enemy/obj_D9116.h"
 #include "../src/enemy/obj_CABF4.h"
+#include "../src/enemy/obj_EAD28.h"
+#include "../src/enemy/obj_1027B4.h"
+#include "../src/enemy/obj_102860.h"
 #include "../src/objects/objscript_CF1E4.h"
 #include "../src/objects/objscript_CF4B8.h"
 
@@ -57,6 +60,9 @@ int main(void)
     bad += run("PlayerShot 0x0C9C6A", "work/ram/obj_C9C6A", Obj_PlayerShot_Tick, rom);
     bad += run("Obj 0x0D9116", "work/ram/obj_D9116", Obj_D9116_Tick, rom);
     bad += run("Obj 0x0CABF4", "work/ram/obj_CABF4", Obj_CABF4_Tick, rom);
+    bad += run("Obj 0x0EAD28", "work/ram/obj_EAD28", Obj_EAD28_Tick, rom);
+    bad += run("Obj 0x1027B4", "work/ram/obj_1027B4", Obj_1027B4_Tick, rom);
+    bad += run("Obj 0x102860", "work/ram/obj_102860", Obj_102860_Tick, rom);
     /* captured with F3_EXIT=ret at the routine entry */
     bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
     bad += run_a1("ObjMove 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);

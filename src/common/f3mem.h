@@ -10,10 +10,13 @@
 #define F3_WRAM_BASE  0x400000u
 #define F3_WRAM_SIZE  0x020000u
 #define F3_A5         0x408000u  /* global base register */
+#define F3_DPRAM_BASE 0xC00000u  /* sound DPRAM (MB8421, 8-bit) */
+#define F3_DPRAM_SIZE 0x000800u
 
 typedef struct {
     uint8_t *wram;        /* F3_WRAM_SIZE bytes, big-endian */
     const uint8_t *rom;   /* F3_ROM_SIZE bytes, big-endian */
+    uint8_t *dpram;       /* optional, F3_DPRAM_SIZE bytes */
 } f3mem_t;
 
 uint8_t  *f3_ptr(const f3mem_t *m, uint32_t addr); /* abort()s outside RAM/ROM */

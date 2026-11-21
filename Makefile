@@ -1,12 +1,13 @@
 CC ?= cc
 CFLAGS ?= -std=c11 -O2 -Wall -Wextra -Werror
-SRC = src/kernel/rng.c src/io/input.c src/common/f3mem.c src/player/player_move.c src/collision/collision.c
+SRC = src/kernel/rng.c src/io/input.c src/common/f3mem.c src/player/player_move.c src/collision/collision.c src/audio/sound_cmd.c
 
 .PHONY: test clean
-test: build/test_kernel build/test_player build/test_collision
+test: build/test_kernel build/test_player build/test_collision build/test_sound
 	./build/test_kernel
 	./build/test_player
 	./build/test_collision
+	./build/test_sound
 
 build/test_kernel: tests/test_kernel.c $(SRC) src/kernel/rng.h src/io/input.h
 	@mkdir -p build
@@ -19,6 +20,10 @@ build/test_player: tests/test_player.c $(SRC) src/common/f3mem.h src/player/play
 build/test_collision: tests/test_collision.c $(SRC) src/collision/collision.h
 	@mkdir -p build
 	$(CC) $(CFLAGS) -o $@ tests/test_collision.c $(SRC)
+
+build/test_sound: tests/test_sound.c $(SRC) src/audio/sound_cmd.h
+	@mkdir -p build
+	$(CC) $(CFLAGS) -o $@ tests/test_sound.c $(SRC)
 
 clean:
 	rm -rf build

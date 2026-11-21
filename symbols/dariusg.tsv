@@ -64,7 +64,13 @@
 001070	func	Sprite_InitBuffers	0	both SPRITE_RAM banks: headers, sentinels
 00117E	func	Sprite_ClearAll	0	clear sprite entries + list pointers
 0014DA	func	Pal_LoadDefault	0	default palette blocks
+003960	func	Sound_ResetDpram	0	clear DPRAM, cmd table ptr = 0x64E8, unmute
+003998	func	Sound_WriteScratch	0	copy length-prefixed bytes at A5-0x13C2 into DPRAM ring
+0039B8	func	Sound_WriteBytes	0	A0 length-prefixed bytes -> DPRAM ring, updates C00480
 0039D8	func	Sound_PlayCmd	0	(cmd.w) -> DPRAM unless sound_mute
+003B4E	func	Sound_CopyToRing	0	A0 length-prefixed bytes -> ring at D1 (&0x3FF)
+003B66	func	Sound_PlayCmdForced	0	(cmd.w) like Sound_PlayCmd without mute/limit checks
+003C12	func	Sound_StopAllPart2	0	alt entry of Sound_StopAll: per-channel volume resend only
 003C24	func	Sound_StopAll	0	stop all sound slots
 003CBA	func	Sound_SetVolume	0	4 bytes -> DPRAM 0xC007F8..FB
 004146	code	Task_GameMain	0	slot 1 during gameplay (GUESS name); entry is mid-function (0x4088 body)
@@ -97,6 +103,7 @@
 406BB4	data	game_flags_next	1	latched into game_flags each frame
 406BB5	data	game_flags	1	bit0 game over, bit1 pause objects, bit7 ENJOY
 406BB6	data	boot_sys_switches	1	bits 7,6 = boot state of test/service
+406BB8	data	sound_cmd_table	4	ptr to ROM table of 0x9A cmd byte-strings (0x64E8)
 406BBC	data	sound_mute	1	gates Sound_PlayCmd
 406C54	data	eeprom_image	32	starts with 'TAITO'
 409D38	data	start_player	2	0 = P1, 1 = P2

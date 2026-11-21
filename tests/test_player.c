@@ -58,7 +58,7 @@ static int run_pairs(const uint8_t *rom, const char *pairs_path, const char *pha
         if (k == 4) continue;
         memcpy(work, pre, F3_WRAM_SIZE);
         memcpy(work + OFF(0x40221C), post + OFF(0x40221C), 24);
-        f3mem_t m = { work, rom }, mp = { (uint8_t *)post, rom };
+        f3mem_t m = { work, rom, NULL }, mp = { (uint8_t *)post, rom, NULL };
         if ((int16_t)rd16(&m, P + 0x4C) < 0 || (rd8(&m, P + PS_FLAGS) & 1) ||
             rd8(&mp, P + PS_FLAGS) != rd8(&m, P + PS_FLAGS)) { ext[k]++; continue; }
         /* Note: shake frames consume RNG and match bit-exactly from pre's
@@ -100,7 +100,7 @@ int main(int argc, char **argv)
     if (!rom || !cap) { printf("player: SKIP (need %s and %s)\n", rom_path, cap_path); return 0; }
     int frames = (int)(cl / F3_WRAM_SIZE);
     uint8_t *work = malloc(F3_WRAM_SIZE);
-    f3mem_t m = { work, rom };
+    f3mem_t m = { work, rom, NULL };
     static const uint32_t fields[] = { PS_POS_X, PS_POS_Y, PS_BANK, PS_HP };
     static const char *fname[] = { "pos_x", "pos_y", "bank", "hp" };
     int rc = 0;
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
             /* only frames where the player object ticks normally: alive & unlocked */
             if ((int16_t)rd16(&m, P + 0x4C) < 0 || (rd8(&m, P + PS_FLAGS) & 1)) { skipped++; continue; }
             {
-                f3mem_t mp = { (uint8_t *)post, rom };
+                f3mem_t mp = { (uint8_t *)post, rom, NULL };
                 if ((int32_t)rd32(&mp, P + PS_HP) < (int32_t)rd32(&m, P + PS_HP) ||
                     rd8(&mp, P + PS_FLAGS) != rd8(&m, P + PS_FLAGS)) { ext_dmg++; continue; }
                 if ((int16_t)rd16(&m, P + PS_INVULN) >= 150) { flyin++; continue; }
@@ -123,7 +123,7 @@ int main(int argc, char **argv)
             int good = 1;
             for (int k = 0; k < 4; k++) {
                 uint32_t got = rd32(&m, P + fields[k]);
-                f3mem_t mp = { (uint8_t *)post, rom };
+                f3mem_t mp = { (uint8_t *)post, rom, NULL };
                 uint32_t want = rd32(&mp, P + fields[k]);
                 if (got != want) {
                     good = 0;

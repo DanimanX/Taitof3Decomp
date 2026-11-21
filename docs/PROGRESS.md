@@ -22,7 +22,7 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 | 0x010172 | Task0_Main | flow | MAPPED | boot → attract ↔ game ↔ test mode supervisor, see docs/GAME_FLOW.md |
 | 0x0050DC | Eeprom_VerifyOrInit | io | MAPPED | 'TAITO' magic |
 | 0x004D06 | Eeprom_UnpackSettings | io | MAPPED | free play, auto start, volume, ... |
-| 0x0039D8 | Sound_PlayCmd | audio | MAPPED | |
+| 0x0039D8 | Sound_PlayCmd | audio | VERIFIED (MAME, exact pre/post incl. DPRAM) | `src/audio/sound_cmd.c`; all 154 command ids forced via `F3_SWEEP` (types 0/2/3; types 1/4 unused by the table) + 100 natural calls |
 | 0x010000 | Reset | boot | MAPPED | HW init, `lea $408000,A5`, → 0x402 POST |
 | 0x000402 | (POST) | boot | TODO | LINE_RAM/RAM test loop, error screen |
 | 0x001DB8 | Kernel_ColdBoot | kernel | MAPPED | spawns Task0_Main @0x10172 |
@@ -43,7 +43,7 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 | 0x0C63F2..0x0C6630 | Task_Collision body (Coll_PlayerShotsVsEnemies, Coll_PlayersVsHazards, Coll_ResetLists, Terrain_SyncScroll) | collision | VERIFIED (MAME, exact pre/post) | `src/collision/collision.c`; 300/300 debugger-captured pairs bit-exact over all Work RAM; 35 shot hits, 1 hazard hit, 20 bomb hits exercised |
 | 0x0D0E04 | Score_OnHit | player | MAPPED | writer of score verified by tap |
 | 0x0047E8.. / 0x00092A.. | EEPROM 93C46 bit-bang | io | TODO | from sweep A |
-| 0x00396C..0x003CDA | Sound DPRAM interface | audio | TODO | clear 0x397A, cmd slots C00000-34 (0x3B58), handshake C00480/C007F8 |
+| 0x003960..0x003CDE | Sound DPRAM interface (ResetDpram, PlayCmdForced, StopAll, SetVolume) | audio | DECOMPILED | `src/audio/sound_cmd.c`; PlayCmdForced 2/2, StopAll 2/2, StopAllPart2 1/1 captured calls bit-exact (rare in gameplay: low coverage); ResetDpram/SetVolume not yet captured. Ring = DPRAM 0x000-0x3FF, C00480 = write idx*2, C00482 = sound-CPU read idx |
 
 ## Task map (docs/GAME_FLOW.md)
 

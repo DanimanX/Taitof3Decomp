@@ -2,6 +2,7 @@
 # --- kernel / interrupts (ROM 0x1A00-0x2400), see docs/KERNEL.md ---
 0015D0	func	Fx_StartA	0	(D0 id) timed effect from table 0x16890[id%6]: ptr -> A5-0x5DEC, timer = dur+1
 0015EC	func	Fx_StartB	0	(D0 id) same with table 0x168C0[id%8], mode 1
+001282	func	Obj_DrawSprite	0	A0 obj -> 16-byte F3 sprite entries at cursor A5-0xCA0 (def ptr +0x10, flip +0x1C, colour +0x1D, zoom +0x1E)
 001A0E	func	Kernel_FrameTick	0	per-frame system update: scroll upload, input poll, 0DFA,161E,0BF6, frame++
 001A66	code	Kernel_EnterTick_thunk	0	jmp Kernel_Preempt
 001A72	func	Kernel_IdleHook	0	called from idle loop; advances RNG
@@ -172,3 +173,4 @@
 40B30C	data	tl_scroll_pos	4	stage scroll position 16.16
 40B310	data	tl_scroll_speed	4	16.16 per frame
 40B314	data	tl_last_pos	2	integer scroll pos seen last frame
+407360	data	sprite_cursor	4	next free sprite RAM entry (0x600000..)

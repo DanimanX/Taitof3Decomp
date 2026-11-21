@@ -78,8 +78,16 @@ Other spawn entries from `scripts/find_spawns.py` (spawned by sub-tasks, TODO): 
 | 0x0015D0 / 0x0015EC | Fx_StartA / Fx_StartB | VERIFIED (A, via above) / DECOMPILED (B) | timed-effect tables 0x16890 / 0x168C0 |
 | 0x13F342.. | stage-end sequence (boss warning spawns into group 11, waits, Fx_StartA(5)) | MAPPED | |
 
+## Video
+| addr | name | status | notes |
+|---|---|---|---|
+| 0x001282 | Obj_DrawSprite | VERIFIED (MAME, Work RAM + sprite RAM) | `src/video/sprite.c`; 400/400 natural + flip modes 1/2/3 forced (`F3_POKEA0B=1C=0n`) 150/150 each |
+
+## Ghidra coverage
+- `scripts/ghidra/obj_states.py` discovers object tick routines referenced only as immediates (`move.l #fn,(A0)`, `move.l #fn,-(SP)` before `jsr Obj_Spawn`) plus the ones observed in MAME (`traces/obj_ticks.txt`, 58 addresses from pool-runner logs). Clean bootstrap: 583 → 2527 functions; 58/58 observed tick routines are functions.
+
 ## Verification tooling
-- `scripts/capture_fn.sh <entry> <exit> <n> <prefix>`: MAME debugger breakpoints (headless `-debug -debugger none`) dump Work RAM + registers exactly at a code region's entry/exit → golden pre/post pairs for any routine. Options: `F3_DPRAM` (sound DPRAM), `F3_SWEEP`/`F3_SWEEP_BASE` (force the word arg), `F3_POKE32` (force RAM at entry), `F3_LOG` (log registers at inner PCs, e.g. indirect calls).
+- `scripts/capture_fn.sh <entry> <exit> <n> <prefix>`: MAME debugger breakpoints (headless `-debug -debugger none`) dump Work RAM + registers exactly at a code region's entry/exit → golden pre/post pairs for any routine. Options: `F3_DPRAM` (sound DPRAM), `F3_SWEEP`/`F3_SWEEP_BASE` (force the word arg), `F3_POKE32` (force RAM at entry), `F3_LOG` (log registers at inner PCs, e.g. indirect calls), `F3_COND` (conditional entry, e.g. `a1==102fe6` at the pool call site 0x104EE to capture one object routine), `F3_SPR` (sprite RAM), `F3_POKEA0B` (byte pokes relative to A0). Tests share `tests/capture.h`.
 
 ## Known caveats
 - Ghidra auto-analysis creates pointers over code reached only via `pea` (task entries); `fix_flow.py` must run after `apply_symbols.py` (bootstrap does this).

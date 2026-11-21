@@ -3,6 +3,7 @@
 -- Env:
 --   F3_ENTRY   hex PC where "pre" is taken   (e.g. C63F2)
 --   F3_EXIT    hex PC(s) where "post" is taken, comma-separated (e.g. C63F0)
+--   F3_SPR     "1" also dumps sprite RAM 0x600000-0x60FFFF to <prefix>_spr.bin
 --   F3_DPRAM   "1" also dumps the 2 KiB sound DPRAM (0xC00000) to <prefix>_dpram.bin
 --   F3_SAMPLES number of pre/post pairs       (default 300)
 --   F3_OUT     output prefix (default work/ram/fn) -> <prefix>_pairs.bin, <prefix>_regs.tsv
@@ -13,6 +14,9 @@
 --              written to <prefix>_regs.tsv as which="log" (no RAM dump)
 --   F3_POKE32  "addr=val,addr=val" (hex) 32-bit writes applied at each entry
 --              before the pre dump (force rare branches)
+--   F3_COND    MAME debugger condition on the entry breakpoint, e.g.
+--              "a1==102fe6" (capture one object routine at the tick call site)
+--   F3_POKEA0B "off=val,..." (hex) byte writes at A0+off at each entry
 --   F3_INPUT   "fire" = P1 autofire + sweeping joystick (default), "none"
 local ROOT = "/PROCESOS/Taitof3Decomp"
 local entry = tonumber(os.getenv("F3_ENTRY"), 16)
@@ -23,6 +27,8 @@ local logs = {}
 for h in string.gmatch(os.getenv("F3_LOG") or "", "[^,]+") do logs[tonumber(h, 16)] = true end
 local pokes = {}
 for a, v in string.gmatch(os.getenv("F3_POKE32") or "", "(%x+)=(%x+)") do pokes[#pokes + 1] = {tonumber(a, 16), tonumber(v, 16)} end
+local pokesa0 = {}
+for o, v in string.gmatch(os.getenv("F3_POKEA0B") or "", "(%x+)=(%x+)") do pokesa0[#pokesa0 + 1] = {tonumber(o, 16), tonumber(v, 16)} end
 local sweep = tonumber(os.getenv("F3_SWEEP") or "0")
 local sweep_base = tonumber(os.getenv("F3_SWEEP_BASE") or "0")
 local want = tonumber(os.getenv("F3_SAMPLES") or "300")
@@ -35,10 +41,11 @@ local p = manager.machine.ioport.ports
 local out = assert(io.open(prefix .. "_pairs.bin", "wb"))
 local regs = assert(io.open(prefix .. "_regs.tsv", "w"))
 regs:write("pair\twhich\tframe\tD0\tD1\tD2\tD3\tD4\tD5\tD6\tD7\tA0\tA1\tA2\tA3\tA4\tA5\tA6\tSP\n")
-cpu.debug:bpset(entry, "", "")
+cpu.debug:bpset(entry, os.getenv("F3_COND") or "", "")
 for pc, _ in pairs(exits) do cpu.debug:bpset(pc, "", "") end
 for pc, _ in pairs(logs) do cpu.debug:bpset(pc, "", "") end
 local dp = want_dpram and assert(io.open(prefix .. "_dpram.bin", "wb")) or nil
+local spf = os.getenv("F3_SPR") == "1" and assert(io.open(prefix .. "_spr.bin", "wb")) or nil
 local function dump()
   local t = {}
   for a = 0x400000, 0x41FFFF, 4 do t[#t + 1] = string.pack(">I4", sp:read_u32(a)) end
@@ -47,6 +54,11 @@ local function dump()
     local d = {}
     for a = 0xC00000, 0xC007FF do d[#d + 1] = string.char(sp:read_u8(a)) end
     dp:write(table.concat(d))
+  end
+  if spf then
+    local t2 = {}
+    for a = 0x600000, 0x60FFFF, 4 do t2[#t2 + 1] = string.pack(">I4", sp:read_u32(a)) end
+    spf:write(table.concat(t2))
   end
 end
 local function regline(i, which)
@@ -62,16 +74,17 @@ emu.register_periodic(function()
   local pc = cpu.state["PC"].value
   if pc == entry and not have_pre then
     for _, pv in ipairs(pokes) do sp:write_u32(pv[1], pv[2]) end
+    for _, pv in ipairs(pokesa0) do sp:write_u8(cpu.state["A0"].value + pv[1], pv[2]) end
     if sweep > 0 then sp:write_u16(cpu.state["SP"].value + 4, sweep_base + pairs_done % sweep) end
     dump(); regline(pairs_done, "pre"); have_pre = true
   elseif logs[pc] and have_pre then
     regline(pairs_done, "log")
   elseif exits[pc] and have_pre then
     dump(); regline(pairs_done, "post"); have_pre = false
-    out:flush(); regs:flush(); if dp then dp:flush() end
+    out:flush(); regs:flush(); if dp then dp:flush() end; if spf then spf:flush() end
     pairs_done = pairs_done + 1
     if pairs_done >= want then
-      out:close(); regs:close(); if dp then dp:close() end; print("CAPTURE DONE pairs=" .. pairs_done); manager.machine:exit(); return
+      out:close(); regs:close(); if dp then dp:close() end; if spf then spf:close() end; print("CAPTURE DONE pairs=" .. pairs_done); manager.machine:exit(); return
     end
   end
   dbg.execution_state = "run"

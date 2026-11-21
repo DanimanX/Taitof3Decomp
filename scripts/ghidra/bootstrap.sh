@@ -21,6 +21,7 @@ L="$G/Ghidra/Features/PyGhidra/support/pyghidra_launcher.py"
 # (e.g. Task0_Main 0x10172, only referenced via pea) that hit the conflicts.
 "$PY" "$L" "$G" -H "$PROJDIR" "$PROJNAME" -process maincpu.bin -noanalysis \
   -scriptPath "$ROOT/scripts/ghidra" \
-  -postScript apply_symbols.py -postScript import_traces.py -postScript fix_flow.py \
+  -postScript apply_symbols.py -postScript import_traces.py -postScript fix_flow.py -postScript obj_states.py -postScript fix_flow.py \
+  -postScript obj_states.py -postScript fix_flow.py -postScript obj_states.py -postScript fix_flow.py \
   -postScript apply_types.py \
   -postScript report_taito_f3.py

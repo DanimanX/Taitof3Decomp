@@ -55,7 +55,7 @@ static int run(const char *pfx, int routine, const uint8_t *rom, int *n)
         const uint8_t *dpre = dp + (size_t)i * 2 * F3_DPRAM_SIZE, *dpost = dpre + F3_DPRAM_SIZE;
         memcpy(work, pre, F3_WRAM_SIZE);
         memcpy(dwork, dpre, F3_DPRAM_SIZE);
-        f3mem_t m = { work, (uint8_t *)rom, dwork };
+        f3mem_t m = { work, (uint8_t *)rom, dwork, NULL };
         int16_t cmd = (int16_t)rd16(&m, sp[i] + 4);
         if (routine == R_PLAY && cmd >= 0 && cmd <= (int16_t)rd16(&m, 0x6750) && !rd8(&m, F3_A5 - 0x1444)) {
             uint8_t t = rd8(&m, rd32(&m, rd32(&m, F3_A5 - 0x1448) + 4u * (uint32_t)cmd));

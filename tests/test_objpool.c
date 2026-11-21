@@ -88,7 +88,7 @@ static int test(const char *pfx, int kind, int *npairs, int *extra)
     for (int i = 0; i < pairs; i++) {
         const uint8_t *pre = cap + (size_t)i * 2 * F3_WRAM_SIZE, *post = pre + F3_WRAM_SIZE;
         memcpy(work, pre, F3_WRAM_SIZE);
-        f3mem_t m = { work, NULL, NULL };
+        f3mem_t m = { work, NULL, NULL, NULL };
         uint32_t sp = r[i].pre[R_SP];
         int d = 0;
         if (kind == 0) {

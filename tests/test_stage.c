@@ -47,7 +47,7 @@ static int run_one(const char *pfx)
     for (int i = 0; i < pairs; i++) {
         const uint8_t *pre = cap + (size_t)i * 2 * F3_WRAM_SIZE, *post = pre + F3_WRAM_SIZE;
         memcpy(work, pre, F3_WRAM_SIZE);
-        f3mem_t m = { work, rom, NULL };
+        f3mem_t m = { work, rom, NULL, NULL };
         uint16_t before = rd16(&m, TL_LAST_POS);
         uint8_t fx_before = rd8(&m, TL_FX_STARTED);
         ends += StageTimeline_Step(&m, &spawned);

@@ -1,7 +1,7 @@
 # Taitof3Decomp — Taito F3 Arcade Decompilation Project
 
 <p align="center">
-  <img src="docs/assets/banner.png" alt="Taito F3 Decompilation Project Banner" width="100%" />
+  <img src="docs/assets/banner_darius_90s.png" alt="Taito F3 Decompilation Project Banner" width="100%" />
 </p>
 
 <p align="center">

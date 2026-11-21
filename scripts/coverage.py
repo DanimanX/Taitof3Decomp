@@ -20,6 +20,11 @@ for ln in open(f"{ROOT}/work/functions.tsv"):
 dec = set()
 for f in glob.glob(f"{ROOT}/src/**/*.[ch]", recursive=True):
     dec |= {int(x, 16) for x in re.findall(r"ROM 0x([0-9A-Fa-f]{4,6})", open(f).read())}
+# stubs (integrated so workers can fill them) are not decompiled
+for f in glob.glob(f"{ROOT}/src/enemy/obj_*.c"):
+    if "(stub)" in open(f).read():
+        dec -= {int(x, 16) for x in re.findall(r"ROM 0x([0-9A-Fa-f]{4,6})", open(f).read())}
+        dec -= {int(os.path.basename(f)[4:-2], 16)}
 ver = set()
 for ln in open(f"{ROOT}/docs/PROGRESS.md"):
     if "VERIFIED" in ln and ln.startswith("|"):

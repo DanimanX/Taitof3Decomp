@@ -4,4 +4,5 @@
 /* Object tick routine (A0 = obj). Returns 0, or -1 when it reaches a ROM
  * path not decompiled yet (no side effects of that path are applied). */
 int Obj_112C3C_Tick(const f3mem_t *m, uint32_t obj); /* ROM 0x112C3C */
+void Obj_113400_FollowParent(const f3mem_t *m, uint32_t obj); /* ROM 0x113400: position = parent + offset (+0x52,+0x54), mirrored when parent flag bit3 */
 #endif

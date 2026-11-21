@@ -37,9 +37,9 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 | 0x001A78 | IO_PollInputs | io | MAPPED | |
 | 0x001B8E | IO_EdgeDetect | io | VERIFIED (truth table) | `src/io/input.c` |
 | 0x001C90 | Video_UploadScroll | video | MAPPED | |
-| 0x0C691A | Player_MoveAndBounds | player | VERIFIED (MAME) | `src/player/player_move.c`; 301/301 gameplay frames bit-exact (pos 16.16, bank, hp) vs per-frame RAM capture. Terrain-hit/recoil/shake branches not yet exercised by a capture |
+| 0x0C691A | Player_MoveAndBounds | player | VERIFIED (MAME, all branches) | `src/player/player_move.c`; 301/301 natural frames + forced-branch pairs (`scripts/lua/session_branches.lua`): shake 95/95, terrain shield-break 98/98, terrain recoil 100/100 |
 | 0x0CBE12 | Obj_MoveByAngle | player | VERIFIED (via above) | sin table 0x27E40, cos = +0x80 |
-| 0x0C6632 | Terrain_TestPoint | collision | DECOMPILED | `src/player/player_move.c`; not yet hit in captures |
+| 0x0C6632 | Terrain_TestPoint | collision | VERIFIED (via above) | forced full bitmap only; per-bit addressing not yet exercised with a real stage map |
 | 0x0C6446 / 0x0C64FC | Coll_* | collision | MAPPED | AABB lists |
 | 0x0D0E04 | Score_OnHit | player | MAPPED | writer of score verified by tap |
 | 0x0047E8.. / 0x00092A.. | EEPROM 93C46 bit-bang | io | TODO | from sweep A |

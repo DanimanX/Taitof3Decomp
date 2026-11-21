@@ -11,7 +11,7 @@ enum { CR_D0 = 0, CR_A0 = 8, CR_A1 = 9, CR_SP = 15, CR_N = 16 };
 
 typedef struct {
     int pairs;
-    uint8_t *wram, *dpram, *spr;   /* pre,post interleaved per pair */
+    uint8_t *wram, *dpram, *spr, *gfx;   /* pre,post interleaved per pair */
     uint32_t (*pre)[CR_N], (*post)[CR_N];
 } capture_t;
 
@@ -39,6 +39,8 @@ static inline int cap_load(capture_t *c, const char *pfx)
     if ((c->dpram = cap_slurp(p, &l)) && l / (2 * F3_DPRAM_SIZE) < c->pairs) c->pairs = (int)(l / (2 * F3_DPRAM_SIZE));
     snprintf(p, sizeof p, "%s_spr.bin", pfx);
     if ((c->spr = cap_slurp(p, &l)) && l / (2 * F3_SPR_SIZE) < c->pairs) c->pairs = (int)(l / (2 * F3_SPR_SIZE));
+    snprintf(p, sizeof p, "%s_gfx.bin", pfx);
+    if ((c->gfx = cap_slurp(p, &l)) && l / (2 * F3_GFX_SIZE) < c->pairs) c->pairs = (int)(l / (2 * F3_GFX_SIZE));
     c->pre = calloc((size_t)c->pairs + 1, sizeof *c->pre);
     c->post = calloc((size_t)c->pairs + 1, sizeof *c->post);
     snprintf(p, sizeof p, "%s_regs.tsv", pfx);
@@ -63,8 +65,11 @@ static inline const uint8_t *cap_wram(const capture_t *c, int i, int post)
 static inline const uint8_t *cap_spr(const capture_t *c, int i, int post)
 { return c->spr ? c->spr + ((size_t)i * 2 + (size_t)post) * F3_SPR_SIZE : NULL; }
 
+static inline const uint8_t *cap_gfx(const capture_t *c, int i, int post)
+{ return c->gfx ? c->gfx + ((size_t)i * 2 + (size_t)post) * F3_GFX_SIZE : NULL; }
+
 static inline void cap_free(capture_t *c)
-{ free(c->wram); free(c->dpram); free(c->spr); free(c->pre); free(c->post); }
+{ free(c->wram); free(c->dpram); free(c->spr); free(c->gfx); free(c->pre); free(c->post); }
 
 /* byte diff of a region, printing up to *budget mismatches; skip [lo,hi) */
 static inline int cap_diff(const char *tag, int pair, uint32_t base, const uint8_t *got,

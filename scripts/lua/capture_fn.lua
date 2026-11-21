@@ -6,6 +6,7 @@
 --              or "ret": post at the return address of the entry call
 --              (entry must be the first instruction of a jsr/bsr target)
 --   F3_SPR     "1" also dumps sprite RAM 0x600000-0x60FFFF to <prefix>_spr.bin
+--   F3_GFX     "1" also dumps playfield/text/char/line RAM 0x610000-0x62FFFF to <prefix>_gfx.bin
 --   F3_DPRAM   "1" also dumps the 2 KiB sound DPRAM (0xC00000) to <prefix>_dpram.bin
 --   F3_SAMPLES number of pre/post pairs       (default 300)
 --   F3_OUT     output prefix (default work/ram/fn) -> <prefix>_pairs.bin, <prefix>_regs.tsv
@@ -67,6 +68,7 @@ for pc, _ in pairs(exits) do cpu.debug:bpset(pc, "", "") end
 for pc, _ in pairs(logs) do cpu.debug:bpset(pc, "", "") end
 local dp = want_dpram and assert(io.open(prefix .. "_dpram.bin", "wb")) or nil
 local spf = os.getenv("F3_SPR") == "1" and assert(io.open(prefix .. "_spr.bin", "wb")) or nil
+local gff = os.getenv("F3_GFX") == "1" and assert(io.open(prefix .. "_gfx.bin", "wb")) or nil
 -- snapshot() returns the dumps as strings; pairs are written only when the
 -- post is reached, so an abandoned pre (routine left without returning)
 -- never desynchronises the output files.
@@ -84,12 +86,18 @@ local function snapshot()
     for a = 0x600000, 0x60FFFF, 4 do t2[#t2 + 1] = string.pack(">I4", sp:read_u32(a)) end
     snap.s = table.concat(t2)
   end
+  if gff then
+    local t3 = {}
+    for a = 0x610000, 0x62FFFF, 4 do t3[#t3 + 1] = string.pack(">I4", sp:read_u32(a)) end
+    snap.g = table.concat(t3)
+  end
   return snap
 end
 local function emit(snap)
   out:write(snap.w)
   if dp then dp:write(snap.d) end
   if spf then spf:write(snap.s) end
+  if gff then gff:write(snap.g) end
 end
 local function regline_str(i, which)
   local r = {}
@@ -103,7 +111,7 @@ local scr0 = nil
 local pre_snap, pre_regs, pending_logs, abandoned = nil, nil, {}, 0
 local maxframes = tonumber(os.getenv("F3_MAXFRAMES") or "6000")
 local function finish(tag)
-  out:close(); regs:close(); if dp then dp:close() end; if spf then spf:close() end
+  out:close(); regs:close(); if dp then dp:close() end; if spf then spf:close() end; if gff then gff:close() end
   print(string.format("CAPTURE %s pairs=%d abandoned=%d frames=%d screen=%d", tag, pairs_done, abandoned, n, manager.machine.screens[":screen"]:frame_number() - scr0)); manager.machine:exit()
 end
 emu.register_periodic(function()
@@ -136,7 +144,7 @@ emu.register_periodic(function()
     if ret_bp then cpu.debug:bpclear(ret_bp); ret_bp = nil; ret_pc = nil end
     emit(pre_snap); regs:write(pre_regs); regs:write(table.concat(pending_logs))
     emit(snapshot()); regs:write(regline_str(pairs_done, "post")); have_pre = false
-    out:flush(); regs:flush(); if dp then dp:flush() end; if spf then spf:flush() end
+    out:flush(); regs:flush(); if dp then dp:flush() end; if spf then spf:flush() end; if gff then gff:flush() end
     pairs_done = pairs_done + 1
     if pairs_done >= want then finish("DONE"); return end
   end

@@ -251,12 +251,13 @@ static int run_any(const char *name, const char *pfx, tick_fn fn, tick_a1_fn fn_
 {
     capture_t c;
     if (cap_load(&c, pfx) || !c.spr) { printf("objects: %-22s SKIP (no %s)\n", name, pfx); return 0; }
-    uint8_t *w = malloc(F3_WRAM_SIZE), *s = malloc(F3_SPR_SIZE);
+    uint8_t *w = malloc(F3_WRAM_SIZE), *s = malloc(F3_SPR_SIZE), *g = c.gfx ? malloc(F3_GFX_SIZE) : NULL;
     int ok = 0, unimpl = 0, budget = 8, died = 0, freed = 0;
     for (int i = 0; i < c.pairs; i++) {
         memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
         memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
-        f3mem_t m = { w, (uint8_t *)rom, NULL, s };
+        if (g) memcpy(g, cap_gfx(&c, i, 0), F3_GFX_SIZE);
+        f3mem_t m = { w, (uint8_t *)rom, NULL, s, g };
         uint32_t obj = c.pre[i][CR_A0], fn0 = rd32(&m, obj);
         int r = fn ? fn(&m, obj) : fn_a1(&m, obj, c.pre[i][CR_A1]);
         if (r < 0) { unimpl++; continue; }
@@ -264,13 +265,14 @@ static int run_any(const char *name, const char *pfx, tick_fn fn, tick_a1_fn fn_
         if (memcmp(w + 0x10000 - 0, cap_wram(&c, i, 0) + 0x10000, 0x30)) freed++; /* free masks changed */
         uint32_t sp = c.pre[i][CR_SP];
         int d = cap_diff(name, i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x80, sp, &budget)
-              + cap_diff(name, i, F3_SPR_BASE, s, cap_spr(&c, i, 1), F3_SPR_SIZE, 0, 0, &budget);
+              + cap_diff(name, i, F3_SPR_BASE, s, cap_spr(&c, i, 1), F3_SPR_SIZE, 0, 0, &budget)
+              + (g ? cap_diff(name, i, F3_GFX_BASE, g, cap_gfx(&c, i, 1), F3_GFX_SIZE, 0, 0, &budget) : 0);
         ok += d == 0;
     }
     int tested = c.pairs - unimpl;
     printf("objects: %-22s %3d/%3d ticks bit-exact (%d state changes, %d alloc/free; %d reach undecompiled paths)\n",
            name, ok, tested, died, freed, unimpl);
-    free(w); free(s); cap_free(&c);
+    free(w); free(s); free(g); cap_free(&c);
     return tested - ok;
 }
 

@@ -14,12 +14,15 @@
 #define F3_DPRAM_SIZE 0x000800u
 #define F3_SPR_BASE   0x600000u  /* sprite RAM */
 #define F3_SPR_SIZE   0x010000u
+#define F3_GFX_BASE   0x610000u  /* playfield, text, character and line RAM */
+#define F3_GFX_SIZE   0x020000u
 
 typedef struct {
     uint8_t *wram;        /* F3_WRAM_SIZE bytes, big-endian */
     const uint8_t *rom;   /* F3_ROM_SIZE bytes, big-endian */
     uint8_t *dpram;       /* optional, F3_DPRAM_SIZE bytes */
     uint8_t *spr;         /* optional, F3_SPR_SIZE bytes (big-endian words) */
+    uint8_t *gfx;         /* optional, F3_GFX_SIZE bytes (0x610000-0x62FFFF) */
 } f3mem_t;
 
 uint8_t  *f3_ptr(const f3mem_t *m, uint32_t addr); /* abort()s outside RAM/ROM */

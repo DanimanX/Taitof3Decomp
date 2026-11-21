@@ -1,9 +1,9 @@
 CC ?= cc
 CFLAGS ?= -std=c11 -O2 -Wall -Wextra -Werror
-SRC = src/kernel/rng.c src/io/input.c src/common/f3mem.c src/player/player_move.c src/collision/collision.c src/audio/sound_cmd.c src/objects/obj_pool.c src/stage/stage_timeline.c src/video/sprite.c
+SRC = src/kernel/rng.c src/io/input.c src/common/f3mem.c src/player/player_move.c src/collision/collision.c src/audio/sound_cmd.c src/objects/obj_pool.c src/stage/stage_timeline.c src/video/sprite.c src/enemy/enemy_bullet.c src/player/player_shot.c
 
 .PHONY: test clean
-test: build/test_kernel build/test_player build/test_collision build/test_sound build/test_objpool build/test_stage build/test_sprite
+test: build/test_kernel build/test_player build/test_collision build/test_sound build/test_objpool build/test_stage build/test_sprite build/test_objects
 	./build/test_kernel
 	./build/test_player
 	./build/test_collision
@@ -11,6 +11,7 @@ test: build/test_kernel build/test_player build/test_collision build/test_sound 
 	./build/test_objpool
 	./build/test_stage
 	./build/test_sprite
+	./build/test_objects
 
 build/test_kernel: tests/test_kernel.c $(SRC) src/kernel/rng.h src/io/input.h
 	@mkdir -p build
@@ -39,6 +40,10 @@ build/test_stage: tests/test_stage.c $(SRC) src/stage/stage_timeline.h
 build/test_sprite: tests/test_sprite.c tests/capture.h $(SRC) src/video/sprite.h
 	@mkdir -p build
 	$(CC) $(CFLAGS) -o $@ tests/test_sprite.c $(SRC)
+
+build/test_objects: tests/test_objects.c tests/capture.h $(SRC)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -o $@ tests/test_objects.c $(SRC)
 
 clean:
 	rm -rf build

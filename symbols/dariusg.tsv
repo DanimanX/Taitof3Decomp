@@ -1,0 +1,59 @@
+# addr	kind	name	size	comment   (kind: func|code|data; size in bytes for data: 1,2,4 or array N)
+# --- kernel / interrupts (ROM 0x1A00-0x2400), see docs/KERNEL.md ---
+001A0E	func	Kernel_FrameTick	0	per-frame system update: scroll upload, input poll, 0DFA,161E,0BF6, frame++
+001A66	code	Kernel_EnterTick_thunk	0	jmp Kernel_Preempt
+001A72	func	Kernel_IdleHook	0	called from idle loop; advances RNG
+001A78	func	IO_PollInputs	0	watchdog, coin outputs, read IN0..IN5
+001B8E	func	IO_EdgeDetect	0	active-low pressed/released per channel
+001C2C	func	Video_InitScrollBase	0	fills scroll_base_tbl (normal/flipped)
+001C90	func	Video_UploadScroll	0	shadow scroll -> 0x660000..1E
+001D8A	func	Rng_Next	0	seed = seed*7+5; D0.w = seed>>16
+001DB8	code	Kernel_ColdBoot	0	load regs from 0x2328, spawn task0 @0x10172, enter idle
+001DF8	code	Sys_KillMask	0	JSR stub -> TRAP_2
+001E32	code	Sys_Exit	0	JSR stub -> TRAP_3
+001E60	code	Sys_Spawn	0	JSR stub -> TRAP_1 (entry, slot, arg) -> D0=id
+001F1A	code	Sys_Sleep	0	JSR stub -> TRAP_4 (frames) -> D0
+001F62	func	Sys_Yield	0	JSR stub -> TRAP_5
+001F96	code	Sys_WaitMask	0	JSR stub -> TRAP_7 (mask)
+001FD2	code	Sys_Recv	0	JSR stub -> TRAP_6 (sender) -> D0
+002046	code	Sys_BlockOn	0	JSR stub -> TRAP_8 (mask)
+0020B2	code	Sys_Send	0	JSR stub -> TRAP_9 (dst, msg)
+002140	code	Sys_Signal	0	JSR stub -> TRAP_10 (mask)
+0021A8	code	Sys_Wake	0	JSR stub -> TRAP_11 (dst, value)
+0021F8	code	Sys_FlushMbox	0	JSR stub -> TRAP_12 (mask)
+00222E	func	Kernel_Preempt	0	VBlank tick entry: save ctx, FrameTick, schedule
+002274	code	Kernel_Schedule	0	scan slots, tick sleeps, dispatch (rte)
+002312	code	Kernel_IdleLoop	0	idle task: IRQs on, loop IdleHook
+002328	data	Kernel_BootRegs	64	D0..A6,SP initial values (A5=0x408000, SP=0x4066B4)
+002368	data	Kernel_TaskStackTops	68	17 stack tops, 0x400 apart
+010172	func	Task0_Main	0	first task spawned by Kernel_ColdBoot
+# --- Work RAM (A5 = 0x408000) ---
+40221C	data	io_ch	24	6 x {cur, pressed, prev, released}, active-low
+402234	data	io_out_4a0004	1	coin lockout/counter shadow
+402235	data	io_out_4a0014	1	coin lockout/counter shadow P3/P4
+402242	data	scroll_base_tbl	20	10 words
+402256	data	vid_ctrl_1e_shadow	2	-> 0x66001E
+402280	data	pf_scroll_xy	32	4 PF x {X,Y} fixed point
+4022A0	data	ext_scroll_x	2	-> 0x660018
+4022A4	data	ext_scroll_y	2	-> 0x66001A
+4022A8	data	screen_flip	2	nonzero = flipped
+4022AC	data	frame_counter	2	++ per Kernel_FrameTick
+4022AE	data	irq5_counter	2	++ per IRQ5
+4022B2	data	irq2_waiting	1	VOLATILE: IRQ2<->IRQ3 handshake
+4022B3	data	irq3_ack	1	VOLATILE: IRQ2<->IRQ3 handshake
+4022B4	data	task_stacks	16384	16 x 1 KiB task stacks
+4066B4	data	idle_saved_sp	4	also initial SP top
+4066B8	data	task_saved_sp	64	16 x saved SP
+4066F8	data	in_idle	1	0xFF while idle loop runs
+4066F9	data	was_idle_at_tick	1	0 = frame overrun
+4066FA	data	cur_task	2	current task slot
+4066FC	data	task_active_mask	4	bit i = slot i alive
+406700	data	cur_saved_sp_ptr	4	-> task_saved_sp[cur] or idle_saved_sp
+406704	data	cur_status_ptr	4	-> task_status[cur]
+406708	data	task_status	64	16 x status (see docs/KERNEL.md)
+406748	data	task_wakeup_val	64	16 x value delivered in D0 on resume
+406788	data	task_mbox_empty	32	16 x sender bitmask (1 = empty)
+4067A8	data	task_mailbox	1024	messages, index 16*dst+4*src
+406BA8	data	trap_sr_tmp	2	SR temp for JSR->TRAP stubs
+406BAA	data	rng_seed	4	LCG state
+406BAE	data	no_idle	1	nonzero: never idle, loop tasks

@@ -42,3 +42,4 @@ Thumbs.db
 # Generated decompiler output (derived from ROM)
 work/decomp/
 work/disasm/
+build/

@@ -12,8 +12,9 @@
 #include "../src/objects/objscript_CF4B8.h"
 
 typedef int (*tick_fn)(const f3mem_t *, uint32_t);
+typedef int (*tick_a1_fn)(const f3mem_t *, uint32_t, uint32_t);
 
-static int run(const char *name, const char *pfx, tick_fn fn, const uint8_t *rom)
+static int run_any(const char *name, const char *pfx, tick_fn fn, tick_a1_fn fn_a1, const uint8_t *rom)
 {
     capture_t c;
     if (cap_load(&c, pfx) || !c.spr) { printf("objects: %-22s SKIP (no %s)\n", name, pfx); return 0; }
@@ -24,7 +25,8 @@ static int run(const char *name, const char *pfx, tick_fn fn, const uint8_t *rom
         memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
         f3mem_t m = { w, (uint8_t *)rom, NULL, s };
         uint32_t obj = c.pre[i][CR_A0], fn0 = rd32(&m, obj);
-        if (fn(&m, obj) < 0) { unimpl++; continue; }
+        int r = fn ? fn(&m, obj) : fn_a1(&m, obj, c.pre[i][CR_A1]);
+        if (r < 0) { unimpl++; continue; }
         if (rd32(&m, obj) != fn0) died++;   /* switched state (dying) */
         if (memcmp(w + 0x10000 - 0, cap_wram(&c, i, 0) + 0x10000, 0x30)) freed++; /* free masks changed */
         uint32_t sp = c.pre[i][CR_SP];
@@ -39,6 +41,11 @@ static int run(const char *name, const char *pfx, tick_fn fn, const uint8_t *rom
     return tested - ok;
 }
 
+static int run(const char *name, const char *pfx, tick_fn fn, const uint8_t *rom)
+{ return run_any(name, pfx, fn, NULL, rom); }
+static int run_a1(const char *name, const char *pfx, tick_a1_fn fn, const uint8_t *rom)
+{ return run_any(name, pfx, NULL, fn, rom); }
+
 int main(void)
 {
     long rl;
@@ -52,7 +59,14 @@ int main(void)
     bad += run("Obj 0x0CABF4", "work/ram/obj_CABF4", Obj_CABF4_Tick, rom);
     /* captured with F3_EXIT=ret at the routine entry */
     bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
-    bad += run("ObjScript 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);
+    bad += run_a1("ObjMove 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);
+    /* every movement mode forced: F3_POKEA0B=20=<mode> (CF4B8 dispatches on obj+0x20) */
+    for (int op = 0; op < 29; op++) {
+        char pfx[64], name[32];
+        snprintf(pfx, sizeof pfx, "work/ram/vmop_CF4B8_%02d", op);
+        snprintf(name, sizeof name, "ObjMove_CF4B8 mode %2d", op);
+        bad += run_a1(name, pfx, ObjScript_CF4B8, rom);
+    }
     free(rom);
     return bad ? 1 : 0;
 }

@@ -92,7 +92,7 @@ Drafts by agy (Gemini), verified here with per-object captures (`F3_COND="a1==<f
 | 0x0D9116 | Obj_D9116_Tick | VERIFIED (MAME) | 300/300 ticks (no state changes seen) |
 | 0x0CABF4 | Obj_CABF4_Tick | VERIFIED (MAME) | 300/300 ticks (no state changes seen) |
 | 0x0CF1E4 | ObjScript_CF1E4 (object script interpreter, 6-byte opcodes at obj+0x44) | VERIFIED (partial coverage) | `src/objects/objscript_CF1E4.c`; 20/20 calls bit-exact; first opcodes seen: 6, 9, 12, 13, 17, 20 of 29 |
-| 0x0CF4B8 | ObjScript_CF4B8 (second interpreter, table 0xCF4C8) | VERIFIED (partial coverage) | 300/300 calls; first opcodes seen: 12, 17, 19 |
+| 0x0CF4B8 | ObjScript_CF4B8 (per-frame movement step, dispatch on mode obj+0x20, table 0xCF4C8; takes caller A1 = aim offset) | VERIFIED (all 29 modes) | 300/300 natural calls + every mode forced with `F3_POKEA0B=20=<mode>` (6/6 each). The 51-way scale table 0xD4F26 is modelled as a multiply and only verified for the speeds seen |
 | 0x0EAD28 | (enemy using the script VMs) | TODO | redo the agy draft now that the VMs are exposed in headers |
 
 Delegation workflow: `scripts/export_bundle.sh <addr>` writes `work/disasm/bundle_<addr>.s` (flow-following disassembly incl. callees and PC-relative jump tables, stopping at routines declared in `src/**/*.h`) → agy drafts the C → `F3_SPR=1 F3_COND="a1==<addr>" scripts/capture_fn.sh 104EE 104F0 300 work/ram/obj_<ADDR>` → `tests/test_objects.c`.

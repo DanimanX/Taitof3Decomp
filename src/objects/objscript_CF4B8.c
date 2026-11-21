@@ -186,10 +186,6 @@ static int sub_0CF660(const f3mem_t *m, uint32_t obj, uint32_t a1)
             a2 = a3;
         }
     } else if ((int16_t)rd16(m, a3 + 0x4Cu) >= 0) {
-        if (a1 == 0u) {
-            /* unimplemented: ROM 0x0CF660 */
-            return -1;
-        }
         uint16_t dx1 = (uint16_t)(rd16(m, obj + 0x3Au) - rd16(m, a2 + 0x14u));
         dx1 = (uint16_t)(dx1 + rd16(m, a1) - 0x0017u);
         if ((int16_t)dx1 < 0)
@@ -219,10 +215,6 @@ static int sub_0CF660(const f3mem_t *m, uint32_t obj, uint32_t a1)
     }
 
     if (target_found) {
-        if (a1 == 0u) {
-            /* unimplemented: ROM 0x0CF660 */
-            return -1;
-        }
         uint16_t dx = (uint16_t)(rd16(m, obj + 0x3Au) - rd16(m, a2 + 0x14u));
         dx = (uint16_t)(dx + rd16(m, a1) - 0x0017u);
 
@@ -281,7 +273,7 @@ static int sub_0CF7AA(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CF4B8 */
-int ObjScript_CF4B8(const f3mem_t *m, uint32_t obj)
+int ObjScript_CF4B8(const f3mem_t *m, uint32_t obj, uint32_t a1)
 {
     uint16_t op = (uint16_t)rd8(m, obj + 0x20u);
     switch (op) {
@@ -299,7 +291,7 @@ int ObjScript_CF4B8(const f3mem_t *m, uint32_t obj)
     case 14u:
         return sub_0CF5EE(m, obj);
     case 15u:
-        return sub_0CF660(m, obj, 0u);
+        return sub_0CF660(m, obj, a1);
     case 20u:
         return sub_0CF7AA(m, obj);
     default:

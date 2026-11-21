@@ -99,11 +99,12 @@ local function regline_str(i, which)
   return string.format("%d\t%s\t%04X\t%s\n", i, which, sp:read_u16(0x4022AC), table.concat(r, "\t"))
 end
 local pairs_done, have_pre, n = 0, false, 0
+local scr0 = nil
 local pre_snap, pre_regs, pending_logs, abandoned = nil, nil, {}, 0
 local maxframes = tonumber(os.getenv("F3_MAXFRAMES") or "6000")
 local function finish(tag)
   out:close(); regs:close(); if dp then dp:close() end; if spf then spf:close() end
-  print(string.format("CAPTURE %s pairs=%d abandoned=%d", tag, pairs_done, abandoned)); manager.machine:exit()
+  print(string.format("CAPTURE %s pairs=%d abandoned=%d frames=%d screen=%d", tag, pairs_done, abandoned, n, manager.machine.screens[":screen"]:frame_number() - scr0)); manager.machine:exit()
 end
 emu.register_periodic(function()
   if dbg.execution_state ~= "stop" then return end
@@ -141,8 +142,13 @@ emu.register_periodic(function()
   end
   dbg.execution_state = "run"
 end)
+-- frame_done fires many times per emulated frame while breakpoints are set
+-- (measured: ~25-40x), so frames are counted on the screen's frame number
 emu.register_frame_done(function()
-  n = n + 1
+  local fnum = manager.machine.screens[":screen"]:frame_number()
+  if not scr0 then scr0 = fnum - 1 end
+  if fnum - scr0 == n then return end
+  n = fnum - scr0
   if n >= maxframes then finish("PARTIAL"); return end
   if inmode == "fire" then
     p[":IN.0"].fields["P1 Button 1"]:set_value((n // 3) % 2)

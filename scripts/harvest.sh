@@ -9,6 +9,9 @@
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+# one harvest at a time (a background loop and a manual run raced once and
+# accepted two routines against a stale test binary)
+exec 9>"$ROOT/build/.harvest.lock"; flock 9
 kept=(); notes=()
 for wt in "$ROOT"/../Taitof3Decomp-wt/*/; do
   w=$(basename "$wt")
@@ -18,6 +21,7 @@ for wt in "$ROOT"/../Taitof3Decomp-wt/*/; do
     grep -q "(stub)" "src/enemy/obj_$a.c" 2>/dev/null || continue   # only fill stubs
     cp "src/enemy/obj_$a.c" "/tmp/harvest_$a.bak"
     cp "$f" "src/enemy/obj_$a.c"
+    rm -f build/test_objects
     if make -s build/test_objects >/dev/null 2>&1; then
       r=$(F3_ONLY="$a" ./build/test_objects 2>&1 | grep -E "Obj 0x0*$a\b" | tail -1)
       if echo "$r" | grep -qE " ([0-9]+)/ *\1 ticks bit-exact" && ! echo "$r" | grep -qE " 0/ *0 " \
@@ -32,7 +36,7 @@ for wt in "$ROOT"/../Taitof3Decomp-wt/*/; do
   done
 done
 rm -f /tmp/harvest_*.bak
-make -s build/test_objects >/dev/null 2>&1
+rm -f build/test_objects; make -s build/test_objects >/dev/null 2>&1
 [ ${#kept[@]} -eq 0 ] && { echo "nothing new"; exit 0; }
 make -s test >/dev/null 2>&1 || { echo "make test FAILED, not committing"; exit 1; }
 row="| $(printf '0x%06X / ' $(for a in "${kept[@]}"; do echo $((16#$a)); done) | sed 's| / $||') | Obj_*_Tick (survey batch) | VERIFIED (MAME) | $(IFS=';'; echo "${notes[*]}" | sed 's/;/, /g') |"

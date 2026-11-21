@@ -30,4 +30,14 @@ void      wr8(const f3mem_t *m, uint32_t a, uint8_t v);
 void      wr16(const f3mem_t *m, uint32_t a, uint16_t v);
 void      wr32(const f3mem_t *m, uint32_t a, uint32_t v);
 
+
+/* ROM 0x001D8A Rng_Next on the RAM seed (0x406BAA): seed = seed*7+5,
+ * returns the swapped seed (D0.w = high half). See src/kernel/rng.c. */
+static inline uint32_t Rng_NextMem(const f3mem_t *m)
+{
+    uint32_t s = rd32(m, 0x406BAAu) * 7u + 5u;
+    wr32(m, 0x406BAAu, s);
+    return (s << 16) | (s >> 16);
+}
+
 #endif

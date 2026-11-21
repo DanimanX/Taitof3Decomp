@@ -5,7 +5,6 @@
 #include "../player/player_move.h"
 #include "../objects/objscript_CF1E4.h"
 #include "../objects/objscript_CF4B8.h"
-#include "../kernel/rng.h"
 #include "../audio/sound_cmd.h"
 
 #define ASR16(v, n) ((int16_t)(((int16_t)(v) < 0) \
@@ -391,9 +390,7 @@ lab_0c9ff8:
         /* LAB_000caa7c */
         wr8(m, obj + 0x1Du, 0x00u);
         wr32(m, obj + 0x36u, 0x000CAB02u);
-        rng_seed = rd32(m, 0x00406BAAu);
-        uint16_t r = (uint16_t)Rng_Next();
-        wr32(m, 0x00406BAAu, rng_seed);
+        uint16_t r = (uint16_t)Rng_NextMem(m);
         uint8_t delta = (uint8_t)((uint8_t)(r & 0x3Fu) + 0x60u);
         wr8(m, obj + 0x21u, (uint8_t)(rd8(m, obj + 0x21u) + delta));
         wr16(m, obj + 0x42u, 0x0000u);

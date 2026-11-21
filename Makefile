@@ -1,6 +1,6 @@
 CC ?= cc
 CFLAGS ?= -std=c11 -O2 -Wall -Wextra -Werror
-SRC = src/kernel/rng.c src/io/input.c src/common/f3mem.c src/player/player_move.c src/collision/collision.c src/audio/sound_cmd.c src/objects/obj_pool.c src/objects/obj_common.c src/objects/objscript_CF1E4.c src/objects/objscript_CF4B8.c src/stage/stage_timeline.c src/video/sprite.c src/enemy/enemy_bullet.c src/player/player_shot.c src/enemy/obj_D9116.c src/enemy/obj_CABF4.c src/enemy/obj_EAD28.c src/enemy/obj_1027B4.c src/enemy/obj_102860.c src/enemy/obj_102928.c src/enemy/obj_C9F2E.c src/enemy/obj_10252E.c src/enemy/obj_102A9A.c
+SRC = src/kernel/rng.c src/io/input.c src/common/f3mem.c src/player/player_move.c src/collision/collision.c src/audio/sound_cmd.c src/objects/obj_pool.c src/objects/obj_common.c src/objects/objscript_CF1E4.c src/objects/objscript_CF4B8.c src/stage/stage_timeline.c src/video/sprite.c src/enemy/enemy_bullet.c src/player/player_shot.c src/enemy/obj_D9116.c src/enemy/obj_CABF4.c src/enemy/obj_EAD28.c src/enemy/obj_CAB36.c src/enemy/obj_13E5B2.c src/enemy/obj_D5464.c src/enemy/obj_117D06.c src/enemy/obj_119CBA.c src/enemy/obj_CBF5E.c src/enemy/obj_119990.c src/enemy/obj_1027B4.c src/enemy/obj_102860.c src/enemy/obj_102928.c src/enemy/obj_C9F2E.c src/enemy/obj_10252E.c src/enemy/obj_102A9A.c
 
 .PHONY: test clean
 test: build/test_kernel build/test_player build/test_collision build/test_sound build/test_objpool build/test_stage build/test_sprite build/test_objects

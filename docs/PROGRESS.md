@@ -96,7 +96,13 @@ Drafts by agy (Gemini), verified here with per-object captures (`F3_COND="a1==<f
 | 0x0EAD28 | Obj_EAD28_Tick (formation enemy using the script VMs; aims and fires at the nearer player) | VERIFIED (MAME) | 202/202 ticks incl. 4 deaths and 2 spawns. Draft by codewhale (agy auth expired, hermes out of context); fire decision 0xD09B8, angle helper 0xD0E52 table index, 0xD0C9E table base and the death tails 0xCEE48..0xCEEEE (A0 vs A1, live D0 low-byte spawn arg) fixed by Claude |
 | 0x1027B4 / 0x102860 | Obj_1027B4_Tick / Obj_102860_Tick | VERIFIED (MAME) | 114/114 ticks each; drafts by hermes |
 | 0x102928 / 0x10252E / 0x102A9A | Obj_*_Tick | VERIFIED (MAME) | 114/114 each (agy drafts, unchanged); no deaths in the captures |
-| 0x0C9F2E | Obj_C9F2E_Tick | VERIFIED (MAME) | 142/142 incl. 8 alloc/free (agy draft, unchanged) |
+| 0x0C9F2E | Obj_C9F2E_Tick | VERIFIED (MAME) | 142/142 incl. 8 alloc/free (agy draft; RNG now via Rng_NextMem) |
+| 0x119990 | Obj_119990_Tick | VERIFIED (MAME) | 69/69 (agy) |
+| 0x0CBF5E / 0x119CBA / 0x117D06 / 0x13E5B2 / 0x0CAB36 | Obj_*_Tick | VERIFIED (MAME) | 69/69, 69/69, 132/132, 139/139, 129/129 (hermes drafts; 0x117D70 path in 117D06 not decompiled) |
+| 0x0D5464 | Obj_D5464_Tick | VERIFIED (MAME) | 150/150 incl. 5 state changes (hermes draft; fixed to use the RAM RNG seed via `Rng_NextMem`) |
+| 0x0CEE7C / 0x0CEE84 / 0x0CEE8C | Obj_Dying1/2/3_Tick | VERIFIED (MAME) | 8/8 each; frees the object on the 3rd frame |
+
+Tools: `scripts/capture_obj.sh <addr>` (tries the savestates until enough ticks), `scripts/integrate_obj.sh <addr> <draft.c>` (header + Makefile + test entry). Shared `Rng_NextMem()` in `f3mem.h` (seed in RAM 0x406BAA).
 
 Delegation workflow: `scripts/export_bundle.sh <addr>` writes `work/disasm/bundle_<addr>.s` (flow-following disassembly incl. callees and PC-relative jump tables, stopping at routines declared in `src/**/*.h`) → agy drafts the C → `F3_SPR=1 F3_COND="a1==<addr>" scripts/capture_fn.sh 104EE 104F0 300 work/ram/obj_<ADDR>` → `tests/test_objects.c`.
 

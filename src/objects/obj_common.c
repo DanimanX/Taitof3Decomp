@@ -1,5 +1,6 @@
 /* Darius Gaiden (Taito F3) — small helpers shared by object tick routines. */
 #include "obj_common.h"
+#include "obj_pool.h"
 
 /* ROM 0x0CEE74 */
 void Obj_StartDying(const f3mem_t *m, uint32_t obj)
@@ -49,3 +50,9 @@ void Obj_Animate(const f3mem_t *m, uint32_t obj, uint32_t anim_tbl)
         wr16(m, obj + 0x3Au, (uint16_t)((uint16_t)off + 6u));
     }
 }
+
+/* ROM 0x0CEE7C / 0x0CEE84 / 0x0CEE8C: the dying chain started by
+ * Obj_StartDying waits two frames, then frees the object. */
+int Obj_Dying1_Tick(const f3mem_t *m, uint32_t obj) { wr32(m, obj, 0x000CEE84u); return 0; }
+int Obj_Dying2_Tick(const f3mem_t *m, uint32_t obj) { wr32(m, obj, 0x000CEE8Cu); return 0; }
+int Obj_Dying3_Tick(const f3mem_t *m, uint32_t obj) { Obj_Free(m, obj); return 0; }

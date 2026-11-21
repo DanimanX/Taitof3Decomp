@@ -1,14 +1,15 @@
 CC ?= cc
 CFLAGS ?= -std=c11 -O2 -Wall -Wextra -Werror
-SRC = src/kernel/rng.c src/io/input.c src/common/f3mem.c src/player/player_move.c src/collision/collision.c src/audio/sound_cmd.c src/objects/obj_pool.c
+SRC = src/kernel/rng.c src/io/input.c src/common/f3mem.c src/player/player_move.c src/collision/collision.c src/audio/sound_cmd.c src/objects/obj_pool.c src/stage/stage_timeline.c
 
 .PHONY: test clean
-test: build/test_kernel build/test_player build/test_collision build/test_sound build/test_objpool
+test: build/test_kernel build/test_player build/test_collision build/test_sound build/test_objpool build/test_stage
 	./build/test_kernel
 	./build/test_player
 	./build/test_collision
 	./build/test_sound
 	./build/test_objpool
+	./build/test_stage
 
 build/test_kernel: tests/test_kernel.c $(SRC) src/kernel/rng.h src/io/input.h
 	@mkdir -p build
@@ -29,6 +30,10 @@ build/test_sound: tests/test_sound.c $(SRC) src/audio/sound_cmd.h
 build/test_objpool: tests/test_objpool.c $(SRC) src/objects/obj_pool.h
 	@mkdir -p build
 	$(CC) $(CFLAGS) -o $@ tests/test_objpool.c $(SRC)
+
+build/test_stage: tests/test_stage.c $(SRC) src/stage/stage_timeline.h
+	@mkdir -p build
+	$(CC) $(CFLAGS) -o $@ tests/test_stage.c $(SRC)
 
 clean:
 	rm -rf build

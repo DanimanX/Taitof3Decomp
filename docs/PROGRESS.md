@@ -71,6 +71,13 @@ Other spawn entries from `scripts/find_spawns.py` (spawned by sub-tasks, TODO): 
 | 0x0104B8 | Obj_RunGroups | VERIFIED (MAME, call order) | 60 frames, 2982 object ticks: same (fn, obj) sequence via `F3_LOG=104EE` |
 | 0x01060E / 0x010638 / 0x010672 / 0x010532 | Obj_ResetGroups / ResetPools / ResetGroup11 / RunGroup11 | DECOMPILED | not yet captured |
 
+## Stage
+| addr | name | status | notes |
+|---|---|---|---|
+| 0x13F2D4..0x13F340 | StageTimeline_Step (Task_StageTimeline frame body) | VERIFIED (MAME, all branches) | `src/stage/stage_timeline.c`; 600/600 natural frames (8 waves), forced end marker 1/1, forced fx start 20/20 |
+| 0x0015D0 / 0x0015EC | Fx_StartA / Fx_StartB | VERIFIED (A, via above) / DECOMPILED (B) | timed-effect tables 0x16890 / 0x168C0 |
+| 0x13F342.. | stage-end sequence (boss warning spawns into group 11, waits, Fx_StartA(5)) | MAPPED | |
+
 ## Verification tooling
 - `scripts/capture_fn.sh <entry> <exit> <n> <prefix>`: MAME debugger breakpoints (headless `-debug -debugger none`) dump Work RAM + registers exactly at a code region's entry/exit → golden pre/post pairs for any routine. Options: `F3_DPRAM` (sound DPRAM), `F3_SWEEP`/`F3_SWEEP_BASE` (force the word arg), `F3_POKE32` (force RAM at entry), `F3_LOG` (log registers at inner PCs, e.g. indirect calls).
 

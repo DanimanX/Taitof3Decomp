@@ -1,5 +1,7 @@
 # addr	kind	name	size	comment   (kind: func|code|data; size in bytes for data: 1,2,4 or array N)
 # --- kernel / interrupts (ROM 0x1A00-0x2400), see docs/KERNEL.md ---
+0015D0	func	Fx_StartA	0	(D0 id) timed effect from table 0x16890[id%6]: ptr -> A5-0x5DEC, timer = dur+1
+0015EC	func	Fx_StartB	0	(D0 id) same with table 0x168C0[id%8], mode 1
 001A0E	func	Kernel_FrameTick	0	per-frame system update: scroll upload, input poll, 0DFA,161E,0BF6, frame++
 001A66	code	Kernel_EnterTick_thunk	0	jmp Kernel_Preempt
 001A72	func	Kernel_IdleHook	0	called from idle loop; advances RNG
@@ -166,3 +168,7 @@
 41B1A4	data	p1_pos_x	4	16.16; verified in MAME (3 px/frame, clamp -8)
 41B1A8	data	p1_pos_y	4	16.16; verified in MAME
 41B1D8	data	p1_score	4	binary; verified vs screen (3400/4600/9000)
+40B308	data	tl_script_ptr	4	stage timeline: next script entry {pos.w, data[6]}
+40B30C	data	tl_scroll_pos	4	stage scroll position 16.16
+40B310	data	tl_scroll_speed	4	16.16 per frame
+40B314	data	tl_last_pos	2	integer scroll pos seen last frame

@@ -117,6 +117,12 @@
 13F2B6	func	Task_13F2B6	0	
 13F436	func	Task_13F436	0	
 01057C	func	Obj_Spawn	0	(fn.l, group.w, ngroups.w, arg.l) -> D0 obj ptr or -1; free bitmasks 0x410000[g], 32 x 0x6C objs per group at 0x410060+g*0xD80
+0104B8	func	Obj_RunGroups	0	snapshot free masks to 0x410030, call fn(A0=obj) of every live obj in groups 0..10
+0105EC	func	Obj_Free	0	(obj.l) set free bit group*32+index
+01060E	func	Obj_ResetGroups	0	(group.w, n.w) mark groups free
+010638	func	Obj_ResetPools	0	groups 0..10 free (masks + snapshots)
+010672	func	Obj_ResetGroup11	0	group 11 free (masks + snapshots)
+010532	func	Obj_RunGroup11	0	like Obj_RunGroups for group 11 only
 010502	func	Task_ObjGroup11Runner	0	gameplay slot 14: ticks object pool group 11 (0x4194E0, mask 0x41002C), unless paused
 0910CC	func	Task_0910CC	0	
 0AC8E4	func	Task_0AC8E4	0	

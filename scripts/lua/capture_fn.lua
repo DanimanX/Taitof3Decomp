@@ -9,12 +9,20 @@
 --   F3_SWEEP   "N" overwrites the word arg at SP+4 on entry with pair_index % N
 --              (forces every command id through a routine like Sound_PlayCmd);
 --              F3_SWEEP_BASE adds a starting id
+--   F3_LOG     hex PC(s), comma-separated: every hit between pre and post is
+--              written to <prefix>_regs.tsv as which="log" (no RAM dump)
+--   F3_POKE32  "addr=val,addr=val" (hex) 32-bit writes applied at each entry
+--              before the pre dump (force rare branches)
 --   F3_INPUT   "fire" = P1 autofire + sweeping joystick (default), "none"
 local ROOT = "/PROCESOS/Taitof3Decomp"
 local entry = tonumber(os.getenv("F3_ENTRY"), 16)
 local exits = {}
 for h in string.gmatch(os.getenv("F3_EXIT"), "[^,]+") do exits[tonumber(h, 16)] = true end
 local want_dpram = os.getenv("F3_DPRAM") == "1"
+local logs = {}
+for h in string.gmatch(os.getenv("F3_LOG") or "", "[^,]+") do logs[tonumber(h, 16)] = true end
+local pokes = {}
+for a, v in string.gmatch(os.getenv("F3_POKE32") or "", "(%x+)=(%x+)") do pokes[#pokes + 1] = {tonumber(a, 16), tonumber(v, 16)} end
 local sweep = tonumber(os.getenv("F3_SWEEP") or "0")
 local sweep_base = tonumber(os.getenv("F3_SWEEP_BASE") or "0")
 local want = tonumber(os.getenv("F3_SAMPLES") or "300")
@@ -29,6 +37,7 @@ local regs = assert(io.open(prefix .. "_regs.tsv", "w"))
 regs:write("pair\twhich\tframe\tD0\tD1\tD2\tD3\tD4\tD5\tD6\tD7\tA0\tA1\tA2\tA3\tA4\tA5\tA6\tSP\n")
 cpu.debug:bpset(entry, "", "")
 for pc, _ in pairs(exits) do cpu.debug:bpset(pc, "", "") end
+for pc, _ in pairs(logs) do cpu.debug:bpset(pc, "", "") end
 local dp = want_dpram and assert(io.open(prefix .. "_dpram.bin", "wb")) or nil
 local function dump()
   local t = {}
@@ -52,8 +61,11 @@ emu.register_periodic(function()
   if dbg.execution_state ~= "stop" then return end
   local pc = cpu.state["PC"].value
   if pc == entry and not have_pre then
+    for _, pv in ipairs(pokes) do sp:write_u32(pv[1], pv[2]) end
     if sweep > 0 then sp:write_u16(cpu.state["SP"].value + 4, sweep_base + pairs_done % sweep) end
     dump(); regline(pairs_done, "pre"); have_pre = true
+  elseif logs[pc] and have_pre then
+    regline(pairs_done, "log")
   elseif exits[pc] and have_pre then
     dump(); regline(pairs_done, "post"); have_pre = false
     out:flush(); regs:flush(); if dp then dp:flush() end

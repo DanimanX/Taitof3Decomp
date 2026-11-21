@@ -63,8 +63,16 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 
 Other spawn entries from `scripts/find_spawns.py` (spawned by sub-tasks, TODO): 010502, 0910CC, 0AC8E4, 0B935A, 0C63E8, 0C6A64, 13F2B6, 13F2C6, 13F436, 1439BC, 144B60, 1783A8.
 
+## Object pool
+| addr | name | status | notes |
+|---|---|---|---|
+| 0x01057C | Obj_Spawn | VERIFIED (MAME, exact pre/post) | `src/objects/obj_pool.c`; 300/300 natural + 2/2 forced pool-full (`F3_POKE32`) |
+| 0x0105EC | Obj_Free | VERIFIED (MAME) | 300/300 |
+| 0x0104B8 | Obj_RunGroups | VERIFIED (MAME, call order) | 60 frames, 2982 object ticks: same (fn, obj) sequence via `F3_LOG=104EE` |
+| 0x01060E / 0x010638 / 0x010672 / 0x010532 | Obj_ResetGroups / ResetPools / ResetGroup11 / RunGroup11 | DECOMPILED | not yet captured |
+
 ## Verification tooling
-- `scripts/capture_fn.sh <entry> <exit> <n> <prefix>`: MAME debugger breakpoints (headless `-debug -debugger none`) dump Work RAM + registers exactly at a code region's entry/exit → golden pre/post pairs for any routine.
+- `scripts/capture_fn.sh <entry> <exit> <n> <prefix>`: MAME debugger breakpoints (headless `-debug -debugger none`) dump Work RAM + registers exactly at a code region's entry/exit → golden pre/post pairs for any routine. Options: `F3_DPRAM` (sound DPRAM), `F3_SWEEP`/`F3_SWEEP_BASE` (force the word arg), `F3_POKE32` (force RAM at entry), `F3_LOG` (log registers at inner PCs, e.g. indirect calls).
 
 ## Known caveats
 - Ghidra auto-analysis creates pointers over code reached only via `pea` (task entries); `fix_flow.py` must run after `apply_symbols.py` (bootstrap does this).

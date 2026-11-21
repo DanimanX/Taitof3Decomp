@@ -5,24 +5,24 @@
 </p>
 
 <p align="center">
-  <strong>Framework de Decompilación e Ingeniería Inversa para la arquitectura arcade Taito F3 System (Motorola MC68EC020)</strong>
+  <strong>Reverse Engineering & Decompilation Framework for the Taito F3 System Architecture (Motorola MC68EC020)</strong>
 </p>
 
 <p align="center">
-  <a href="#descripción-general">Descripción</a> •
-  <a href="#arquitectura-del-flujo-de-trabajo">Flujo de Trabajo</a> •
-  <a href="#especificaciones-de-hardware">Hardware F3</a> •
-  <a href="#herramientas-y-mcp">Herramientas MCP</a> •
-  <a href="#estructura-del-repositorio">Estructura</a> •
-  <a href="#guía-rápida-de-inicio">Inicio Rápido</a> •
-  <a href="#aviso-legal">Aviso Legal</a>
+  <a href="#overview">Overview</a> •
+  <a href="#architecture--workflow">Workflow</a> •
+  <a href="#hardware-specifications">Hardware Specs</a> •
+  <a href="#mcp-tooling">MCP Tooling</a> •
+  <a href="#repository-layout">Repository Layout</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#legal-notice">Legal Notice</a>
 </p>
 
 ---
 
-## Descripción General
+## Overview
 
-**Taitof3Decomp** es un entorno estructurado de decompilación e ingeniería inversa centrado en los títulos arcade de la plataforma **Taito F3 System** (1992–1998). Impulsada por una CPU de 32 bits **Motorola MC68EC020 @ 16 MHz**, esta placa albergó algunos de los títulos más legendarios de los salones recreativos, incluyendo:
+**Taitof3Decomp** is a structured decompilation and reverse engineering framework targeting arcade games built on the **Taito F3 System** motherboard (1992–1998). Powered by a 32-bit **Motorola MC68EC020 @ 16 MHz** CPU, this hardware platform hosted some of the most influential titles of the 90s arcade era, including:
 
 - 🚀 *Darius Gaiden*
 - 🏢 *Elevator Action Returns*
@@ -31,110 +31,110 @@
 - 💎 *Cleopatra Fortune*
 - 🥊 *Kaiser Knuckle*
 
-El proyecto implementa un bucle cerrado entre **análisis estático en Ghidra 12.1.4** y **análisis dinámico con MAME** mediante el protocolo Model Context Protocol (MCP), utilizando `astrobleem/mame-mcp` y `clearbluejar/pyghidra-mcp`.
+The framework implements a closed-loop verification pipeline connecting **static binary analysis in Ghidra 12.1.4** with **dynamic emulation in MAME** via the Model Context Protocol (MCP), utilizing `astrobleem/mame-mcp` and `clearbluejar/pyghidra-mcp`.
 
 ---
 
-## Arquitectura del Flujo de Trabajo
+## Architecture & Workflow
 
-El objetivo es transformar el código binario del 68EC020 en C legible y verificable mediante oráculos dinámicos:
+The core strategy revolves around iteratively decompiling 68EC020 machine code into human-readable, matching C code verified against live dynamic execution states:
 
 ```mermaid
 flowchart LR
-    ROM["ROMset Taito F3 (.zip)"] --> F1["Fase 1: Extracción & De-interleaving\n(MAME Lua / Python Script)"]
+    ROM["Taito F3 ROMset (.zip)"] --> F1["Phase 1: Extraction & De-interleaving\n(MAME Lua / Python Script)"]
     F1 --> BIN["maincpu.bin\n(0x000000 - 0x1FFFFF)"]
-    BIN --> GHIDRA["Fase 2: Ghidra 12.1.4\n(68000:BE:32:MC68020 + Mapa HW F3)"]
-    ROM --> MAME["Fase 3: MAME + mame-mcp\n(Trazas MMIO, Live Session, Cobertura)"]
-    MAME -->|"PCs activos, RAM, Jump Tables,\nRegistros HW y Estructuras"| GHIDRA
-    GHIDRA -->|"Funciones etiquetadas,\nStructs y Código C"| DECOMP["Fase 4: Decompilación Iterativa\n(src/ por subsistema)"]
-    DECOMP --> VERIF["Fase 5: Validación Diferencial\n(capture_leaf_io / Golden Vectors)"]
-    MAME -->|"Snapshots & Estados"| VERIF
+    BIN --> GHIDRA["Phase 2: Ghidra 12.1.4\n(68000:BE:32:MC68020 + F3 Memory Map)"]
+    ROM --> MAME["Phase 3: MAME + mame-mcp\n(MMIO Tracing, Live Session, Coverage)"]
+    MAME -->|"Active PCs, RAM, Jump Tables,\nHW Registers & Structs"| GHIDRA
+    GHIDRA -->|"Labeled Functions,\nStructs & C Code"| DECOMP["Phase 4: Iterative Decompilation\n(src/ by subsystem)"]
+    DECOMP --> VERIF["Phase 5: Differential Validation\n(capture_leaf_io / Golden Vectors)"]
+    MAME -->|"Snapshots & State Dumps"| VERIF
 ```
 
 ---
 
-## Especificaciones de Hardware
+## Hardware Specifications
 
-Para una descripción exhaustiva del mapa de memoria y controladores de video/audio, consultar [`docs/TAITO_F3_HW_MAP.md`](docs/TAITO_F3_HW_MAP.md).
+For an in-depth breakdown of the memory space and custom ASIC register maps, refer to [`docs/TAITO_F3_HW_MAP.md`](docs/TAITO_F3_HW_MAP.md).
 
-| Componente | Especificación Técnica |
+| Component | Technical Details |
 |---|---|
-| **CPU Principal** | Motorola **MC68EC020** @ 16 MHz (Bus de datos 32-bit, Direcciones 24-bit: `0x000000`–`0xFFFFFF`) |
-| **Idioma Ghidra** | `68000:BE:32:MC68020` |
-| **Work RAM** | 128 KiB en `0x400000`–`0x41FFFF` (con mirror en `0x420000`–`0x43FFFF`) |
-| **Subsistema Gráfico** | Tilemaps multicapa, Sprite RAM (64 KiB), Line RAM raster effects (scroll/zoom/alpha), Paleta 24-bit (8192 colores) |
-| **Subsistema de Audio** | Motorola 68000 @ 16 MHz + Ensoniq ES5505 / ES5510, acoplado mediante DPRAM de 2 KB (`MB8421`) |
-| **Control / I/O** | MMIO en `0x4A0000`–`0x4A001F`: Inputs P1-P4, Watchdog, EEPROM serial 93C46 |
+| **Main CPU** | Motorola **MC68EC020** @ 16 MHz (32-bit data bus, 24-bit address space: `0x000000`–`0xFFFFFF`) |
+| **Ghidra Language ID** | `68000:BE:32:MC68020` |
+| **Work RAM** | 128 KiB located at `0x400000`–`0x41FFFF` (mirrored at `0x420000`–`0x43FFFF`) |
+| **Video Subsystem** | Multi-layer tilemaps, 64 KiB Sprite RAM, Line RAM raster effects (scroll/zoom/alpha blending), 24-bit Palette (8,192 colors) |
+| **Audio Subsystem** | Motorola 68000 @ 16 MHz + Ensoniq ES5505 / ES5510, interfaced via 2 KB DPRAM (`MB8421`) |
+| **Control / I/O** | MMIO at `0x4A0000`–`0x4A001F`: Inputs P1-P4, Watchdog, serial EEPROM 93C46 |
 
 ---
 
-## Herramientas y MCP
+## MCP Tooling
 
-El proyecto integra dos servidores MCP para permitir que agentes de IA e ingenieros de reversa interactúen simultáneamente con Ghidra y MAME:
+This environment integrates two dedicated MCP servers enabling AI agents and reverse engineers to orchestrate Ghidra and MAME concurrently:
 
 1. **`mame-mcp`** ([`astrobleem/mame-mcp`](https://github.com/astrobleem/mame-mcp)):
-   - Inspección y modificación de memoria (`read_memory`, `write_memory`).
-   - Trazas de ejecución MMIO en caliente y breakpoints dinámicos.
-   - Ejecución de scripts MAME Lua para extracción de dumps y golden vectors.
+   - Live memory inspection and modification (`read_memory`, `write_memory`).
+   - Dynamic MMIO tracing and runtime breakpoints.
+   - Execution of MAME Lua scripts for automated binary dumping and golden vector capture.
 
 2. **`pyghidra-mcp`** ([`clearbluejar/pyghidra-mcp`](https://github.com/clearbluejar/pyghidra-mcp)):
-   - Automatización de análisis headless con Ghidra 12.1.4.
-   - Descompilación a pseudo-C en demanda, etiquetado de símbolos y tipos de datos.
-   - Búsqueda semántica y navegación de funciones.
+   - Headless Ghidra 12.1.4 automation.
+   - On-demand decompilation to pseudo-C, symbol labeling, and struct creation.
+   - Semantic code search and function graph navigation.
 
-Ver [`.mcp.json.example`](.mcp.json.example) para la configuración de conexión.
+Check [`.mcp.json.example`](.mcp.json.example) for configuration details.
 
 ---
 
-## Estructura del Repositorio
+## Repository Layout
 
 ```
 Taitof3Decomp/
-├── PLAN.md                   # Plan maestro detallado paso a paso
+├── PLAN.md                   # Complete step-by-step master decompilation plan
 ├── docs/
-│   ├── TAITO_F3_HW_MAP.md    # Mapa de hardware y memoria completo
+│   ├── TAITO_F3_HW_MAP.md    # Full hardware & memory map reference
 │   └── assets/
-│       └── banner.png        # Banner oficial del proyecto
-├── .mcp.json.example         # Plantilla de configuración de servidores MCP
-├── ghidra_proj/              # Proyecto base de Ghidra (taito_f3)
-├── scripts/                  # Scripts de extracción, de-interleaving y ayuda
-├── src/                      # Código fuente decompilado (por subsistema / juego)
-├── traces/                   # Trazas de ejecución y logs MMIO
-├── states/                   # Savestates de MAME para reproducción determinista
-├── tests/                    # Tests de validación diferencial (golden vectors)
-└── work/                     # Espacio de trabajo temporal y artefactos intermedios
+│       └── banner.png        # Official project widescreen banner
+├── .mcp.json.example         # Template for MCP server configuration
+├── ghidra_proj/              # Base Ghidra project workspace (taito_f3)
+├── scripts/                  # Extraction, de-interleaving and helper scripts
+├── src/                      # Decompiled C source code (per game / subsystem)
+├── traces/                   # Dynamic execution traces and MMIO logs
+├── states/                   # Deterministic MAME savestates
+├── tests/                    # Differential verification tests (golden vectors)
+└── work/                     # Scratch workspace and intermediate artifacts
 ```
 
 ---
 
-## Guía Rápida de Inicio
+## Quick Start
 
-### Requisitos Previos
+### Prerequisites
 
-- **Linux** (probado en Arch Linux)
-- **Ghidra 12.1.4** con JDK 21
-- **MAME** (versión reciente con soporte Lua habilitado)
-- **Python 3.12+** y gestor de paquetes [`uv`](https://github.com/astral-sh/uv)
+- **Linux** (tested on Arch Linux)
+- **Ghidra 12.1.4** with JDK 21
+- **MAME** (recent version with Lua support enabled)
+- **Python 3.12+** and package manager [`uv`](https://github.com/astral-sh/uv)
 
-### Configuración
+### Setup
 
-1. Clonar el repositorio:
+1. Clone the repository with submodules:
    ```bash
-   git clone https://github.com/DanimanX/Taitof3Decomp.git
+   git clone --recurse-submodules https://github.com/DanimanX/Taitof3Decomp.git
    cd Taitof3Decomp
    ```
 
-2. Configurar el entorno MCP:
+2. Configure your local MCP environment:
    ```bash
    cp .mcp.json.example .mcp.json
-   # Ajustar rutas en .mcp.json según tu instalación local de Ghidra y MAME
+   # Adjust paths in .mcp.json to match your local Ghidra and MAME binaries
    ```
 
-3. Seguir el plan maestro en [`PLAN.md`](PLAN.md) para la fase correspondiente.
+3. Review the execution phases outlined in [`PLAN.md`](PLAN.md).
 
 ---
 
-## Aviso Legal / Legal Notice
+## Legal Notice
 
 > [!IMPORTANT]
-> Este proyecto no incluye ni distribuye ROMs comerciales, binarios protegidos por derechos de autor ni código propietario de Taito Corporation. Todos los archivos de juego deben ser provistos por el usuario final a partir de sus propios cartuchos o placas originales para propósitos exclusivos de investigación y preservación histórica.
+> This project does not contain, host, or distribute copyrighted game ROMs, proprietary binaries, or assets owned by Taito Corporation. All target game files must be legally acquired by the end user from their own physical arcade boards or cartridges exclusively for historical preservation, study, and research purposes.

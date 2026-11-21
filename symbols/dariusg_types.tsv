@@ -1,0 +1,49 @@
+# struct	size	offset	type	name	comment     (type: u8 s8 u16 s16 u32 s32 ptr fix16 or <Struct>*)
+EntityObj	0x6C	0x00	ptr	tick_fn	object-pool callback
+EntityObj	0x6C	0x08	ptr	owner	shot -> player
+EntityObj	0x6C	0x14	fix16	pos_x	16.16, high word = screen X
+EntityObj	0x6C	0x18	fix16	pos_y	16.16
+EntityObj	0x6C	0x24	fix16	hp	16.16
+EntityObj	0x6C	0x28	fix16	contact_dmg	
+EntityObj	0x6C	0x2C	s16	hb_x0	
+EntityObj	0x6C	0x2E	s16	hb_x1	
+EntityObj	0x6C	0x30	s16	hb_y0	
+EntityObj	0x6C	0x32	s16	hb_y1	
+EntityObj	0x6C	0x34	u8	coll_flags	bit0 no dmg, bit1 invuln, bit4 bomb-immune, bit5 no area dmg, bit6 piercing
+EntityObj	0x6C	0x35	u8	hit_type	1 shot hit, 0xFF consumed, 2 player/bomb hit
+EntityObj	0x6C	0x36	ptr	hit_by	
+PlayerState	0x8A	0x00	ptr	tick_fn	
+PlayerState	0x8A	0x06	s16	pal_pulse_cnt	
+PlayerState	0x8A	0x0C	u8	pal_bank	
+PlayerState	0x8A	0x14	fix16	pos_x	verified in MAME
+PlayerState	0x8A	0x18	fix16	pos_y	verified in MAME
+PlayerState	0x8A	0x20	s16	move_angle	0..255 or -1
+PlayerState	0x8A	0x22	s16	player_id	
+PlayerState	0x8A	0x24	fix16	hp	
+PlayerState	0x8A	0x28	fix16	contact_dmg	
+PlayerState	0x8A	0x2C	s16	hb_x0	
+PlayerState	0x8A	0x2E	s16	hb_x1	
+PlayerState	0x8A	0x30	s16	hb_y0	
+PlayerState	0x8A	0x32	s16	hb_y1	
+PlayerState	0x8A	0x34	u8	coll_flags	nonzero disables hits
+PlayerState	0x8A	0x35	u8	hit_type	
+PlayerState	0x8A	0x36	ptr	hit_by	
+PlayerState	0x8A	0x3A	fix16	bank_tilt	[-2,+2], step 0x2000
+PlayerState	0x8A	0x42	s16	move_speed	12, recoil 9
+PlayerState	0x8A	0x44	ptr	io_ch	-> io_ch[2] / io_ch[3]
+PlayerState	0x8A	0x48	u32	score	verified in MAME
+PlayerState	0x8A	0x4C	s16	life_state	<0 = not ticking
+PlayerState	0x8A	0x4E	s16	shield	
+PlayerState	0x8A	0x50	s16	invuln	frames, 210 on respawn
+PlayerState	0x8A	0x58	s16	arm_level	
+PlayerState	0x8A	0x65	u8	flags	bit0 lock movement, bit2 no collision
+# apply	addr	type	count
+@data	41B190	PlayerState	2
+# param	func_addr	reg	type	name     (custom storage register parameter)
+@param	0C691A	A0	PlayerState*	player
+@param	0C6866	A0	PlayerState*	player
+@param	0C8682	A0	PlayerState*	player
+@param	0C689E	A0	PlayerState*	player
+@param	0CBE12	A0	EntityObj*	obj
+@param	0CBE12	D0	s16	angle
+@param	0CBE00	A0	EntityObj*	obj

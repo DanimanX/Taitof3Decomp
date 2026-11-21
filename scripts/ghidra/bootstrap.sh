@@ -22,4 +22,5 @@ L="$G/Ghidra/Features/PyGhidra/support/pyghidra_launcher.py"
 "$PY" "$L" "$G" -H "$PROJDIR" "$PROJNAME" -process maincpu.bin -noanalysis \
   -scriptPath "$ROOT/scripts/ghidra" \
   -postScript apply_symbols.py -postScript import_traces.py -postScript fix_flow.py \
+  -postScript apply_types.py \
   -postScript report_taito_f3.py

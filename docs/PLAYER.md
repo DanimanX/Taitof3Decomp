@@ -4,7 +4,9 @@
      Up -> angle 0xC0, Y 14..210), score +0x48 = 0x41B1D8 (screen 3400/4600/9000,
      writer PC 0xD0E1A), slot 3 = collision task (its D1/D3 at yield = hitbox
      min X/Y, which is what the first RAM diff picked up). Other claims reviewed,
-     not re-derived. Canonical names: symbols/dariusg.tsv. -->
+     not re-derived. Canonical names: symbols/dariusg.tsv.
+     2026-11-21: Player_MoveAndBounds decompiled to src/player/player_move.c and
+     verified bit-exact on 301/301 MAME frames (tests/test_player.c). -->
 
 # Darius Gaiden — `Task_Player1Ship` (`0xC63E8`–`0xC6A63`) Analysis
 

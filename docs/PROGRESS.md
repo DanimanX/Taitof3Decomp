@@ -12,8 +12,8 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 | 2 | Ghidra bootstrap with HW map | DONE | `scripts/ghidra/bootstrap.sh`: 563 fn, XREFs to CTRL_IO/SPRITE/PF/DPRAM; A5=0x408000 context; `fix_flow.py` repairs 22 code-over-data conflicts (e.g. Task0 0x1019C) |
 | 3 | MMIO sweep A (I/O + audio) | DONE | `traces/mmio/sweepA_io_audio.log` (590 unique, 1200 frames attract) |
 | 3 | MMIO sweep B (video) | DONE | `traces/mmio/sweepB_video.pcs.tsv` (158 PC/region rows, 150k unique accesses, 1200 frames attract) |
-| 3 | Savestates `states/0x_*.sta` | TODO | |
-| 3 | `docs/RAM_MAP.md` | STARTED | `symbols/dariusg.tsv` (kernel/io vars) |
+| 3 | Savestates `states/0x_*.sta` | DONE | `scripts/lua/session_ramdiff.lua` → 01_attract, 02_stage1_start, 03_active_combat (local, not versioned) |
+| 3 | `docs/RAM_MAP.md` | DONE (initial) | players[2] 0x41B190, score 0x41B1D8, object pool, collision lists, terrain bitmap |
 
 ## Functions
 
@@ -37,6 +37,9 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 | 0x001A78 | IO_PollInputs | io | MAPPED | |
 | 0x001B8E | IO_EdgeDetect | io | VERIFIED (truth table) | `src/io/input.c` |
 | 0x001C90 | Video_UploadScroll | video | MAPPED | |
+| 0x0C691A | Player_MoveAndBounds | player | MAPPED | speed/bounds verified in MAME |
+| 0x0C6446 / 0x0C64FC | Coll_* | collision | MAPPED | AABB lists |
+| 0x0D0E04 | Score_OnHit | player | MAPPED | writer of score verified by tap |
 | 0x0047E8.. / 0x00092A.. | EEPROM 93C46 bit-bang | io | TODO | from sweep A |
 | 0x00396C..0x003CDA | Sound DPRAM interface | audio | TODO | clear 0x397A, cmd slots C00000-34 (0x3B58), handshake C00480/C007F8 |
 
@@ -45,7 +48,9 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 | Slot | Entry | Name | Lifetime |
 |---|---|---|---|
 | 0 | 0x010172 | Task0_Main | forever |
-| 4 | 0x010488 | Task_ObjectPoolRunner | attract + game (killed 0xFFFE at game over) |
+| 4 | 0x010488 | Task_ObjectPoolRunner | attract + game (killed 0xFFFE at game over); ticks Obj_PlayersTick (ship movement) |
+| 3 | 0x0C63E8 | Task_Collision | game: collisions + terrain (docs/PLAYER.md) |
+| 2,5,6,14 | 0x144B60, 0x0C6A64, 0x13F2C6, 0x010502 | (unnamed) | game |
 | 15 | 0x0038AC | Task_Slot15Daemon (sound?) | survives game start (kill 0x7FFE) |
 | 1 | 0x0B8404 | Task_Attract | attract only |
 | 1 | 0x004146 | Task_GameMain | game only |

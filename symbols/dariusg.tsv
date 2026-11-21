@@ -102,3 +102,53 @@
 409D38	data	start_player	2	0 = P1, 1 = P2
 410000	data	obj_alloc_bitmap	96	
 410060	data	obj_pool	38016	11 groups x 32 x 0x6C
+# --- task entries (scripts/find_spawns.py); gameplay slots from saved contexts ---
+0C63E8	func	Task_Collision	0	gameplay slot 3: shots vs enemies, players vs hazards, terrain scroll sync (docs/PLAYER.md)
+0C6A64	func	Task_C6A64	0	gameplay slot 5
+144B60	func	Task_144B60	0	gameplay slot 2
+13F2C6	func	Task_13F2C6	0	gameplay slot 6
+13F2B6	func	Task_13F2B6	0	
+13F436	func	Task_13F436	0	
+010502	func	Task_10502	0	gameplay slot 14
+0910CC	func	Task_0910CC	0	
+0AC8E4	func	Task_0AC8E4	0	
+0B935A	func	Task_0B935A	0	
+1439BC	func	Task_1439BC	0	
+1783A8	func	Task_1783A8	0	
+# --- player / collision (docs/PLAYER.md) ---
+0C640A	func	Coll_ResetLists	0	
+0C6446	func	Coll_PlayerShotsVsEnemies	0	list2 x list1 AABB
+0C64FC	func	Coll_PlayersVsHazards	0	players x list3 AABB + bomb damage
+0C660A	func	Coll_AddAreaDamage	0	
+0C6624	func	Terrain_SyncScroll	0	
+0C6632	func	Terrain_TestPoint	0	1 bit of terrain_bitmap
+0C666A	func	Terrain_OrMask16	0	
+0C6738	func	Terrain_LoadStageMap	0	RLE from ROM 0x16AD1E[stage]
+0C676E	func	Debug_DrawHitboxes	0	
+0C685A	func	Obj_PlayerTickInit	0	
+0C6866	func	Obj_PlayersTick	0	object-pool callback for P1/P2
+0C689E	func	Player_PulsePalette	0	
+0C691A	func	Player_MoveAndBounds	0	joystick -> angle, speed 12 (3px/f), clamp X -8..280 Y 14..210
+0C8682	func	Player_UpdateShield	0	
+0CBE00	func	Obj_SubScrollVel	0	
+0CBE12	func	Obj_MoveByAngle	0	pos += speed*cos/sin[angle] (tables 0x27EC0/0x27E40)
+0D0E04	func	Score_OnHit	0	writes players[n].score (PC 0xD0E1A verified by write tap)
+16A2F6	func	Rle16_Decompress	0	
+001866	func	Pal_FadeFromBlack	0	
+001890	func	Pal_FadeToBlack	0	
+0C9462	data	joy_nibble_to_angle	32	16 x s16, active-low UDLR nibble -> angle or -1
+4088FE	data	coll_list1_end	4	
+408902	data	coll_list2_end	4	
+408906	data	coll_list3_end	4	
+40891C	data	terrain_bitmap	5120	64x640 1bpp, 8x8 cells
+409D1C	data	terrain_coll_off	1	
+409D36	data	player_ctrl_flags	1	bit3 no joystick, bit4 shake
+40B2DC	data	stage_index	2	
+41A980	data	player_bomb_dmg	8	
+41A988	data	coll_list1	600	shootable entity ptrs
+41ABE0	data	coll_list2	256	player shot ptrs
+41ACE0	data	coll_list3	0	hazard ptrs
+41B190	data	players	276	2 x PlayerState (0x8A): +14 pos_x 16.16, +18 pos_y, +20 angle, +24 hp, +48 score
+41B1A4	data	p1_pos_x	4	16.16; verified in MAME (3 px/frame, clamp -8)
+41B1A8	data	p1_pos_y	4	16.16; verified in MAME
+41B1D8	data	p1_score	4	binary; verified vs screen (3400/4600/9000)

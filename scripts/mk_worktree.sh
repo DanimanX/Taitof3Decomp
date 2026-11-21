@@ -7,5 +7,5 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WT="$ROOT/../Taitof3Decomp-wt/$1"
 git -C "$ROOT" worktree add -q --detach "$WT" HEAD
 mkdir -p "$WT/work"
-for f in ram disasm maincpu.bin drafts; do ln -sfn "$ROOT/work/$f" "$WT/work/$f"; done
+for f in ram disasm maincpu.bin; do ln -sfn "$ROOT/work/$f" "$WT/work/$f"; done
 echo "$WT"

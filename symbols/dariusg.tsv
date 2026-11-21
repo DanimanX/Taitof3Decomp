@@ -57,3 +57,48 @@
 406BA8	data	trap_sr_tmp	2	SR temp for JSR->TRAP stubs
 406BAA	data	rng_seed	4	LCG state
 406BAE	data	no_idle	1	nonzero: never idle, loop tasks
+# --- boot / game flow (Task0_Main), see docs/GAME_FLOW.md ---
+000DFA	func	Coin_Update	0	coin/credit counting (per frame from Kernel_FrameTick)
+000FEC	func	Coin_CheckStartReady	0	<0 if no credit ready
+001016	func	Coin_CoinsNeeded	0	0 when a credit is available
+001070	func	Sprite_InitBuffers	0	both SPRITE_RAM banks: headers, sentinels
+00117E	func	Sprite_ClearAll	0	clear sprite entries + list pointers
+0014DA	func	Pal_LoadDefault	0	default palette blocks
+0039D8	func	Sound_PlayCmd	0	(cmd.w) -> DPRAM unless sound_mute
+003C24	func	Sound_StopAll	0	stop all sound slots
+003CBA	func	Sound_SetVolume	0	4 bytes -> DPRAM 0xC007F8..FB
+004146	code	Task_GameMain	0	slot 1 during gameplay (GUESS name); entry is mid-function (0x4088 body)
+004D06	func	Eeprom_UnpackSettings	0	EEPROM image 0x406C54.. -> setting bytes 0x402237..
+0050DC	func	Eeprom_VerifyOrInit	0	'TAITO' magic @0x406C54; -1 on failure
+005666	func	Text_DrawString	0	(str, text_ram_addr, attr)
+005690	func	Text_DrawNumber	0	
+005880	func	Gfx_ClearTextLayer	0	
+005A12	func	Gfx_ClearAllLayers	0	text + 4 PF + scroll shadows
+005A3A	func	Gfx_LoadCharFont	0	ROM 0x1120A -> CHAR_RAM
+005B0C	func	Gfx_InitLineRam	0	
+0038AC	func	Task_Slot15Daemon	0	persistent slot-15 task, survives kill(0x7FFE) (GUESS: sound)
+01033C	func	Task0_PerFrameUpdate	0	test switch, credit HUD, latch game_flags
+010352	func	Hud_DrawCreditStatus	0	FREE PLAY / CREDIT n / ENJOY
+010420	func	Sys_CheckTestSwitch	0	io_ch[0].pressed bits 4,3 -> test mode
+010432	code	Task0_EnterTestMode	0	kill 0xFFFE, spawn Task_TestModeMenu
+010488	func	Task_ObjectPoolRunner	0	slot 4: ticks 11x32 objects of 0x6C bytes
+0B8404	func	Task_Attract	0	slot 1 during attract (GUESS name)
+13F238	func	Sound_PreCmdHook	0	empty stub called before Sound_PlayCmd
+1A1A26	func	Task_TestModeMenu	0	'TESTMODE MAIN MENU'
+01047A	data	str_WAIT_A_MOMENT	14	
+1FFFFE	data	rom_region_code	2	0x0003 in this set
+400090	data	credit_count	2	
+402239	data	coin_sys_enable	1	
+40223A	data	cfg_1p_only	1	from EEPROM (GUESS meaning)
+40223B	data	cfg_attract_mute	1	from EEPROM 0x406C5E bit 6
+40223D	data	cfg_auto_start	1	EEPROM 0x406C6C bit 30
+40223F	data	cfg_free_play	1	EEPROM 0x406C6C bit 31
+402240	data	cfg_sound_volume	2	EEPROM 0x406C62, 0..0x3F
+406BB4	data	game_flags_next	1	latched into game_flags each frame
+406BB5	data	game_flags	1	bit0 game over, bit1 pause objects, bit7 ENJOY
+406BB6	data	boot_sys_switches	1	bits 7,6 = boot state of test/service
+406BBC	data	sound_mute	1	gates Sound_PlayCmd
+406C54	data	eeprom_image	32	starts with 'TAITO'
+409D38	data	start_player	2	0 = P1, 1 = P2
+410000	data	obj_alloc_bitmap	96	
+410060	data	obj_pool	38016	11 groups x 32 x 0x6C

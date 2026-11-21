@@ -47,3 +47,6 @@ build/
 # Ghidra program databases contain ROM bytes: never commit
 ghidra_proj/**/idata/
 ghidra_proj/**/versioned/
+
+# Raw multi-MB trace logs: commit the *.pcs.tsv summaries instead
+traces/mmio/*.log

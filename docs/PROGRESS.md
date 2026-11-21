@@ -9,9 +9,9 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 | 0 | mame-mcp + pyghidra-mcp wired in Hermes | DONE | `~/.hermes/config.yaml` |
 | 1 | `work/maincpu.bin` reproducible | DONE | `scripts/reconstruct_rom.py`: MAME dump == offline rebuild (2 MiB, md5 27be2aa1…) |
 | 1 | Vector table coherent | DONE | SSP=0x41FFFC, Reset=0x010000, IRQ2/3/5=0x1A34/0x1A54/0x1A6C, TRAP1..12 used, rest → 0x400 |
-| 2 | Ghidra bootstrap with HW map | DONE (scratch project) | `scripts/ghidra/bootstrap.sh`: 561 fn, XREFs to CTRL_IO/SPRITE/PF/DPRAM; A5=0x408000 context |
+| 2 | Ghidra bootstrap with HW map | DONE | `scripts/ghidra/bootstrap.sh`: 563 fn, XREFs to CTRL_IO/SPRITE/PF/DPRAM; A5=0x408000 context; `fix_flow.py` repairs 22 code-over-data conflicts (e.g. Task0 0x1019C) |
 | 3 | MMIO sweep A (I/O + audio) | DONE | `traces/mmio/sweepA_io_audio.log` (590 unique, 1200 frames attract) |
-| 3 | MMIO sweep B (video) | TODO | |
+| 3 | MMIO sweep B (video) | DONE | `traces/mmio/sweepB_video.pcs.tsv` (158 PC/region rows, 150k unique accesses, 1200 frames attract) |
 | 3 | Savestates `states/0x_*.sta` | TODO | |
 | 3 | `docs/RAM_MAP.md` | STARTED | `symbols/dariusg.tsv` (kernel/io vars) |
 
@@ -19,6 +19,10 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 
 | ROM | Name | Subsystem | Status | Notes |
 |---|---|---|---|---|
+| 0x010172 | Task0_Main | flow | MAPPED | boot → attract ↔ game ↔ test mode supervisor, see docs/GAME_FLOW.md |
+| 0x0050DC | Eeprom_VerifyOrInit | io | MAPPED | 'TAITO' magic |
+| 0x004D06 | Eeprom_UnpackSettings | io | MAPPED | free play, auto start, volume, ... |
+| 0x0039D8 | Sound_PlayCmd | audio | MAPPED | |
 | 0x010000 | Reset | boot | MAPPED | HW init, `lea $408000,A5`, → 0x402 POST |
 | 0x000402 | (POST) | boot | TODO | LINE_RAM/RAM test loop, error screen |
 | 0x001DB8 | Kernel_ColdBoot | kernel | MAPPED | spawns Task0_Main @0x10172 |
@@ -36,10 +40,20 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 | 0x0047E8.. / 0x00092A.. | EEPROM 93C46 bit-bang | io | TODO | from sweep A |
 | 0x00396C..0x003CDA | Sound DPRAM interface | audio | TODO | clear 0x397A, cmd slots C00000-34 (0x3B58), handshake C00480/C007F8 |
 
-## Task entry points (`scripts/find_spawns.py`)
+## Task map (docs/GAME_FLOW.md)
 
-010172 (task0), 010488, 010502, 0910CC, 0AC8E4, 0B935A, 0C63E8, 0C6A64, 13F2B6, 13F2C6, 13F436, 1439BC, 144B60, 1783A8, 1A1A26 — TODO name each (scene/state machine, Phase 4 priority 6).
+| Slot | Entry | Name | Lifetime |
+|---|---|---|---|
+| 0 | 0x010172 | Task0_Main | forever |
+| 4 | 0x010488 | Task_ObjectPoolRunner | attract + game (killed 0xFFFE at game over) |
+| 15 | 0x0038AC | Task_Slot15Daemon (sound?) | survives game start (kill 0x7FFE) |
+| 1 | 0x0B8404 | Task_Attract | attract only |
+| 1 | 0x004146 | Task_GameMain | game only |
+| 1 | 0x1A1A26 | Task_TestModeMenu | test mode |
+
+Other spawn entries from `scripts/find_spawns.py` (spawned by sub-tasks, TODO): 010502, 0910CC, 0AC8E4, 0B935A, 0C63E8, 0C6A64, 13F2B6, 13F2C6, 13F436, 1439BC, 144B60, 1783A8.
 
 ## Known caveats
+- Ghidra auto-analysis creates pointers over code reached only via `pea` (task entries); `fix_flow.py` must run after `apply_symbols.py` (bootstrap does this).
 - Auto-analysis made scalar constants into refs to SOUND_BANK/PIVOT_RAM/WORK_RAM_MIRROR (1 ref per function) — likely false XREFs, review before trusting.
 - The repo's `ghidra_proj/taito_f3` is locked by Hermes' pyghidra-mcp while the gateway runs; bootstrap there once it is stopped.

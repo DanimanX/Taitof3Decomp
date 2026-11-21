@@ -95,6 +95,8 @@ Drafts by agy (Gemini), verified here with per-object captures (`F3_COND="a1==<f
 | 0x0CF4B8 | ObjScript_CF4B8 (per-frame movement step, dispatch on mode obj+0x20, table 0xCF4C8; takes caller A1 = aim offset) | VERIFIED (all 29 modes) | 300/300 natural calls + every mode forced with `F3_POKEA0B=20=<mode>` (6/6 each). The 51-way scale table 0xD4F26 is modelled as a multiply and only verified for the speeds seen |
 | 0x0EAD28 | Obj_EAD28_Tick (formation enemy using the script VMs; aims and fires at the nearer player) | VERIFIED (MAME) | 202/202 ticks incl. 4 deaths and 2 spawns. Draft by codewhale (agy auth expired, hermes out of context); fire decision 0xD09B8, angle helper 0xD0E52 table index, 0xD0C9E table base and the death tails 0xCEE48..0xCEEEE (A0 vs A1, live D0 low-byte spawn arg) fixed by Claude |
 | 0x1027B4 / 0x102860 | Obj_1027B4_Tick / Obj_102860_Tick | VERIFIED (MAME) | 114/114 ticks each; drafts by hermes |
+| 0x102928 / 0x10252E / 0x102A9A | Obj_*_Tick | VERIFIED (MAME) | 114/114 each (agy drafts, unchanged); no deaths in the captures |
+| 0x0C9F2E | Obj_C9F2E_Tick | VERIFIED (MAME) | 142/142 incl. 8 alloc/free (agy draft, unchanged) |
 
 Delegation workflow: `scripts/export_bundle.sh <addr>` writes `work/disasm/bundle_<addr>.s` (flow-following disassembly incl. callees and PC-relative jump tables, stopping at routines declared in `src/**/*.h`) → agy drafts the C → `F3_SPR=1 F3_COND="a1==<addr>" scripts/capture_fn.sh 104EE 104F0 300 work/ram/obj_<ADDR>` → `tests/test_objects.c`.
 

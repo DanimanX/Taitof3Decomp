@@ -11,6 +11,10 @@
 #include "../src/enemy/obj_EAD28.h"
 #include "../src/enemy/obj_1027B4.h"
 #include "../src/enemy/obj_102860.h"
+#include "../src/enemy/obj_102928.h"
+#include "../src/enemy/obj_C9F2E.h"
+#include "../src/enemy/obj_10252E.h"
+#include "../src/enemy/obj_102A9A.h"
 #include "../src/objects/objscript_CF1E4.h"
 #include "../src/objects/objscript_CF4B8.h"
 
@@ -63,6 +67,10 @@ int main(void)
     bad += run("Obj 0x0EAD28", "work/ram/obj_EAD28", Obj_EAD28_Tick, rom);
     bad += run("Obj 0x1027B4", "work/ram/obj_1027B4", Obj_1027B4_Tick, rom);
     bad += run("Obj 0x102860", "work/ram/obj_102860", Obj_102860_Tick, rom);
+    bad += run("Obj 0x102928", "work/ram/obj_102928", Obj_102928_Tick, rom);
+    bad += run("Obj 0x0C9F2E", "work/ram/obj_C9F2E", Obj_C9F2E_Tick, rom);
+    bad += run("Obj 0x10252E", "work/ram/obj_10252E", Obj_10252E_Tick, rom);
+    bad += run("Obj 0x102A9A", "work/ram/obj_102A9A", Obj_102A9A_Tick, rom);
     /* captured with F3_EXIT=ret at the routine entry */
     bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
     bad += run_a1("ObjMove 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);

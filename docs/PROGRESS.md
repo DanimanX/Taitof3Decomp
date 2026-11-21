@@ -40,7 +40,7 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 | 0x0C691A | Player_MoveAndBounds | player | VERIFIED (MAME, all branches) | `src/player/player_move.c`; 301/301 natural frames + forced-branch pairs (`scripts/lua/session_branches.lua`): shake 95/95, terrain shield-break 98/98, terrain recoil 100/100 |
 | 0x0CBE12 | Obj_MoveByAngle | player | VERIFIED (via above) | sin table 0x27E40, cos = +0x80 |
 | 0x0C6632 | Terrain_TestPoint | collision | VERIFIED (via above) | forced full bitmap only; per-bit addressing not yet exercised with a real stage map |
-| 0x0C6446 / 0x0C64FC | Coll_* | collision | MAPPED | AABB lists |
+| 0x0C63F2..0x0C6630 | Task_Collision body (Coll_PlayerShotsVsEnemies, Coll_PlayersVsHazards, Coll_ResetLists, Terrain_SyncScroll) | collision | VERIFIED (MAME, exact pre/post) | `src/collision/collision.c`; 300/300 debugger-captured pairs bit-exact over all Work RAM; 35 shot hits, 1 hazard hit, 20 bomb hits exercised |
 | 0x0D0E04 | Score_OnHit | player | MAPPED | writer of score verified by tap |
 | 0x0047E8.. / 0x00092A.. | EEPROM 93C46 bit-bang | io | TODO | from sweep A |
 | 0x00396C..0x003CDA | Sound DPRAM interface | audio | TODO | clear 0x397A, cmd slots C00000-34 (0x3B58), handshake C00480/C007F8 |
@@ -59,6 +59,9 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 | 1 | 0x1A1A26 | Task_TestModeMenu | test mode |
 
 Other spawn entries from `scripts/find_spawns.py` (spawned by sub-tasks, TODO): 010502, 0910CC, 0AC8E4, 0B935A, 0C63E8, 0C6A64, 13F2B6, 13F2C6, 13F436, 1439BC, 144B60, 1783A8.
+
+## Verification tooling
+- `scripts/capture_fn.sh <entry> <exit> <n> <prefix>`: MAME debugger breakpoints (headless `-debug -debugger none`) dump Work RAM + registers exactly at a code region's entry/exit → golden pre/post pairs for any routine.
 
 ## Known caveats
 - Ghidra auto-analysis creates pointers over code reached only via `pea` (task entries); `fix_flow.py` must run after `apply_symbols.py` (bootstrap does this).

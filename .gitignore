@@ -1,0 +1,40 @@
+# ROMs & Dumps (STRICTLY PROHIBITED TO COMMIT COPYRIGHTED GAME DATA)
+roms/
+*.zip
+*.7z
+*.bin
+*.rom
+
+# Python Virtual Environments & Packages
+.venv/
+tools/*/.venv/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+
+# Agent & MCP working directories
+.codewhale/
+.mame_mcp/
+.mcp.json
+
+# Ghidra user data, vector DB & locks
+ghidra_proj/**/*.lock*
+ghidra_proj/**/chromadb/
+ghidra_proj/**/gzfs/
+ghidra_proj/**/user/
+*.lock
+*.lock~
+
+# Dynamic traces and intermediate dumps
+traces/*.trace
+states/*.sta
+work/*.bin
+work/*.dump
+
+# OS & Editor configurations
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "mame-mcp": {
+      "command": "/PROCESOS/Taitof3Decomp/tools/mame-mcp/.venv/bin/mame-mcp-bridge",
+      "env": {
+        "MAME_EXE": "/usr/bin/mame",
+        "MAME_SYSTEM": "CAMBIAR_POR_ROMSET_F3",
+        "MAME_ROMPATH": "/PROCESOS/Taitof3Decomp/roms",
+        "MAME_CWD": "/PROCESOS/Taitof3Decomp",
+        "MAME_WORKDIR": "/PROCESOS/Taitof3Decomp/.mame_mcp"
+      }
+    },
+    "pyghidra-mcp": {
+      "command": "/PROCESOS/Taitof3Decomp/tools/pyghidra-mcp/.venv/bin/pyghidra-mcp",
+      "args": [
+        "--transport",
+        "stdio",
+        "--project-path",
+        "/PROCESOS/Taitof3Decomp/ghidra_proj",
+        "--project-name",
+        "taito_f3",
+        "--no-wait-for-analysis"
+      ],
+      "env": {
+        "GHIDRA_INSTALL_DIR": "/home/danimanx/opt/ghidra_12.1.4_PUBLIC",
+        "JAVA_HOME": "/usr/lib/jvm/java-21-openjdk"
+      }
+    }
+  }
+}

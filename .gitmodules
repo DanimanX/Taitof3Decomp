@@ -1,0 +1,6 @@
+[submodule "tools/mame-mcp"]
+	path = tools/mame-mcp
+	url = https://github.com/astrobleem/mame-mcp.git
+[submodule "tools/pyghidra-mcp"]
+	path = tools/pyghidra-mcp
+	url = https://github.com/clearbluejar/pyghidra-mcp.git

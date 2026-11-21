@@ -38,3 +38,7 @@ work/*.dump
 Thumbs.db
 .vscode/
 .idea/
+
+# Generated decompiler output (derived from ROM)
+work/decomp/
+work/disasm/

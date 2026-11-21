@@ -19,8 +19,8 @@ for wt in "$ROOT"/../Taitof3Decomp-wt/*/; do
     a=$(basename "$f" .c); a=${a#obj_}
     grep -q "(stub)" "$f" && continue
     grep -q "(stub)" "src/enemy/obj_$a.c" 2>/dev/null || continue   # only fill stubs
-    cp "src/enemy/obj_$a.c" "/tmp/harvest_$a.bak"
-    cp "$f" "src/enemy/obj_$a.c"
+    cp "src/enemy/obj_$a.c" "/tmp/harvest_$a.bak"; cp "src/enemy/obj_$a.h" "/tmp/harvest_$a.hbak"
+    cp "$f" "src/enemy/obj_$a.c"; cp "${f%.c}.h" "src/enemy/obj_$a.h"   # shared helpers may be declared there
     rm -f build/test_objects
     if make -s build/test_objects >/dev/null 2>&1; then
       r=$(F3_ONLY="$a" ./build/test_objects 2>&1 | grep -E "Obj 0x0*$a\b" | tail -1)
@@ -32,10 +32,10 @@ for wt in "$ROOT"/../Taitof3Decomp-wt/*/; do
         continue
       fi
     fi
-    cp "/tmp/harvest_$a.bak" "src/enemy/obj_$a.c"
+    cp "/tmp/harvest_$a.bak" "src/enemy/obj_$a.c"; cp "/tmp/harvest_$a.hbak" "src/enemy/obj_$a.h"
   done
 done
-rm -f /tmp/harvest_*.bak
+rm -f /tmp/harvest_*.bak /tmp/harvest_*.hbak
 rm -f build/test_objects; make -s build/test_objects >/dev/null 2>&1
 [ ${#kept[@]} -eq 0 ] && { echo "nothing new"; exit 0; }
 make -s test >/dev/null 2>&1 || { echo "make test FAILED, not committing"; exit 1; }

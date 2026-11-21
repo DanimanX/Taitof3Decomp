@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="#overview">Overview</a> •
+  <a href="#progress">Progress</a> •
   <a href="#architecture--workflow">Workflow</a> •
   <a href="#hardware-specifications">Hardware Specs</a> •
   <a href="#mcp-tooling">MCP Tooling</a> •
@@ -32,6 +33,25 @@
 - 🥊 *Kaiser Knuckle*
 
 The framework implements a closed-loop verification pipeline connecting **static binary analysis in Ghidra 12.1.4** with **dynamic emulation in MAME** via the Model Context Protocol (MCP), utilizing `astrobleem/mame-mcp` and `clearbluejar/pyghidra-mcp`.
+
+---
+
+## Progress
+
+<!-- coverage:start -->
+### Decompilation progress — Darius Gaiden (`dariusg`)
+
+**4.1% decompiled · 95.9% remaining**  
+`██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
+
+| | functions | code bytes | % of code in functions |
+|---|---:|---:|---:|
+| Decompiled to C | 124 / 2474 | 13,446 / 324,046 | **4.1%** |
+| …of which verified bit-exact vs MAME | 51 | 8,562 | 2.6% |
+| **Remaining** | 2350 | 310,600 | **95.9%** |
+
+Per-bank map: [`docs/COVERAGE.md`](docs/COVERAGE.md). Code bytes = instruction bytes of the 2474 Ghidra functions in maincpu (324,046 of 403,578 disassembled bytes; the rest is code Ghidra has not assigned to a function yet). A function counts as decompiled when its entry address is annotated `ROM 0x…` in `src/`. Regenerate with `make coverage`.
+<!-- coverage:end -->
 
 ---
 

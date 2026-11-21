@@ -1,0 +1,6 @@
+You are translating a Taito F3 (68EC020) object tick routine into C for a register-faithful decompilation in /PROCESOS/Taitof3Decomp.
+Read: work/disasm/bundle_ADDR.s (flow-following disassembly of ROM 0xADDR and its callees), src/common/f3mem.h (memory API: rd8/rd16/rd32/wr8/wr16/wr32, Rng_NextMem), every header under src/ (src/objects/*.h, src/video/sprite.h, src/player/*.h, src/enemy/*.h) for already-decompiled routines you MUST call instead of re-implementing (match by the "ROM 0x......" comment), and src/enemy/obj_E0278.c + src/enemy/obj_DC3F6.c as style examples.
+Output ONLY the complete C file (no prose, no markdown fences) implementing:
+  #include "obj_ADDR.h"   (plus the needed ../objects, ../video, ../player headers)
+  int Obj_ADDR_Tick(const f3mem_t *m, uint32_t obj);  /* obj = A0 */
+Rules: exact 68k semantics (byte/word/long sizes, sign extension of .w address/data, carry/negative branches, 16-bit truncation of addresses when the code uses .w); A5 = 0x408000; PC-relative tables are read from ROM with rd16/rd32 at their absolute address; callees not declared in a header become static helpers in the same file; if a path cannot be translated (unknown indirect call), return -1 before applying any side effect of that path. Return 0 otherwise. Comment each block with its ROM address. Do not edit any file.

@@ -106,6 +106,7 @@ Drafts by agy (Gemini), verified here with per-object captures (`F3_COND="a1==<f
 | 0x0DECF8 | Obj_DECF8_Tick (gun attached to an E04CC parent) | VERIFIED (MAME) | 56/56 (codewhale draft; Claude fixed 16-bit address truncation, 0xD0DC2 fall-through, 0xD0090, 0xCFA7C and the 0xDF01E table). Paths outside the capture are less trusted |
 | 0x0EACDE / 0x0E0278 / 0x117BDE / 0x0DC3F6 | Obj_*_Tick | VERIFIED (MAME) | 49/49, 56/56, 55/55, 44/44 (hermes drafts) |
 | 0x0F302E | Obj_F302E_Tick | VERIFIED (MAME) | 4/4 incl. a spawn (hermes draft; Obj_Spawn group/ngroups were swapped) |
+| 0x0C6866 / 0x0C9978 / 0x0C9D7E / 0x0DC542 / 0x0E02C4 | Obj_*_Tick | VERIFIED (MAME) | 69/69, 21/21 (21 state changes), 9/9 (9 state changes), 27/27, 56/56 (1 alloc/free) (agy drafts, unchanged) |
 
 Note on `Obj_Spawn` argument order: the word pushed last (just before the fn long) is the group, the one before it is ngroups. `tests/test_objects` accepts `F3_ONLY=<substring>` to run a subset.
 | 0x0D5464 | Obj_D5464_Tick | VERIFIED (MAME) | 150/150 incl. 5 state changes (hermes draft; fixed to use the RAM RNG seed via `Rng_NextMem`) |

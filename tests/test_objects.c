@@ -59,6 +59,8 @@
 #include "../src/enemy/obj_13E4EE.h"
 #include "../src/enemy/obj_DC328.h"
 #include "../src/enemy/obj_DC0F8.h"
+#include "../src/enemy/obj_DF7EA.h"
+#include "../src/enemy/obj_DF844.h"
 #include "../src/objects/objscript_CF1E4.h"
 #include "../src/objects/objscript_CF4B8.h"
 
@@ -162,6 +164,8 @@ int main(void)
     bad += run("Obj 0x13E4EE", "work/ram/obj_13E4EE", Obj_13E4EE_Tick, rom);
     bad += run("Obj 0x0DC328", "work/ram/obj_DC328", Obj_DC328_Tick, rom);
     bad += run("Obj 0x0DC0F8", "work/ram/obj_DC0F8", Obj_DC0F8_Tick, rom);
+    bad += run("Obj 0x0DF7EA", "work/ram/obj_DF7EA", Obj_DF7EA_Tick, rom);
+    bad += run("Obj 0x0DF844", "work/ram/obj_DF844", Obj_DF844_Tick, rom);
     /* captured with F3_EXIT=ret at the routine entry */
     bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
     bad += run_a1("ObjMove 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);

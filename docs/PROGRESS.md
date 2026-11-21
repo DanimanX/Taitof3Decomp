@@ -91,7 +91,9 @@ Drafts by agy (Gemini), verified here with per-object captures (`F3_COND="a1==<f
 | 0x0C9C6A | Obj_PlayerShot_Tick | VERIFIED (MAME) | 399/399 ticks, 5 frees; hit/explode path (0xCA970) not decompiled (1 tick skipped) |
 | 0x0D9116 | Obj_D9116_Tick | VERIFIED (MAME) | 300/300 ticks (no state changes seen) |
 | 0x0CABF4 | Obj_CABF4_Tick | VERIFIED (MAME) | 300/300 ticks (no state changes seen) |
-| 0x0EAD28 | (enemy using the movement-script VM) | TODO | needs the script interpreter 0xCF1E4/0xCF4B8 (PC-relative opcode tables 0xCF204, 0xCF4C8) |
+| 0x0CF1E4 | ObjScript_CF1E4 (object script interpreter, 6-byte opcodes at obj+0x44) | VERIFIED (partial coverage) | `src/objects/objscript_CF1E4.c`; 20/20 calls bit-exact; first opcodes seen: 6, 9, 12, 13, 17, 20 of 29 |
+| 0x0CF4B8 | ObjScript_CF4B8 (second interpreter, table 0xCF4C8) | VERIFIED (partial coverage) | 300/300 calls; first opcodes seen: 12, 17, 19 |
+| 0x0EAD28 | (enemy using the script VMs) | TODO | redo the agy draft now that the VMs are exposed in headers |
 
 Delegation workflow: `scripts/export_bundle.sh <addr>` writes `work/disasm/bundle_<addr>.s` (flow-following disassembly incl. callees and PC-relative jump tables, stopping at routines declared in `src/**/*.h`) → agy drafts the C → `F3_SPR=1 F3_COND="a1==<addr>" scripts/capture_fn.sh 104EE 104F0 300 work/ram/obj_<ADDR>` → `tests/test_objects.c`.
 
@@ -99,7 +101,7 @@ Delegation workflow: `scripts/export_bundle.sh <addr>` writes `work/disasm/bundl
 - `scripts/ghidra/obj_states.py` discovers object tick routines referenced only as immediates (`move.l #fn,(A0)`, `move.l #fn,-(SP)` before `jsr Obj_Spawn`) plus the ones observed in MAME (`traces/obj_ticks.txt`, 58 addresses from pool-runner logs). Clean bootstrap: 583 → 2527 functions; 58/58 observed tick routines are functions.
 
 ## Verification tooling
-- `scripts/capture_fn.sh <entry> <exit> <n> <prefix>`: MAME debugger breakpoints (headless `-debug -debugger none`) dump Work RAM + registers exactly at a code region's entry/exit → golden pre/post pairs for any routine. Options: `F3_DPRAM` (sound DPRAM), `F3_SWEEP`/`F3_SWEEP_BASE` (force the word arg), `F3_POKE32` (force RAM at entry), `F3_LOG` (log registers at inner PCs, e.g. indirect calls), `F3_COND` (conditional entry, e.g. `a1==102fe6` at the pool call site 0x104EE to capture one object routine), `F3_SPR` (sprite RAM), `F3_POKEA0B` (byte pokes relative to A0). Tests share `tests/capture.h`.
+- `scripts/capture_fn.sh <entry> <exit> <n> <prefix>`: MAME debugger breakpoints (headless `-debug -debugger none`) dump Work RAM + registers exactly at a code region's entry/exit → golden pre/post pairs for any routine. Options: `F3_DPRAM` (sound DPRAM), `F3_SWEEP`/`F3_SWEEP_BASE` (force the word arg), `F3_POKE32` (force RAM at entry), `F3_LOG` (log registers at inner PCs, e.g. indirect calls), `F3_EXIT=ret` (post at the caller's return address; abandoned calls are dropped), `F3_MAXFRAMES` (watchdog: a stopped `-debug` MAME ignores SIGTERM, use `timeout -s KILL`), `F3_COND` (conditional entry, e.g. `a1==102fe6` at the pool call site 0x104EE to capture one object routine), `F3_SPR` (sprite RAM), `F3_POKEA0B` (byte pokes relative to A0). Tests share `tests/capture.h`.
 
 ## Known caveats
 - Ghidra auto-analysis creates pointers over code reached only via `pea` (task entries); `fix_flow.py` must run after `apply_symbols.py` (bootstrap does this).

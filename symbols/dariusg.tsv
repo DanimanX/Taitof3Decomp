@@ -118,6 +118,8 @@
 0C6A64	func	Task_PlayerControl	0	gameplay slot 5: spawns ship objs (Obj_Spawn 0xC685A), per frame runs each player's obj fn with io_ch, unless paused
 144B60	func	Task_StageBackground	0	gameplay slot 2: per-stage table 0x16AC3E[stage 0x40B2DC], line-RAM raster writes 0x62B000..
 102FE6	func	Obj_EnemyBullet_Tick	0	enemy bullet: move (vel +0x50/+0x54 minus scroll), off-screen/terrain -> 0xCEE74 dying chain, hazard list, sprite; bomb cancels via 0xCBB2C
+0CF1E4	func	ObjScript_CF1E4	0	object script interpreter: 6-byte ops at obj+0x44, table 0xCF204 (29 ops), loops while op sets flags7 bit2
+0CF4B8	func	ObjScript_CF4B8	0	second object script interpreter, table 0xCF4C8
 0CEE74	code	Obj_DieChain	0	fn = 0xCEE7C -> 0xCEE84 -> 0xCEE8C (Obj_Free) over 3 frames
 13F2C6	func	Task_StageTimeline	0	gameplay slot 6: scroll pos += speed; at each scripted position spawns Obj_Spawn(0xCC11C, grp 5, 2, entry) (enemy waves)
 13F2B6	func	Task_13F2B6	0	

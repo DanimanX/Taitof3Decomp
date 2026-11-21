@@ -8,6 +8,8 @@
 #include "../src/player/player_shot.h"
 #include "../src/enemy/obj_D9116.h"
 #include "../src/enemy/obj_CABF4.h"
+#include "../src/objects/objscript_CF1E4.h"
+#include "../src/objects/objscript_CF4B8.h"
 
 typedef int (*tick_fn)(const f3mem_t *, uint32_t);
 
@@ -48,6 +50,9 @@ int main(void)
     bad += run("PlayerShot 0x0C9C6A", "work/ram/obj_C9C6A", Obj_PlayerShot_Tick, rom);
     bad += run("Obj 0x0D9116", "work/ram/obj_D9116", Obj_D9116_Tick, rom);
     bad += run("Obj 0x0CABF4", "work/ram/obj_CABF4", Obj_CABF4_Tick, rom);
+    /* captured with F3_EXIT=ret at the routine entry */
+    bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
+    bad += run("ObjScript 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);
     free(rom);
     return bad ? 1 : 0;
 }

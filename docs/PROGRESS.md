@@ -99,6 +99,7 @@ Drafts by agy (Gemini), verified here with per-object captures (`F3_COND="a1==<f
 | 0x0C9F2E | Obj_C9F2E_Tick | VERIFIED (MAME) | 142/142 incl. 8 alloc/free (agy draft; RNG now via Rng_NextMem) |
 | 0x119990 | Obj_119990_Tick | VERIFIED (MAME) | 69/69 (agy) |
 | 0x0CBF5E / 0x119CBA / 0x117D06 / 0x13E5B2 / 0x0CAB36 | Obj_*_Tick | VERIFIED (MAME) | 69/69, 69/69, 132/132, 139/139, 129/129 (hermes drafts; 0x117D70 path in 117D06 not decompiled) |
+| 0x119714 | Obj_119714_Tick | VERIFIED (MAME) | 69/69 (hermes) |
 | 0x0D5464 | Obj_D5464_Tick | VERIFIED (MAME) | 150/150 incl. 5 state changes (hermes draft; fixed to use the RAM RNG seed via `Rng_NextMem`) |
 | 0x0CEE7C / 0x0CEE84 / 0x0CEE8C | Obj_Dying1/2/3_Tick | VERIFIED (MAME) | 8/8 each; frees the object on the 3rd frame |
 

@@ -23,6 +23,7 @@
 #include "../src/enemy/obj_13E5B2.h"
 #include "../src/enemy/obj_CAB36.h"
 #include "../src/objects/obj_common.h"
+#include "../src/enemy/obj_119714.h"
 #include "../src/objects/objscript_CF1E4.h"
 #include "../src/objects/objscript_CF4B8.h"
 
@@ -89,6 +90,7 @@ int main(void)
     bad += run("Obj_Dying1 0x0CEE7C", "work/ram/obj_CEE7C", Obj_Dying1_Tick, rom);
     bad += run("Obj_Dying2 0x0CEE84", "work/ram/obj_CEE84", Obj_Dying2_Tick, rom);
     bad += run("Obj_Dying3 0x0CEE8C", "work/ram/obj_CEE8C", Obj_Dying3_Tick, rom);
+    bad += run("Obj 0x119714", "work/ram/obj_119714", Obj_119714_Tick, rom);
     /* captured with F3_EXIT=ret at the routine entry */
     bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
     bad += run_a1("ObjMove 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);

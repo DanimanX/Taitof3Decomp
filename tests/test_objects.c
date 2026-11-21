@@ -6,6 +6,8 @@
 #include "capture.h"
 #include "../src/enemy/enemy_bullet.h"
 #include "../src/player/player_shot.h"
+#include "../src/enemy/obj_D9116.h"
+#include "../src/enemy/obj_CABF4.h"
 
 typedef int (*tick_fn)(const f3mem_t *, uint32_t);
 
@@ -44,6 +46,8 @@ int main(void)
     int bad = 0;
     bad += run("EnemyBullet 0x102FE6", "work/ram/obj_102FE6", Obj_EnemyBullet_Tick, rom);
     bad += run("PlayerShot 0x0C9C6A", "work/ram/obj_C9C6A", Obj_PlayerShot_Tick, rom);
+    bad += run("Obj 0x0D9116", "work/ram/obj_D9116", Obj_D9116_Tick, rom);
+    bad += run("Obj 0x0CABF4", "work/ram/obj_CABF4", Obj_CABF4_Tick, rom);
     free(rom);
     return bad ? 1 : 0;
 }

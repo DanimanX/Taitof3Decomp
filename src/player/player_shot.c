@@ -2,6 +2,7 @@
 #include "../player/player_move.h"
 #include "../video/sprite.h"
 #include "../objects/obj_pool.h"
+#include "../objects/obj_common.h"
 
 #define SHOT_LIST_CURSOR (F3_A5 + 0x0902u)
 #define SHOT_X_BOUNDS    0x000CC112u
@@ -23,28 +24,6 @@ static int sub_0CA514(const f3mem_t *m, uint32_t obj)
         return 0;
     /* unimplemented: ROM 0x11819A */
     return -1;
-}
-
-/* ROM 0x0CBD52 */
-static void sub_0CBD52(const f3mem_t *m, uint32_t obj, uint32_t anim_tbl)
-{
-    for (;;) {
-        int16_t off = (int16_t)rd16(m, obj + 0x3Au);
-        uint32_t entry = anim_tbl + (uint32_t)(int32_t)off;
-        int16_t dur = (int16_t)rd16(m, entry);
-        if (dur < 0) {
-            wr16(m, obj + 0x3Au, 0);
-            continue;
-        }
-        uint16_t cnt = (uint16_t)(rd16(m, obj + 0x3Eu) + 1u);
-        wr16(m, obj + 0x3Eu, cnt);
-        if ((int16_t)cnt <= dur) {
-            wr32(m, obj + 0x10u, rd32(m, entry + 2u));
-            return;
-        }
-        wr16(m, obj + 0x3Eu, 0);
-        wr16(m, obj + 0x3Au, (uint16_t)((uint16_t)off + 6u));
-    }
 }
 
 /* ROM 0x0C9C6A */
@@ -83,7 +62,7 @@ int Obj_PlayerShot_Tick(const f3mem_t *m, uint32_t obj)
         wr32(m, SHOT_LIST_CURSOR, p + 4u);
     }
 
-    sub_0CBD52(m, obj, rd32(m, obj + 0x44u));
+    Obj_Animate(m, obj, rd32(m, obj + 0x44u));
     Obj_DrawSprite(m, obj);
 
     uint8_t hit = rd8(m, obj + 0x35u);

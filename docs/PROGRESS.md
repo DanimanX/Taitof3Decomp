@@ -89,6 +89,11 @@ Drafts by agy (Gemini), verified here with per-object captures (`F3_COND="a1==<f
 |---|---|---|---|
 | 0x102FE6 | Obj_EnemyBullet_Tick | VERIFIED (MAME) | 400/400 ticks; 2 death transitions seen; bomb-cancel path (0xCBB2C) and explosion spawn not yet exercised/decompiled |
 | 0x0C9C6A | Obj_PlayerShot_Tick | VERIFIED (MAME) | 399/399 ticks, 5 frees; hit/explode path (0xCA970) not decompiled (1 tick skipped) |
+| 0x0D9116 | Obj_D9116_Tick | VERIFIED (MAME) | 300/300 ticks (no state changes seen) |
+| 0x0CABF4 | Obj_CABF4_Tick | VERIFIED (MAME) | 300/300 ticks (no state changes seen) |
+| 0x0EAD28 | (enemy using the movement-script VM) | TODO | needs the script interpreter 0xCF1E4/0xCF4B8 (PC-relative opcode tables 0xCF204, 0xCF4C8) |
+
+Delegation workflow: `scripts/export_bundle.sh <addr>` writes `work/disasm/bundle_<addr>.s` (flow-following disassembly incl. callees and PC-relative jump tables, stopping at routines declared in `src/**/*.h`) → agy drafts the C → `F3_SPR=1 F3_COND="a1==<addr>" scripts/capture_fn.sh 104EE 104F0 300 work/ram/obj_<ADDR>` → `tests/test_objects.c`.
 
 ## Ghidra coverage
 - `scripts/ghidra/obj_states.py` discovers object tick routines referenced only as immediates (`move.l #fn,(A0)`, `move.l #fn,-(SP)` before `jsr Obj_Spawn`) plus the ones observed in MAME (`traces/obj_ticks.txt`, 58 addresses from pool-runner logs). Clean bootstrap: 583 → 2527 functions; 58/58 observed tick routines are functions.

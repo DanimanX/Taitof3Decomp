@@ -1,3 +1,26 @@
 #include "obj_CB2C6.h"
-/* ROM 0x0CB2C6: not decompiled yet (stub) */
-int Obj_CB2C6_Tick(const f3mem_t *m, uint32_t obj) { (void)m; (void)obj; return -1; }
+#include "../objects/obj_common.h"
+
+/* ROM 0x0CBD86: clear the per-object animation state */
+static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
+{
+    wr16(m, obj + 0x1Cu, 0u);
+    wr16(m, obj + 0x1Eu, 0u);
+    wr16(m, obj + 0x34u, 0u);
+    wr16(m, obj + 0x3Au, 0u);
+    wr16(m, obj + 0x3Eu, 0u);
+    wr32(m, obj + 0x24u, 0u);
+    wr32(m, obj + 0x28u, 0u);
+}
+
+/* ROM 0x0CB2C6: scrolling text line (colour 0x2E, drift 0x7800, 0xC0 frames). */
+int Obj_CB2C6_Tick(const f3mem_t *m, uint32_t obj)
+{
+    sub_0CBD86(m, obj);
+    wr8(m, obj + 0x1Du, 0x2Eu);
+    wr16(m, obj + 0x20u, rd16(m, obj + 0x0Eu));
+    wr16(m, obj + 0x22u, 0x7800u);
+    wr16(m, obj + 0x06u, 0x00C0u);
+    wr32(m, obj + 0x00u, 0x000CB2ECu);
+    return 0;
+}

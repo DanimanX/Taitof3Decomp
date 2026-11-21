@@ -1,3 +1,32 @@
 #include "obj_11A87E.h"
-/* ROM 0x11A87E: not decompiled yet (stub) */
-int Obj_11A87E_Tick(const f3mem_t *m, uint32_t obj) { (void)m; (void)obj; return -1; }
+#include "../objects/obj_pool.h"
+#include "../objects/obj_common.h"
+#include "../video/sprite.h"
+
+/* ROM 0x0CBD86: clear the per-frame sprite state */
+static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
+{
+    wr16(m, obj + 0x1Cu, 0u);
+    wr16(m, obj + 0x1Eu, 0u);
+    wr16(m, obj + 0x34u, 0u);
+    wr16(m, obj + 0x3Au, 0u);
+    wr16(m, obj + 0x3Eu, 0u);
+    wr32(m, obj + 0x24u, 0u);
+    wr32(m, obj + 0x28u, 0u);
+}
+
+/* ROM 0x11A87E */
+int Obj_11A87E_Tick(const f3mem_t *m, uint32_t obj)
+{
+    /* 0x11A87E */
+    sub_0CBD86(m, obj);
+
+    /* 0x11A884 */
+    wr16(m, obj + 0x3Au, 0u);
+    wr16(m, obj + 0x3Eu, 0u);
+    wr32(m, obj + 0x2Cu, 0u);
+    wr32(m, obj + 0x30u, 0xFFF80000u);   /* move.l #-0x80000 */
+    wr16(m, obj + 0x06u, 0u);
+    wr32(m, obj, 0x0011A8A8u);
+    return 0;
+}

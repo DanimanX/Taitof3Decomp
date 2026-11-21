@@ -111,12 +111,13 @@
 410060	data	obj_pool	38016	11 groups x 32 x 0x6C
 # --- task entries (scripts/find_spawns.py); gameplay slots from saved contexts ---
 0C63E8	func	Task_Collision	0	gameplay slot 3: shots vs enemies, players vs hazards, terrain scroll sync (docs/PLAYER.md)
-0C6A64	func	Task_C6A64	0	gameplay slot 5
-144B60	func	Task_144B60	0	gameplay slot 2
-13F2C6	func	Task_13F2C6	0	gameplay slot 6
+0C6A64	func	Task_PlayerControl	0	gameplay slot 5: spawns ship objs (Obj_Spawn 0xC685A), per frame runs each player's obj fn with io_ch, unless paused
+144B60	func	Task_StageBackground	0	gameplay slot 2: per-stage table 0x16AC3E[stage 0x40B2DC], line-RAM raster writes 0x62B000..
+13F2C6	func	Task_StageTimeline	0	gameplay slot 6: scroll pos += speed; at each scripted position spawns Obj_Spawn(0xCC11C, grp 5, 2, entry) (enemy waves)
 13F2B6	func	Task_13F2B6	0	
 13F436	func	Task_13F436	0	
-010502	func	Task_10502	0	gameplay slot 14
+01057C	func	Obj_Spawn	0	(fn.l, group.w, ngroups.w, arg.l) -> D0 obj ptr or -1; free bitmasks 0x410000[g], 32 x 0x6C objs per group at 0x410060+g*0xD80
+010502	func	Task_ObjGroup11Runner	0	gameplay slot 14: ticks object pool group 11 (0x4194E0, mask 0x41002C), unless paused
 0910CC	func	Task_0910CC	0	
 0AC8E4	func	Task_0AC8E4	0	
 0B935A	func	Task_0B935A	0	

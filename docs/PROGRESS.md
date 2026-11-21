@@ -52,7 +52,10 @@ Status legend: `TODO` / `MAPPED` (named, purpose known) / `DECOMPILED` (C in `sr
 | 0 | 0x010172 | Task0_Main | forever |
 | 4 | 0x010488 | Task_ObjectPoolRunner | attract + game (killed 0xFFFE at game over); ticks Obj_PlayersTick (ship movement) |
 | 3 | 0x0C63E8 | Task_Collision | game: collisions + terrain (docs/PLAYER.md) |
-| 2,5,6,14 | 0x144B60, 0x0C6A64, 0x13F2C6, 0x010502 | (unnamed) | game |
+| 2 | 0x144B60 | Task_StageBackground (inferred: per-stage table, line-RAM raster) | game |
+| 5 | 0x0C6A64 | Task_PlayerControl (runs ship obj fns → Player_MoveAndBounds) | game |
+| 6 | 0x13F2C6 | Task_StageTimeline (scroll-position-scripted enemy spawns) | game |
+| 14 | 0x010502 | Task_ObjGroup11Runner (object pool group 11) | game |
 | 15 | 0x0038AC | Task_Slot15Daemon (sound?) | survives game start (kill 0x7FFE) |
 | 1 | 0x0B8404 | Task_Attract | attract only |
 | 1 | 0x004146 | Task_GameMain | game only |

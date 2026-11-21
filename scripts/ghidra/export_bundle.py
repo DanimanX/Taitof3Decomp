@@ -38,6 +38,16 @@ while queue:
     lines, a = [], start
     while True:
         ins = L.getInstructionAt(sp.getAddress(a))
+        if ins is None and L.getInstructionContaining(sp.getAddress(a)) is None:
+            # jump-table targets and code after calls Ghidra thought were
+            # non-returning are left undecoded: disassemble in memory
+            # (the project is opened read-only, nothing is saved)
+            from ghidra.app.cmd.disassemble import DisassembleCommand
+            d = L.getDataContaining(sp.getAddress(a))
+            lo = d.getMinAddress() if d is not None else sp.getAddress(a)
+            L.clearCodeUnits(lo, sp.getAddress(a + 0x20), False)
+            DisassembleCommand(sp.getAddress(a), None, True).applyTo(prog)
+            ins = L.getInstructionAt(sp.getAddress(a))
         if ins is None:
             lines.append("  %06X  <no instruction: undecoded bytes>" % a)
             break

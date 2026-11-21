@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdlib.h>
 /* Differential tests for individual object tick routines, captured at the
  * pool call site with a conditional breakpoint, e.g.
  *   F3_SPR=1 F3_COND="a1==102fe6" scripts/capture_fn.sh 104EE 104F0 400 work/ram/obj_102FE6
@@ -28,6 +30,13 @@
 #include "../src/enemy/obj_DCDF2.h"
 #include "../src/enemy/obj_DC8BE.h"
 #include "../src/enemy/obj_F30F6.h"
+#include "../src/enemy/obj_E04CC.h"
+#include "../src/enemy/obj_DECF8.h"
+#include "../src/enemy/obj_EACDE.h"
+#include "../src/enemy/obj_E0278.h"
+#include "../src/enemy/obj_117BDE.h"
+#include "../src/enemy/obj_F302E.h"
+#include "../src/enemy/obj_DC3F6.h"
 #include "../src/objects/objscript_CF1E4.h"
 #include "../src/objects/objscript_CF4B8.h"
 
@@ -61,10 +70,13 @@ static int run_any(const char *name, const char *pfx, tick_fn fn, tick_a1_fn fn_
     return tested - ok;
 }
 
+/* F3_ONLY=<substring>: run only the tests whose name contains it */
+static int skip(const char *name)
+{ const char *o = getenv("F3_ONLY"); return o && *o && !strstr(name, o); }
 static int run(const char *name, const char *pfx, tick_fn fn, const uint8_t *rom)
-{ return run_any(name, pfx, fn, NULL, rom); }
+{ return skip(name) ? 0 : run_any(name, pfx, fn, NULL, rom); }
 static int run_a1(const char *name, const char *pfx, tick_a1_fn fn, const uint8_t *rom)
-{ return run_any(name, pfx, NULL, fn, rom); }
+{ return skip(name) ? 0 : run_any(name, pfx, NULL, fn, rom); }
 
 int main(void)
 {
@@ -99,6 +111,13 @@ int main(void)
     bad += run("Obj 0x0DCDF2", "work/ram/obj_DCDF2", Obj_DCDF2_Tick, rom);
     bad += run("Obj 0x0DC8BE", "work/ram/obj_DC8BE", Obj_DC8BE_Tick, rom);
     bad += run("Obj 0x0F30F6", "work/ram/obj_F30F6", Obj_F30F6_Tick, rom);
+    bad += run("Obj 0x0E04CC", "work/ram/obj_E04CC", Obj_E04CC_Tick, rom);
+    bad += run("Obj 0x0DECF8", "work/ram/obj_DECF8", Obj_DECF8_Tick, rom);
+    bad += run("Obj 0x0EACDE", "work/ram/obj_EACDE", Obj_EACDE_Tick, rom);
+    bad += run("Obj 0x0E0278", "work/ram/obj_E0278", Obj_E0278_Tick, rom);
+    bad += run("Obj 0x117BDE", "work/ram/obj_117BDE", Obj_117BDE_Tick, rom);
+    bad += run("Obj 0x0F302E", "work/ram/obj_F302E", Obj_F302E_Tick, rom);
+    bad += run("Obj 0x0DC3F6", "work/ram/obj_DC3F6", Obj_DC3F6_Tick, rom);
     /* captured with F3_EXIT=ret at the routine entry */
     bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
     bad += run_a1("ObjMove 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);

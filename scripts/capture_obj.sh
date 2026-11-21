@@ -7,7 +7,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 A=$(echo "$1" | tr a-z A-Z); N=${2:-200}; a=$(echo "$A" | tr A-Z a-z | sed 's/^0*//')
 best=0
 for st in 02_stage1_start 03_active_combat 01_attract; do
-  out=$(F3_SPR=1 F3_COND="a1==$a" F3_MAXFRAMES=2500 timeout -s KILL 400 \
+  out=$(F3_SPR=1 F3_COND="a1==$a" F3_MAXFRAMES=${F3_MAXFRAMES:-6000} timeout -s KILL 400 \
         "$ROOT/scripts/capture_fn.sh" 104EE 104F0 "$N" "$ROOT/work/ram/obj_${A}_try" "$st" 2>&1 | grep -oE "pairs=[0-9]+" | cut -d= -f2)
   out=${out:-0}
   if [ "$out" -gt "$best" ]; then

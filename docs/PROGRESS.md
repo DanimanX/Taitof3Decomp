@@ -102,6 +102,12 @@ Drafts by agy (Gemini), verified here with per-object captures (`F3_COND="a1==<f
 | 0x119714 | Obj_119714_Tick | VERIFIED (MAME) | 69/69 (hermes) |
 | 0x0CBF8A | Obj_CBF8A_Tick (generic mover; per-object callback table at obj+0x50, index obj+0x5C) | VERIFIED (MAME) | 200/200 (agy); only callback table 0xD54D0 (0xD54DC/0xD550A/0xD5594) implemented, other tables return -1 |
 | 0x0DCDF2 / 0x0DC8BE / 0x0F30F6 | Obj_*_Tick | VERIFIED (MAME) | 97/97, 133/133 (3 state changes, 3 alloc/free), 100/100 (agy drafts, unchanged) |
+| 0x0E04CC | Obj_E04CC_Tick (turret that follows the scroll) | VERIFIED (MAME) | 58/58 (codewhale draft; Claude rewrote the 0xE0654 state table, which is 1-based, and the animation helpers 0xD0678/0xD0690) |
+| 0x0DECF8 | Obj_DECF8_Tick (gun attached to an E04CC parent) | VERIFIED (MAME) | 56/56 (codewhale draft; Claude fixed 16-bit address truncation, 0xD0DC2 fall-through, 0xD0090, 0xCFA7C and the 0xDF01E table). Paths outside the capture are less trusted |
+| 0x0EACDE / 0x0E0278 / 0x117BDE / 0x0DC3F6 | Obj_*_Tick | VERIFIED (MAME) | 49/49, 56/56, 55/55, 44/44 (hermes drafts) |
+| 0x0F302E | Obj_F302E_Tick | VERIFIED (MAME) | 4/4 incl. a spawn (hermes draft; Obj_Spawn group/ngroups were swapped) |
+
+Note on `Obj_Spawn` argument order: the word pushed last (just before the fn long) is the group, the one before it is ngroups. `tests/test_objects` accepts `F3_ONLY=<substring>` to run a subset.
 | 0x0D5464 | Obj_D5464_Tick | VERIFIED (MAME) | 150/150 incl. 5 state changes (hermes draft; fixed to use the RAM RNG seed via `Rng_NextMem`) |
 | 0x0CEE7C / 0x0CEE84 / 0x0CEE8C | Obj_Dying1/2/3_Tick | VERIFIED (MAME) | 8/8 each; frees the object on the 3rd frame |
 

@@ -1173,6 +1173,11 @@
 #include "../src/enemy/obj_C2C22.h"
 #include "../src/enemy/obj_126AB4.h"
 #include "../src/enemy/obj_126AE2.h"
+#include "../src/enemy/obj_11B262.h"
+#include "../src/enemy/obj_11B288.h"
+#include "../src/enemy/obj_11B2CA.h"
+#include "../src/enemy/obj_11B09A.h"
+#include "../src/enemy/obj_11B06E.h"
 #include "../src/objects/objscript_CF1E4.h"
 #include "../src/objects/objscript_CF4B8.h"
 
@@ -2404,6 +2409,11 @@ int main(void)
     bad += run("Obj 0x0C2C22", "work/ram/obj_C2C22", Obj_C2C22_Tick, rom);
     bad += run("Obj 0x126AB4", "work/ram/obj_126AB4", Obj_126AB4_Tick, rom);
     bad += run("Obj 0x126AE2", "work/ram/obj_126AE2", Obj_126AE2_Tick, rom);
+    bad += run("Obj 0x011B262", "work/ram/obj_11B262", Obj_11B262_Tick, rom);
+    bad += run("Obj 0x011B288", "work/ram/obj_11B288", Obj_11B288_Tick, rom);
+    bad += run("Obj 0x011B2CA", "work/ram/obj_11B2CA", Obj_11B2CA_Tick, rom);
+    bad += run("Obj 0x011B09A", "work/ram/obj_11B09A", Obj_11B09A_Tick, rom);
+    bad += run("Obj 0x011B06E", "work/ram/obj_11B06E", Obj_11B06E_Tick, rom);
     /* captured with F3_EXIT=ret at the routine entry */
     bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
     bad += run_a1("ObjMove 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);

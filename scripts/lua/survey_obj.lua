@@ -3,6 +3,7 @@
 -- 0x410000, 68020 bit order) and record first frame / count per fn.
 -- Env: F3_FRAMES (default 30000), F3_OUT (tsv path), F3_INPUT fire|none,
 --      F3_POKE32 "addr=val,..." written every frame (e.g. invincibility)
+--      F3_POKE16 "addr=val,..." 16-bit writes every frame (P1 invuln: 41B1E0=00D2)
 local cpu = manager.machine.devices[":maincpu"]
 local sp = cpu.spaces["program"]
 local p = manager.machine.ioport.ports
@@ -11,10 +12,13 @@ local outp = os.getenv("F3_OUT") or "work/survey.tsv"
 local inmode = os.getenv("F3_INPUT") or "fire"
 local pokes = {}
 for a, v in string.gmatch(os.getenv("F3_POKE32") or "", "(%x+)=(%x+)") do pokes[#pokes + 1] = {tonumber(a, 16), tonumber(v, 16)} end
+local pokes16 = {}
+for a, v in string.gmatch(os.getenv("F3_POKE16") or "", "(%x+)=(%x+)") do pokes16[#pokes16 + 1] = {tonumber(a, 16), tonumber(v, 16)} end
 local seen, n = {}, 0
 emu.register_frame_done(function()
   n = n + 1
   for _, pv in ipairs(pokes) do sp:write_u32(pv[1], pv[2]) end
+  for _, pv in ipairs(pokes16) do sp:write_u16(pv[1], pv[2]) end
   for g = 0, 11 do
     local mask = sp:read_u32(0x410000 + 4 * g)
     for s = 0, 31 do

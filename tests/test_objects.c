@@ -335,6 +335,7 @@
 #include "../src/enemy/obj_D9E06.h"
 #include "../src/enemy/obj_DBF16.h"
 #include "../src/enemy/obj_DBF70.h"
+#include "../src/enemy/obj_CC11C.h"
 #include "../src/objects/objscript_CF1E4.h"
 #include "../src/objects/objscript_CF4B8.h"
 
@@ -716,6 +717,7 @@ int main(void)
     bad += run("Obj 0x0D9E06", "work/ram/obj_D9E06", Obj_D9E06_Tick, rom);
     bad += run("Obj 0x0DBF16", "work/ram/obj_DBF16", Obj_DBF16_Tick, rom);
     bad += run("Obj 0x0DBF70", "work/ram/obj_DBF70", Obj_DBF70_Tick, rom);
+    bad += run("Obj 0x0CC11C", "work/ram/obj_CC11C", Obj_CC11C_Tick, rom);
     /* captured with F3_EXIT=ret at the routine entry */
     bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
     bad += run_a1("ObjMove 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);

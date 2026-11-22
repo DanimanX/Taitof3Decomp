@@ -51,6 +51,44 @@ void Obj_Animate(const f3mem_t *m, uint32_t obj, uint32_t anim_tbl)
     }
 }
 
+/* ROM 0x0D0690: advance the object script (obj+0x48) once its frame timer
+ * (obj+0x4C) runs out. Copied from the five sibling tick routines that carry
+ * this ROM range as a private static helper. */
+void Obj_StepScript(const f3mem_t *m, uint32_t obj)
+{
+    uint16_t cnt = (uint16_t)(rd16(m, obj + 0x4Cu) - 1u);
+    wr16(m, obj + 0x4Cu, cnt);
+    if (cnt != 0u)
+        return;
+
+    uint32_t a1 = rd32(m, obj + 0x48u) + 0x0Cu;
+    wr32(m, obj + 0x48u, a1);
+    uint16_t d0 = rd16(m, a1);
+    a1 += 2u;
+    if ((int16_t)d0 < 0) {
+        int16_t back = (int16_t)rd16(m, a1);
+        if (back == 0)
+            return;
+        a1 -= (uint32_t)(int32_t)back;
+        wr32(m, obj + 0x48u, a1);
+        wr16(m, obj + 0x4Cu, rd16(m, a1));
+        a1 += 2u;
+        wr8(m, obj + 0x1Cu, (uint8_t)rd16(m, a1));
+        a1 += 2u;
+        wr32(m, obj + 0x10u, rd32(m, a1));
+        a1 += 4u;
+        wr32(m, obj + 0x68u, rd32(m, a1));
+        return;
+    }
+
+    wr16(m, obj + 0x4Cu, d0);
+    wr8(m, obj + 0x1Cu, (uint8_t)rd16(m, a1));
+    a1 += 2u;
+    wr32(m, obj + 0x10u, rd32(m, a1));
+    a1 += 4u;
+    wr32(m, obj + 0x68u, rd32(m, a1));
+}
+
 /* ROM 0x0CEE7C / 0x0CEE84 / 0x0CEE8C: the dying chain started by
  * Obj_StartDying waits two frames, then frees the object. */
 int Obj_Dying1_Tick(const f3mem_t *m, uint32_t obj) { wr32(m, obj, 0x000CEE84u); return 0; }

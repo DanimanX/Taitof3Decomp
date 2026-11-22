@@ -127,6 +127,7 @@ Note: 0x0BDE92 and 0x0BE262 (palette/scroll objects, attract-mode text typer) al
 | 0x118D7C / 0x118DDC / 0x0F0788 / 0x0F0814 / 0x0F0846 / 0x0F0D7E / 0x0F0D8A | Obj_*_Tick (survey batch) | VERIFIED (MAME) | 0x118D7C 1/1 (agy2), 0x118DDC 86/86 (agy2), 0x0F0788 100/100 (agy2), 0x0F0814 20/20 (agy2), 0x0F0846 100/100 (agy2), 0x0F0D7E 100/100 (agy2), 0x0F0D8A 7/7 (agy2) |
 | 0x0CB97E / 0x0BDE92 | graphics RAM writes completed (0x55C8, 0x5A86, 0x53B2, 0x176832, 0x1768CA) | VERIFIED (MAME, gfx RAM compared) | 1/1, 32/32 (claude3) |
 | 0x108DFC | Obj_*_Tick (survey batch) | VERIFIED (MAME) | 0x108DFC 8/8 (claude4) |
+| 0x0CC11C / 0x0F4D52 / 0x0F4DDE / 0x0F4E1E / 0x0D9D9E / 0x0D9E06 | Obj_*_Tick (survey batch) | VERIFIED (MAME) | 0x0CC11C 6/6 (claude1), 0x0F4D52 100/100 (claude2), 0x0F4DDE 3/3 (claude2), 0x0F4E1E 100/100 (claude2), 0x0D9D9E 15/15 (claude4), 0x0D9E06 100/100 (claude4) |
 Note on `Obj_Spawn` argument order: the word pushed last (just before the fn long) is the group, the one before it is ngroups. `tests/test_objects` accepts `F3_ONLY=<substring>` to run a subset.
 | 0x0D5464 | Obj_D5464_Tick | VERIFIED (MAME) | 150/150 incl. 5 state changes (hermes draft; fixed to use the RAM RNG seed via `Rng_NextMem`) |
 | 0x0CEE7C / 0x0CEE84 / 0x0CEE8C | Obj_Dying1/2/3_Tick | VERIFIED (MAME) | 8/8 each; frees the object on the 3rd frame |

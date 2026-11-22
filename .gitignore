@@ -52,3 +52,4 @@ ghidra_proj/**/versioned/
 # Raw multi-MB trace logs: commit the *.pcs.tsv summaries instead
 traces/mmio/*.log
 work/ram/
+.codewhale-worktrees/

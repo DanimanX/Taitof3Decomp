@@ -135,6 +135,7 @@ emu.register_periodic(function()
   end
   if pc == entry and not have_pre then
     for _, pv in ipairs(pokes) do sp:write_u32(pv[1], pv[2]) end
+    for _, pv in ipairs(pokes16) do sp:write_u16(pv[1], pv[2]) end
     if not pokefn then poke_a0() end
     if sweep > 0 then sp:write_u16(spv + 4, sweep_base + pairs_done % sweep) end
     pre_snap = snapshot(); pre_regs = regline_str(pairs_done, "pre"); pending_logs = {}; have_pre = true
@@ -163,7 +164,9 @@ emu.register_frame_done(function()
   if fnum - scr0 == n then return end
   n = fnum - scr0
   if n >= maxframes then finish("PARTIAL"); return end
-  for _, pv in ipairs(pokes16) do sp:write_u16(pv[1], pv[2]) end
+  -- never between a pre and a post snapshot (the tick would see a write
+  -- the routine did not make); the entry breakpoint re-applies them
+  if not have_pre then for _, pv in ipairs(pokes16) do sp:write_u16(pv[1], pv[2]) end end
   if inmode == "fire" then
     local t = n + noffset
     p[":IN.0"].fields["P1 Button 1"]:set_value((t // 3) % 2)

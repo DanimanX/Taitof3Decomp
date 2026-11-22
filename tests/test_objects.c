@@ -1178,6 +1178,22 @@
 #include "../src/enemy/obj_11B2CA.h"
 #include "../src/enemy/obj_11B09A.h"
 #include "../src/enemy/obj_11B06E.h"
+#include "../src/enemy/obj_179550.h"
+#include "../src/enemy/obj_1795F6.h"
+#include "../src/enemy/obj_17960A.h"
+#include "../src/enemy/obj_179572.h"
+#include "../src/enemy/obj_17961E.h"
+#include "../src/enemy/obj_1795A4.h"
+#include "../src/enemy/obj_179632.h"
+#include "../src/enemy/obj_179646.h"
+#include "../src/enemy/obj_17955E.h"
+#include "../src/enemy/obj_179600.h"
+#include "../src/enemy/obj_179614.h"
+#include "../src/enemy/obj_179588.h"
+#include "../src/enemy/obj_179628.h"
+#include "../src/enemy/obj_1795CA.h"
+#include "../src/enemy/obj_17963C.h"
+#include "../src/enemy/obj_179650.h"
 #include "../src/objects/objscript_CF1E4.h"
 #include "../src/objects/objscript_CF4B8.h"
 
@@ -2414,6 +2430,24 @@ int main(void)
     bad += run("Obj 0x011B2CA", "work/ram/obj_11B2CA", Obj_11B2CA_Tick, rom);
     bad += run("Obj 0x011B09A", "work/ram/obj_11B09A", Obj_11B09A_Tick, rom);
     bad += run("Obj 0x011B06E", "work/ram/obj_11B06E", Obj_11B06E_Tick, rom);
+    bad += run("Obj 0x0179550", "work/ram/obj_179550", Obj_179550_Tick, rom);
+    bad += run("Obj 0x01795F6", "work/ram/obj_1795F6", Obj_1795F6_Tick, rom);
+    bad += run("Obj 0x017960A", "work/ram/obj_17960A", Obj_17960A_Tick, rom);
+    bad += run("Obj 0x0179572", "work/ram/obj_179572", Obj_179572_Tick, rom);
+    bad += run("Obj 0x017961E", "work/ram/obj_17961E", Obj_17961E_Tick, rom);
+    bad += run("Obj 0x01795A4", "work/ram/obj_1795A4", Obj_1795A4_Tick, rom);
+    bad += run("Obj 0x0179632", "work/ram/obj_179632", Obj_179632_Tick, rom);
+    bad += run("Obj 0x0179646", "work/ram/obj_179646", Obj_179646_Tick, rom);
+    bad += run("Obj 0x017955E", "work/ram/obj_17955E", Obj_17955E_Tick, rom);
+    bad += run("Obj 0x0179600", "work/ram/obj_179600", Obj_179600_Tick, rom);
+    bad += run("Obj 0x0179614", "work/ram/obj_179614", Obj_179614_Tick, rom);
+    bad += run("Obj 0x0179588", "work/ram/obj_179588", Obj_179588_Tick, rom);
+    bad += run("Obj 0x0179628", "work/ram/obj_179628", Obj_179628_Tick, rom);
+    bad += run("Obj 0x01795CA", "work/ram/obj_1795CA", Obj_1795CA_Tick, rom);
+    bad += run("Obj 0x017963C", "work/ram/obj_17963C", Obj_17963C_Tick, rom);
+    bad += run("Obj 0x0179650", "work/ram/obj_179650", Obj_179650_Tick, rom);
+    bad += run("Obj 0x011B472", "work/ram/obj_11B472", Obj_11B472_Tick, rom);
+    bad += run("Obj 0x011B3D2", "work/ram/obj_11B3D2", Obj_11B3D2_Tick, rom);
     /* captured with F3_EXIT=ret at the routine entry */
     bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
     bad += run_a1("ObjMove 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);

@@ -43,6 +43,7 @@ Thumbs.db
 work/decomp/
 work/disasm/
 build/
+.worktrees/
 
 # Ghidra program databases contain ROM bytes: never commit
 ghidra_proj/**/idata/

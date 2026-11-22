@@ -23,11 +23,9 @@ static int sub_0D1EBC(const f3mem_t *m, uint16_t d0w, uint16_t d1w,
     uint32_t d1 = rd32(m, 0x000D2044u + off);
     uint32_t d0 = rd32(m, 0x000D1EDCu + off);
 
-    /* Jump table 0x0D4F26 [0..50] -> 0x0D4FF2..0x0D538A: exact (D0*k, D1*k) mod 2^32. */
-    if (d2w > 50u) {
-        /* unimplemented: ROM 0x0D4F26 */
-        return -1;
-    }
+        /* Jump table 0x0D4F26 [0..50] -> 0x0D4FF2..0x0D538A: block k is the
+         * constant 0..50 (k=0 at 0x0D4FF2 clears both), so (D0*k, D1*k)
+         * mod 2^32 is exact for every k the table has. */
 
     *out_d0 = (uint32_t)(d0 * (uint32_t)d2w);
     *out_d1 = (uint32_t)(d1 * (uint32_t)d2w);

@@ -23,8 +23,11 @@ for wt in "$ROOT"/../Taitof3Decomp-wt/*/; do
     cp "$f" "src/enemy/obj_$a.c"; cp "${f%.c}.h" "src/enemy/obj_$a.h"   # shared helpers may be declared there
     rm -f build/test_objects
     if make -s build/test_objects >/dev/null 2>&1; then
-      r=$(F3_ONLY="$a" ./build/test_objects 2>&1 | grep -E "Obj 0x0*$a\b" | tail -1)
+      # F3_STRICT_UNIMPL: a routine whose every captured tick takes an
+      # undecompiled path reports "0/ 0 bit-exact" and must not be harvested
+      r=$(F3_STRICT_UNIMPL=1 F3_ONLY="$a" ./build/test_objects 2>&1 | grep -E "Obj 0x0*$a\b" | tail -1)
       if echo "$r" | grep -qE " ([0-9]+)/ *\1 ticks bit-exact" && ! echo "$r" | grep -qE " 0/ *0 " \
+         && ! echo "$r" | grep -q "REJECT" \
          && echo "$r" | grep -q " 0 reach undecompiled"; then
         n=$(echo "$r" | grep -oE "[0-9]+/ *[0-9]+" | head -1 | tr -d ' ')
         kept+=("$a"); notes+=("0x$(printf %06X $((16#$a))) $n ($w)")

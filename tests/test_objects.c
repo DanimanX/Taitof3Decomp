@@ -1184,15 +1184,20 @@ static int run_any(const char *name, const char *pfx, tick_fn fn, tick_a1_fn fn_
     capture_t c;
     if (cap_load(&c, pfx) || !c.spr) { printf("objects: %-22s SKIP (no %s)\n", name, pfx); return 0; }
     uint8_t *w = malloc(F3_WRAM_SIZE), *s = malloc(F3_SPR_SIZE), *g = c.gfx ? malloc(F3_GFX_SIZE) : NULL;
-    int ok = 0, unimpl = 0, budget = 8, died = 0, freed = 0;
+    int ok = 0, unimpl = 0, budget = 8, died = 0, freed = 0, hidden = 0;
     for (int i = 0; i < c.pairs; i++) {
         memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
         memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
         if (g) memcpy(g, cap_gfx(&c, i, 0), F3_GFX_SIZE);
         f3mem_t m = { w, (uint8_t *)rom, NULL, s, g };
-        uint32_t obj = c.pre[i][CR_A0], fn0 = rd32(&m, obj);
+        uint32_t obj = c.pre[i][CR_A0];
+        uint32_t fn0 = rd32(&m, obj);   /* tick fn before the call */
         int r = fn ? fn(&m, obj) : fn_a1(&m, obj, c.pre[i][CR_A1]);
-        if (r < 0) { unimpl++; continue; }
+        if (r < 0) {
+            /* the tick's effect is unobservable, so this pair cannot be
+             * compared; strict mode (harvest gates) refuses to count it */
+            unimpl++; hidden++; continue;
+        }
         if (rd32(&m, obj) != fn0) died++;   /* switched state (dying) */
         if (memcmp(w + 0x10000 - 0, cap_wram(&c, i, 0) + 0x10000, 0x30)) freed++; /* free masks changed */
         uint32_t sp = c.pre[i][CR_SP];
@@ -1205,6 +1210,13 @@ static int run_any(const char *name, const char *pfx, tick_fn fn, tick_a1_fn fn_
     printf("objects: %-22s %3d/%3d ticks bit-exact (%d state changes, %d alloc/free; %d reach undecompiled paths)\n",
            name, ok, tested, died, freed, unimpl);
     free(w); free(s); free(g); cap_free(&c);
+    if (hidden && tested == 0) {
+        /* every captured tick took a not-yet-decompiled path: nothing was
+         * observable, so this routine must not pass silently (the harvest
+         * gate has to see a failure) */
+        printf("objects: %-22s %3d/%3d ticks bit-exact REJECT %d unobservable tick(s) (undecompiled path)\n", name, ok, tested, hidden);
+        return hidden;
+    }
     return tested - ok;
 }
 

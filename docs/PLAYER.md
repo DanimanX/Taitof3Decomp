@@ -163,3 +163,105 @@ Both share offsets `0x00..0x39` so `SUB_000c6446`/`000c64fc`/`000c67ea` treat th
 | `0x41A980` | abs | 2×4 B | `player_bomb_dmg[2]` | **CONFIRMED** per-player area dmg added by `0xC660A`, applied `0xC655C`, cleared `0xC6434` |
 | `0x41A988`/`ABE0`/`ACE0` | abs | ptr arrays | `coll_list1`/`2`/`3` | **CONFIRMED** entity ptr lists: shootables (`0x41A988`), shots (`0x41ABE0`), hazards (`0x41ACE0`) |
 | `0x41B190`/`B21A` | abs | 2×`0x8A` B | `players[2]` | **CONFIRMED** P1 (`0x41B190`, `score_p1` at `+0x48`=`0x41B1D8`) & P2 (`0x41B21A`) state structs |
+
+---
+
+## 5. `Task_PlayerControl` (`0xC6A64`, kernel slot 5) — the per-frame player lane
+
+Translated in `src/player/player_task.c` (+`.h`); test in `tests/test_player_task.c`.
+Disassembly: `work/disasm/bundle_0C6A64.s` (`scripts/export_bundle.sh 0C6A64 4`).
+
+### A. Re-entry semantics — **CONFIRMED** (this is what makes captures hard)
+
+The task is **not** a call-and-return routine. The kernel slot calls it, and the
+task yields (`TRAP #5`) several times per frame at `0xC6A9A`. Every resume
+re-enters at `0xC6A64` from the top: the saved return address of the slot call
+(`0xC6A64 + 0x36 = 0xC6A9A`) is reused, so after the yield the SPAWN
+(`Obj_Spawn 0xC685A`) and the scene init `0xC6B36` run again. The nested
+`TRAP #5` sites inside the stage-fail loop (`0xC6E6E`, `0xC7332`, `0xC736E`,
+`0xC73AA`, `0xC73F8`, `0xC7440`, `0xC747C`) behave the same way.
+
+Measured (MAME 0.289, state `02_stage1_start`, breakpoint log): a run that visits
+`0xC6A9C`, `0xC6AA0`, `0xC6AB0` "moves on" one instruction per yield
+(`0xC6A9A → 0xC6A9C → 0xC6AA0 → 0xC6AB0 → ... 0xC6B16`, then the slot restarts
+at `0xC6A64` with the loop re-entered at `0xC6A9A`). A single execution of the
+task in this state therefore reaches `0xC6B16` (the frame boundary used for the
+captures) once, and reaches `0x0B9080`/`0x0C8A5E` on other frames.
+
+Consequence for verification: `scripts/capture_fn.sh 0C6A64 …` never produces a
+pair (the task never returns), and **any** breakpoint on a later PC of the task
+perturbs the next hit: a non-persistent MAME breakpoint makes the CPU stop one
+instruction earlier on every subsequent hit, which is visible as a one-byte lag
+in every "post" dump (`0x407360` sprite cursor and friends). The only MAME
+reading of this lane that is not perturbed is a debugger-free run; the
+reference capture for the test is
+`work/dariusg_trace/lua/boot_frame.lua` (frame 0 Work RAM = the loaded state,
+frame 1 = the state after one frame).
+
+### B. Frame loop (ROM map)
+
+```text
+0C6A64  bset.b #0,(0x1D1E,A5)        ; Z = previous bit (scene started?)
+0C6A6A  if Z was 0: (0x1D40,A5)=0x1D ; (0x1D36,A5) = 0
+0C6A7A  Obj_Spawn(A0=0, fn 0x0C685A, group 2, n 7, arg 0)   ; P1/P2 wrapper task
+0C6A96  bsr 0x0C6B36                                        ; scene init
+0C6A9A: TRAP #5                                             ; <-- yield of the frame
+0C6A9C  addq.w #1,(0x878,A5)                                ; once per resume
+0C6AA0  btst #1,(0x1D36-0x144B,A5); bne 0x0C6A9A            ; paused -> yield
+0C6AA8  (0x1D4C,A5) = 0x41B190                              ; active list head = P1
+0C6AB0  jsr 0x0B9080                                        ; object-script pass
+0C6AB6  bsr 0x0C8488 / 0x0C87F8                             ; HUD anim rows
+0C6ABE  A0 = 0x41B190; bclr #0,(0x34,A0); D0b = !btst#1(0x1D36); or.b D0b,(0x34,A0)
+0C6ADA  A1 = (0x44,A0); A2 = (A0); jsr (A2)                 ; P1 tick, io_ch in A1
+0C6AE2  if !(0x1D36-0x5DC6): the same for P2 at 0x41B21A
+0C6B0E  bsr 0x0C6E10                                        ; pick one active player
+0C6B12  bsr 0x0C8A5E                                        ; player HUD
+0C6B16  if P1.+0x4C >= 0 -> yield ; if P2.+0x4C >= 0 -> yield
+0C6B32  else bra 0x0C6E5A                                   ; stage fail (never returns)
+```
+
+`A0` is reloaded at `0x0C6B16` while `A5 = 0x408000` (breakpoint log), i.e.
+`0x0C6B16` also runs with `A5` set — a scheduler detail, not a task parameter.
+
+### C. Scene init `0x0C6B36` (`src/player/player_task.c:Player_SceneInit`)
+
+`clr.w (0x878)`; clear bits 1–4 of `(0x1D36)`; `sf (0x1D58)`; `clr.w (0x1D4A)`;
+`clr.l (0x1D20)/(0x1D24)`; `0x0C7D9A` (`clr.w 0x41B2A4+0x1C/+0x1E`, `clr.w
+0x1D46/0x1D48/0x1D42/0x1D44`); then four `jsr 0x001660` palette-block copies
+(`(0x354,3) (0x360,8) (0x94,3) (0xA0,8)` from table `0x0C9242`); then the
+two-player spawn loop (register map in the commented block of `Player_SceneInit`):
+per player `Obj_Spawn(*(SP), fn 0x0CABAC, group 2..7, 0xFFF4)` and `(…, 0x1B)`,
+fill `+0x44/+0x0C/+0x0D`, `+0x00 = 0x0C7480`, `+0x22 = id`, `+0x34 = 0xFF`,
+`+0x4C = -1`, `+0x42 = 12`, `+0x5A = 0x0F`, `+0x5C = 12`, `+0x62 = -1`,
+`+0x66 = -1` (bfclr bit 0), `+0x6A/+0x7A` pair init, and for player 0
+`0x0C6D0E` + `0x0C6CE6`; finally `0x0C6DEC` (64 shot objects). The init stops
+before `0x001660` in the C model (that routine is not decompiled).
+
+### D. Player-pool helpers translated here
+
+| Addr | Name (`src/player/player_task.c`) | What it does |
+|---|---|---|
+| `0x0C6DEC` | `Player_ShotPoolReset` | 64 shot objects at `0x410354`: `+0x10 = 0x28740`, `+0x1E = 0`, `+0x34 = 0xFF`, `+0x35 = 0` |
+| `0x0C6CE6` | `Player_ArmRespawn` | `+0x00 = 0x0C793E`; `+0x4C = *(0x1D3A)`, `+0x60 = *(0x1D3C)`; clr `+0x5E/+0x52/+0x62`; bclr bit 0 of `+0x64` |
+| `0x0C6D0E` | `Player_Respawn` | `Obj_Spawn(*(+0x62), 0x0C95DE, g1..11)`; `+0x65 = 0`; X/Y from `0x0C926E + 4*id`; `hp = dmg = 0x10000`; `invuln = 0xD2`; `+0x54 -= 3` and `-= (+0x54 % 3)`, `+0x58 -= (+0x58 % 5)`; clr `+0x34`, `+0x3A..0x41`, `+0x4E`; `+0x60 = *(0x1D3C)`; `(+0x6A,+0x6C) = (+0x56,-1)`, `(+0x7A,+0x7C) = (+0x58,-1)` → tail `0x0C8E1A`, `0x0C8BCE` (not decompiled) |
+| `0x0C6E10` | `Player_PickActive` | `(0x1D28) = 0`; collect P1/P2 with `+0x4C >= 0` into `0x1D2C[]`, count → `(0x1D34)`; if any, `(0x1D28) = 0x1D2C[*(0x1456) % count]` (`divu` + `swap`) |
+| `0x0C77BE` | `Player_CoinCheckA` | `if (0x5DC1,A5) != 0: return`; else `tst.w (+0x62)` + `0CFEC`/`01016` (not decompiled) |
+| `0x0C77E8` | (inside `Player_DefeatBookKeeping`) | guards `0x5DC1/0x5DC3`, then `01034`/`0103A` (not decompiled) |
+| `0x0C7814` | `Player_FailText` | per-player stage-fail text rows (`0x5566/0x571A`) — mapped, not translated |
+| `0x0C7C60` | `Player_DefeatBookKeeping` | `+0x62 < 0` → `score = 0`, `0x0C6D0E`, `0x0C6CE6`; else hi-score slot via `0x13D638` (not decompiled) |
+| `0x0C8488`, `0x0C87F8` | `Player_HudRow1/2` | HUD animation-row advance + `0x001660` palette copy per player (mapped only) |
+| `0x0C8A5E` | `Player_Hud` | HUD digits `0x0C8BFA/0x0C8EE8/0x0C8AB4/0x0C8B8A/0x0C8F48` (mapped only) |
+| `0x0C6E5A` | `Player_StageFail` | fail loop: 13× `0x5566` labels, per player `0x0C77BE`/`0x0C7814`/`0x0C7C60`, `0x3C12`/`0x13F238`/`0x39D8`, `0x978`; ends in the `0xC747C` dead loop (mapped only) |
+
+### E. Corrections to §3 of this file
+
+* `+0x4C` is **not** "lives": it is a per-player counter that is `-1` for an
+  unfinished/out player and `0`/`1`/`2` in live play (states: attract `2`,
+  stage1 start `1`, active combat `0`), re-armed by `0x0C6CE6` from `A5+0x1D3A`.
+  `0x0C6A64` treats `>= 0` as "in play" and `< 0` as "out of players" (stage fail).
+* `+0x00` is a function pointer and takes four measured values in the states:
+  `0x0C7480` (stage-fail task; set by the scene init), `0x0C7946` (ship, spawned
+  by `0x0C6B36`'s argument list), `0x0C77BE`/`0x0C7946` family and
+  `0x0C793E` (respawn tick written by `0x0C6CE6`). A debugger-perturbed run can
+  show other nearby values.
+* `PS_X`/`PS_Y` names used by `player_move.h` are `+0x14/+0x18`.

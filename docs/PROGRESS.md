@@ -136,6 +136,7 @@ Note: 0x0BDE92 and 0x0BE262 (palette/scroll objects, attract-mode text typer) al
 | 0x1193E2 / 0x119422 / 0x13E12C | Obj_*_Tick (survey batch) | VERIFIED (MAME) | 0x1193E2 60/60 (claude4), 0x119422 6/6 (claude4), 0x13E12C 1/1 (cw5) |
 | 0x119ACA | Obj_*_Tick (survey batch) | VERIFIED (MAME) | 0x119ACA 12/12 (claude4) |
 | 0x0DA8B4 / 0x0E1BAE / 0x0E4B02 / 0x0EC734 | Obj_*_Tick (survey batch) | VERIFIED (MAME) | 0x0DA8B4 60/60 (claude1), 0x0E1BAE 60/60 (claude1), 0x0E4B02 60/60 (claude2), 0x0EC734 60/60 (claude2) |
+| 0x0D7A86 / 0x0F299C | Obj_*_Tick (survey batch) | VERIFIED (MAME) | 0x0D7A86 60/60 (claude1), 0x0F299C 60/60 (claude2) |
 Note on `Obj_Spawn` argument order: the word pushed last (just before the fn long) is the group, the one before it is ngroups. `tests/test_objects` accepts `F3_ONLY=<substring>` to run a subset.
 | 0x0D5464 | Obj_D5464_Tick | VERIFIED (MAME) | 150/150 incl. 5 state changes (hermes draft; fixed to use the RAM RNG seed via `Rng_NextMem`) |
 | 0x0CEE7C / 0x0CEE84 / 0x0CEE8C | Obj_Dying1/2/3_Tick | VERIFIED (MAME) | 8/8 each; frees the object on the 3rd frame |

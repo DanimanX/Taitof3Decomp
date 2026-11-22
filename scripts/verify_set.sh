@@ -18,7 +18,9 @@ fi
 rc=0
 for a in "${ADDRS[@]}"; do
   # accept on the strict line, or on the plain line when every tick was observable
-  r=$(F3_STRICT_UNIMPL=1 F3_ONLY=$a timeout 180 ./build/test_objects 2>&1 | grep -E "^objects: .*0x0*$a\b" | grep -v REJECT | tail -1)
+  # plain run only: F3_STRICT_UNIMPL adds a second, REJECT-tagged line for
+  # routines that have an unobservable pair even when others are exact
+  r=$(F3_ONLY=$a timeout 180 ./build/test_objects 2>&1 | grep -E "^objects: .*0x0*$a\b" | tail -1)
   n=$(echo "$r" | grep -oE '[0-9]+/ *[0-9]+' | head -1 | tr -d ' ')
   un=$(echo "$r" | grep -oE '[0-9]+ reach undecompiled' | cut -d' ' -f1)
   rej=$(echo "$r" | grep -c REJECT)

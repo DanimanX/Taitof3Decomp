@@ -3,6 +3,7 @@
 -- 0x410000, 68020 bit order) and record first frame / count per fn.
 -- Env: F3_FRAMES (default 30000), F3_OUT (tsv path), F3_INPUT fire|none,
 --      F3_POKE32 "addr=val,..." written every frame (e.g. invincibility)
+--      F3_SAVEEVERY N: save state <F3_SAVEPFX>_<frame> every N frames (+ <out>.progress)
 --      F3_POKE16 "addr=val,..." 16-bit writes every frame (P1 invuln: 41B1E0=00D2)
 local cpu = manager.machine.devices[":maincpu"]
 local sp = cpu.spaces["program"]
@@ -14,6 +15,8 @@ local pokes = {}
 for a, v in string.gmatch(os.getenv("F3_POKE32") or "", "(%x+)=(%x+)") do pokes[#pokes + 1] = {tonumber(a, 16), tonumber(v, 16)} end
 local pokes16 = {}
 for a, v in string.gmatch(os.getenv("F3_POKE16") or "", "(%x+)=(%x+)") do pokes16[#pokes16 + 1] = {tonumber(a, 16), tonumber(v, 16)} end
+local saveevery = tonumber(os.getenv("F3_SAVEEVERY") or "0")
+local savepfx = os.getenv("F3_SAVEPFX") or "auto"
 local seen, n = {}, 0
 emu.register_frame_done(function()
   n = n + 1
@@ -36,6 +39,12 @@ emu.register_frame_done(function()
     p[":IN.1"].fields["P1 Right"]:set_value(k == 1 and 1 or 0)
     p[":IN.1"].fields["P1 Down"]:set_value(k == 2 and 1 or 0)
     p[":IN.1"].fields["P1 Left"]:set_value(k == 3 and 1 or 0)
+  end
+  if saveevery > 0 and n % saveevery == 0 then
+    manager.machine:save(string.format("%s_%06d", savepfx, n))
+    local f = assert(io.open(outp .. ".progress", "a"))
+    f:write(string.format("%d\tA5+0x4228=%08X\tstage?=%04X\n", n, sp:read_u32(0x40C228), sp:read_u16(0x408000 + 0x3300)))
+    f:close()
   end
   if n >= frames then
     local f = assert(io.open(outp, "w"))

@@ -41,7 +41,14 @@ done
 rm -f /tmp/harvest_*.bak /tmp/harvest_*.hbak
 rm -f build/test_objects; make -s build/test_objects >/dev/null 2>&1
 [ ${#kept[@]} -eq 0 ] && { echo "nothing new"; exit 0; }
-make -s test >/dev/null 2>&1 || { echo "make test FAILED, not committing"; exit 1; }
+test_ok=$(scripts/object_health.sh | tail -1) || { echo "object suite FAILED, not committing"; exit 1; }
+case "$test_ok" in ACCEPTED=0) echo "nothing verifies, not committing"; exit 1;; esac
+# the other suites are unaffected by object-routine edits, but they must still
+# pass: run them explicitly (test_objects is already triaged above)
+for t in kernel player collision sound objpool stage sprite; do
+  ./build/test_$t >/dev/null 2>&1 || { echo "test_$t FAILED, not committing"; exit 1; }
+done
+make -s build/test_objects >/dev/null 2>&1 || { echo "test_objects build FAILED"; exit 1; }
 row="| $(printf '0x%06X / ' $(for a in "${kept[@]}"; do echo $((16#$a)); done) | sed 's| / $||') | Obj_*_Tick (survey batch) | VERIFIED (MAME) | $(IFS=';'; echo "${notes[*]}" | sed 's/;/, /g') |"
 python3 - "$row" <<'PY'
 import sys

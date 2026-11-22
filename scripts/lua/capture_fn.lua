@@ -51,6 +51,11 @@ local sweep_base = tonumber(os.getenv("F3_SWEEP_BASE") or "0")
 local want = tonumber(os.getenv("F3_SAMPLES") or "300")
 local prefix = os.getenv("F3_OUT") or (ROOT .. "/work/ram/fn")
 local inmode = os.getenv("F3_INPUT") or "fire"
+-- F3_NOFFSET: frame count already elapsed in the run that saved -state (keeps
+-- the input pattern in phase with survey_obj.lua runs); F3_POKE16 per frame
+local noffset = tonumber(os.getenv("F3_NOFFSET") or "0")
+local pokes16 = {}
+for a, v in string.gmatch(os.getenv("F3_POKE16") or "", "(%x+)=(%x+)") do pokes16[#pokes16 + 1] = {tonumber(a, 16), tonumber(v, 16)} end
 local dbg = manager.machine.debugger
 local cpu = manager.machine.devices[":maincpu"]
 local sp = cpu.spaces["program"]
@@ -158,9 +163,11 @@ emu.register_frame_done(function()
   if fnum - scr0 == n then return end
   n = fnum - scr0
   if n >= maxframes then finish("PARTIAL"); return end
+  for _, pv in ipairs(pokes16) do sp:write_u16(pv[1], pv[2]) end
   if inmode == "fire" then
-    p[":IN.0"].fields["P1 Button 1"]:set_value((n // 3) % 2)
-    local k = (n // 45) % 4
+    local t = n + noffset
+    p[":IN.0"].fields["P1 Button 1"]:set_value((t // 3) % 2)
+    local k = (t // 45) % 4
     p[":IN.1"].fields["P1 Up"]:set_value(k == 0 and 1 or 0)
     p[":IN.1"].fields["P1 Right"]:set_value(k == 1 and 1 or 0)
     p[":IN.1"].fields["P1 Down"]:set_value(k == 2 and 1 or 0)

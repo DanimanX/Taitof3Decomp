@@ -1,0 +1,22 @@
+Task: translate 6 already-decompiled dependency routines. Produce ONLY the C file contents; write nothing to disk.
+Scope: read-only. Read work/disasm/bundle_ADDR.s for each ADDR below, plus src/common/f3mem.h, src/video/sprite.h, src/objects/obj_pool.h, src/objects/obj_common.h, and the headers of any callee named in the bundle's "; calls:" line.
+Do: for each ADDR emit a fenced block:
+
+=== FILE src/enemy/obj_ADDR.c ===
+<the whole file: #include "obj_ADDR.h" plus the other ../ headers needed>
+=== END ===
+
+Rules for the file body:
+- int Obj_ADDR_Tick(const f3mem_t *m, uint32_t obj)  /* obj = A0 */
+- Exact 68k semantics: byte/word/long sizes preserved (clr.w = wr16 0, move.b = wr8), .w values sign-extended where the CPU does, (An)+ advances the pointer.
+- A5 == F3_A5 (0x408000). ROM tables read with rd16/rd32 at their absolute address.
+- Callees listed in the bundle header as STOP/"already decompiled" MUST be called through their header declaration, never re-implemented (e.g. Obj_DrawSprite from ../video/sprite.h, Obj_Spawn/Obj_Free from ../objects/obj_pool.h).
+- Any other block in the bundle (FUN_..., LAB_..., a second OBJ_... entry point) becomes a static helper in the same file with a /* ROM 0x...... */ comment naming its real entry address. A helper reached only through a tail branch may be emitted as a normal function that returns; call it. Never invent a dynamic dispatch you cannot resolve: return -1 instead (and say so in your summary line).
+- One /* ROM 0xXXXXXX */ comment per block.
+- No prose inside the code, no markdown inside the file contents.
+
+Batches:
+124532
+125DAA
+11AAF0
+115334

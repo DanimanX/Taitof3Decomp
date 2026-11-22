@@ -57,6 +57,7 @@ local noffset = tonumber(os.getenv("F3_NOFFSET") or "0")
 local pokes16 = {}
 for a, v in string.gmatch(os.getenv("F3_POKE16") or "", "(%x+)=(%x+)") do pokes16[#pokes16 + 1] = {tonumber(a, 16), tonumber(v, 16)} end
 local dbg = manager.machine.debugger
+assert(dbg, "capture_fn: MAME has no debugger (need -debug -debugger none)")
 local cpu = manager.machine.devices[":maincpu"]
 local sp = cpu.spaces["program"]
 local function poke_a0()

@@ -506,6 +506,673 @@
 #include "../src/enemy/obj_186388.h"
 #include "../src/enemy/obj_1867A4.h"
 #include "../src/enemy/obj_ED124.h"
+#include "../src/enemy/obj_11418E.h"
+#include "../src/enemy/obj_184A20.h"
+#include "../src/enemy/obj_184A10.h"
+#include "../src/enemy/obj_11423E.h"
+#include "../src/enemy/obj_114212.h"
+#include "../src/enemy/obj_1143C8.h"
+#include "../src/enemy/obj_186326.h"
+#include "../src/enemy/obj_186782.h"
+#include "../src/enemy/obj_184D6C.h"
+#include "../src/enemy/obj_186482.h"
+#include "../src/enemy/obj_184BAE.h"
+#include "../src/enemy/obj_186406.h"
+#include "../src/enemy/obj_17A688.h"
+#include "../src/enemy/obj_18724E.h"
+#include "../src/enemy/obj_18702C.h"
+#include "../src/enemy/obj_1865A0.h"
+#include "../src/enemy/obj_187370.h"
+#include "../src/enemy/obj_1873D6.h"
+#include "../src/enemy/obj_17DAA0.h"
+#include "../src/enemy/obj_18747C.h"
+#include "../src/enemy/obj_187508.h"
+#include "../src/enemy/obj_118D12.h"
+#include "../src/enemy/obj_17A070.h"
+#include "../src/enemy/obj_17A664.h"
+#include "../src/enemy/obj_17C14C.h"
+#include "../src/enemy/obj_17C8CC.h"
+#include "../src/enemy/obj_17C660.h"
+#include "../src/enemy/obj_179C6E.h"
+#include "../src/enemy/obj_18657E.h"
+#include "../src/enemy/obj_17A3F4.h"
+#include "../src/enemy/obj_17A420.h"
+#include "../src/enemy/obj_187246.h"
+#include "../src/enemy/obj_17C9D0.h"
+#include "../src/enemy/obj_187024.h"
+#include "../src/enemy/obj_17BE1C.h"
+#include "../src/enemy/obj_17A016.h"
+#include "../src/enemy/obj_17D136.h"
+#include "../src/enemy/obj_17D912.h"
+#include "../src/enemy/obj_17D186.h"
+#include "../src/enemy/obj_17D586.h"
+#include "../src/enemy/obj_17A122.h"
+#include "../src/enemy/obj_18415A.h"
+#include "../src/enemy/obj_17A52A.h"
+#include "../src/enemy/obj_17D4F4.h"
+#include "../src/enemy/obj_17DDD0.h"
+#include "../src/enemy/obj_17D640.h"
+#include "../src/enemy/obj_179E7A.h"
+#include "../src/enemy/obj_17DE20.h"
+#include "../src/enemy/obj_17A50E.h"
+#include "../src/enemy/obj_185C18.h"
+#include "../src/enemy/obj_1860AA.h"
+#include "../src/enemy/obj_17D66E.h"
+#include "../src/enemy/obj_17DB68.h"
+#include "../src/enemy/obj_17D72C.h"
+#include "../src/enemy/obj_17D6C8.h"
+#include "../src/enemy/obj_17DC1E.h"
+#include "../src/enemy/obj_17CDA6.h"
+#include "../src/enemy/obj_179DEE.h"
+#include "../src/enemy/obj_17CE04.h"
+#include "../src/enemy/obj_184EDE.h"
+#include "../src/enemy/obj_17DBB8.h"
+#include "../src/enemy/obj_186064.h"
+#include "../src/enemy/obj_179C26.h"
+#include "../src/enemy/obj_17CE88.h"
+#include "../src/enemy/obj_17A42A.h"
+#include "../src/enemy/obj_18675E.h"
+#include "../src/enemy/obj_17F038.h"
+#include "../src/enemy/obj_17D3E6.h"
+#include "../src/enemy/obj_17C240.h"
+#include "../src/enemy/obj_17C508.h"
+#include "../src/enemy/obj_17C360.h"
+#include "../src/enemy/obj_11BCB2.h"
+#include "../src/enemy/obj_11BDAA.h"
+#include "../src/enemy/obj_11BD48.h"
+#include "../src/enemy/obj_17F006.h"
+#include "../src/enemy/obj_17C4D4.h"
+#include "../src/enemy/obj_11BE14.h"
+#include "../src/enemy/obj_17D394.h"
+#include "../src/enemy/obj_17A5C4.h"
+#include "../src/enemy/obj_13EA38.h"
+#include "../src/enemy/obj_13E9E8.h"
+#include "../src/enemy/obj_17DD46.h"
+#include "../src/enemy/obj_11BD96.h"
+#include "../src/enemy/obj_17A5A8.h"
+#include "../src/enemy/obj_13EB4C.h"
+#include "../src/enemy/obj_11BEF6.h"
+#include "../src/enemy/obj_13EA54.h"
+#include "../src/enemy/obj_179DCC.h"
+#include "../src/enemy/obj_17AE0A.h"
+#include "../src/enemy/obj_184DA8.h"
+#include "../src/enemy/obj_E66F8.h"
+#include "../src/enemy/obj_E739E.h"
+#include "../src/enemy/obj_E7FC6.h"
+#include "../src/enemy/obj_E800C.h"
+#include "../src/enemy/obj_E66B2.h"
+#include "../src/enemy/obj_F13F4.h"
+#include "../src/enemy/obj_E735A.h"
+#include "../src/enemy/obj_F1400.h"
+#include "../src/enemy/obj_F1432.h"
+#include "../src/enemy/obj_F1814.h"
+#include "../src/enemy/obj_F40DE.h"
+#include "../src/enemy/obj_F40EA.h"
+#include "../src/enemy/obj_F4112.h"
+#include "../src/enemy/obj_EDBFE.h"
+#include "../src/enemy/obj_EA8EE.h"
+#include "../src/enemy/obj_EDC38.h"
+#include "../src/enemy/obj_EDC0A.h"
+#include "../src/enemy/obj_EE0A4.h"
+#include "../src/enemy/obj_EE076.h"
+#include "../src/enemy/obj_E8DFE.h"
+#include "../src/enemy/obj_E9426.h"
+#include "../src/enemy/obj_E940A.h"
+#include "../src/enemy/obj_E949E.h"
+#include "../src/enemy/obj_E94BC.h"
+#include "../src/enemy/obj_D5EE8.h"
+#include "../src/enemy/obj_ED76E.h"
+#include "../src/enemy/obj_ED7AC.h"
+#include "../src/enemy/obj_ED77A.h"
+#include "../src/enemy/obj_DD314.h"
+#include "../src/enemy/obj_E9556.h"
+#include "../src/enemy/obj_E953A.h"
+#include "../src/enemy/obj_D6BD8.h"
+#include "../src/enemy/obj_D5FFE.h"
+#include "../src/enemy/obj_11AD46.h"
+#include "../src/enemy/obj_D6CEC.h"
+#include "../src/enemy/obj_D6DCC.h"
+#include "../src/enemy/obj_EF8F8.h"
+#include "../src/enemy/obj_D6E98.h"
+#include "../src/enemy/obj_EF938.h"
+#include "../src/enemy/obj_184170.h"
+#include "../src/enemy/obj_DD6FC.h"
+#include "../src/enemy/obj_EF904.h"
+#include "../src/enemy/obj_17AD56.h"
+#include "../src/enemy/obj_17AD18.h"
+#include "../src/enemy/obj_179D26.h"
+#include "../src/enemy/obj_17E1DA.h"
+#include "../src/enemy/obj_DC43E.h"
+#include "../src/enemy/obj_17E188.h"
+#include "../src/enemy/obj_C99B8.h"
+#include "../src/enemy/obj_D70A0.h"
+#include "../src/enemy/obj_F7BD2.h"
+#include "../src/enemy/obj_F7CDC.h"
+#include "../src/enemy/obj_11AA5E.h"
+#include "../src/enemy/obj_F7C48.h"
+#include "../src/enemy/obj_14C9FE.h"
+#include "../src/enemy/obj_14CAFA.h"
+#include "../src/enemy/obj_17ABC8.h"
+#include "../src/enemy/obj_14CC4C.h"
+#include "../src/enemy/obj_101A6C.h"
+#include "../src/enemy/obj_187986.h"
+#include "../src/enemy/obj_14C8F6.h"
+#include "../src/enemy/obj_101BB6.h"
+#include "../src/enemy/obj_14CC12.h"
+#include "../src/enemy/obj_14CC8C.h"
+#include "../src/enemy/obj_109AEC.h"
+#include "../src/enemy/obj_14CD0C.h"
+#include "../src/enemy/obj_14CCCC.h"
+#include "../src/enemy/obj_101B20.h"
+#include "../src/enemy/obj_109BB6.h"
+#include "../src/enemy/obj_14CD4C.h"
+#include "../src/enemy/obj_14CD8C.h"
+#include "../src/enemy/obj_14CB12.h"
+#include "../src/enemy/obj_109B7E.h"
+#include "../src/enemy/obj_11AB3E.h"
+#include "../src/enemy/obj_14CDCC.h"
+#include "../src/enemy/obj_FE0AA.h"
+#include "../src/enemy/obj_FE724.h"
+#include "../src/enemy/obj_11AAB8.h"
+#include "../src/enemy/obj_14CB96.h"
+#include "../src/enemy/obj_FE5BA.h"
+#include "../src/enemy/obj_11AAF0.h"
+#include "../src/enemy/obj_FF3E4.h"
+#include "../src/enemy/obj_11AAD4.h"
+#include "../src/enemy/obj_FE53C.h"
+#include "../src/enemy/obj_11AB96.h"
+#include "../src/enemy/obj_FF4E0.h"
+#include "../src/enemy/obj_EFE92.h"
+#include "../src/enemy/obj_FF4A8.h"
+#include "../src/enemy/obj_EFF34.h"
+#include "../src/enemy/obj_DBEE6.h"
+#include "../src/enemy/obj_FEC64.h"
+#include "../src/enemy/obj_FEEA0.h"
+#include "../src/enemy/obj_DBE98.h"
+#include "../src/enemy/obj_D9CE8.h"
+#include "../src/enemy/obj_F44B4.h"
+#include "../src/enemy/obj_114E0E.h"
+#include "../src/enemy/obj_EFEDE.h"
+#include "../src/enemy/obj_FEE74.h"
+#include "../src/enemy/obj_1899B0.h"
+#include "../src/enemy/obj_D9C88.h"
+#include "../src/enemy/obj_18A4EC.h"
+#include "../src/enemy/obj_1897BA.h"
+#include "../src/enemy/obj_1897AA.h"
+#include "../src/enemy/obj_18A4D4.h"
+#include "../src/enemy/obj_18B41C.h"
+#include "../src/enemy/obj_189BE2.h"
+#include "../src/enemy/obj_114F38.h"
+#include "../src/enemy/obj_18B2CA.h"
+#include "../src/enemy/obj_18B3CC.h"
+#include "../src/enemy/obj_18B4E8.h"
+#include "../src/enemy/obj_18B4B8.h"
+#include "../src/enemy/obj_189C1E.h"
+#include "../src/enemy/obj_18B230.h"
+#include "../src/enemy/obj_18A582.h"
+#include "../src/enemy/obj_189C56.h"
+#include "../src/enemy/obj_18A572.h"
+#include "../src/enemy/obj_189C7C.h"
+#include "../src/enemy/obj_18B3AE.h"
+#include "../src/enemy/obj_18A550.h"
+#include "../src/enemy/obj_179354.h"
+#include "../src/enemy/obj_189CCC.h"
+#include "../src/enemy/obj_17933A.h"
+#include "../src/enemy/obj_18A540.h"
+#include "../src/enemy/obj_189D8A.h"
+#include "../src/enemy/obj_189CE8.h"
+#include "../src/enemy/obj_189D2A.h"
+#include "../src/enemy/obj_189D20.h"
+#include "../src/enemy/obj_189E2E.h"
+#include "../src/enemy/obj_189E6A.h"
+#include "../src/enemy/obj_17F48E.h"
+#include "../src/enemy/obj_189FE2.h"
+#include "../src/enemy/obj_189EDC.h"
+#include "../src/enemy/obj_189EBA.h"
+#include "../src/enemy/obj_17F43C.h"
+#include "../src/enemy/obj_18A01E.h"
+#include "../src/enemy/obj_17EDA4.h"
+#include "../src/enemy/obj_17ED40.h"
+#include "../src/enemy/obj_17F260.h"
+#include "../src/enemy/obj_17EFC8.h"
+#include "../src/enemy/obj_18A12C.h"
+#include "../src/enemy/obj_17E99A.h"
+#include "../src/enemy/obj_17E9F6.h"
+#include "../src/enemy/obj_17EA7E.h"
+#include "../src/enemy/obj_17EA0A.h"
+#include "../src/enemy/obj_18A06E.h"
+#include "../src/enemy/obj_18A08A.h"
+#include "../src/enemy/obj_17E84E.h"
+#include "../src/enemy/obj_18B9DE.h"
+#include "../src/enemy/obj_17E89E.h"
+#include "../src/enemy/obj_18A0C2.h"
+#include "../src/enemy/obj_17AADA.h"
+#include "../src/enemy/obj_18A0CC.h"
+#include "../src/enemy/obj_14D86E.h"
+#include "../src/enemy/obj_18A20C.h"
+#include "../src/enemy/obj_18A1D0.h"
+#include "../src/enemy/obj_18A25C.h"
+#include "../src/enemy/obj_18A27E.h"
+#include "../src/enemy/obj_183F18.h"
+#include "../src/enemy/obj_183CF6.h"
+#include "../src/enemy/obj_18A474.h"
+#include "../src/enemy/obj_14D81A.h"
+#include "../src/enemy/obj_18B9CE.h"
+#include "../src/enemy/obj_18A4CA.h"
+#include "../src/enemy/obj_17F812.h"
+#include "../src/enemy/obj_183CBA.h"
+#include "../src/enemy/obj_17F7CE.h"
+#include "../src/enemy/obj_17F5DA.h"
+#include "../src/enemy/obj_17F6C8.h"
+#include "../src/enemy/obj_183DA6.h"
+#include "../src/enemy/obj_17F8FC.h"
+#include "../src/enemy/obj_183EDA.h"
+#include "../src/enemy/obj_17F74E.h"
+#include "../src/enemy/obj_183FB0.h"
+#include "../src/enemy/obj_17AA36.h"
+#include "../src/enemy/obj_F6700.h"
+#include "../src/enemy/obj_179ED0.h"
+#include "../src/enemy/obj_17F8B0.h"
+#include "../src/enemy/obj_17F594.h"
+#include "../src/enemy/obj_F752E.h"
+#include "../src/enemy/obj_F7722.h"
+#include "../src/enemy/obj_F778A.h"
+#include "../src/enemy/obj_179F6C.h"
+#include "../src/enemy/obj_F75DE.h"
+#include "../src/enemy/obj_F754C.h"
+#include "../src/enemy/obj_F7618.h"
+#include "../src/enemy/obj_10B93C.h"
+#include "../src/enemy/obj_F773E.h"
+#include "../src/enemy/obj_F7800.h"
+#include "../src/enemy/obj_10B83E.h"
+#include "../src/enemy/obj_10BD20.h"
+#include "../src/enemy/obj_FB526.h"
+#include "../src/enemy/obj_10BD88.h"
+#include "../src/enemy/obj_CDD12.h"
+#include "../src/enemy/obj_CDCA0.h"
+#include "../src/enemy/obj_D9056.h"
+#include "../src/enemy/obj_D92B4.h"
+#include "../src/enemy/obj_C99F8.h"
+#include "../src/enemy/obj_1118BC.h"
+#include "../src/enemy/obj_FB584.h"
+#include "../src/enemy/obj_111A7A.h"
+#include "../src/enemy/obj_FCC4C.h"
+#include "../src/enemy/obj_1899EC.h"
+#include "../src/enemy/obj_111B56.h"
+#include "../src/enemy/obj_111DF0.h"
+#include "../src/enemy/obj_D93D4.h"
+#include "../src/enemy/obj_D936A.h"
+#include "../src/enemy/obj_1153B8.h"
+#include "../src/enemy/obj_1150E0.h"
+#include "../src/enemy/obj_111D18.h"
+#include "../src/enemy/obj_115092.h"
+#include "../src/enemy/obj_111D9C.h"
+#include "../src/enemy/obj_111D8E.h"
+#include "../src/enemy/obj_115334.h"
+#include "../src/enemy/obj_11509A.h"
+#include "../src/enemy/obj_118D4A.h"
+#include "../src/enemy/obj_D7EAE.h"
+#include "../src/enemy/obj_C9A38.h"
+#include "../src/enemy/obj_115326.h"
+#include "../src/enemy/obj_D8030.h"
+#include "../src/enemy/obj_D7DD8.h"
+#include "../src/enemy/obj_D808C.h"
+#include "../src/enemy/obj_D8574.h"
+#include "../src/enemy/obj_D7F52.h"
+#include "../src/enemy/obj_D8164.h"
+#include "../src/enemy/obj_D7F0E.h"
+#include "../src/enemy/obj_D7F8E.h"
+#include "../src/enemy/obj_D853C.h"
+#include "../src/enemy/obj_D823E.h"
+#include "../src/enemy/obj_15929C.h"
+#include "../src/enemy/obj_111DA6.h"
+#include "../src/enemy/obj_1242EC.h"
+#include "../src/enemy/obj_1592EC.h"
+#include "../src/enemy/obj_11AEBE.h"
+#include "../src/enemy/obj_123FCA.h"
+#include "../src/enemy/obj_11B14C.h"
+#include "../src/enemy/obj_11AFA6.h"
+#include "../src/enemy/obj_124404.h"
+#include "../src/enemy/obj_124D64.h"
+#include "../src/enemy/obj_125016.h"
+#include "../src/enemy/obj_11AECE.h"
+#include "../src/enemy/obj_124E00.h"
+#include "../src/enemy/obj_1250BC.h"
+#include "../src/enemy/obj_11B17C.h"
+#include "../src/enemy/obj_1253B0.h"
+#include "../src/enemy/obj_12442A.h"
+#include "../src/enemy/obj_12552E.h"
+#include "../src/enemy/obj_124D78.h"
+#include "../src/enemy/obj_125D22.h"
+#include "../src/enemy/obj_11AFE4.h"
+#include "../src/enemy/obj_11B3D2.h"
+#include "../src/enemy/obj_1250E4.h"
+#include "../src/enemy/obj_125046.h"
+#include "../src/enemy/obj_124E30.h"
+#include "../src/enemy/obj_1253D0.h"
+#include "../src/enemy/obj_12554E.h"
+#include "../src/enemy/obj_125D44.h"
+#include "../src/enemy/obj_11B022.h"
+#include "../src/enemy/obj_11B472.h"
+#include "../src/enemy/obj_124438.h"
+#include "../src/enemy/obj_125DAA.h"
+#include "../src/enemy/obj_124466.h"
+#include "../src/enemy/obj_1244A2.h"
+#include "../src/enemy/obj_1244DA.h"
+#include "../src/enemy/obj_125B88.h"
+#include "../src/enemy/obj_CD7B8.h"
+#include "../src/enemy/obj_CD74E.h"
+#include "../src/enemy/obj_125B0C.h"
+#include "../src/enemy/obj_CCD5C.h"
+#include "../src/enemy/obj_124524.h"
+#include "../src/enemy/obj_124550.h"
+#include "../src/enemy/obj_124532.h"
+#include "../src/enemy/obj_125CA8.h"
+#include "../src/enemy/obj_11B668.h"
+#include "../src/enemy/obj_11B12C.h"
+#include "../src/enemy/obj_11B35E.h"
+#include "../src/enemy/obj_11B5E6.h"
+#include "../src/enemy/obj_124358.h"
+#include "../src/enemy/obj_12431E.h"
+#include "../src/enemy/obj_11B656.h"
+#include "../src/enemy/obj_11B23A.h"
+#include "../src/enemy/obj_159C8C.h"
+#include "../src/enemy/obj_11B1BE.h"
+#include "../src/enemy/obj_11C054.h"
+#include "../src/enemy/obj_125CFA.h"
+#include "../src/enemy/obj_C7DBA.h"
+#include "../src/enemy/obj_11BFAC.h"
+#include "../src/enemy/obj_C8218.h"
+#include "../src/enemy/obj_15A264.h"
+#include "../src/enemy/obj_C7DCA.h"
+#include "../src/enemy/obj_15A1CA.h"
+#include "../src/enemy/obj_C823E.h"
+#include "../src/enemy/obj_C7E5E.h"
+#include "../src/enemy/obj_11BF5C.h"
+#include "../src/enemy/obj_C7F3E.h"
+#include "../src/enemy/obj_C80DC.h"
+#include "../src/enemy/obj_11B1FA.h"
+#include "../src/enemy/obj_C7E10.h"
+#include "../src/enemy/obj_C8168.h"
+#include "../src/enemy/obj_C7DDE.h"
+#include "../src/enemy/obj_C7F14.h"
+#include "../src/enemy/obj_15A088.h"
+#include "../src/enemy/obj_159D68.h"
+#include "../src/enemy/obj_159D22.h"
+#include "../src/enemy/obj_15A154.h"
+#include "../src/enemy/obj_FFCF4.h"
+#include "../src/enemy/obj_111432.h"
+#include "../src/enemy/obj_111424.h"
+#include "../src/enemy/obj_111492.h"
+#include "../src/enemy/obj_1114F6.h"
+#include "../src/enemy/obj_10010C.h"
+#include "../src/enemy/obj_1002CC.h"
+#include "../src/enemy/obj_111450.h"
+#include "../src/enemy/obj_15A0C8.h"
+#include "../src/enemy/obj_C7EE6.h"
+#include "../src/enemy/obj_C7EF4.h"
+#include "../src/enemy/obj_1114B4.h"
+#include "../src/enemy/obj_11151A.h"
+#include "../src/enemy/obj_1000DE.h"
+#include "../src/enemy/obj_1002B0.h"
+#include "../src/enemy/obj_1008A6.h"
+#include "../src/enemy/obj_1008E2.h"
+#include "../src/enemy/obj_115F96.h"
+#include "../src/enemy/obj_1117CC.h"
+#include "../src/enemy/obj_115F36.h"
+#include "../src/enemy/obj_115B3E.h"
+#include "../src/enemy/obj_116078.h"
+#include "../src/enemy/obj_1161C4.h"
+#include "../src/enemy/obj_116118.h"
+#include "../src/enemy/obj_1160C4.h"
+#include "../src/enemy/obj_116030.h"
+#include "../src/enemy/obj_D6242.h"
+#include "../src/enemy/obj_D6192.h"
+#include "../src/enemy/obj_E8516.h"
+#include "../src/enemy/obj_118F84.h"
+#include "../src/enemy/obj_E8B72.h"
+#include "../src/enemy/obj_E8C36.h"
+#include "../src/enemy/obj_118F4E.h"
+#include "../src/enemy/obj_109FAA.h"
+#include "../src/enemy/obj_E8BEA.h"
+#include "../src/enemy/obj_D9224.h"
+#include "../src/enemy/obj_E8B26.h"
+#include "../src/enemy/obj_10A054.h"
+#include "../src/enemy/obj_D8DC4.h"
+#include "../src/enemy/obj_10A024.h"
+#include "../src/enemy/obj_D8D22.h"
+#include "../src/enemy/obj_E8D12.h"
+#include "../src/enemy/obj_D8D30.h"
+#include "../src/enemy/obj_D572C.h"
+#include "../src/enemy/obj_E8CAE.h"
+#include "../src/enemy/obj_ED214.h"
+#include "../src/enemy/obj_DC56E.h"
+#include "../src/enemy/obj_D56C6.h"
+#include "../src/enemy/obj_115D14.h"
+#include "../src/enemy/obj_ED2A0.h"
+#include "../src/enemy/obj_D64BA.h"
+#include "../src/enemy/obj_ED2D8.h"
+#include "../src/enemy/obj_D6636.h"
+#include "../src/enemy/obj_D653C.h"
+#include "../src/enemy/obj_10A42C.h"
+#include "../src/enemy/obj_D6846.h"
+#include "../src/enemy/obj_10A484.h"
+#include "../src/enemy/obj_D67F6.h"
+#include "../src/enemy/obj_D6ACA.h"
+#include "../src/enemy/obj_DB2E0.h"
+#include "../src/enemy/obj_D6958.h"
+#include "../src/enemy/obj_10A438.h"
+#include "../src/enemy/obj_118B3C.h"
+#include "../src/enemy/obj_D8E42.h"
+#include "../src/enemy/obj_DB26C.h"
+#include "../src/enemy/obj_118B74.h"
+#include "../src/enemy/obj_F238A.h"
+#include "../src/enemy/obj_D66BA.h"
+#include "../src/enemy/obj_F2454.h"
+#include "../src/enemy/obj_D59F0.h"
+#include "../src/enemy/obj_F241C.h"
+#include "../src/enemy/obj_D5CD0.h"
+#include "../src/enemy/obj_D5974.h"
+#include "../src/enemy/obj_D5C64.h"
+#include "../src/enemy/obj_1003E2.h"
+#include "../src/enemy/obj_18F1C2.h"
+#include "../src/enemy/obj_10048C.h"
+#include "../src/enemy/obj_100B94.h"
+#include "../src/enemy/obj_18F002.h"
+#include "../src/enemy/obj_190B1A.h"
+#include "../src/enemy/obj_1909B2.h"
+#include "../src/enemy/obj_18F012.h"
+#include "../src/enemy/obj_19090C.h"
+#include "../src/enemy/obj_190AA6.h"
+#include "../src/enemy/obj_190FD0.h"
+#include "../src/enemy/obj_191014.h"
+#include "../src/enemy/obj_191374.h"
+#include "../src/enemy/obj_191356.h"
+#include "../src/enemy/obj_1914E6.h"
+#include "../src/enemy/obj_191486.h"
+#include "../src/enemy/obj_1915E0.h"
+#include "../src/enemy/obj_191700.h"
+#include "../src/enemy/obj_1915AE.h"
+#include "../src/enemy/obj_191742.h"
+#include "../src/enemy/obj_1916BE.h"
+#include "../src/enemy/obj_19163C.h"
+#include "../src/enemy/obj_181AEC.h"
+#include "../src/enemy/obj_1802F4.h"
+#include "../src/enemy/obj_1802A4.h"
+#include "../src/enemy/obj_1804DA.h"
+#include "../src/enemy/obj_18048A.h"
+#include "../src/enemy/obj_191688.h"
+#include "../src/enemy/obj_18F216.h"
+#include "../src/enemy/obj_EE42E.h"
+#include "../src/enemy/obj_10C966.h"
+#include "../src/enemy/obj_EE468.h"
+#include "../src/enemy/obj_EE43A.h"
+#include "../src/enemy/obj_EE7D8.h"
+#include "../src/enemy/obj_EE7AA.h"
+#include "../src/enemy/obj_EF366.h"
+#include "../src/enemy/obj_EF44E.h"
+#include "../src/enemy/obj_DA28C.h"
+#include "../src/enemy/obj_EF400.h"
+#include "../src/enemy/obj_EF434.h"
+#include "../src/enemy/obj_DA20E.h"
+#include "../src/enemy/obj_105ED6.h"
+#include "../src/enemy/obj_1070DA.h"
+#include "../src/enemy/obj_10747E.h"
+#include "../src/enemy/obj_107B6E.h"
+#include "../src/enemy/obj_107786.h"
+#include "../src/enemy/obj_107DB2.h"
+#include "../src/enemy/obj_1080A4.h"
+#include "../src/enemy/obj_107112.h"
+#include "../src/enemy/obj_105EDE.h"
+#include "../src/enemy/obj_108294.h"
+#include "../src/enemy/obj_1084C0.h"
+#include "../src/enemy/obj_1074B6.h"
+#include "../src/enemy/obj_1077DA.h"
+#include "../src/enemy/obj_107BC2.h"
+#include "../src/enemy/obj_107E00.h"
+#include "../src/enemy/obj_1080F2.h"
+#include "../src/enemy/obj_1082E6.h"
+#include "../src/enemy/obj_108512.h"
+#include "../src/enemy/obj_DBC1A.h"
+#include "../src/enemy/obj_C9AB8.h"
+#include "../src/enemy/obj_DBCAE.h"
+#include "../src/enemy/obj_10DBE0.h"
+#include "../src/enemy/obj_10E1BC.h"
+#include "../src/enemy/obj_10DBD8.h"
+#include "../src/enemy/obj_10E178.h"
+#include "../src/enemy/obj_DC03A.h"
+#include "../src/enemy/obj_116B86.h"
+#include "../src/enemy/obj_DC008.h"
+#include "../src/enemy/obj_DC46E.h"
+#include "../src/enemy/obj_116B0C.h"
+#include "../src/enemy/obj_1165CC.h"
+#include "../src/enemy/obj_116C48.h"
+#include "../src/enemy/obj_116C9A.h"
+#include "../src/enemy/obj_1166EA.h"
+#include "../src/enemy/obj_116DD2.h"
+#include "../src/enemy/obj_116E22.h"
+#include "../src/enemy/obj_E5372.h"
+#include "../src/enemy/obj_116802.h"
+#include "../src/enemy/obj_E54EE.h"
+#include "../src/enemy/obj_10E316.h"
+#include "../src/enemy/obj_FEF76.h"
+#include "../src/enemy/obj_E262A.h"
+#include "../src/enemy/obj_116F82.h"
+#include "../src/enemy/obj_116EE4.h"
+#include "../src/enemy/obj_E54A0.h"
+#include "../src/enemy/obj_E2804.h"
+#include "../src/enemy/obj_117826.h"
+#include "../src/enemy/obj_DACDC.h"
+#include "../src/enemy/obj_1177AC.h"
+#include "../src/enemy/obj_116EDC.h"
+#include "../src/enemy/obj_116F7A.h"
+#include "../src/enemy/obj_12601C.h"
+#include "../src/enemy/obj_117980.h"
+#include "../src/enemy/obj_E27C0.h"
+#include "../src/enemy/obj_DAC54.h"
+#include "../src/enemy/obj_11792A.h"
+#include "../src/enemy/obj_126158.h"
+#include "../src/enemy/obj_11699A.h"
+#include "../src/enemy/obj_125DC2.h"
+#include "../src/enemy/obj_126DEC.h"
+#include "../src/enemy/obj_126D92.h"
+#include "../src/enemy/obj_126EB4.h"
+#include "../src/enemy/obj_126E84.h"
+#include "../src/enemy/obj_126132.h"
+#include "../src/enemy/obj_126FF6.h"
+#include "../src/enemy/obj_126FA4.h"
+#include "../src/enemy/obj_1270BE.h"
+#include "../src/enemy/obj_12739E.h"
+#include "../src/enemy/obj_12706C.h"
+#include "../src/enemy/obj_1169CA.h"
+#include "../src/enemy/obj_127584.h"
+#include "../src/enemy/obj_12737E.h"
+#include "../src/enemy/obj_1261FE.h"
+#include "../src/enemy/obj_1289A6.h"
+#include "../src/enemy/obj_127560.h"
+#include "../src/enemy/obj_126282.h"
+#include "../src/enemy/obj_128B9E.h"
+#include "../src/enemy/obj_128A84.h"
+#include "../src/enemy/obj_128BB2.h"
+#include "../src/enemy/obj_126310.h"
+#include "../src/enemy/obj_CD1AE.h"
+#include "../src/enemy/obj_CCCA2.h"
+#include "../src/enemy/obj_CCFD4.h"
+#include "../src/enemy/obj_128924.h"
+#include "../src/enemy/obj_126254.h"
+#include "../src/enemy/obj_1261AA.h"
+#include "../src/enemy/obj_126364.h"
+#include "../src/enemy/obj_1289EA.h"
+#include "../src/enemy/obj_128B44.h"
+#include "../src/enemy/obj_1263BE.h"
+#include "../src/enemy/obj_128476.h"
+#include "../src/enemy/obj_1262B0.h"
+#include "../src/enemy/obj_1284D4.h"
+#include "../src/enemy/obj_126430.h"
+#include "../src/enemy/obj_CCF72.h"
+#include "../src/enemy/obj_12645E.h"
+#include "../src/enemy/obj_128D4A.h"
+#include "../src/enemy/obj_128660.h"
+#include "../src/enemy/obj_126390.h"
+#include "../src/enemy/obj_12886A.h"
+#include "../src/enemy/obj_1264CA.h"
+#include "../src/enemy/obj_12649C.h"
+#include "../src/enemy/obj_128226.h"
+#include "../src/enemy/obj_1264F8.h"
+#include "../src/enemy/obj_126402.h"
+#include "../src/enemy/obj_1286E2.h"
+#include "../src/enemy/obj_1282B4.h"
+#include "../src/enemy/obj_1285FC.h"
+#include "../src/enemy/obj_12652C.h"
+#include "../src/enemy/obj_1287A4.h"
+#include "../src/enemy/obj_1287C4.h"
+#include "../src/enemy/obj_126562.h"
+#include "../src/enemy/obj_1281C4.h"
+#include "../src/enemy/obj_1265BE.h"
+#include "../src/enemy/obj_CD124.h"
+#include "../src/enemy/obj_126608.h"
+#include "../src/enemy/obj_126670.h"
+#include "../src/enemy/obj_CC7C0.h"
+#include "../src/enemy/obj_CC860.h"
+#include "../src/enemy/obj_1266C2.h"
+#include "../src/enemy/obj_126590.h"
+#include "../src/enemy/obj_126710.h"
+#include "../src/enemy/obj_126744.h"
+#include "../src/enemy/obj_CDDF8.h"
+#include "../src/enemy/obj_CDF68.h"
+#include "../src/enemy/obj_CDE50.h"
+#include "../src/enemy/obj_CDF84.h"
+#include "../src/enemy/obj_CC756.h"
+#include "../src/enemy/obj_126772.h"
+#include "../src/enemy/obj_1267BC.h"
+#include "../src/enemy/obj_1267F0.h"
+#include "../src/enemy/obj_CDDB0.h"
+#include "../src/enemy/obj_126844.h"
+#include "../src/enemy/obj_1268D4.h"
+#include "../src/enemy/obj_126902.h"
+#include "../src/enemy/obj_12681E.h"
+#include "../src/enemy/obj_126936.h"
+#include "../src/enemy/obj_CCDB6.h"
+#include "../src/enemy/obj_126B7E.h"
+#include "../src/enemy/obj_126976.h"
+#include "../src/enemy/obj_12687E.h"
+#include "../src/enemy/obj_1269C4.h"
+#include "../src/enemy/obj_126BAA.h"
+#include "../src/enemy/obj_11939E.h"
+#include "../src/enemy/obj_1269F2.h"
+#include "../src/enemy/obj_126A2A.h"
+#include "../src/enemy/obj_126086.h"
+#include "../src/enemy/obj_128D6C.h"
+#include "../src/enemy/obj_CDDA6.h"
+#include "../src/enemy/obj_128E44.h"
+#include "../src/enemy/obj_12604C.h"
+#include "../src/enemy/obj_C2BBE.h"
+#include "../src/enemy/obj_128E8C.h"
+#include "../src/enemy/obj_C2C02.h"
+#include "../src/enemy/obj_126A7A.h"
+#include "../src/enemy/obj_C2C22.h"
+#include "../src/enemy/obj_126AB4.h"
+#include "../src/enemy/obj_126AE2.h"
 #include "../src/objects/objscript_CF1E4.h"
 #include "../src/objects/objscript_CF4B8.h"
 
@@ -1058,6 +1725,673 @@ int main(void)
     bad += run("Obj 0x186388", "work/ram/obj_186388", Obj_186388_Tick, rom);
     bad += run("Obj 0x1867A4", "work/ram/obj_1867A4", Obj_1867A4_Tick, rom);
     bad += run("Obj 0x0ED124", "work/ram/obj_ED124", Obj_ED124_Tick, rom);
+    bad += run("Obj 0x11418E", "work/ram/obj_11418E", Obj_11418E_Tick, rom);
+    bad += run("Obj 0x184A20", "work/ram/obj_184A20", Obj_184A20_Tick, rom);
+    bad += run("Obj 0x184A10", "work/ram/obj_184A10", Obj_184A10_Tick, rom);
+    bad += run("Obj 0x11423E", "work/ram/obj_11423E", Obj_11423E_Tick, rom);
+    bad += run("Obj 0x114212", "work/ram/obj_114212", Obj_114212_Tick, rom);
+    bad += run("Obj 0x1143C8", "work/ram/obj_1143C8", Obj_1143C8_Tick, rom);
+    bad += run("Obj 0x186326", "work/ram/obj_186326", Obj_186326_Tick, rom);
+    bad += run("Obj 0x186782", "work/ram/obj_186782", Obj_186782_Tick, rom);
+    bad += run("Obj 0x184D6C", "work/ram/obj_184D6C", Obj_184D6C_Tick, rom);
+    bad += run("Obj 0x186482", "work/ram/obj_186482", Obj_186482_Tick, rom);
+    bad += run("Obj 0x184BAE", "work/ram/obj_184BAE", Obj_184BAE_Tick, rom);
+    bad += run("Obj 0x186406", "work/ram/obj_186406", Obj_186406_Tick, rom);
+    bad += run("Obj 0x17A688", "work/ram/obj_17A688", Obj_17A688_Tick, rom);
+    bad += run("Obj 0x18724E", "work/ram/obj_18724E", Obj_18724E_Tick, rom);
+    bad += run("Obj 0x18702C", "work/ram/obj_18702C", Obj_18702C_Tick, rom);
+    bad += run("Obj 0x1865A0", "work/ram/obj_1865A0", Obj_1865A0_Tick, rom);
+    bad += run("Obj 0x187370", "work/ram/obj_187370", Obj_187370_Tick, rom);
+    bad += run("Obj 0x1873D6", "work/ram/obj_1873D6", Obj_1873D6_Tick, rom);
+    bad += run("Obj 0x17DAA0", "work/ram/obj_17DAA0", Obj_17DAA0_Tick, rom);
+    bad += run("Obj 0x18747C", "work/ram/obj_18747C", Obj_18747C_Tick, rom);
+    bad += run("Obj 0x187508", "work/ram/obj_187508", Obj_187508_Tick, rom);
+    bad += run("Obj 0x118D12", "work/ram/obj_118D12", Obj_118D12_Tick, rom);
+    bad += run("Obj 0x17A070", "work/ram/obj_17A070", Obj_17A070_Tick, rom);
+    bad += run("Obj 0x17A664", "work/ram/obj_17A664", Obj_17A664_Tick, rom);
+    bad += run("Obj 0x17C14C", "work/ram/obj_17C14C", Obj_17C14C_Tick, rom);
+    bad += run("Obj 0x17C8CC", "work/ram/obj_17C8CC", Obj_17C8CC_Tick, rom);
+    bad += run("Obj 0x17C660", "work/ram/obj_17C660", Obj_17C660_Tick, rom);
+    bad += run("Obj 0x179C6E", "work/ram/obj_179C6E", Obj_179C6E_Tick, rom);
+    bad += run("Obj 0x18657E", "work/ram/obj_18657E", Obj_18657E_Tick, rom);
+    bad += run("Obj 0x17A3F4", "work/ram/obj_17A3F4", Obj_17A3F4_Tick, rom);
+    bad += run("Obj 0x17A420", "work/ram/obj_17A420", Obj_17A420_Tick, rom);
+    bad += run("Obj 0x187246", "work/ram/obj_187246", Obj_187246_Tick, rom);
+    bad += run("Obj 0x17C9D0", "work/ram/obj_17C9D0", Obj_17C9D0_Tick, rom);
+    bad += run("Obj 0x187024", "work/ram/obj_187024", Obj_187024_Tick, rom);
+    bad += run("Obj 0x17BE1C", "work/ram/obj_17BE1C", Obj_17BE1C_Tick, rom);
+    bad += run("Obj 0x17A016", "work/ram/obj_17A016", Obj_17A016_Tick, rom);
+    bad += run("Obj 0x17D136", "work/ram/obj_17D136", Obj_17D136_Tick, rom);
+    bad += run("Obj 0x17D912", "work/ram/obj_17D912", Obj_17D912_Tick, rom);
+    bad += run("Obj 0x17D186", "work/ram/obj_17D186", Obj_17D186_Tick, rom);
+    bad += run("Obj 0x17D586", "work/ram/obj_17D586", Obj_17D586_Tick, rom);
+    bad += run("Obj 0x17A122", "work/ram/obj_17A122", Obj_17A122_Tick, rom);
+    bad += run("Obj 0x18415A", "work/ram/obj_18415A", Obj_18415A_Tick, rom);
+    bad += run("Obj 0x17A52A", "work/ram/obj_17A52A", Obj_17A52A_Tick, rom);
+    bad += run("Obj 0x17D4F4", "work/ram/obj_17D4F4", Obj_17D4F4_Tick, rom);
+    bad += run("Obj 0x17DDD0", "work/ram/obj_17DDD0", Obj_17DDD0_Tick, rom);
+    bad += run("Obj 0x17D640", "work/ram/obj_17D640", Obj_17D640_Tick, rom);
+    bad += run("Obj 0x179E7A", "work/ram/obj_179E7A", Obj_179E7A_Tick, rom);
+    bad += run("Obj 0x17DE20", "work/ram/obj_17DE20", Obj_17DE20_Tick, rom);
+    bad += run("Obj 0x17A50E", "work/ram/obj_17A50E", Obj_17A50E_Tick, rom);
+    bad += run("Obj 0x185C18", "work/ram/obj_185C18", Obj_185C18_Tick, rom);
+    bad += run("Obj 0x1860AA", "work/ram/obj_1860AA", Obj_1860AA_Tick, rom);
+    bad += run("Obj 0x17D66E", "work/ram/obj_17D66E", Obj_17D66E_Tick, rom);
+    bad += run("Obj 0x17DB68", "work/ram/obj_17DB68", Obj_17DB68_Tick, rom);
+    bad += run("Obj 0x17D72C", "work/ram/obj_17D72C", Obj_17D72C_Tick, rom);
+    bad += run("Obj 0x17D6C8", "work/ram/obj_17D6C8", Obj_17D6C8_Tick, rom);
+    bad += run("Obj 0x17DC1E", "work/ram/obj_17DC1E", Obj_17DC1E_Tick, rom);
+    bad += run("Obj 0x17CDA6", "work/ram/obj_17CDA6", Obj_17CDA6_Tick, rom);
+    bad += run("Obj 0x179DEE", "work/ram/obj_179DEE", Obj_179DEE_Tick, rom);
+    bad += run("Obj 0x17CE04", "work/ram/obj_17CE04", Obj_17CE04_Tick, rom);
+    bad += run("Obj 0x184EDE", "work/ram/obj_184EDE", Obj_184EDE_Tick, rom);
+    bad += run("Obj 0x17DBB8", "work/ram/obj_17DBB8", Obj_17DBB8_Tick, rom);
+    bad += run("Obj 0x186064", "work/ram/obj_186064", Obj_186064_Tick, rom);
+    bad += run("Obj 0x179C26", "work/ram/obj_179C26", Obj_179C26_Tick, rom);
+    bad += run("Obj 0x17CE88", "work/ram/obj_17CE88", Obj_17CE88_Tick, rom);
+    bad += run("Obj 0x17A42A", "work/ram/obj_17A42A", Obj_17A42A_Tick, rom);
+    bad += run("Obj 0x18675E", "work/ram/obj_18675E", Obj_18675E_Tick, rom);
+    bad += run("Obj 0x17F038", "work/ram/obj_17F038", Obj_17F038_Tick, rom);
+    bad += run("Obj 0x17D3E6", "work/ram/obj_17D3E6", Obj_17D3E6_Tick, rom);
+    bad += run("Obj 0x17C240", "work/ram/obj_17C240", Obj_17C240_Tick, rom);
+    bad += run("Obj 0x17C508", "work/ram/obj_17C508", Obj_17C508_Tick, rom);
+    bad += run("Obj 0x17C360", "work/ram/obj_17C360", Obj_17C360_Tick, rom);
+    bad += run("Obj 0x11BCB2", "work/ram/obj_11BCB2", Obj_11BCB2_Tick, rom);
+    bad += run("Obj 0x11BDAA", "work/ram/obj_11BDAA", Obj_11BDAA_Tick, rom);
+    bad += run("Obj 0x11BD48", "work/ram/obj_11BD48", Obj_11BD48_Tick, rom);
+    bad += run("Obj 0x17F006", "work/ram/obj_17F006", Obj_17F006_Tick, rom);
+    bad += run("Obj 0x17C4D4", "work/ram/obj_17C4D4", Obj_17C4D4_Tick, rom);
+    bad += run("Obj 0x11BE14", "work/ram/obj_11BE14", Obj_11BE14_Tick, rom);
+    bad += run("Obj 0x17D394", "work/ram/obj_17D394", Obj_17D394_Tick, rom);
+    bad += run("Obj 0x17A5C4", "work/ram/obj_17A5C4", Obj_17A5C4_Tick, rom);
+    bad += run("Obj 0x13EA38", "work/ram/obj_13EA38", Obj_13EA38_Tick, rom);
+    bad += run("Obj 0x13E9E8", "work/ram/obj_13E9E8", Obj_13E9E8_Tick, rom);
+    bad += run("Obj 0x17DD46", "work/ram/obj_17DD46", Obj_17DD46_Tick, rom);
+    bad += run("Obj 0x11BD96", "work/ram/obj_11BD96", Obj_11BD96_Tick, rom);
+    bad += run("Obj 0x17A5A8", "work/ram/obj_17A5A8", Obj_17A5A8_Tick, rom);
+    bad += run("Obj 0x13EB4C", "work/ram/obj_13EB4C", Obj_13EB4C_Tick, rom);
+    bad += run("Obj 0x11BEF6", "work/ram/obj_11BEF6", Obj_11BEF6_Tick, rom);
+    bad += run("Obj 0x13EA54", "work/ram/obj_13EA54", Obj_13EA54_Tick, rom);
+    bad += run("Obj 0x179DCC", "work/ram/obj_179DCC", Obj_179DCC_Tick, rom);
+    bad += run("Obj 0x17AE0A", "work/ram/obj_17AE0A", Obj_17AE0A_Tick, rom);
+    bad += run("Obj 0x184DA8", "work/ram/obj_184DA8", Obj_184DA8_Tick, rom);
+    bad += run("Obj 0x0E66F8", "work/ram/obj_E66F8", Obj_E66F8_Tick, rom);
+    bad += run("Obj 0x0E739E", "work/ram/obj_E739E", Obj_E739E_Tick, rom);
+    bad += run("Obj 0x0E7FC6", "work/ram/obj_E7FC6", Obj_E7FC6_Tick, rom);
+    bad += run("Obj 0x0E800C", "work/ram/obj_E800C", Obj_E800C_Tick, rom);
+    bad += run("Obj 0x0E66B2", "work/ram/obj_E66B2", Obj_E66B2_Tick, rom);
+    bad += run("Obj 0x0F13F4", "work/ram/obj_F13F4", Obj_F13F4_Tick, rom);
+    bad += run("Obj 0x0E735A", "work/ram/obj_E735A", Obj_E735A_Tick, rom);
+    bad += run("Obj 0x0F1400", "work/ram/obj_F1400", Obj_F1400_Tick, rom);
+    bad += run("Obj 0x0F1432", "work/ram/obj_F1432", Obj_F1432_Tick, rom);
+    bad += run("Obj 0x0F1814", "work/ram/obj_F1814", Obj_F1814_Tick, rom);
+    bad += run("Obj 0x0F40DE", "work/ram/obj_F40DE", Obj_F40DE_Tick, rom);
+    bad += run("Obj 0x0F40EA", "work/ram/obj_F40EA", Obj_F40EA_Tick, rom);
+    bad += run("Obj 0x0F4112", "work/ram/obj_F4112", Obj_F4112_Tick, rom);
+    bad += run("Obj 0x0EDBFE", "work/ram/obj_EDBFE", Obj_EDBFE_Tick, rom);
+    bad += run("Obj 0x0EA8EE", "work/ram/obj_EA8EE", Obj_EA8EE_Tick, rom);
+    bad += run("Obj 0x0EDC38", "work/ram/obj_EDC38", Obj_EDC38_Tick, rom);
+    bad += run("Obj 0x0EDC0A", "work/ram/obj_EDC0A", Obj_EDC0A_Tick, rom);
+    bad += run("Obj 0x0EE0A4", "work/ram/obj_EE0A4", Obj_EE0A4_Tick, rom);
+    bad += run("Obj 0x0EE076", "work/ram/obj_EE076", Obj_EE076_Tick, rom);
+    bad += run("Obj 0x0E8DFE", "work/ram/obj_E8DFE", Obj_E8DFE_Tick, rom);
+    bad += run("Obj 0x0E9426", "work/ram/obj_E9426", Obj_E9426_Tick, rom);
+    bad += run("Obj 0x0E940A", "work/ram/obj_E940A", Obj_E940A_Tick, rom);
+    bad += run("Obj 0x0E949E", "work/ram/obj_E949E", Obj_E949E_Tick, rom);
+    bad += run("Obj 0x0E94BC", "work/ram/obj_E94BC", Obj_E94BC_Tick, rom);
+    bad += run("Obj 0x0D5EE8", "work/ram/obj_D5EE8", Obj_D5EE8_Tick, rom);
+    bad += run("Obj 0x0ED76E", "work/ram/obj_ED76E", Obj_ED76E_Tick, rom);
+    bad += run("Obj 0x0ED7AC", "work/ram/obj_ED7AC", Obj_ED7AC_Tick, rom);
+    bad += run("Obj 0x0ED77A", "work/ram/obj_ED77A", Obj_ED77A_Tick, rom);
+    bad += run("Obj 0x0DD314", "work/ram/obj_DD314", Obj_DD314_Tick, rom);
+    bad += run("Obj 0x0E9556", "work/ram/obj_E9556", Obj_E9556_Tick, rom);
+    bad += run("Obj 0x0E953A", "work/ram/obj_E953A", Obj_E953A_Tick, rom);
+    bad += run("Obj 0x0D6BD8", "work/ram/obj_D6BD8", Obj_D6BD8_Tick, rom);
+    bad += run("Obj 0x0D5FFE", "work/ram/obj_D5FFE", Obj_D5FFE_Tick, rom);
+    bad += run("Obj 0x11AD46", "work/ram/obj_11AD46", Obj_11AD46_Tick, rom);
+    bad += run("Obj 0x0D6CEC", "work/ram/obj_D6CEC", Obj_D6CEC_Tick, rom);
+    bad += run("Obj 0x0D6DCC", "work/ram/obj_D6DCC", Obj_D6DCC_Tick, rom);
+    bad += run("Obj 0x0EF8F8", "work/ram/obj_EF8F8", Obj_EF8F8_Tick, rom);
+    bad += run("Obj 0x0D6E98", "work/ram/obj_D6E98", Obj_D6E98_Tick, rom);
+    bad += run("Obj 0x0EF938", "work/ram/obj_EF938", Obj_EF938_Tick, rom);
+    bad += run("Obj 0x184170", "work/ram/obj_184170", Obj_184170_Tick, rom);
+    bad += run("Obj 0x0DD6FC", "work/ram/obj_DD6FC", Obj_DD6FC_Tick, rom);
+    bad += run("Obj 0x0EF904", "work/ram/obj_EF904", Obj_EF904_Tick, rom);
+    bad += run("Obj 0x17AD56", "work/ram/obj_17AD56", Obj_17AD56_Tick, rom);
+    bad += run("Obj 0x17AD18", "work/ram/obj_17AD18", Obj_17AD18_Tick, rom);
+    bad += run("Obj 0x179D26", "work/ram/obj_179D26", Obj_179D26_Tick, rom);
+    bad += run("Obj 0x17E1DA", "work/ram/obj_17E1DA", Obj_17E1DA_Tick, rom);
+    bad += run("Obj 0x0DC43E", "work/ram/obj_DC43E", Obj_DC43E_Tick, rom);
+    bad += run("Obj 0x17E188", "work/ram/obj_17E188", Obj_17E188_Tick, rom);
+    bad += run("Obj 0x0C99B8", "work/ram/obj_C99B8", Obj_C99B8_Tick, rom);
+    bad += run("Obj 0x0D70A0", "work/ram/obj_D70A0", Obj_D70A0_Tick, rom);
+    bad += run("Obj 0x0F7BD2", "work/ram/obj_F7BD2", Obj_F7BD2_Tick, rom);
+    bad += run("Obj 0x0F7CDC", "work/ram/obj_F7CDC", Obj_F7CDC_Tick, rom);
+    bad += run("Obj 0x11AA5E", "work/ram/obj_11AA5E", Obj_11AA5E_Tick, rom);
+    bad += run("Obj 0x0F7C48", "work/ram/obj_F7C48", Obj_F7C48_Tick, rom);
+    bad += run("Obj 0x14C9FE", "work/ram/obj_14C9FE", Obj_14C9FE_Tick, rom);
+    bad += run("Obj 0x14CAFA", "work/ram/obj_14CAFA", Obj_14CAFA_Tick, rom);
+    bad += run("Obj 0x17ABC8", "work/ram/obj_17ABC8", Obj_17ABC8_Tick, rom);
+    bad += run("Obj 0x14CC4C", "work/ram/obj_14CC4C", Obj_14CC4C_Tick, rom);
+    bad += run("Obj 0x101A6C", "work/ram/obj_101A6C", Obj_101A6C_Tick, rom);
+    bad += run("Obj 0x187986", "work/ram/obj_187986", Obj_187986_Tick, rom);
+    bad += run("Obj 0x14C8F6", "work/ram/obj_14C8F6", Obj_14C8F6_Tick, rom);
+    bad += run("Obj 0x101BB6", "work/ram/obj_101BB6", Obj_101BB6_Tick, rom);
+    bad += run("Obj 0x14CC12", "work/ram/obj_14CC12", Obj_14CC12_Tick, rom);
+    bad += run("Obj 0x14CC8C", "work/ram/obj_14CC8C", Obj_14CC8C_Tick, rom);
+    bad += run("Obj 0x109AEC", "work/ram/obj_109AEC", Obj_109AEC_Tick, rom);
+    bad += run("Obj 0x14CD0C", "work/ram/obj_14CD0C", Obj_14CD0C_Tick, rom);
+    bad += run("Obj 0x14CCCC", "work/ram/obj_14CCCC", Obj_14CCCC_Tick, rom);
+    bad += run("Obj 0x101B20", "work/ram/obj_101B20", Obj_101B20_Tick, rom);
+    bad += run("Obj 0x109BB6", "work/ram/obj_109BB6", Obj_109BB6_Tick, rom);
+    bad += run("Obj 0x14CD4C", "work/ram/obj_14CD4C", Obj_14CD4C_Tick, rom);
+    bad += run("Obj 0x14CD8C", "work/ram/obj_14CD8C", Obj_14CD8C_Tick, rom);
+    bad += run("Obj 0x14CB12", "work/ram/obj_14CB12", Obj_14CB12_Tick, rom);
+    bad += run("Obj 0x109B7E", "work/ram/obj_109B7E", Obj_109B7E_Tick, rom);
+    bad += run("Obj 0x11AB3E", "work/ram/obj_11AB3E", Obj_11AB3E_Tick, rom);
+    bad += run("Obj 0x14CDCC", "work/ram/obj_14CDCC", Obj_14CDCC_Tick, rom);
+    bad += run("Obj 0x0FE0AA", "work/ram/obj_FE0AA", Obj_FE0AA_Tick, rom);
+    bad += run("Obj 0x0FE724", "work/ram/obj_FE724", Obj_FE724_Tick, rom);
+    bad += run("Obj 0x11AAB8", "work/ram/obj_11AAB8", Obj_11AAB8_Tick, rom);
+    bad += run("Obj 0x14CB96", "work/ram/obj_14CB96", Obj_14CB96_Tick, rom);
+    bad += run("Obj 0x0FE5BA", "work/ram/obj_FE5BA", Obj_FE5BA_Tick, rom);
+    bad += run("Obj 0x11AAF0", "work/ram/obj_11AAF0", Obj_11AAF0_Tick, rom);
+    bad += run("Obj 0x0FF3E4", "work/ram/obj_FF3E4", Obj_FF3E4_Tick, rom);
+    bad += run("Obj 0x11AAD4", "work/ram/obj_11AAD4", Obj_11AAD4_Tick, rom);
+    bad += run("Obj 0x0FE53C", "work/ram/obj_FE53C", Obj_FE53C_Tick, rom);
+    bad += run("Obj 0x11AB96", "work/ram/obj_11AB96", Obj_11AB96_Tick, rom);
+    bad += run("Obj 0x0FF4E0", "work/ram/obj_FF4E0", Obj_FF4E0_Tick, rom);
+    bad += run("Obj 0x0EFE92", "work/ram/obj_EFE92", Obj_EFE92_Tick, rom);
+    bad += run("Obj 0x0FF4A8", "work/ram/obj_FF4A8", Obj_FF4A8_Tick, rom);
+    bad += run("Obj 0x0EFF34", "work/ram/obj_EFF34", Obj_EFF34_Tick, rom);
+    bad += run("Obj 0x0DBEE6", "work/ram/obj_DBEE6", Obj_DBEE6_Tick, rom);
+    bad += run("Obj 0x0FEC64", "work/ram/obj_FEC64", Obj_FEC64_Tick, rom);
+    bad += run("Obj 0x0FEEA0", "work/ram/obj_FEEA0", Obj_FEEA0_Tick, rom);
+    bad += run("Obj 0x0DBE98", "work/ram/obj_DBE98", Obj_DBE98_Tick, rom);
+    bad += run("Obj 0x0D9CE8", "work/ram/obj_D9CE8", Obj_D9CE8_Tick, rom);
+    bad += run("Obj 0x0F44B4", "work/ram/obj_F44B4", Obj_F44B4_Tick, rom);
+    bad += run("Obj 0x114E0E", "work/ram/obj_114E0E", Obj_114E0E_Tick, rom);
+    bad += run("Obj 0x0EFEDE", "work/ram/obj_EFEDE", Obj_EFEDE_Tick, rom);
+    bad += run("Obj 0x0FEE74", "work/ram/obj_FEE74", Obj_FEE74_Tick, rom);
+    bad += run("Obj 0x1899B0", "work/ram/obj_1899B0", Obj_1899B0_Tick, rom);
+    bad += run("Obj 0x0D9C88", "work/ram/obj_D9C88", Obj_D9C88_Tick, rom);
+    bad += run("Obj 0x18A4EC", "work/ram/obj_18A4EC", Obj_18A4EC_Tick, rom);
+    bad += run("Obj 0x1897BA", "work/ram/obj_1897BA", Obj_1897BA_Tick, rom);
+    bad += run("Obj 0x1897AA", "work/ram/obj_1897AA", Obj_1897AA_Tick, rom);
+    bad += run("Obj 0x18A4D4", "work/ram/obj_18A4D4", Obj_18A4D4_Tick, rom);
+    bad += run("Obj 0x18B41C", "work/ram/obj_18B41C", Obj_18B41C_Tick, rom);
+    bad += run("Obj 0x189BE2", "work/ram/obj_189BE2", Obj_189BE2_Tick, rom);
+    bad += run("Obj 0x114F38", "work/ram/obj_114F38", Obj_114F38_Tick, rom);
+    bad += run("Obj 0x18B2CA", "work/ram/obj_18B2CA", Obj_18B2CA_Tick, rom);
+    bad += run("Obj 0x18B3CC", "work/ram/obj_18B3CC", Obj_18B3CC_Tick, rom);
+    bad += run("Obj 0x18B4E8", "work/ram/obj_18B4E8", Obj_18B4E8_Tick, rom);
+    bad += run("Obj 0x18B4B8", "work/ram/obj_18B4B8", Obj_18B4B8_Tick, rom);
+    bad += run("Obj 0x189C1E", "work/ram/obj_189C1E", Obj_189C1E_Tick, rom);
+    bad += run("Obj 0x18B230", "work/ram/obj_18B230", Obj_18B230_Tick, rom);
+    bad += run("Obj 0x18A582", "work/ram/obj_18A582", Obj_18A582_Tick, rom);
+    bad += run("Obj 0x189C56", "work/ram/obj_189C56", Obj_189C56_Tick, rom);
+    bad += run("Obj 0x18A572", "work/ram/obj_18A572", Obj_18A572_Tick, rom);
+    bad += run("Obj 0x189C7C", "work/ram/obj_189C7C", Obj_189C7C_Tick, rom);
+    bad += run("Obj 0x18B3AE", "work/ram/obj_18B3AE", Obj_18B3AE_Tick, rom);
+    bad += run("Obj 0x18A550", "work/ram/obj_18A550", Obj_18A550_Tick, rom);
+    bad += run("Obj 0x179354", "work/ram/obj_179354", Obj_179354_Tick, rom);
+    bad += run("Obj 0x189CCC", "work/ram/obj_189CCC", Obj_189CCC_Tick, rom);
+    bad += run("Obj 0x17933A", "work/ram/obj_17933A", Obj_17933A_Tick, rom);
+    bad += run("Obj 0x18A540", "work/ram/obj_18A540", Obj_18A540_Tick, rom);
+    bad += run("Obj 0x189D8A", "work/ram/obj_189D8A", Obj_189D8A_Tick, rom);
+    bad += run("Obj 0x189CE8", "work/ram/obj_189CE8", Obj_189CE8_Tick, rom);
+    bad += run("Obj 0x189D2A", "work/ram/obj_189D2A", Obj_189D2A_Tick, rom);
+    bad += run("Obj 0x189D20", "work/ram/obj_189D20", Obj_189D20_Tick, rom);
+    bad += run("Obj 0x189E2E", "work/ram/obj_189E2E", Obj_189E2E_Tick, rom);
+    bad += run("Obj 0x189E6A", "work/ram/obj_189E6A", Obj_189E6A_Tick, rom);
+    bad += run("Obj 0x17F48E", "work/ram/obj_17F48E", Obj_17F48E_Tick, rom);
+    bad += run("Obj 0x189FE2", "work/ram/obj_189FE2", Obj_189FE2_Tick, rom);
+    bad += run("Obj 0x189EDC", "work/ram/obj_189EDC", Obj_189EDC_Tick, rom);
+    bad += run("Obj 0x189EBA", "work/ram/obj_189EBA", Obj_189EBA_Tick, rom);
+    bad += run("Obj 0x17F43C", "work/ram/obj_17F43C", Obj_17F43C_Tick, rom);
+    bad += run("Obj 0x18A01E", "work/ram/obj_18A01E", Obj_18A01E_Tick, rom);
+    bad += run("Obj 0x17EDA4", "work/ram/obj_17EDA4", Obj_17EDA4_Tick, rom);
+    bad += run("Obj 0x17ED40", "work/ram/obj_17ED40", Obj_17ED40_Tick, rom);
+    bad += run("Obj 0x17F260", "work/ram/obj_17F260", Obj_17F260_Tick, rom);
+    bad += run("Obj 0x17EFC8", "work/ram/obj_17EFC8", Obj_17EFC8_Tick, rom);
+    bad += run("Obj 0x18A12C", "work/ram/obj_18A12C", Obj_18A12C_Tick, rom);
+    bad += run("Obj 0x17E99A", "work/ram/obj_17E99A", Obj_17E99A_Tick, rom);
+    bad += run("Obj 0x17E9F6", "work/ram/obj_17E9F6", Obj_17E9F6_Tick, rom);
+    bad += run("Obj 0x17EA7E", "work/ram/obj_17EA7E", Obj_17EA7E_Tick, rom);
+    bad += run("Obj 0x17EA0A", "work/ram/obj_17EA0A", Obj_17EA0A_Tick, rom);
+    bad += run("Obj 0x18A06E", "work/ram/obj_18A06E", Obj_18A06E_Tick, rom);
+    bad += run("Obj 0x18A08A", "work/ram/obj_18A08A", Obj_18A08A_Tick, rom);
+    bad += run("Obj 0x17E84E", "work/ram/obj_17E84E", Obj_17E84E_Tick, rom);
+    bad += run("Obj 0x18B9DE", "work/ram/obj_18B9DE", Obj_18B9DE_Tick, rom);
+    bad += run("Obj 0x17E89E", "work/ram/obj_17E89E", Obj_17E89E_Tick, rom);
+    bad += run("Obj 0x18A0C2", "work/ram/obj_18A0C2", Obj_18A0C2_Tick, rom);
+    bad += run("Obj 0x17AADA", "work/ram/obj_17AADA", Obj_17AADA_Tick, rom);
+    bad += run("Obj 0x18A0CC", "work/ram/obj_18A0CC", Obj_18A0CC_Tick, rom);
+    bad += run("Obj 0x14D86E", "work/ram/obj_14D86E", Obj_14D86E_Tick, rom);
+    bad += run("Obj 0x18A20C", "work/ram/obj_18A20C", Obj_18A20C_Tick, rom);
+    bad += run("Obj 0x18A1D0", "work/ram/obj_18A1D0", Obj_18A1D0_Tick, rom);
+    bad += run("Obj 0x18A25C", "work/ram/obj_18A25C", Obj_18A25C_Tick, rom);
+    bad += run("Obj 0x18A27E", "work/ram/obj_18A27E", Obj_18A27E_Tick, rom);
+    bad += run("Obj 0x183F18", "work/ram/obj_183F18", Obj_183F18_Tick, rom);
+    bad += run("Obj 0x183CF6", "work/ram/obj_183CF6", Obj_183CF6_Tick, rom);
+    bad += run("Obj 0x18A474", "work/ram/obj_18A474", Obj_18A474_Tick, rom);
+    bad += run("Obj 0x14D81A", "work/ram/obj_14D81A", Obj_14D81A_Tick, rom);
+    bad += run("Obj 0x18B9CE", "work/ram/obj_18B9CE", Obj_18B9CE_Tick, rom);
+    bad += run("Obj 0x18A4CA", "work/ram/obj_18A4CA", Obj_18A4CA_Tick, rom);
+    bad += run("Obj 0x17F812", "work/ram/obj_17F812", Obj_17F812_Tick, rom);
+    bad += run("Obj 0x183CBA", "work/ram/obj_183CBA", Obj_183CBA_Tick, rom);
+    bad += run("Obj 0x17F7CE", "work/ram/obj_17F7CE", Obj_17F7CE_Tick, rom);
+    bad += run("Obj 0x17F5DA", "work/ram/obj_17F5DA", Obj_17F5DA_Tick, rom);
+    bad += run("Obj 0x17F6C8", "work/ram/obj_17F6C8", Obj_17F6C8_Tick, rom);
+    bad += run("Obj 0x183DA6", "work/ram/obj_183DA6", Obj_183DA6_Tick, rom);
+    bad += run("Obj 0x17F8FC", "work/ram/obj_17F8FC", Obj_17F8FC_Tick, rom);
+    bad += run("Obj 0x183EDA", "work/ram/obj_183EDA", Obj_183EDA_Tick, rom);
+    bad += run("Obj 0x17F74E", "work/ram/obj_17F74E", Obj_17F74E_Tick, rom);
+    bad += run("Obj 0x183FB0", "work/ram/obj_183FB0", Obj_183FB0_Tick, rom);
+    bad += run("Obj 0x17AA36", "work/ram/obj_17AA36", Obj_17AA36_Tick, rom);
+    bad += run("Obj 0x0F6700", "work/ram/obj_F6700", Obj_F6700_Tick, rom);
+    bad += run("Obj 0x179ED0", "work/ram/obj_179ED0", Obj_179ED0_Tick, rom);
+    bad += run("Obj 0x17F8B0", "work/ram/obj_17F8B0", Obj_17F8B0_Tick, rom);
+    bad += run("Obj 0x17F594", "work/ram/obj_17F594", Obj_17F594_Tick, rom);
+    bad += run("Obj 0x0F752E", "work/ram/obj_F752E", Obj_F752E_Tick, rom);
+    bad += run("Obj 0x0F7722", "work/ram/obj_F7722", Obj_F7722_Tick, rom);
+    bad += run("Obj 0x0F778A", "work/ram/obj_F778A", Obj_F778A_Tick, rom);
+    bad += run("Obj 0x179F6C", "work/ram/obj_179F6C", Obj_179F6C_Tick, rom);
+    bad += run("Obj 0x0F75DE", "work/ram/obj_F75DE", Obj_F75DE_Tick, rom);
+    bad += run("Obj 0x0F754C", "work/ram/obj_F754C", Obj_F754C_Tick, rom);
+    bad += run("Obj 0x0F7618", "work/ram/obj_F7618", Obj_F7618_Tick, rom);
+    bad += run("Obj 0x10B93C", "work/ram/obj_10B93C", Obj_10B93C_Tick, rom);
+    bad += run("Obj 0x0F773E", "work/ram/obj_F773E", Obj_F773E_Tick, rom);
+    bad += run("Obj 0x0F7800", "work/ram/obj_F7800", Obj_F7800_Tick, rom);
+    bad += run("Obj 0x10B83E", "work/ram/obj_10B83E", Obj_10B83E_Tick, rom);
+    bad += run("Obj 0x10BD20", "work/ram/obj_10BD20", Obj_10BD20_Tick, rom);
+    bad += run("Obj 0x0FB526", "work/ram/obj_FB526", Obj_FB526_Tick, rom);
+    bad += run("Obj 0x10BD88", "work/ram/obj_10BD88", Obj_10BD88_Tick, rom);
+    bad += run("Obj 0x0CDD12", "work/ram/obj_CDD12", Obj_CDD12_Tick, rom);
+    bad += run("Obj 0x0CDCA0", "work/ram/obj_CDCA0", Obj_CDCA0_Tick, rom);
+    bad += run("Obj 0x0D9056", "work/ram/obj_D9056", Obj_D9056_Tick, rom);
+    bad += run("Obj 0x0D92B4", "work/ram/obj_D92B4", Obj_D92B4_Tick, rom);
+    bad += run("Obj 0x0C99F8", "work/ram/obj_C99F8", Obj_C99F8_Tick, rom);
+    bad += run("Obj 0x1118BC", "work/ram/obj_1118BC", Obj_1118BC_Tick, rom);
+    bad += run("Obj 0x0FB584", "work/ram/obj_FB584", Obj_FB584_Tick, rom);
+    bad += run("Obj 0x111A7A", "work/ram/obj_111A7A", Obj_111A7A_Tick, rom);
+    bad += run("Obj 0x0FCC4C", "work/ram/obj_FCC4C", Obj_FCC4C_Tick, rom);
+    bad += run("Obj 0x1899EC", "work/ram/obj_1899EC", Obj_1899EC_Tick, rom);
+    bad += run("Obj 0x111B56", "work/ram/obj_111B56", Obj_111B56_Tick, rom);
+    bad += run("Obj 0x111DF0", "work/ram/obj_111DF0", Obj_111DF0_Tick, rom);
+    bad += run("Obj 0x0D93D4", "work/ram/obj_D93D4", Obj_D93D4_Tick, rom);
+    bad += run("Obj 0x0D936A", "work/ram/obj_D936A", Obj_D936A_Tick, rom);
+    bad += run("Obj 0x1153B8", "work/ram/obj_1153B8", Obj_1153B8_Tick, rom);
+    bad += run("Obj 0x1150E0", "work/ram/obj_1150E0", Obj_1150E0_Tick, rom);
+    bad += run("Obj 0x111D18", "work/ram/obj_111D18", Obj_111D18_Tick, rom);
+    bad += run("Obj 0x115092", "work/ram/obj_115092", Obj_115092_Tick, rom);
+    bad += run("Obj 0x111D9C", "work/ram/obj_111D9C", Obj_111D9C_Tick, rom);
+    bad += run("Obj 0x111D8E", "work/ram/obj_111D8E", Obj_111D8E_Tick, rom);
+    bad += run("Obj 0x115334", "work/ram/obj_115334", Obj_115334_Tick, rom);
+    bad += run("Obj 0x11509A", "work/ram/obj_11509A", Obj_11509A_Tick, rom);
+    bad += run("Obj 0x118D4A", "work/ram/obj_118D4A", Obj_118D4A_Tick, rom);
+    bad += run("Obj 0x0D7EAE", "work/ram/obj_D7EAE", Obj_D7EAE_Tick, rom);
+    bad += run("Obj 0x0C9A38", "work/ram/obj_C9A38", Obj_C9A38_Tick, rom);
+    bad += run("Obj 0x115326", "work/ram/obj_115326", Obj_115326_Tick, rom);
+    bad += run("Obj 0x0D8030", "work/ram/obj_D8030", Obj_D8030_Tick, rom);
+    bad += run("Obj 0x0D7DD8", "work/ram/obj_D7DD8", Obj_D7DD8_Tick, rom);
+    bad += run("Obj 0x0D808C", "work/ram/obj_D808C", Obj_D808C_Tick, rom);
+    bad += run("Obj 0x0D8574", "work/ram/obj_D8574", Obj_D8574_Tick, rom);
+    bad += run("Obj 0x0D7F52", "work/ram/obj_D7F52", Obj_D7F52_Tick, rom);
+    bad += run("Obj 0x0D8164", "work/ram/obj_D8164", Obj_D8164_Tick, rom);
+    bad += run("Obj 0x0D7F0E", "work/ram/obj_D7F0E", Obj_D7F0E_Tick, rom);
+    bad += run("Obj 0x0D7F8E", "work/ram/obj_D7F8E", Obj_D7F8E_Tick, rom);
+    bad += run("Obj 0x0D853C", "work/ram/obj_D853C", Obj_D853C_Tick, rom);
+    bad += run("Obj 0x0D823E", "work/ram/obj_D823E", Obj_D823E_Tick, rom);
+    bad += run("Obj 0x15929C", "work/ram/obj_15929C", Obj_15929C_Tick, rom);
+    bad += run("Obj 0x111DA6", "work/ram/obj_111DA6", Obj_111DA6_Tick, rom);
+    bad += run("Obj 0x1242EC", "work/ram/obj_1242EC", Obj_1242EC_Tick, rom);
+    bad += run("Obj 0x1592EC", "work/ram/obj_1592EC", Obj_1592EC_Tick, rom);
+    bad += run("Obj 0x11AEBE", "work/ram/obj_11AEBE", Obj_11AEBE_Tick, rom);
+    bad += run("Obj 0x123FCA", "work/ram/obj_123FCA", Obj_123FCA_Tick, rom);
+    bad += run("Obj 0x11B14C", "work/ram/obj_11B14C", Obj_11B14C_Tick, rom);
+    bad += run("Obj 0x11AFA6", "work/ram/obj_11AFA6", Obj_11AFA6_Tick, rom);
+    bad += run("Obj 0x124404", "work/ram/obj_124404", Obj_124404_Tick, rom);
+    bad += run("Obj 0x124D64", "work/ram/obj_124D64", Obj_124D64_Tick, rom);
+    bad += run("Obj 0x125016", "work/ram/obj_125016", Obj_125016_Tick, rom);
+    bad += run("Obj 0x11AECE", "work/ram/obj_11AECE", Obj_11AECE_Tick, rom);
+    bad += run("Obj 0x124E00", "work/ram/obj_124E00", Obj_124E00_Tick, rom);
+    bad += run("Obj 0x1250BC", "work/ram/obj_1250BC", Obj_1250BC_Tick, rom);
+    bad += run("Obj 0x11B17C", "work/ram/obj_11B17C", Obj_11B17C_Tick, rom);
+    bad += run("Obj 0x1253B0", "work/ram/obj_1253B0", Obj_1253B0_Tick, rom);
+    bad += run("Obj 0x12442A", "work/ram/obj_12442A", Obj_12442A_Tick, rom);
+    bad += run("Obj 0x12552E", "work/ram/obj_12552E", Obj_12552E_Tick, rom);
+    bad += run("Obj 0x124D78", "work/ram/obj_124D78", Obj_124D78_Tick, rom);
+    bad += run("Obj 0x125D22", "work/ram/obj_125D22", Obj_125D22_Tick, rom);
+    bad += run("Obj 0x11AFE4", "work/ram/obj_11AFE4", Obj_11AFE4_Tick, rom);
+    bad += run("Obj 0x11B3D2", "work/ram/obj_11B3D2", Obj_11B3D2_Tick, rom);
+    bad += run("Obj 0x1250E4", "work/ram/obj_1250E4", Obj_1250E4_Tick, rom);
+    bad += run("Obj 0x125046", "work/ram/obj_125046", Obj_125046_Tick, rom);
+    bad += run("Obj 0x124E30", "work/ram/obj_124E30", Obj_124E30_Tick, rom);
+    bad += run("Obj 0x1253D0", "work/ram/obj_1253D0", Obj_1253D0_Tick, rom);
+    bad += run("Obj 0x12554E", "work/ram/obj_12554E", Obj_12554E_Tick, rom);
+    bad += run("Obj 0x125D44", "work/ram/obj_125D44", Obj_125D44_Tick, rom);
+    bad += run("Obj 0x11B022", "work/ram/obj_11B022", Obj_11B022_Tick, rom);
+    bad += run("Obj 0x11B472", "work/ram/obj_11B472", Obj_11B472_Tick, rom);
+    bad += run("Obj 0x124438", "work/ram/obj_124438", Obj_124438_Tick, rom);
+    bad += run("Obj 0x125DAA", "work/ram/obj_125DAA", Obj_125DAA_Tick, rom);
+    bad += run("Obj 0x124466", "work/ram/obj_124466", Obj_124466_Tick, rom);
+    bad += run("Obj 0x1244A2", "work/ram/obj_1244A2", Obj_1244A2_Tick, rom);
+    bad += run("Obj 0x1244DA", "work/ram/obj_1244DA", Obj_1244DA_Tick, rom);
+    bad += run("Obj 0x125B88", "work/ram/obj_125B88", Obj_125B88_Tick, rom);
+    bad += run("Obj 0x0CD7B8", "work/ram/obj_CD7B8", Obj_CD7B8_Tick, rom);
+    bad += run("Obj 0x0CD74E", "work/ram/obj_CD74E", Obj_CD74E_Tick, rom);
+    bad += run("Obj 0x125B0C", "work/ram/obj_125B0C", Obj_125B0C_Tick, rom);
+    bad += run("Obj 0x0CCD5C", "work/ram/obj_CCD5C", Obj_CCD5C_Tick, rom);
+    bad += run("Obj 0x124524", "work/ram/obj_124524", Obj_124524_Tick, rom);
+    bad += run("Obj 0x124550", "work/ram/obj_124550", Obj_124550_Tick, rom);
+    bad += run("Obj 0x124532", "work/ram/obj_124532", Obj_124532_Tick, rom);
+    bad += run("Obj 0x125CA8", "work/ram/obj_125CA8", Obj_125CA8_Tick, rom);
+    bad += run("Obj 0x11B668", "work/ram/obj_11B668", Obj_11B668_Tick, rom);
+    bad += run("Obj 0x11B12C", "work/ram/obj_11B12C", Obj_11B12C_Tick, rom);
+    bad += run("Obj 0x11B35E", "work/ram/obj_11B35E", Obj_11B35E_Tick, rom);
+    bad += run("Obj 0x11B5E6", "work/ram/obj_11B5E6", Obj_11B5E6_Tick, rom);
+    bad += run("Obj 0x124358", "work/ram/obj_124358", Obj_124358_Tick, rom);
+    bad += run("Obj 0x12431E", "work/ram/obj_12431E", Obj_12431E_Tick, rom);
+    bad += run("Obj 0x11B656", "work/ram/obj_11B656", Obj_11B656_Tick, rom);
+    bad += run("Obj 0x11B23A", "work/ram/obj_11B23A", Obj_11B23A_Tick, rom);
+    bad += run("Obj 0x159C8C", "work/ram/obj_159C8C", Obj_159C8C_Tick, rom);
+    bad += run("Obj 0x11B1BE", "work/ram/obj_11B1BE", Obj_11B1BE_Tick, rom);
+    bad += run("Obj 0x11C054", "work/ram/obj_11C054", Obj_11C054_Tick, rom);
+    bad += run("Obj 0x125CFA", "work/ram/obj_125CFA", Obj_125CFA_Tick, rom);
+    bad += run("Obj 0x0C7DBA", "work/ram/obj_C7DBA", Obj_C7DBA_Tick, rom);
+    bad += run("Obj 0x11BFAC", "work/ram/obj_11BFAC", Obj_11BFAC_Tick, rom);
+    bad += run("Obj 0x0C8218", "work/ram/obj_C8218", Obj_C8218_Tick, rom);
+    bad += run("Obj 0x15A264", "work/ram/obj_15A264", Obj_15A264_Tick, rom);
+    bad += run("Obj 0x0C7DCA", "work/ram/obj_C7DCA", Obj_C7DCA_Tick, rom);
+    bad += run("Obj 0x15A1CA", "work/ram/obj_15A1CA", Obj_15A1CA_Tick, rom);
+    bad += run("Obj 0x0C823E", "work/ram/obj_C823E", Obj_C823E_Tick, rom);
+    bad += run("Obj 0x0C7E5E", "work/ram/obj_C7E5E", Obj_C7E5E_Tick, rom);
+    bad += run("Obj 0x11BF5C", "work/ram/obj_11BF5C", Obj_11BF5C_Tick, rom);
+    bad += run("Obj 0x0C7F3E", "work/ram/obj_C7F3E", Obj_C7F3E_Tick, rom);
+    bad += run("Obj 0x0C80DC", "work/ram/obj_C80DC", Obj_C80DC_Tick, rom);
+    bad += run("Obj 0x11B1FA", "work/ram/obj_11B1FA", Obj_11B1FA_Tick, rom);
+    bad += run("Obj 0x0C7E10", "work/ram/obj_C7E10", Obj_C7E10_Tick, rom);
+    bad += run("Obj 0x0C8168", "work/ram/obj_C8168", Obj_C8168_Tick, rom);
+    bad += run("Obj 0x0C7DDE", "work/ram/obj_C7DDE", Obj_C7DDE_Tick, rom);
+    bad += run("Obj 0x0C7F14", "work/ram/obj_C7F14", Obj_C7F14_Tick, rom);
+    bad += run("Obj 0x15A088", "work/ram/obj_15A088", Obj_15A088_Tick, rom);
+    bad += run("Obj 0x159D68", "work/ram/obj_159D68", Obj_159D68_Tick, rom);
+    bad += run("Obj 0x159D22", "work/ram/obj_159D22", Obj_159D22_Tick, rom);
+    bad += run("Obj 0x15A154", "work/ram/obj_15A154", Obj_15A154_Tick, rom);
+    bad += run("Obj 0x0FFCF4", "work/ram/obj_FFCF4", Obj_FFCF4_Tick, rom);
+    bad += run("Obj 0x111432", "work/ram/obj_111432", Obj_111432_Tick, rom);
+    bad += run("Obj 0x111424", "work/ram/obj_111424", Obj_111424_Tick, rom);
+    bad += run("Obj 0x111492", "work/ram/obj_111492", Obj_111492_Tick, rom);
+    bad += run("Obj 0x1114F6", "work/ram/obj_1114F6", Obj_1114F6_Tick, rom);
+    bad += run("Obj 0x10010C", "work/ram/obj_10010C", Obj_10010C_Tick, rom);
+    bad += run("Obj 0x1002CC", "work/ram/obj_1002CC", Obj_1002CC_Tick, rom);
+    bad += run("Obj 0x111450", "work/ram/obj_111450", Obj_111450_Tick, rom);
+    bad += run("Obj 0x15A0C8", "work/ram/obj_15A0C8", Obj_15A0C8_Tick, rom);
+    bad += run("Obj 0x0C7EE6", "work/ram/obj_C7EE6", Obj_C7EE6_Tick, rom);
+    bad += run("Obj 0x0C7EF4", "work/ram/obj_C7EF4", Obj_C7EF4_Tick, rom);
+    bad += run("Obj 0x1114B4", "work/ram/obj_1114B4", Obj_1114B4_Tick, rom);
+    bad += run("Obj 0x11151A", "work/ram/obj_11151A", Obj_11151A_Tick, rom);
+    bad += run("Obj 0x1000DE", "work/ram/obj_1000DE", Obj_1000DE_Tick, rom);
+    bad += run("Obj 0x1002B0", "work/ram/obj_1002B0", Obj_1002B0_Tick, rom);
+    bad += run("Obj 0x1008A6", "work/ram/obj_1008A6", Obj_1008A6_Tick, rom);
+    bad += run("Obj 0x1008E2", "work/ram/obj_1008E2", Obj_1008E2_Tick, rom);
+    bad += run("Obj 0x115F96", "work/ram/obj_115F96", Obj_115F96_Tick, rom);
+    bad += run("Obj 0x1117CC", "work/ram/obj_1117CC", Obj_1117CC_Tick, rom);
+    bad += run("Obj 0x115F36", "work/ram/obj_115F36", Obj_115F36_Tick, rom);
+    bad += run("Obj 0x115B3E", "work/ram/obj_115B3E", Obj_115B3E_Tick, rom);
+    bad += run("Obj 0x116078", "work/ram/obj_116078", Obj_116078_Tick, rom);
+    bad += run("Obj 0x1161C4", "work/ram/obj_1161C4", Obj_1161C4_Tick, rom);
+    bad += run("Obj 0x116118", "work/ram/obj_116118", Obj_116118_Tick, rom);
+    bad += run("Obj 0x1160C4", "work/ram/obj_1160C4", Obj_1160C4_Tick, rom);
+    bad += run("Obj 0x116030", "work/ram/obj_116030", Obj_116030_Tick, rom);
+    bad += run("Obj 0x0D6242", "work/ram/obj_D6242", Obj_D6242_Tick, rom);
+    bad += run("Obj 0x0D6192", "work/ram/obj_D6192", Obj_D6192_Tick, rom);
+    bad += run("Obj 0x0E8516", "work/ram/obj_E8516", Obj_E8516_Tick, rom);
+    bad += run("Obj 0x118F84", "work/ram/obj_118F84", Obj_118F84_Tick, rom);
+    bad += run("Obj 0x0E8B72", "work/ram/obj_E8B72", Obj_E8B72_Tick, rom);
+    bad += run("Obj 0x0E8C36", "work/ram/obj_E8C36", Obj_E8C36_Tick, rom);
+    bad += run("Obj 0x118F4E", "work/ram/obj_118F4E", Obj_118F4E_Tick, rom);
+    bad += run("Obj 0x109FAA", "work/ram/obj_109FAA", Obj_109FAA_Tick, rom);
+    bad += run("Obj 0x0E8BEA", "work/ram/obj_E8BEA", Obj_E8BEA_Tick, rom);
+    bad += run("Obj 0x0D9224", "work/ram/obj_D9224", Obj_D9224_Tick, rom);
+    bad += run("Obj 0x0E8B26", "work/ram/obj_E8B26", Obj_E8B26_Tick, rom);
+    bad += run("Obj 0x10A054", "work/ram/obj_10A054", Obj_10A054_Tick, rom);
+    bad += run("Obj 0x0D8DC4", "work/ram/obj_D8DC4", Obj_D8DC4_Tick, rom);
+    bad += run("Obj 0x10A024", "work/ram/obj_10A024", Obj_10A024_Tick, rom);
+    bad += run("Obj 0x0D8D22", "work/ram/obj_D8D22", Obj_D8D22_Tick, rom);
+    bad += run("Obj 0x0E8D12", "work/ram/obj_E8D12", Obj_E8D12_Tick, rom);
+    bad += run("Obj 0x0D8D30", "work/ram/obj_D8D30", Obj_D8D30_Tick, rom);
+    bad += run("Obj 0x0D572C", "work/ram/obj_D572C", Obj_D572C_Tick, rom);
+    bad += run("Obj 0x0E8CAE", "work/ram/obj_E8CAE", Obj_E8CAE_Tick, rom);
+    bad += run("Obj 0x0ED214", "work/ram/obj_ED214", Obj_ED214_Tick, rom);
+    bad += run("Obj 0x0DC56E", "work/ram/obj_DC56E", Obj_DC56E_Tick, rom);
+    bad += run("Obj 0x0D56C6", "work/ram/obj_D56C6", Obj_D56C6_Tick, rom);
+    bad += run("Obj 0x115D14", "work/ram/obj_115D14", Obj_115D14_Tick, rom);
+    bad += run("Obj 0x0ED2A0", "work/ram/obj_ED2A0", Obj_ED2A0_Tick, rom);
+    bad += run("Obj 0x0D64BA", "work/ram/obj_D64BA", Obj_D64BA_Tick, rom);
+    bad += run("Obj 0x0ED2D8", "work/ram/obj_ED2D8", Obj_ED2D8_Tick, rom);
+    bad += run("Obj 0x0D6636", "work/ram/obj_D6636", Obj_D6636_Tick, rom);
+    bad += run("Obj 0x0D653C", "work/ram/obj_D653C", Obj_D653C_Tick, rom);
+    bad += run("Obj 0x10A42C", "work/ram/obj_10A42C", Obj_10A42C_Tick, rom);
+    bad += run("Obj 0x0D6846", "work/ram/obj_D6846", Obj_D6846_Tick, rom);
+    bad += run("Obj 0x10A484", "work/ram/obj_10A484", Obj_10A484_Tick, rom);
+    bad += run("Obj 0x0D67F6", "work/ram/obj_D67F6", Obj_D67F6_Tick, rom);
+    bad += run("Obj 0x0D6ACA", "work/ram/obj_D6ACA", Obj_D6ACA_Tick, rom);
+    bad += run("Obj 0x0DB2E0", "work/ram/obj_DB2E0", Obj_DB2E0_Tick, rom);
+    bad += run("Obj 0x0D6958", "work/ram/obj_D6958", Obj_D6958_Tick, rom);
+    bad += run("Obj 0x10A438", "work/ram/obj_10A438", Obj_10A438_Tick, rom);
+    bad += run("Obj 0x118B3C", "work/ram/obj_118B3C", Obj_118B3C_Tick, rom);
+    bad += run("Obj 0x0D8E42", "work/ram/obj_D8E42", Obj_D8E42_Tick, rom);
+    bad += run("Obj 0x0DB26C", "work/ram/obj_DB26C", Obj_DB26C_Tick, rom);
+    bad += run("Obj 0x118B74", "work/ram/obj_118B74", Obj_118B74_Tick, rom);
+    bad += run("Obj 0x0F238A", "work/ram/obj_F238A", Obj_F238A_Tick, rom);
+    bad += run("Obj 0x0D66BA", "work/ram/obj_D66BA", Obj_D66BA_Tick, rom);
+    bad += run("Obj 0x0F2454", "work/ram/obj_F2454", Obj_F2454_Tick, rom);
+    bad += run("Obj 0x0D59F0", "work/ram/obj_D59F0", Obj_D59F0_Tick, rom);
+    bad += run("Obj 0x0F241C", "work/ram/obj_F241C", Obj_F241C_Tick, rom);
+    bad += run("Obj 0x0D5CD0", "work/ram/obj_D5CD0", Obj_D5CD0_Tick, rom);
+    bad += run("Obj 0x0D5974", "work/ram/obj_D5974", Obj_D5974_Tick, rom);
+    bad += run("Obj 0x0D5C64", "work/ram/obj_D5C64", Obj_D5C64_Tick, rom);
+    bad += run("Obj 0x1003E2", "work/ram/obj_1003E2", Obj_1003E2_Tick, rom);
+    bad += run("Obj 0x18F1C2", "work/ram/obj_18F1C2", Obj_18F1C2_Tick, rom);
+    bad += run("Obj 0x10048C", "work/ram/obj_10048C", Obj_10048C_Tick, rom);
+    bad += run("Obj 0x100B94", "work/ram/obj_100B94", Obj_100B94_Tick, rom);
+    bad += run("Obj 0x18F002", "work/ram/obj_18F002", Obj_18F002_Tick, rom);
+    bad += run("Obj 0x190B1A", "work/ram/obj_190B1A", Obj_190B1A_Tick, rom);
+    bad += run("Obj 0x1909B2", "work/ram/obj_1909B2", Obj_1909B2_Tick, rom);
+    bad += run("Obj 0x18F012", "work/ram/obj_18F012", Obj_18F012_Tick, rom);
+    bad += run("Obj 0x19090C", "work/ram/obj_19090C", Obj_19090C_Tick, rom);
+    bad += run("Obj 0x190AA6", "work/ram/obj_190AA6", Obj_190AA6_Tick, rom);
+    bad += run("Obj 0x190FD0", "work/ram/obj_190FD0", Obj_190FD0_Tick, rom);
+    bad += run("Obj 0x191014", "work/ram/obj_191014", Obj_191014_Tick, rom);
+    bad += run("Obj 0x191374", "work/ram/obj_191374", Obj_191374_Tick, rom);
+    bad += run("Obj 0x191356", "work/ram/obj_191356", Obj_191356_Tick, rom);
+    bad += run("Obj 0x1914E6", "work/ram/obj_1914E6", Obj_1914E6_Tick, rom);
+    bad += run("Obj 0x191486", "work/ram/obj_191486", Obj_191486_Tick, rom);
+    bad += run("Obj 0x1915E0", "work/ram/obj_1915E0", Obj_1915E0_Tick, rom);
+    bad += run("Obj 0x191700", "work/ram/obj_191700", Obj_191700_Tick, rom);
+    bad += run("Obj 0x1915AE", "work/ram/obj_1915AE", Obj_1915AE_Tick, rom);
+    bad += run("Obj 0x191742", "work/ram/obj_191742", Obj_191742_Tick, rom);
+    bad += run("Obj 0x1916BE", "work/ram/obj_1916BE", Obj_1916BE_Tick, rom);
+    bad += run("Obj 0x19163C", "work/ram/obj_19163C", Obj_19163C_Tick, rom);
+    bad += run("Obj 0x181AEC", "work/ram/obj_181AEC", Obj_181AEC_Tick, rom);
+    bad += run("Obj 0x1802F4", "work/ram/obj_1802F4", Obj_1802F4_Tick, rom);
+    bad += run("Obj 0x1802A4", "work/ram/obj_1802A4", Obj_1802A4_Tick, rom);
+    bad += run("Obj 0x1804DA", "work/ram/obj_1804DA", Obj_1804DA_Tick, rom);
+    bad += run("Obj 0x18048A", "work/ram/obj_18048A", Obj_18048A_Tick, rom);
+    bad += run("Obj 0x191688", "work/ram/obj_191688", Obj_191688_Tick, rom);
+    bad += run("Obj 0x18F216", "work/ram/obj_18F216", Obj_18F216_Tick, rom);
+    bad += run("Obj 0x0EE42E", "work/ram/obj_EE42E", Obj_EE42E_Tick, rom);
+    bad += run("Obj 0x10C966", "work/ram/obj_10C966", Obj_10C966_Tick, rom);
+    bad += run("Obj 0x0EE468", "work/ram/obj_EE468", Obj_EE468_Tick, rom);
+    bad += run("Obj 0x0EE43A", "work/ram/obj_EE43A", Obj_EE43A_Tick, rom);
+    bad += run("Obj 0x0EE7D8", "work/ram/obj_EE7D8", Obj_EE7D8_Tick, rom);
+    bad += run("Obj 0x0EE7AA", "work/ram/obj_EE7AA", Obj_EE7AA_Tick, rom);
+    bad += run("Obj 0x0EF366", "work/ram/obj_EF366", Obj_EF366_Tick, rom);
+    bad += run("Obj 0x0EF44E", "work/ram/obj_EF44E", Obj_EF44E_Tick, rom);
+    bad += run("Obj 0x0DA28C", "work/ram/obj_DA28C", Obj_DA28C_Tick, rom);
+    bad += run("Obj 0x0EF400", "work/ram/obj_EF400", Obj_EF400_Tick, rom);
+    bad += run("Obj 0x0EF434", "work/ram/obj_EF434", Obj_EF434_Tick, rom);
+    bad += run("Obj 0x0DA20E", "work/ram/obj_DA20E", Obj_DA20E_Tick, rom);
+    bad += run("Obj 0x105ED6", "work/ram/obj_105ED6", Obj_105ED6_Tick, rom);
+    bad += run("Obj 0x1070DA", "work/ram/obj_1070DA", Obj_1070DA_Tick, rom);
+    bad += run("Obj 0x10747E", "work/ram/obj_10747E", Obj_10747E_Tick, rom);
+    bad += run("Obj 0x107B6E", "work/ram/obj_107B6E", Obj_107B6E_Tick, rom);
+    bad += run("Obj 0x107786", "work/ram/obj_107786", Obj_107786_Tick, rom);
+    bad += run("Obj 0x107DB2", "work/ram/obj_107DB2", Obj_107DB2_Tick, rom);
+    bad += run("Obj 0x1080A4", "work/ram/obj_1080A4", Obj_1080A4_Tick, rom);
+    bad += run("Obj 0x107112", "work/ram/obj_107112", Obj_107112_Tick, rom);
+    bad += run("Obj 0x105EDE", "work/ram/obj_105EDE", Obj_105EDE_Tick, rom);
+    bad += run("Obj 0x108294", "work/ram/obj_108294", Obj_108294_Tick, rom);
+    bad += run("Obj 0x1084C0", "work/ram/obj_1084C0", Obj_1084C0_Tick, rom);
+    bad += run("Obj 0x1074B6", "work/ram/obj_1074B6", Obj_1074B6_Tick, rom);
+    bad += run("Obj 0x1077DA", "work/ram/obj_1077DA", Obj_1077DA_Tick, rom);
+    bad += run("Obj 0x107BC2", "work/ram/obj_107BC2", Obj_107BC2_Tick, rom);
+    bad += run("Obj 0x107E00", "work/ram/obj_107E00", Obj_107E00_Tick, rom);
+    bad += run("Obj 0x1080F2", "work/ram/obj_1080F2", Obj_1080F2_Tick, rom);
+    bad += run("Obj 0x1082E6", "work/ram/obj_1082E6", Obj_1082E6_Tick, rom);
+    bad += run("Obj 0x108512", "work/ram/obj_108512", Obj_108512_Tick, rom);
+    bad += run("Obj 0x0DBC1A", "work/ram/obj_DBC1A", Obj_DBC1A_Tick, rom);
+    bad += run("Obj 0x0C9AB8", "work/ram/obj_C9AB8", Obj_C9AB8_Tick, rom);
+    bad += run("Obj 0x0DBCAE", "work/ram/obj_DBCAE", Obj_DBCAE_Tick, rom);
+    bad += run("Obj 0x10DBE0", "work/ram/obj_10DBE0", Obj_10DBE0_Tick, rom);
+    bad += run("Obj 0x10E1BC", "work/ram/obj_10E1BC", Obj_10E1BC_Tick, rom);
+    bad += run("Obj 0x10DBD8", "work/ram/obj_10DBD8", Obj_10DBD8_Tick, rom);
+    bad += run("Obj 0x10E178", "work/ram/obj_10E178", Obj_10E178_Tick, rom);
+    bad += run("Obj 0x0DC03A", "work/ram/obj_DC03A", Obj_DC03A_Tick, rom);
+    bad += run("Obj 0x116B86", "work/ram/obj_116B86", Obj_116B86_Tick, rom);
+    bad += run("Obj 0x0DC008", "work/ram/obj_DC008", Obj_DC008_Tick, rom);
+    bad += run("Obj 0x0DC46E", "work/ram/obj_DC46E", Obj_DC46E_Tick, rom);
+    bad += run("Obj 0x116B0C", "work/ram/obj_116B0C", Obj_116B0C_Tick, rom);
+    bad += run("Obj 0x1165CC", "work/ram/obj_1165CC", Obj_1165CC_Tick, rom);
+    bad += run("Obj 0x116C48", "work/ram/obj_116C48", Obj_116C48_Tick, rom);
+    bad += run("Obj 0x116C9A", "work/ram/obj_116C9A", Obj_116C9A_Tick, rom);
+    bad += run("Obj 0x1166EA", "work/ram/obj_1166EA", Obj_1166EA_Tick, rom);
+    bad += run("Obj 0x116DD2", "work/ram/obj_116DD2", Obj_116DD2_Tick, rom);
+    bad += run("Obj 0x116E22", "work/ram/obj_116E22", Obj_116E22_Tick, rom);
+    bad += run("Obj 0x0E5372", "work/ram/obj_E5372", Obj_E5372_Tick, rom);
+    bad += run("Obj 0x116802", "work/ram/obj_116802", Obj_116802_Tick, rom);
+    bad += run("Obj 0x0E54EE", "work/ram/obj_E54EE", Obj_E54EE_Tick, rom);
+    bad += run("Obj 0x10E316", "work/ram/obj_10E316", Obj_10E316_Tick, rom);
+    bad += run("Obj 0x0FEF76", "work/ram/obj_FEF76", Obj_FEF76_Tick, rom);
+    bad += run("Obj 0x0E262A", "work/ram/obj_E262A", Obj_E262A_Tick, rom);
+    bad += run("Obj 0x116F82", "work/ram/obj_116F82", Obj_116F82_Tick, rom);
+    bad += run("Obj 0x116EE4", "work/ram/obj_116EE4", Obj_116EE4_Tick, rom);
+    bad += run("Obj 0x0E54A0", "work/ram/obj_E54A0", Obj_E54A0_Tick, rom);
+    bad += run("Obj 0x0E2804", "work/ram/obj_E2804", Obj_E2804_Tick, rom);
+    bad += run("Obj 0x117826", "work/ram/obj_117826", Obj_117826_Tick, rom);
+    bad += run("Obj 0x0DACDC", "work/ram/obj_DACDC", Obj_DACDC_Tick, rom);
+    bad += run("Obj 0x1177AC", "work/ram/obj_1177AC", Obj_1177AC_Tick, rom);
+    bad += run("Obj 0x116EDC", "work/ram/obj_116EDC", Obj_116EDC_Tick, rom);
+    bad += run("Obj 0x116F7A", "work/ram/obj_116F7A", Obj_116F7A_Tick, rom);
+    bad += run("Obj 0x12601C", "work/ram/obj_12601C", Obj_12601C_Tick, rom);
+    bad += run("Obj 0x117980", "work/ram/obj_117980", Obj_117980_Tick, rom);
+    bad += run("Obj 0x0E27C0", "work/ram/obj_E27C0", Obj_E27C0_Tick, rom);
+    bad += run("Obj 0x0DAC54", "work/ram/obj_DAC54", Obj_DAC54_Tick, rom);
+    bad += run("Obj 0x11792A", "work/ram/obj_11792A", Obj_11792A_Tick, rom);
+    bad += run("Obj 0x126158", "work/ram/obj_126158", Obj_126158_Tick, rom);
+    bad += run("Obj 0x11699A", "work/ram/obj_11699A", Obj_11699A_Tick, rom);
+    bad += run("Obj 0x125DC2", "work/ram/obj_125DC2", Obj_125DC2_Tick, rom);
+    bad += run("Obj 0x126DEC", "work/ram/obj_126DEC", Obj_126DEC_Tick, rom);
+    bad += run("Obj 0x126D92", "work/ram/obj_126D92", Obj_126D92_Tick, rom);
+    bad += run("Obj 0x126EB4", "work/ram/obj_126EB4", Obj_126EB4_Tick, rom);
+    bad += run("Obj 0x126E84", "work/ram/obj_126E84", Obj_126E84_Tick, rom);
+    bad += run("Obj 0x126132", "work/ram/obj_126132", Obj_126132_Tick, rom);
+    bad += run("Obj 0x126FF6", "work/ram/obj_126FF6", Obj_126FF6_Tick, rom);
+    bad += run("Obj 0x126FA4", "work/ram/obj_126FA4", Obj_126FA4_Tick, rom);
+    bad += run("Obj 0x1270BE", "work/ram/obj_1270BE", Obj_1270BE_Tick, rom);
+    bad += run("Obj 0x12739E", "work/ram/obj_12739E", Obj_12739E_Tick, rom);
+    bad += run("Obj 0x12706C", "work/ram/obj_12706C", Obj_12706C_Tick, rom);
+    bad += run("Obj 0x1169CA", "work/ram/obj_1169CA", Obj_1169CA_Tick, rom);
+    bad += run("Obj 0x127584", "work/ram/obj_127584", Obj_127584_Tick, rom);
+    bad += run("Obj 0x12737E", "work/ram/obj_12737E", Obj_12737E_Tick, rom);
+    bad += run("Obj 0x1261FE", "work/ram/obj_1261FE", Obj_1261FE_Tick, rom);
+    bad += run("Obj 0x1289A6", "work/ram/obj_1289A6", Obj_1289A6_Tick, rom);
+    bad += run("Obj 0x127560", "work/ram/obj_127560", Obj_127560_Tick, rom);
+    bad += run("Obj 0x126282", "work/ram/obj_126282", Obj_126282_Tick, rom);
+    bad += run("Obj 0x128B9E", "work/ram/obj_128B9E", Obj_128B9E_Tick, rom);
+    bad += run("Obj 0x128A84", "work/ram/obj_128A84", Obj_128A84_Tick, rom);
+    bad += run("Obj 0x128BB2", "work/ram/obj_128BB2", Obj_128BB2_Tick, rom);
+    bad += run("Obj 0x126310", "work/ram/obj_126310", Obj_126310_Tick, rom);
+    bad += run("Obj 0x0CD1AE", "work/ram/obj_CD1AE", Obj_CD1AE_Tick, rom);
+    bad += run("Obj 0x0CCCA2", "work/ram/obj_CCCA2", Obj_CCCA2_Tick, rom);
+    bad += run("Obj 0x0CCFD4", "work/ram/obj_CCFD4", Obj_CCFD4_Tick, rom);
+    bad += run("Obj 0x128924", "work/ram/obj_128924", Obj_128924_Tick, rom);
+    bad += run("Obj 0x126254", "work/ram/obj_126254", Obj_126254_Tick, rom);
+    bad += run("Obj 0x1261AA", "work/ram/obj_1261AA", Obj_1261AA_Tick, rom);
+    bad += run("Obj 0x126364", "work/ram/obj_126364", Obj_126364_Tick, rom);
+    bad += run("Obj 0x1289EA", "work/ram/obj_1289EA", Obj_1289EA_Tick, rom);
+    bad += run("Obj 0x128B44", "work/ram/obj_128B44", Obj_128B44_Tick, rom);
+    bad += run("Obj 0x1263BE", "work/ram/obj_1263BE", Obj_1263BE_Tick, rom);
+    bad += run("Obj 0x128476", "work/ram/obj_128476", Obj_128476_Tick, rom);
+    bad += run("Obj 0x1262B0", "work/ram/obj_1262B0", Obj_1262B0_Tick, rom);
+    bad += run("Obj 0x1284D4", "work/ram/obj_1284D4", Obj_1284D4_Tick, rom);
+    bad += run("Obj 0x126430", "work/ram/obj_126430", Obj_126430_Tick, rom);
+    bad += run("Obj 0x0CCF72", "work/ram/obj_CCF72", Obj_CCF72_Tick, rom);
+    bad += run("Obj 0x12645E", "work/ram/obj_12645E", Obj_12645E_Tick, rom);
+    bad += run("Obj 0x128D4A", "work/ram/obj_128D4A", Obj_128D4A_Tick, rom);
+    bad += run("Obj 0x128660", "work/ram/obj_128660", Obj_128660_Tick, rom);
+    bad += run("Obj 0x126390", "work/ram/obj_126390", Obj_126390_Tick, rom);
+    bad += run("Obj 0x12886A", "work/ram/obj_12886A", Obj_12886A_Tick, rom);
+    bad += run("Obj 0x1264CA", "work/ram/obj_1264CA", Obj_1264CA_Tick, rom);
+    bad += run("Obj 0x12649C", "work/ram/obj_12649C", Obj_12649C_Tick, rom);
+    bad += run("Obj 0x128226", "work/ram/obj_128226", Obj_128226_Tick, rom);
+    bad += run("Obj 0x1264F8", "work/ram/obj_1264F8", Obj_1264F8_Tick, rom);
+    bad += run("Obj 0x126402", "work/ram/obj_126402", Obj_126402_Tick, rom);
+    bad += run("Obj 0x1286E2", "work/ram/obj_1286E2", Obj_1286E2_Tick, rom);
+    bad += run("Obj 0x1282B4", "work/ram/obj_1282B4", Obj_1282B4_Tick, rom);
+    bad += run("Obj 0x1285FC", "work/ram/obj_1285FC", Obj_1285FC_Tick, rom);
+    bad += run("Obj 0x12652C", "work/ram/obj_12652C", Obj_12652C_Tick, rom);
+    bad += run("Obj 0x1287A4", "work/ram/obj_1287A4", Obj_1287A4_Tick, rom);
+    bad += run("Obj 0x1287C4", "work/ram/obj_1287C4", Obj_1287C4_Tick, rom);
+    bad += run("Obj 0x126562", "work/ram/obj_126562", Obj_126562_Tick, rom);
+    bad += run("Obj 0x1281C4", "work/ram/obj_1281C4", Obj_1281C4_Tick, rom);
+    bad += run("Obj 0x1265BE", "work/ram/obj_1265BE", Obj_1265BE_Tick, rom);
+    bad += run("Obj 0x0CD124", "work/ram/obj_CD124", Obj_CD124_Tick, rom);
+    bad += run("Obj 0x126608", "work/ram/obj_126608", Obj_126608_Tick, rom);
+    bad += run("Obj 0x126670", "work/ram/obj_126670", Obj_126670_Tick, rom);
+    bad += run("Obj 0x0CC7C0", "work/ram/obj_CC7C0", Obj_CC7C0_Tick, rom);
+    bad += run("Obj 0x0CC860", "work/ram/obj_CC860", Obj_CC860_Tick, rom);
+    bad += run("Obj 0x1266C2", "work/ram/obj_1266C2", Obj_1266C2_Tick, rom);
+    bad += run("Obj 0x126590", "work/ram/obj_126590", Obj_126590_Tick, rom);
+    bad += run("Obj 0x126710", "work/ram/obj_126710", Obj_126710_Tick, rom);
+    bad += run("Obj 0x126744", "work/ram/obj_126744", Obj_126744_Tick, rom);
+    bad += run("Obj 0x0CDDF8", "work/ram/obj_CDDF8", Obj_CDDF8_Tick, rom);
+    bad += run("Obj 0x0CDF68", "work/ram/obj_CDF68", Obj_CDF68_Tick, rom);
+    bad += run("Obj 0x0CDE50", "work/ram/obj_CDE50", Obj_CDE50_Tick, rom);
+    bad += run("Obj 0x0CDF84", "work/ram/obj_CDF84", Obj_CDF84_Tick, rom);
+    bad += run("Obj 0x0CC756", "work/ram/obj_CC756", Obj_CC756_Tick, rom);
+    bad += run("Obj 0x126772", "work/ram/obj_126772", Obj_126772_Tick, rom);
+    bad += run("Obj 0x1267BC", "work/ram/obj_1267BC", Obj_1267BC_Tick, rom);
+    bad += run("Obj 0x1267F0", "work/ram/obj_1267F0", Obj_1267F0_Tick, rom);
+    bad += run("Obj 0x0CDDB0", "work/ram/obj_CDDB0", Obj_CDDB0_Tick, rom);
+    bad += run("Obj 0x126844", "work/ram/obj_126844", Obj_126844_Tick, rom);
+    bad += run("Obj 0x1268D4", "work/ram/obj_1268D4", Obj_1268D4_Tick, rom);
+    bad += run("Obj 0x126902", "work/ram/obj_126902", Obj_126902_Tick, rom);
+    bad += run("Obj 0x12681E", "work/ram/obj_12681E", Obj_12681E_Tick, rom);
+    bad += run("Obj 0x126936", "work/ram/obj_126936", Obj_126936_Tick, rom);
+    bad += run("Obj 0x0CCDB6", "work/ram/obj_CCDB6", Obj_CCDB6_Tick, rom);
+    bad += run("Obj 0x126B7E", "work/ram/obj_126B7E", Obj_126B7E_Tick, rom);
+    bad += run("Obj 0x126976", "work/ram/obj_126976", Obj_126976_Tick, rom);
+    bad += run("Obj 0x12687E", "work/ram/obj_12687E", Obj_12687E_Tick, rom);
+    bad += run("Obj 0x1269C4", "work/ram/obj_1269C4", Obj_1269C4_Tick, rom);
+    bad += run("Obj 0x126BAA", "work/ram/obj_126BAA", Obj_126BAA_Tick, rom);
+    bad += run("Obj 0x11939E", "work/ram/obj_11939E", Obj_11939E_Tick, rom);
+    bad += run("Obj 0x1269F2", "work/ram/obj_1269F2", Obj_1269F2_Tick, rom);
+    bad += run("Obj 0x126A2A", "work/ram/obj_126A2A", Obj_126A2A_Tick, rom);
+    bad += run("Obj 0x126086", "work/ram/obj_126086", Obj_126086_Tick, rom);
+    bad += run("Obj 0x128D6C", "work/ram/obj_128D6C", Obj_128D6C_Tick, rom);
+    bad += run("Obj 0x0CDDA6", "work/ram/obj_CDDA6", Obj_CDDA6_Tick, rom);
+    bad += run("Obj 0x128E44", "work/ram/obj_128E44", Obj_128E44_Tick, rom);
+    bad += run("Obj 0x12604C", "work/ram/obj_12604C", Obj_12604C_Tick, rom);
+    bad += run("Obj 0x0C2BBE", "work/ram/obj_C2BBE", Obj_C2BBE_Tick, rom);
+    bad += run("Obj 0x128E8C", "work/ram/obj_128E8C", Obj_128E8C_Tick, rom);
+    bad += run("Obj 0x0C2C02", "work/ram/obj_C2C02", Obj_C2C02_Tick, rom);
+    bad += run("Obj 0x126A7A", "work/ram/obj_126A7A", Obj_126A7A_Tick, rom);
+    bad += run("Obj 0x0C2C22", "work/ram/obj_C2C22", Obj_C2C22_Tick, rom);
+    bad += run("Obj 0x126AB4", "work/ram/obj_126AB4", Obj_126AB4_Tick, rom);
+    bad += run("Obj 0x126AE2", "work/ram/obj_126AE2", Obj_126AE2_Tick, rom);
     /* captured with F3_EXIT=ret at the routine entry */
     bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
     bad += run_a1("ObjMove 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);

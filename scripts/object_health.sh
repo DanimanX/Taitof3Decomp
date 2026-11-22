@@ -16,6 +16,7 @@ acc=$(printf '%s\n' "$out" | grep -cE '[0-9]+/ *[0-9]+ ticks bit-exact \(.* 0 re
 rej=$(printf '%s\n' "$out" | grep -c 'REJECT')
 other=$(printf '%s\n' "$out" | grep '^objects:' | grep -v 'REJECT' \
         | grep -vE '[0-9]+/ *[0-9]+ ticks bit-exact \(.* 0 reach undecompiled' \
-        | grep -vE '^objects: .* [0-9]+/ *[0-9]+ ticks bit-exact ' | wc -l)
+        | grep -vE '^objects: .* [0-9]+/ *[0-9]+ ticks bit-exact ' \
+        | grep -vF ' SKIP (no ' | wc -l)
 echo "objects: accepted=$acc rejected(unobservable)=$rej failing=$other"
 [ "$other" -eq 0 ] && echo "ACCEPTED=$acc" || { echo "ACCEPTED=0"; exit 1; }

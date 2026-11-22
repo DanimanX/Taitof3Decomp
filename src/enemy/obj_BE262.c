@@ -1,8 +1,7 @@
 #include "obj_BE262.h"
 #include "../objects/obj_pool.h"
 
-/* ROM 0x0BE262: type one character per frame into text RAM (0x61C000).
- * Text RAM is not modelled: only the Work RAM effects are reproduced. */
+/* ROM 0x0BE262: type one character per frame into text RAM (0x61C000). */
 int Obj_BE262_Tick(const f3mem_t *m, uint32_t obj)
 {
     uint32_t a1 = rd32(m, obj + 0x44u);
@@ -15,8 +14,13 @@ int Obj_BE262_Tick(const f3mem_t *m, uint32_t obj)
         Obj_Free(m, obj);
         return 0;
     } else {
-        /* 0x0BE286: text RAM write {0x0E, c} at 0x61C000 + y*128 + x*2 skipped */
-        wr16(m, obj + 0x14u, (uint16_t)(rd16(m, obj + 0x14u) + 1u));
+        uint16_t d1w = rd16(m, obj + 0x14u);
+        uint16_t d2w = rd16(m, obj + 0x18u);
+        uint16_t off = (uint16_t)((uint16_t)(d2w << 7) + (uint16_t)(d1w + d1w));
+        uint32_t dst = 0x0061C000u + (uint32_t)(int32_t)(int16_t)off;
+        wr8(m, dst, 0x0Eu);
+        wr8(m, dst + 1u, c);
+        wr16(m, obj + 0x14u, (uint16_t)(d1w + 1u));
     }
     wr32(m, obj + 0x00u, 0x000BE262u);
     return 0;

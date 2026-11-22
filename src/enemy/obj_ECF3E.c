@@ -20,14 +20,14 @@ static void sub_0D0690(const f3mem_t *m, uint32_t obj)
         wr32(m, obj + 0x48u, a1);
         wr16(m, obj + 0x4Cu, rd16(m, a1)); a1 += 2u;
         d0w = rd16(m, a1); a1 += 2u;
-        wr8(m, obj + 0x1Cu, (uint8_t)(d0w >> 8));
+        wr8(m, obj + 0x1Cu, (uint8_t)d0w);
         wr32(m, obj + 0x10u, rd32(m, a1)); a1 += 4u;
         wr32(m, obj + 0x68u, rd32(m, a1));
         return;
     }
     wr16(m, obj + 0x4Cu, d0w);
     d0w = rd16(m, a1); a1 += 2u;
-    wr8(m, obj + 0x1Cu, (uint8_t)(d0w >> 8));
+    wr8(m, obj + 0x1Cu, (uint8_t)d0w);
     wr32(m, obj + 0x10u, rd32(m, a1)); a1 += 4u;
     wr32(m, obj + 0x68u, rd32(m, a1));
 }

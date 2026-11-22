@@ -1,9 +1,17 @@
 #include "obj_BDDE2.h"
 
+/* ROM 0x176198: fill 0x1D0 bytes (232 words) of line RAM at dst + (A5-0x5D56) with val */
+static void sub_176198(const f3mem_t *m, uint32_t dst, uint16_t val)
+{
+    uint32_t a0 = dst + (uint32_t)(int32_t)(int16_t)rd16(m, F3_A5 - 0x5D56u);
+    for (uint32_t off = 0; off < 0x1D0u; off += 2u)
+        wr16(m, a0 + off, val);
+}
+
 /* ROM 0x0BDDE2 */
 int Obj_BDDE2_Tick(const f3mem_t *m, uint32_t obj)
 {
-    /* jsr 0x176198 (fill line RAM 0x62B600 with 0x300C) only writes line RAM */
+    sub_176198(m, 0x0062B600u, 0x300Cu);
 
     /* jsr 0x16AB2C: D0 = (A5-0x5DA0), D1 = (A5-0x5D9C) -> A5+0x421C and A5-0x5D90 */
     uint32_t d0 = rd32(m, F3_A5 - 0x5DA0u);

@@ -52,7 +52,7 @@ static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
 {
     wr32(m, obj + 0x48u, a1);
     wr16(m, obj + 0x4Cu, rd16(m, a1)); a1 += 2u;
-    wr8(m, obj + 0x1Cu, (uint8_t)(rd16(m, a1) >> 8)); a1 += 2u;
+    wr8(m, obj + 0x1Cu, (uint8_t)rd16(m, a1)); a1 += 2u;
     wr32(m, obj + 0x10u, rd32(m, a1)); a1 += 4u;
     wr32(m, obj + 0x68u, rd32(m, a1));
 }

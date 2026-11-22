@@ -27,7 +27,7 @@ for a in "${ADDRS[@]}"; do
   ok=no
   [ -n "$n" ] && [ "${n%%/*}" = "${n##*/}" ] && [ "${un:-1}" = "0" ] && [ "$rej" = "0" ] && [ "${n%%/*}" != "0" ] && ok=yes
   echo "$a ${n:-NONE} un=${un:-?} accept=$ok"
-  [ "$ok" = yes ] || rc=1
+  if [ "$ok" = yes ]; then cp "$WT/src/enemy/obj_$a.c" ".verify_keep_$a.c"; else rc=1; fi
 done
 if [ "$rc" != 0 ]; then
   for a in "${ADDRS[@]}"; do
@@ -38,3 +38,9 @@ if [ "$rc" != 0 ]; then
   done
   echo "(set reverted)"
 fi
+
+# The set is reverted from GIT, which also discards the ACCEPTED drafts (they
+# were never committed). Put the accepted ones back so the parent can commit.
+for a in "${ADDRS[@]}"; do
+  if [ -e ".verify_keep_$a.c" ]; then cp ".verify_keep_$a.c" "src/enemy/obj_$a.c"; rm -f ".verify_keep_$a.c"; fi
+done

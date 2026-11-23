@@ -1,4 +1,5 @@
 #include "obj_DBC1A.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -30,7 +31,6 @@ static void sub_0CEDE4(const f3mem_t *m, uint32_t obj, uint32_t a1)
     wr8(m, obj + 0x4Fu, 0u);
 }
 
-
 /* ROM 0x0D0678: script pointer + first frame */
 static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
 {
@@ -45,14 +45,6 @@ static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
 }
 
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0D1EBC */
 static int sub_0D1EBC(const f3mem_t *m, uint16_t d0w, uint16_t d1w,
@@ -98,7 +90,7 @@ int Obj_DBC1A_Tick(const f3mem_t *m, uint32_t obj)
     if (rd16(m, obj + 0x10u) > 50u)
         return -1;
     /* subi.l #0,(0x886,A5): no effect */
-    uint16_t speed = (uint16_t)((sub_0D0E3A(m) & 7u) + 0x1Cu);
+    uint16_t speed = (uint16_t)((Obj_Next4Way(m) & 7u) + 0x1Cu);
     wr16(m, obj + 0x60u, speed);
     uint32_t vx = 0u, vy = 0u;
     sub_0D1EBC(m, rd16(m, obj + 0x58u), rd16(m, obj + 0x10u), &vx, &vy);

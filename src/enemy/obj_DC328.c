@@ -1,4 +1,5 @@
 #include "obj_DC328.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
 #include "../audio/sound_cmd.h"
@@ -53,14 +54,6 @@ static void sub_0CEDE4(const f3mem_t *m, uint32_t obj, uint32_t a1)
 
 /* ROM 0x0D0E3A: 16-bit LCG step at A5+0x1D60 (n = n*5+1), D1 preserved;
  * returns the high byte of the new seed. */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0DC076: second half of the 0x0DC328 tail. Copy the current player
  * (A0+0x08) into obj+0x3A/0x3E i.e. move obj+/+ world position 0x14/0x18 to
@@ -88,7 +81,7 @@ static int tail_0DC076(const f3mem_t *m, uint32_t obj)
     sub_0CEDE4(m, obj, 0x000D8FE2u);
 
     /* 0x0DC0A4: lea (0x7e,PC),A1 -> 0x0DC124 */
-    uint16_t d0 = sub_0D0E3A(m);
+    uint16_t d0 = Obj_Next4Way(m);
     uint32_t a1 = 0x000DC124u;
     if (d0 > 0x0033u) {
         /* 0x0DC0B6: lea (0x114,PC),A1 -> 0x0DC1CC */

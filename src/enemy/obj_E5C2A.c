@@ -1,4 +1,5 @@
 #include "obj_E5C2A.h"
+#include "../objects/obj_shared.h"
 #include "../video/sprite.h"
 
 /* ROM 0x0CEC4C: base state + the per-group script chunk at A1 */
@@ -63,14 +64,6 @@ static void sub_0CFA86(const f3mem_t *m, uint32_t obj, uint32_t a1)
 }
 
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0w = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1w = (uint16_t)(d0w << 2);
-    d0w = (uint16_t)(d0w + d1w + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0w);
-    return (uint16_t)(d0w >> 8);
-}
 
 /* ROM 0x0D2D44 */
 static int sub_0D2D44(const f3mem_t *m, uint16_t d0w, uint16_t d1w,
@@ -98,10 +91,10 @@ int Obj_E5C2A_Tick(const f3mem_t *m, uint32_t obj)
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) & (uint8_t)~0x02u));
     sub_0CFA86(m, obj, rd32(m, a3));
 
-    uint16_t spd = (uint16_t)(rd16(m, obj + 0x60u) + (sub_0D0E3A(m) & 0x0003u));
+    uint16_t spd = (uint16_t)(rd16(m, obj + 0x60u) + (Obj_Next4Way(m) & 0x0003u));
     wr16(m, obj + 0x60u, spd);
 
-    int16_t ang = (int16_t)(uint16_t)((sub_0D0E3A(m) & 0x003Fu) - 0x0020u + rd16(m, obj + 0x58u));
+    int16_t ang = (int16_t)(uint16_t)((Obj_Next4Way(m) & 0x003Fu) - 0x0020u + rd16(m, obj + 0x58u));
     if (ang < 0)
         ang = (int16_t)(ang + 0x0168);
     else if (ang >= 0x0168)

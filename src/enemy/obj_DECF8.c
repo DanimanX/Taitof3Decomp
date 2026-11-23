@@ -1,4 +1,5 @@
 #include "obj_DECF8.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -66,143 +67,12 @@ static int  sub_0DEFC0(const f3mem_t *m, uint32_t a0, uint32_t a1);
 static int  lab_0DEE94(const f3mem_t *m, uint32_t a0, int16_t d0w);
 
 /* ROM 0x00649A: D0.w = angle index from the doubled squared distance. */
-static uint16_t sub_00649A(const f3mem_t *m, int16_t d0w, int16_t d1w)
-{
-    int32_t d0 = (int32_t)d0w * (int32_t)d0w + (int32_t)d1w * (int32_t)d1w;
-    uint32_t d1 = 4u;
-    uint32_t v;
-
-    d0 = (int32_t)((uint32_t)d0 << 1);
-    if (d0 >= 0x200) {
-        d0 = (int32_t)((uint32_t)d0 >> 8);
-        d1 += 4u;
-        if (d0 >= 0x200) {
-            d0 = (int32_t)((uint32_t)d0 >> 8);
-            d1 += 4u;
-            if (d0 >= 0x200) {
-                d0 = (int32_t)((uint32_t)d0 >> 8);
-                d1 += 4u;
-            }
-        }
-    }
-    v = ld16(m, (0x28340u + (uint32_t)(uint16_t)((uint16_t)d0 << 1)));
-    v = v << (d1 & 31u);
-    return U16(v >> 16);
-}
 
 /* ROM 0x006422: polar table lookup. */
-static int16_t sub_006422(const f3mem_t *m, int16_t d0w, int16_t d1w)
-{
-    uint16_t u0 = (uint16_t)d0w;
-    uint16_t u1 = (uint16_t)d1w;
-    uint16_t d2 = 0u;
-    int16_t d3;
-    uint16_t sel;
-
-    if (W(u0) < 0) { d2 = (uint16_t)(d2 | 2u); u0 = (uint16_t)(0u - u0); }
-    if (W(u1) < 0) { d2 = (uint16_t)(d2 | 4u); u1 = (uint16_t)(0u - u1); }
-    sel = (W(u0) > W(u1)) ? u1 : u0;
-    d3 = (int16_t)((uint16_t)(0x20u - (uint16_t)__builtin_clz((uint32_t)sel)));
-    d3 = (int16_t)((uint16_t)d3 - 0x1Au);
-    if (d3 < 0) {
-        uint32_t sh = (uint32_t)(-(int32_t)d3) & 15u;
-        u0 = (uint16_t)(u0 >> sh);
-        u1 = (uint16_t)(u1 >> sh);
-    }
-    if (d2 != 0u && d2 != 6u) {
-        uint16_t t = u0; u0 = u1; u1 = t;
-    }
-    {
-        uint16_t b = ld8(m, (0x406E40u + (uint32_t)(uint16_t)((uint16_t)(u1 << 6) + u0)));
-        uint16_t t = ld16(m, (0x406E40u + d2));
-        return (int16_t)(uint16_t)(b + t);
-    }
-}
 
 /* ROM 0x0CBB2C: orbiter re-arm body at 0x0CBB50. */
-static void sub_0CBB2C(const f3mem_t *m, uint32_t a0)
-{
-    uint32_t a1;
-    int16_t d0;
-
-    wr8(m, a0 + O_INV, 0u);
-    wr8(m, a0 + O_VISIBLE, 1u);
-    a1 = ld32(m, a0 + O_SPRDEF);
-    d0 = (int16_t)(uint16_t)((uint16_t)ld8(m, a0 + O_EASE) - 0x100u);
-    d0 = (int16_t)(((int32_t)d0 * W(ld16(m, a1))) >> 5);
-    wr16(m, a0 + O_Y, U16(ld16(m, a0 + O_Y) - (uint16_t)d0));
-    d0 = (int16_t)(uint16_t)((uint16_t)ld8(m, a0 + O_EASE1) - 0x100u);
-    d0 = (int16_t)(((int32_t)d0 * W(ld16(m, a1 + 2u))) >> 5);
-    wr16(m, a0 + O_X, U16(ld16(m, a0 + O_X) - (uint16_t)d0));
-
-    d0 = (int16_t)sub_00649A(m, (int16_t)(ld16(m, a0 + O_X) - 0xA0u),
-                                (int16_t)(ld16(m, a0 + O_Y) - 0x74u));
-    d0 = (int16_t)(uint16_t)((uint16_t)(d0 << 2) - ld16(m, G_SCROLL_Y));
-    if (d0 < 0) {
-        wr32(m, a0 + 0x00u, 0x000CBC80u);
-        return;
-    }
-    wr16(m, a0 + O_ANGLE, U16((uint16_t)(d0 << 6)));
-    d0 = sub_006422(m, (int16_t)(ld16(m, a0 + O_X) - 0xA0u),
-                       (int16_t)(ld16(m, a0 + O_Y) - 0x74u));
-    wr16(m, a0 + O_RADIUS, U16((uint16_t)(d0 << 8)));
-    wr16(m, a0 + O_ZOOM, 0x100u);
-    if ((ld8(m, G_STAGE_FLAGS) & 0x02u) == 0u) {
-        wr32(m, a0 + 0x00u, 0x000CBC80u);
-        return;
-    }
-    wr16(m, a0 + O_RADIUS, U16(ld16(m, a0 + O_RADIUS) + 0x200u));
-    d0 = (int16_t)ld8(m, a0 + O_INV);
-    if (d0 != 0) {
-        a1 = ld32(m, a0 + O_CURSOR);
-        uint32_t sh = (uint32_t)(uint16_t)ld8(m, a0 + O_INV);
-        d0 = (int16_t)((uint32_t)U16(ld16(m, a0 + O_RADIUS) + 0x4800u) >> (sh & 31u));
-        wr32(m, a0 + O_SPRDEF, ld32(m, a1 + ((uint32_t)(uint16_t)d0 << 2)));
-    }
-    {
-        uint16_t dang = (uint16_t)(ld16(m, a0 + O_ANGLE) >> 5);
-        uint16_t d1w, d2w;
-
-        wr16(m, a0 + O_ANGLE, U16(ld16(m, a0 + O_ANGLE) - dang));
-        d1w = (uint16_t)(ld16(m, a0 + O_ANGLE) * 0x100u);
-        d1w = (uint16_t)((uint16_t)((int32_t)d1w >> 8) >> 6);
-        d1w = (uint16_t)(d1w + ld16(m, G_SCROLL_Y));
-        d2w = d1w;
-        d0 = (int16_t)(ld16(m, a0 + O_RADIUS) & 0xFFu);
-        wr32(m, a0 + O_X,
-             (uint32_t)((int32_t)(int16_t)d1w * W(ld16(m, (0x27EC0u + (uint32_t)(uint16_t)((uint16_t)d0 << 1)))))
-             + 0x00A00000u);
-        wr32(m, a0 + O_Y,
-             (uint32_t)((int32_t)(int16_t)d2w * W(ld16(m, (0x27E40u + (uint32_t)(uint16_t)((uint16_t)d0 << 1)))))
-             + 0x00740000u);
-    }
-    /* move.w #-0x100,D0w; muls.w (0x30,A0),D0 */
-    d0 = (int16_t)(((int32_t)-0x100 * W(ld16(m, a0 + O_ZOOM))) >> 8);
-    d0 = (int16_t)(uint16_t)((uint16_t)d0 + 0x100u);
-    wr8(m, a0 + O_EASE1, (uint8_t)d0);
-    wr8(m, a0 + O_EASE, (uint8_t)d0);
-    a1 = ld32(m, a0 + O_SPRDEF);
-    d0 = (int16_t)(uint16_t)((uint16_t)ld8(m, a0 + O_EASE) - 0x100u);
-    d0 = (int16_t)(((int32_t)d0 * W(ld16(m, a1))) >> 5);
-    wr16(m, a0 + O_X, U16(ld16(m, a0 + O_X) + (uint16_t)d0));
-    wr16(m, a0 + O_Y, U16(ld16(m, a0 + O_Y) + (uint16_t)d0));
-    Obj_DrawSprite(m, a0);
-}
 
 /* ROM 0x0CBE34 */
-static void sub_0CBE34(const f3mem_t *m, uint32_t a0)
-{
-    if (ld8(m, a0 + O_FLASH_TGL) != 0u) {
-        if (ld8(m, a0 + O_COLOR) == 0x40u) {
-            wr8(m, a0 + O_FLASH_TGL, 0u);
-            wr8(m, a0 + O_COLOR, 0x42u);
-        } else {
-            wr8(m, a0 + O_COLOR, 0x40u);
-        }
-        return;
-    }
-    wr8(m, a0 + O_COLOR, ld8(m, a0 + O_COLOR_SRC));
-}
 
 /* ROM 0x0CEF0E */
 static void sub_0CEF0E(const f3mem_t *m, uint32_t a0)
@@ -215,7 +85,7 @@ static void sub_0CEF0E(const f3mem_t *m, uint32_t a0)
         int32_t x = W(ld16(m, a0 + O_X));
         if (x >= -0x0A && x <= 0x11C) {
             wr8(m, a0 + O_COLOR, ld8(m, a0 + O_COLOR_SRC));
-            sub_0CBB2C(m, a0);
+            Obj_ExplodeTick(m, a0);
             return;
         }
     }
@@ -329,15 +199,6 @@ static int16_t sub_0D0C8C(const f3mem_t *m)
 }
 
 /* ROM 0x0D0E3A: PRNG step at A5+0x1D60, high byte returned. */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = ld16(m, G_RAND_W);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1);
-    d0 = (uint16_t)(d0 + 1u);
-    wr16(m, G_RAND_W, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* bfffo on a word register, 68020 MSB-first numbering. */
 static uint16_t bfffo_w(uint16_t v)
@@ -476,7 +337,7 @@ static void sub_0D07B4(const f3mem_t *m, uint32_t a0, uint32_t a1)
     }
     {
         int16_t thresh = (int16_t)(uint16_t)(ld16(m, a1 + 0x10u) + (uint16_t)sub_0D0C8C(m));
-        uint16_t r = sub_0D0E3A(m);
+        uint16_t r = Obj_Next4Way(m);
 
         if (W(r) > thresh) {
             wr8(m, a0 + O_TIMER, (uint8_t)ld16(m, a1 + 0x12u));
@@ -700,6 +561,6 @@ int Obj_DECF8_Tick(const f3mem_t *m, uint32_t obj)
     default: return -1; /* unimplemented: ROM 0x0DEDF8 */
     }
     sub_0D0DC2(m, obj);
-    sub_0CBE34(m, obj);
+    Obj_BlinkColour(m, obj);
     return rc;
 }

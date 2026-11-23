@@ -1,4 +1,5 @@
 #include "obj_114E0E.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../player/player_move.h"
 
@@ -51,19 +52,6 @@ static uint16_t sub_006422(const f3mem_t *m, uint16_t d0, uint16_t d1)
 }
 
 /* ROM 0x0CBE34: damage flash colour in +0x1D */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) != 0u) {
-        if (rd8(m, obj + 0x1Du) == 0x40u) {
-            wr8(m, obj + 0x35u, 0u);
-            wr8(m, obj + 0x1Du, 0x42u);
-        } else {
-            wr8(m, obj + 0x1Du, 0x40u);
-        }
-    } else {
-        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-    }
-}
 
 /* ROM 0x113456: random drift towards the screen centre */
 static void sub_113456(const f3mem_t *m, uint32_t obj)
@@ -111,7 +99,7 @@ int Obj_114E0E_Tick(const f3mem_t *m, uint32_t obj)
         return 0;
     }
 
-    sub_0CBE34(m, obj);
+    Obj_BlinkColour(m, obj);
     if (rd8(m, obj + 0x50u) & 0x01u) {
         wr32(m, obj + 0x00u, 0x00114E0Eu);          /* 0x114E06 */
         return 0;

@@ -1,4 +1,5 @@
 #include "obj_102A9A.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -25,14 +26,6 @@ static uint16_t sub_0D0C9E(const f3mem_t *m)
 }
 
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0D0E52 */
 static uint16_t sub_0D0E52(const f3mem_t *m, uint16_t d0, uint16_t d1)
@@ -159,7 +152,7 @@ static void sub_0D09B8(const f3mem_t *m, uint32_t obj, uint32_t a1)
 
     wr16(m, obj + 0x42u, (uint16_t)d0);
     uint16_t d1 = (uint16_t)(rd16(m, a1 + 0x10u) + sub_0D0C9E(m));
-    uint16_t roll = sub_0D0E3A(m);
+    uint16_t roll = Obj_Next4Way(m);
     if ((int16_t)d1 > (int16_t)roll)
         wr8(m, obj + 0x23u, (uint8_t)rd16(m, a1 + 0x12u));
 }

@@ -1196,6 +1196,7 @@
 #include "../src/enemy/obj_179650.h"
 #include "../src/objects/objscript_CF1E4.h"
 #include "../src/objects/objscript_CF4B8.h"
+#include "../src/objects/obj_shared.h"
 
 typedef int (*tick_fn)(const f3mem_t *, uint32_t);
 typedef int (*tick_a1_fn)(const f3mem_t *, uint32_t, uint32_t);
@@ -2466,6 +2467,28 @@ int main(void)
         snprintf(pfx, sizeof pfx, "work/ram/vmop_CF4B8_%02d", op);
         snprintf(name, sizeof name, "ObjMove_CF4B8 mode %2d", op);
         bad += run_a1(name, pfx, ObjScript_CF4B8, rom);
+    }
+    /* Shared jsr primitives: one representative call shape each. These have no
+       per-routine golden capture, so they are checked against the ROM formula
+       directly (Obj_Atan2/Obj_Distance go through the 0x026E40 / 0x028340
+       tables and are covered by every object routine that calls them). */
+    {
+        uint8_t w[F3_WRAM_SIZE] = {0}, g2[F3_GFX_SIZE] = {0};
+        f3mem_t sm = { w, (const uint8_t *)rom, NULL, NULL, g2 };
+        int bad_s = 0;
+        wr16(&sm, F3_A5 + 0x1D60u, 0x0102u);   /* x' = x + 4x + 1; return x' >> 8 */
+        bad_s += Obj_Next4Way(&sm) != (uint16_t)((0x0102u + (uint16_t)(0x0102u << 2) + 1u) >> 8);
+        wr32(&sm, 0x410060u + 0x48u, 0u);
+        wr32(&sm, F3_A5 + 0x1D50u, 0x410060u);
+        Obj_RelayTimer(&sm, 0x12Cu);
+        bad_s += rd32(&sm, 0x410060u + 0x48u) != 0x12Cu;
+        Obj_StartScript(&sm, 0x410100u, 0x00105160u);
+        bad_s += rd32(&sm, 0x410100u + 0x44u) != 0x00105160u;
+        bad_s += (rd8(&sm, 0x410100u + 0x07u) & 0x02u) == 0u;
+        bad_s += Obj_Distance(&sm, 0u, 0u) != 0u;
+        printf("objects: %-22s %3d/%3d ticks bit-exact (shared primitives)\n",
+               "Shared primitives", bad_s ? 0 : 6, 6);
+        bad += bad_s;
     }
     free(rom);
     return bad ? 1 : 0;

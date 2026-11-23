@@ -1,4 +1,5 @@
 #include "obj_1049C4.h"
+#include "../objects/obj_shared.h"
 #include "../audio/sound_cmd.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
@@ -8,20 +9,6 @@
 #include "../objects/objscript_CF4B8.h"
 
 /* ROM 0x0CBE34 */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) == 0u) {
-        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-        return;
-    }
-
-    if (rd8(m, obj + 0x1Du) == 0x40u) {
-        wr8(m, obj + 0x35u, 0x00u);
-        wr8(m, obj + 0x1Du, 0x42u);
-    } else {
-        wr8(m, obj + 0x1Du, 0x40u);
-    }
-}
 
 /* ROM 0x0D0690 */
 static void sub_0D0690(const f3mem_t *m, uint32_t obj)
@@ -304,14 +291,6 @@ static void sub_0CF7FE(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x13F238 -> 0x0039D8 */
 static void play_sound(const f3mem_t *m, uint16_t cmdw)
@@ -341,7 +320,7 @@ static void spawn_shot_104C98(const f3mem_t *m, uint32_t obj)
     wr16(m, c + 0x14u, (uint16_t)(rd16(m, c + 0x14u) + 0x10u));
     wr32(m, c + 0x18u, rd32(m, obj + 0x18u));
     wr16(m, c + 0x18u, (uint16_t)(rd16(m, c + 0x18u) + 0x30u));
-    uint16_t d0 = (uint16_t)((sub_0D0E3A(m) & 0x3Fu) + 0x82u);
+    uint16_t d0 = (uint16_t)((Obj_Next4Way(m) & 0x3Fu) + 0x82u);
     wr16(m, c + 0x58u, d0);
     wr16(m, c + 0x10u, 0u);
 }
@@ -441,7 +420,7 @@ int Obj_1049C4_Tick(const f3mem_t *m, uint32_t obj)
     }
     sub_0D0690(m, obj);
     sub_0D0DC2(m, obj);
-    sub_0CBE34(m, obj);
+    Obj_BlinkColour(m, obj);
     if (rd8(m, obj + 0x1Du) == 0u)
         wr8(m, obj + 0x1Du, rd8(m, obj + 0x22u));
 

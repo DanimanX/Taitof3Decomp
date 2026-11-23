@@ -1,4 +1,5 @@
 #include "obj_1003E2.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -69,14 +70,7 @@ static void sub_0CFA86(const f3mem_t *m, uint32_t obj, uint32_t a1)
     wr32(m, obj + 0x68u, rd32(m, a1));
 }
 /* ROM 0x0D0E3A: LCG step at A5+0x1D60 (n = n*5+1); returns n >> 8 */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
+
 /* ROM 0x0D2D44: (D0, D1) = per-angle speed tables scaled by D1w (0..50) */
 static void sub_0D2D44(const f3mem_t *m, uint16_t d0w, uint16_t d1w,
                        uint32_t *out_d0, uint32_t *out_d1)
@@ -108,10 +102,10 @@ int Obj_1003E2_Tick(const f3mem_t *m, uint32_t obj)
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) | 0x04u));  /* bset.b #2 */
 
     /* 0x10041C */
-    d0 = (uint16_t)(sub_0D0E3A(m) & 0x3u);
+    d0 = (uint16_t)(Obj_Next4Way(m) & 0x3u);
     wr16(m, obj + 0x60u, (uint16_t)(rd16(m, obj + 0x60u) + d0));
 
-    d0 = (uint16_t)((sub_0D0E3A(m) & 0x3Fu) - 0x20u);
+    d0 = (uint16_t)((Obj_Next4Way(m) & 0x3Fu) - 0x20u);
     d0 = (uint16_t)(rd16(m, obj + 0x58u) + d0);
     if ((int16_t)d0 < 0) {
         d0 = (uint16_t)(d0 + 0x168u);

@@ -1,4 +1,5 @@
 #include "obj_DF7EA.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_common.h"
 
 /* ROM 0x0D2D44: D0 = speed.w, D1 = angle (0..0x168). Reads the 16.16
@@ -51,14 +52,6 @@ static void sub_0CEDE4(const f3mem_t *m, uint32_t obj, uint32_t a1)
 
 /* ROM 0x0D0E3A: 16-bit LCG step at A5+0x1D60 (n = n*5+1), D1 preserved;
  * returns the high byte of the new seed. */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0D0678: point obj at a 12-byte-entry animation sequence (A1). */
 static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -92,7 +85,7 @@ int Obj_DF7EA_Tick(const f3mem_t *m, uint32_t obj)
 
     /* 0x0DF81C: angle = 0xB4 - ((roll & 0xF) sign-extended), speed = 0x0C */
     {
-        uint16_t d0 = sub_0D0E3A(m);
+        uint16_t d0 = Obj_Next4Way(m);
         d0 = (uint16_t)(d0 & 0x000Fu);
         d0 = (uint16_t)(0u - d0);
         d0 = (uint16_t)(d0 + 0x00B4u);

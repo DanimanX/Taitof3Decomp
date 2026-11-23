@@ -1,4 +1,5 @@
 #include "obj_113ED0.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../player/player_move.h"
 
@@ -43,17 +44,6 @@ static uint16_t sub_006422(const f3mem_t *m, uint16_t d0, uint16_t d1)
 }
 
 /* ROM 0x0CBE34: hit flash */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) == 0u) {
-        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-    } else if (rd8(m, obj + 0x1Du) == 0x40u) {
-        wr8(m, obj + 0x35u, 0u);
-        wr8(m, obj + 0x1Du, 0x42u);
-    } else {
-        wr8(m, obj + 0x1Du, 0x40u);
-    }
-}
 
 /* ROM 0x0CBEB0: D0w scaled by the difficulty (A5+0x87E) */
 static uint16_t sub_0CBEB0(const f3mem_t *m, uint16_t d0)
@@ -112,7 +102,7 @@ int Obj_113ED0_Tick(const f3mem_t *m, uint32_t obj)
         wr32(m, obj + 0x00u, 0x00113FBAu);
         return 0;
     }
-    sub_0CBE34(m, obj);
+    Obj_BlinkColour(m, obj);
 
     int clear51 = 1;
     if (!(rd8(m, obj + 0x50u) & 0x01u)) {

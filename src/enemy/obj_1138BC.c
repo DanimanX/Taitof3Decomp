@@ -1,4 +1,5 @@
 #include "obj_1138BC.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../player/player_move.h"
 
@@ -51,19 +52,6 @@ static uint16_t sub_006422(const f3mem_t *m, uint16_t d0, uint16_t d1)
 }
 
 /* ROM 0x0CBE34 */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) != 0u) {
-        if (rd8(m, obj + 0x1Du) == 0x40u) {
-            wr8(m, obj + 0x35u, 0x00u);
-            wr8(m, obj + 0x1Du, 0x42u);
-        } else {
-            wr8(m, obj + 0x1Du, 0x40u);
-        }
-    } else {
-        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-    }
-}
 
 /* ROM 0x0CC2BC: D0w = (A5+0x878) mod max(1, ((0x180 - A5+0x87E) * d0) >> 8) */
 static uint16_t sub_0CC2BC(const f3mem_t *m, uint16_t d0w)
@@ -122,7 +110,7 @@ int Obj_1138BC_Tick(const f3mem_t *m, uint32_t obj)
         wr_state(m, obj, 0x0011399Cu);
         return 0;
     }
-    sub_0CBE34(m, obj);
+    Obj_BlinkColour(m, obj);
     if (!(rd8(m, obj + 0x50u) & 0x01u)) {
         uint16_t d0;
         int16_t t = (int16_t)(rd16(m, obj + 0x56u) - 1u);

@@ -1,4 +1,5 @@
 #include "obj_DC358.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -47,15 +48,6 @@ static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
 }
 
 /* ROM 0x0D0E3A: 4-way interleaved global counter in A5+0x1D60 */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0w = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1w = (uint16_t)(d0w << 2);
-    d0w = (uint16_t)(d0w + d1w);
-    d0w = (uint16_t)(d0w + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0w);
-    return (uint16_t)(d0w >> 8);
-}
 
 /* ROM 0x0D2D44: (D0, D1) = per-mode speed tables scaled by D2w */
 static void sub_0D2D44(const f3mem_t *m, uint16_t d0w, uint16_t d1w,
@@ -99,7 +91,7 @@ int Obj_DC358_Tick(const f3mem_t *m, uint32_t obj)
     sub_0CEDE4(m, obj, 0x000D8FE2u);
 
     uint32_t a1 = 0x000DC124u;
-    uint16_t r = sub_0D0E3A(m);
+    uint16_t r = Obj_Next4Way(m);
     if (r > 0x0033u) {
         a1 = 0x000DC1CCu;
         if (r > 0x0099u)

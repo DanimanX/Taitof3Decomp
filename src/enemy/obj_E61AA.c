@@ -1,22 +1,10 @@
 #include "obj_E61AA.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
 
 /* ROM 0x0CBE34: flash palette on hit */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) != 0u) {
-        if (rd8(m, obj + 0x1Du) == 0x40u) {
-            wr8(m, obj + 0x35u, 0u);
-            wr8(m, obj + 0x1Du, 0x42u);
-        } else {
-            wr8(m, obj + 0x1Du, 0x40u);
-        }
-    } else {
-        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-    }
-}
 
 /* ROM 0x0CFA86: load palette/sprite/ext from table */
 static void sub_0CFA86(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -96,14 +84,6 @@ static void sub_0D0E04(const f3mem_t *m, uint32_t obj, uint32_t d0)
 }
 
 /* ROM 0x0D0E3A: 4-way interleaved global counter in A5+0x1D60 */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0w = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1w = (uint16_t)(d0w << 2);
-    d0w = (uint16_t)(d0w + d1w + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0w);
-    return (uint16_t)(d0w >> 8);
-}
 
 /* ROM 0x0E62AE: state 1 - wait for player alignment or random fire trigger */
 static void sub_0E62AE(const f3mem_t *m, uint32_t obj)
@@ -132,7 +112,7 @@ static void sub_0E62AE(const f3mem_t *m, uint32_t obj)
     }
 
     if (!fire) {
-        uint8_t d0b = (uint8_t)sub_0D0E3A(m);
+        uint8_t d0b = (uint8_t)Obj_Next4Way(m);
         uint8_t d1b = (uint8_t)(rd8(m, F3_A5 + 0x87Fu) >> 3);
         if (d1b < d0b)
             return;
@@ -209,7 +189,7 @@ int Obj_E61AA_Tick(const f3mem_t *m, uint32_t obj)
         sub_0E63BE(m, obj);
 
     sub_0D0DC2(m, obj);
-    sub_0CBE34(m, obj);
+    Obj_BlinkColour(m, obj);
     Obj_DrawSprite(m, obj);
     Obj_DrawSprite(m, parent);
     return 0;

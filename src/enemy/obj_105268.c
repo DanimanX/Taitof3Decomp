@@ -1,20 +1,8 @@
 #include "obj_105268.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_common.h"
 
 /* ROM 0x0CBE34 */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) != 0u) {
-        if (rd8(m, obj + 0x1Du) == 0x40u) {
-            wr8(m, obj + 0x35u, 0x00u);
-            wr8(m, obj + 0x1Du, 0x42u);
-        } else {
-            wr8(m, obj + 0x1Du, 0x40u);
-        }
-    } else {
-        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-    }
-}
 
 /* ROM 0x0D0DC2 */
 static void sub_0D0DC2(const f3mem_t *m, uint32_t obj)
@@ -42,7 +30,7 @@ int Obj_105268_Tick(const f3mem_t *m, uint32_t obj)
     wr16(m, obj + 0x14u, rd16(m, a1 + 0x14u));
     wr16(m, obj + 0x18u, rd16(m, a1 + 0x18u));
     sub_0D0DC2(m, obj);
-    sub_0CBE34(m, obj);
+    Obj_BlinkColour(m, obj);
     a1 = rd32(m, obj + 0x08u);
     wr8(m, a1 + 0x22u, rd8(m, obj + 0x1Du));
     return 0;

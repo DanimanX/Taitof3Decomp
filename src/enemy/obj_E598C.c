@@ -1,22 +1,10 @@
 #include "obj_E598C.h"
+#include "../objects/obj_shared.h"
 #include "../audio/sound_cmd.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 
 /* ROM 0x0CBE34 */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) != 0u) {
-        if (rd8(m, obj + 0x1Du) == 0x40u) {
-            wr8(m, obj + 0x35u, 0x00u);
-            wr8(m, obj + 0x1Du, 0x42u);
-        } else {
-            wr8(m, obj + 0x1Du, 0x40u);
-        }
-    } else {
-        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-    }
-}
 
 /* ROM 0x0D0DC2 */
 static void sub_0D0DC2(const f3mem_t *m, uint32_t obj)
@@ -41,11 +29,6 @@ static void sub_0D0E04(const f3mem_t *m, uint32_t obj, uint32_t d0)
 }
 
 /* ROM 0x0D0E30 */
-static void sub_0D0E30(const f3mem_t *m, uint32_t d0)
-{
-    uint32_t a1 = rd32(m, F3_A5 + 0x1D50u);
-    wr32(m, a1 + 0x48u, rd32(m, a1 + 0x48u) + d0);
-}
 
 /* ROM 0x0D1EBC */
 static int sub_0D1EBC(const f3mem_t *m, uint16_t d0w, uint16_t d1w,
@@ -231,7 +214,7 @@ int Obj_E598C_Tick(const f3mem_t *m, uint32_t obj)
         int16_t x = (int16_t)rd16(m, obj + 0x14u);
         if (x >= -0x000A && x <= 0x011C) {
             wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-            sub_0D0E30(m, 0x00000FA0u);
+            Obj_RelayTimer(m, 0x00000FA0u);
             spawn_fragments_and_die(m, obj);
             return 0;
         }
@@ -281,6 +264,6 @@ int Obj_E598C_Tick(const f3mem_t *m, uint32_t obj)
     }
 
     sub_0D0DC2(m, obj);
-    sub_0CBE34(m, obj);
+    Obj_BlinkColour(m, obj);
     return 0;
 }

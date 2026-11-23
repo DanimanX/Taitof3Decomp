@@ -1,16 +1,9 @@
 #include "obj_F0788.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 
 /* ROM 0x0D0E3A: 4-way interleaved global counter in A5+0x1D60 */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0F0788 */
 int Obj_F0788_Tick(const f3mem_t *m, uint32_t obj)
@@ -39,7 +32,7 @@ int Obj_F0788_Tick(const f3mem_t *m, uint32_t obj)
 
     wr32(m, child + 0x14u, rd32(m, obj + 0x14u));
     wr32(m, child + 0x18u, rd32(m, obj + 0x18u));
-    uint16_t dy = (uint16_t)((sub_0D0E3A(m) & 0x3Fu) - 0x20u);
+    uint16_t dy = (uint16_t)((Obj_Next4Way(m) & 0x3Fu) - 0x20u);
     wr16(m, child + 0x18u, (uint16_t)(rd16(m, child + 0x18u) + dy));
     wr8(m, child + 0x4Eu, 0u);
     if (rd8(m, obj + 0x21u) == 0u)

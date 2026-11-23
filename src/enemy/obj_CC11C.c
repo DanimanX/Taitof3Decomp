@@ -1,4 +1,5 @@
 #include "obj_CC11C.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 
@@ -50,11 +51,6 @@ static void sub_0CEE2C(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CF1D8: set script, request restart */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));
-}
 
 /* ROM 0x0CFA7C: frame record A1 + table 0x0CFA96[d0] -> sprite + hit box */
 static void sub_0CFA7C(const f3mem_t *m, uint32_t obj, uint32_t a1, uint16_t d0w)
@@ -126,13 +122,6 @@ static uint16_t sub_0D0C7A(const f3mem_t *m)
 }
 
 /* ROM 0x0D0E3A: 4-way interleaved global counter in A5+0x1D60 */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    d0 = (uint16_t)(d0 + (uint16_t)(d0 << 2) + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0CF046 (chain = 1: each child is the parent of the next, group 5)
  * and 0x0CF138 (chain = 0, group 3): spawn D1 objects of fn A1, listed at
@@ -427,7 +416,7 @@ static void case_0E0466(const f3mem_t *m, uint32_t obj)
     a1 = 0x000E022Eu;
     sub_0CEC4C(m, obj, a1);
     a1 = 0x000E06CCu;
-    sub_0CF1D8(m, obj, a1);
+    Obj_StartScript(m, obj, a1);
     a1 = 0x000DEC56u;
     sub_0D0678(m, obj, a1);
     wr8(m, obj + 0x06u, 0x00000001u);
@@ -478,7 +467,7 @@ static void case_0E1B5E(const f3mem_t *m, uint32_t obj)
     a1 = 0x000E1DF6u;
     sub_0CEC4C(m, obj, a1);
     a1 = 0x000E1E2Eu;
-    sub_0CF1D8(m, obj, a1);
+    Obj_StartScript(m, obj, a1);
     a1 = 0x000E1EA6u;
     sub_0CFA86(m, obj, a1);
     wr8(m, obj + 0x06u, 0x00000001u);
@@ -573,7 +562,7 @@ static void case_0E4D42(const f3mem_t *m, uint32_t obj)
     a1 = 0x000E4E56u;
     sub_0CEC4C(m, obj, a1);
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) & ~ 0x02u));
-    d0 = (d0 & 0xFFFF0000u) | sub_0D0E3A(m);
+    d0 = (d0 & 0xFFFF0000u) | Obj_Next4Way(m);
     wr8(m, obj + 0x21u, (uint8_t)d0);
     wr8(m, obj + 0x06u, 0x00000001u);
     wr32(m, obj + 0x00u, 0x000E4D8Eu);
@@ -590,7 +579,7 @@ static void case_0E5326(const f3mem_t *m, uint32_t obj)
     a1 = 0x000E543Au;
     sub_0CEC4C(m, obj, a1);
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) & ~ 0x02u));
-    d0 = (d0 & 0xFFFF0000u) | sub_0D0E3A(m);
+    d0 = (d0 & 0xFFFF0000u) | Obj_Next4Way(m);
     wr8(m, obj + 0x21u, (uint8_t)d0);
     wr8(m, obj + 0x06u, 0x00000001u);
     wr32(m, obj + 0x00u, 0x000E5372u);
@@ -619,7 +608,7 @@ static void case_0E84EE(const f3mem_t *m, uint32_t obj)
     sub_0CEC4C(m, obj, a1);
     wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x80u));
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) & ~ 0x02u));
-    d0 = (d0 & 0xFFFF0000u) | sub_0D0E3A(m);
+    d0 = (d0 & 0xFFFF0000u) | Obj_Next4Way(m);
     wr8(m, obj + 0x21u, (uint8_t)d0);
     wr32(m, obj + 0x00u, 0x000E8516u);
     return;
@@ -639,7 +628,7 @@ static void case_0E8DAE(const f3mem_t *m, uint32_t obj)
     a1 = 0x000E9250u;
     sub_0CEC4C(m, obj, a1);
     a1 = 0x000E9288u;
-    sub_0CF1D8(m, obj, a1);
+    Obj_StartScript(m, obj, a1);
     a1 = 0x000E930Cu;
     sub_0CFA86(m, obj, a1);
     wr8(m, obj + 0x06u, 0x00000001u);
@@ -658,7 +647,7 @@ static void case_0E9D9A(const f3mem_t *m, uint32_t obj)
     a1 = 0x000EA03Cu;
     sub_0CEC4C(m, obj, a1);
     a1 = 0x000EA074u;
-    sub_0CF1D8(m, obj, a1);
+    Obj_StartScript(m, obj, a1);
     wr8(m, obj + 0x06u, 0x00000001u);
     wr32(m, obj + 0x00u, 0x000E9DE0u);
     return;
@@ -809,7 +798,7 @@ static void case_0F1D24(const f3mem_t *m, uint32_t obj)
     sub_0CEC4C(m, obj, a1);
     sub_0CEE2C(m, obj);
     a1 = 0x000F3B28u;
-    sub_0CF1D8(m, obj, a1);
+    Obj_StartScript(m, obj, a1);
     a1 = 0x000F3B40u;
     sub_0D0678(m, obj, a1);
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) & ~ 0x02u));
@@ -956,7 +945,7 @@ static void case_0F8284(const f3mem_t *m, uint32_t obj)
     a1 = 0x000F854Eu;
     sub_0CEC4C(m, obj, a1);
     a1 = 0x000F8586u;
-    sub_0CF1D8(m, obj, a1);
+    Obj_StartScript(m, obj, a1);
     a1 = 0x000F8676u;
     sub_0D0678(m, obj, a1);
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) & ~ 0x02u));
@@ -976,7 +965,7 @@ static void case_0F87DA(const f3mem_t *m, uint32_t obj)
     a1 = 0x000F8ADAu;
     sub_0CEC4C(m, obj, a1);
     a1 = 0x000F8B12u;
-    sub_0CF1D8(m, obj, a1);
+    Obj_StartScript(m, obj, a1);
     a1 = 0x000F8C02u;
     sub_0D0678(m, obj, a1);
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) & ~ 0x02u));
@@ -1024,7 +1013,7 @@ static void case_0F9596(const f3mem_t *m, uint32_t obj)
     a1 = 0x000F986Cu;
     sub_0CEC4C(m, obj, a1);
     a1 = 0x000F98A4u;
-    sub_0CF1D8(m, obj, a1);
+    Obj_StartScript(m, obj, a1);
     a1 = 0x000F9A54u;
     sub_0D0678(m, obj, a1);
     wr8(m, obj + 0x4Fu, 0x0000007Cu);
@@ -1046,7 +1035,7 @@ static void case_0F9A6C(const f3mem_t *m, uint32_t obj)
     a1 = 0x000F9D9Eu;
     sub_0CEC4C(m, obj, a1);
     a1 = 0x000F9DD6u;
-    sub_0CF1D8(m, obj, a1);
+    Obj_StartScript(m, obj, a1);
     a1 = 0x000F9F86u;
     sub_0D0678(m, obj, a1);
     wr8(m, obj + 0x4Fu, 0x0000007Cu);
@@ -1190,7 +1179,7 @@ static void case_0FFC8A(const f3mem_t *m, uint32_t obj)
     a1 = 0x000FFFE2u;
     sub_0CEC4C(m, obj, a1);
     a1 = 0x0010001Au;
-    sub_0CF1D8(m, obj, a1);
+    Obj_StartScript(m, obj, a1);
     a1 = 0x001000D4u;
     sub_0CFA86(m, obj, a1);
     wr8(m, obj + 0x1Du, 0x000000CAu);

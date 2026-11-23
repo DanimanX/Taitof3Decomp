@@ -1,16 +1,9 @@
 #include "obj_E7ABE.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0D0678: script pointer + first frame */
 static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -71,19 +64,6 @@ static void sub_0D0DC2(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CBE34 */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) != 0u) {
-        if (rd8(m, obj + 0x1Du) == 0x40u) {
-            wr8(m, obj + 0x35u, 0x00u);
-            wr8(m, obj + 0x1Du, 0x42u);
-        } else {
-            wr8(m, obj + 0x1Du, 0x40u);
-        }
-    } else {
-        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-    }
-}
 
 /* ROM 0x0CFA86 */
 static void sub_0CFA86(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -94,7 +74,6 @@ static void sub_0CFA86(const f3mem_t *m, uint32_t obj, uint32_t a1)
     a1 += 4u;
     wr32(m, obj + 0x68u, rd32(m, a1));
 }
-
 
 /* ROM 0x0D0E04 */
 static void sub_0D0E04(const f3mem_t *m, uint32_t obj, uint32_t d0)
@@ -128,7 +107,7 @@ static void state_E7BC2(const f3mem_t *m, uint32_t obj)
     if (y < -0x20 || y > 0xC7)
         return;
     if (!near_x(m, obj, 0x41B190u) && !near_x(m, obj, 0x41B21Au)) {
-        uint8_t d0 = (uint8_t)sub_0D0E3A(m);
+        uint8_t d0 = (uint8_t)Obj_Next4Way(m);
         uint8_t d1 = (uint8_t)(rd8(m, F3_A5 + 0x87Fu) >> 3);
         if (d1 < d0)
             return;
@@ -186,7 +165,7 @@ int Obj_E7ABE_Tick(const f3mem_t *m, uint32_t obj)
             else
                 state_E7CD2(m, obj);
             sub_0D0DC2(m, obj);
-            sub_0CBE34(m, obj);
+            Obj_BlinkColour(m, obj);
             Obj_DrawSprite(m, obj);
         }
         Obj_DrawSprite(m, p);

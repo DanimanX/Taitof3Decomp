@@ -1,4 +1,5 @@
 #include "obj_108DFC.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 
 /* ROM 0x0CEC4C */
@@ -51,21 +52,8 @@ static void sub_0CEE2C(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CF1D8: script pointer + "run script" bit */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));  /* bset.b #1 */
-}
 
 /* ROM 0x0D0E3A: 4-way interleaved global counter in A5+0x1D60 */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0D0E52 */
 static uint16_t sub_0D0E52(const f3mem_t *m, int16_t d0_in, int16_t d1_in)
@@ -157,7 +145,7 @@ int Obj_108DFC_Tick(const f3mem_t *m, uint32_t obj)
     sub_0CEC4C(m, obj, 0x001092CEu);        /* lea (0x4d0,PC) */
     sub_0CEE2C(m, obj);
     wr32(m, obj + 0x58u, 0x00B40000u);
-    sub_0CF1D8(m, obj, 0x0010933Eu);        /* lea (0x528,PC) */
+    Obj_StartScript(m, obj, 0x0010933Eu);        /* lea (0x528,PC) */
     wr32(m, obj + 0x3Au, 0x01400000u);
     wr32(m, obj + 0x3Eu, 0xFFE00000u);
     wr32(m, obj + 0x14u, 0x01400000u);
@@ -166,11 +154,11 @@ int Obj_108DFC_Tick(const f3mem_t *m, uint32_t obj)
     sub_0D06E0(m, obj);
     if (rd16(m, obj + 0x42u) < 0x00B4u) {
         wr32(m, obj + 0x3Eu, 0x00E80000u);
-        sub_0CF1D8(m, obj, 0x0010938Cu);    /* lea (0x52c,PC) */
+        Obj_StartScript(m, obj, 0x0010938Cu);    /* lea (0x52c,PC) */
     }
 
     /* 0x108E68 */
-    uint16_t d0 = (uint16_t)((sub_0D0E3A(m) & 0x3Fu) - 0x20u);
+    uint16_t d0 = (uint16_t)((Obj_Next4Way(m) & 0x3Fu) - 0x20u);
     wr16(m, obj + 0x3Eu, (uint16_t)(rd16(m, obj + 0x3Eu) + d0));
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) & ~0x02u));
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) | 0x04u));

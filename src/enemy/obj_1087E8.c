@@ -1,4 +1,5 @@
 #include "obj_1087E8.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 
@@ -10,14 +11,6 @@ static uint16_t sub_0D0C9E(const f3mem_t *m)
 }
 
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0D0E52 */
 static uint16_t sub_0D0E52(const f3mem_t *m, int16_t d0_in, int16_t d1_in)
@@ -180,7 +173,7 @@ check_best:;
 
     wr16(m, obj + 0x42u, d0);
     uint16_t d1 = (uint16_t)(rd16(m, a1 + 0x10u) + sub_0D0C9E(m));
-    uint16_t rnd = sub_0D0E3A(m);
+    uint16_t rnd = Obj_Next4Way(m);
     if ((int16_t)d1 > (int16_t)rnd)
         wr8(m, obj + 0x23u, (uint8_t)rd16(m, a1 + 0x12u));
     return a2;

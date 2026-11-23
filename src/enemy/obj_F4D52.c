@@ -1,16 +1,8 @@
 #include "obj_F4D52.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
-
 
 /* ROM 0x0F4D52: spawner, emits 0xF4DDE every 40 frames */
 int Obj_F4D52_Tick(const f3mem_t *m, uint32_t obj)
@@ -34,7 +26,7 @@ int Obj_F4D52_Tick(const f3mem_t *m, uint32_t obj)
     }
     wr32(m, c + 0x14u, rd32(m, obj + 0x14u));
     wr32(m, c + 0x18u, rd32(m, obj + 0x18u));
-    uint16_t d0 = (uint16_t)((sub_0D0E3A(m) & 0x3Fu) - 0x20u);
+    uint16_t d0 = (uint16_t)((Obj_Next4Way(m) & 0x3Fu) - 0x20u);
     wr16(m, c + 0x18u, (uint16_t)(rd16(m, c + 0x18u) + d0));
     wr8(m, c + 0x4Eu, 0u);
     if (rd8(m, obj + 0x21u) == 0u)

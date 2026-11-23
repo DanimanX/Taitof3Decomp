@@ -1,4 +1,5 @@
 #include "obj_F4DDE.h"
+#include "../objects/obj_shared.h"
 /* ROM 0x0CEC4C: base state + the per-group script chunk at A1 */
 static void sub_0CEC4C(const f3mem_t *m, uint32_t obj, uint32_t a1)
 {
@@ -51,21 +52,8 @@ static void sub_0CEE2C(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0CF1D8: start object script */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));
-}
 
 /* ROM 0x0D0678: script pointer + first frame */
 static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -80,14 +68,13 @@ static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
     wr32(m, obj + 0x68u, rd32(m, a1));
 }
 
-
 /* ROM 0x0F4DDE: init, random script of 4, fn = 0xF4E1E */
 int Obj_F4DDE_Tick(const f3mem_t *m, uint32_t obj)
 {
     sub_0CEC4C(m, obj, 0xF51F2u);
     sub_0CEE2C(m, obj);
-    uint16_t d0 = (uint16_t)(sub_0D0E3A(m) & 3u);
-    sub_0CF1D8(m, obj, rd32(m, 0xF522Au + d0 * 4u));
+    uint16_t d0 = (uint16_t)(Obj_Next4Way(m) & 3u);
+    Obj_StartScript(m, obj, rd32(m, 0xF522Au + d0 * 4u));
     sub_0D0678(m, obj, 0xF53F6u);
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) | 0x04u));
     wr32(m, obj, 0xF4E1Eu);

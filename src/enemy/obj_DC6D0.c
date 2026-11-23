@@ -1,4 +1,5 @@
 #include "obj_DC6D0.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -12,7 +13,6 @@
 #define ASR32(v, n) ((int32_t)(((int32_t)(v) < 0) \
     ? ~(uint32_t)((uint32_t)~(uint32_t)(v) >> (n)) \
     : ((uint32_t)(v) >> (n))))
-
 
 /* ROM 0x13F238 -> 0x0039D8 */
 static void play_sound(const f3mem_t *m, uint16_t cmdw)
@@ -69,14 +69,6 @@ static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
 }
 
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0D2D44: (D0, D1) = per-mode speed tables scaled by D2w */
 static void sub_0D2D44(const f3mem_t *m, uint16_t d0w, uint16_t d1w,
@@ -122,7 +114,7 @@ int Obj_DC6D0_Tick(const f3mem_t *m, uint32_t obj)
     wr16(m, obj + 0x18u, (uint16_t)(rd16(m, obj + 0x18u) - d0w));
 
     uint32_t a1 = 0x000DC124u;
-    uint16_t r = sub_0D0E3A(m);
+    uint16_t r = Obj_Next4Way(m);
     if (r > 0x0033u) {
         a1 = 0x000DC1CCu;
         if (r > 0x0099u)

@@ -1,4 +1,5 @@
 #include "obj_F131C.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 
 /* ROM 0x0CEC4C */
@@ -51,11 +52,6 @@ static void sub_0CEE2C(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CF1D8 */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));
-}
 
 /* ROM 0x0D0050 */
 static void sub_0D0050(const f3mem_t *m, uint32_t obj)
@@ -69,7 +65,7 @@ int Obj_F131C_Tick(const f3mem_t *m, uint32_t obj)
 {
     sub_0CEC4C(m, obj, 0x000F1046u);
     sub_0CEE2C(m, obj);
-    sub_0CF1D8(m, obj, 0x000F1334u);
+    Obj_StartScript(m, obj, 0x000F1334u);
     sub_0D0050(m, obj);
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) | 0x04u));
     wr32(m, obj + 0x00u, 0x000F0DB8u);

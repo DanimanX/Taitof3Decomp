@@ -1,4 +1,5 @@
 #include "obj_EACEA.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -67,11 +68,6 @@ static void sub_0CEE2C(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CF1D8: script pointer obj+0x44 and flag bit 1 of obj+7 */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));
-}
 
 /* ROM 0x0D0678: install a script record: ptr A1, duration.w (obj+0x4C),
  * frame byte (obj+0x1C), sprite (obj+0x10), long (obj+0x68) */
@@ -97,7 +93,7 @@ int Obj_EACEA_Tick(const f3mem_t *m, uint32_t obj)
     sub_0CEE2C(m, obj);
 
     /* 0x0EACFA: A1 = obj+0x10 */
-    sub_0CF1D8(m, obj, rd32(m, obj + 0x10u));
+    Obj_StartScript(m, obj, rd32(m, obj + 0x10u));
 
     /* 0x0EAD04 */
     wr8(m, obj + 0x22u, rd8(m, obj + 0x36u));

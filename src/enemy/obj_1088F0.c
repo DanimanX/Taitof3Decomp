@@ -1,4 +1,5 @@
 #include "obj_1088F0.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 
 /* ROM 0x0CEC4C */
@@ -62,11 +63,6 @@ static void sub_0CEE2C(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CF1D8 */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));
-}
 
 /* ROM 0x0D0678 */
 static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -86,7 +82,7 @@ int Obj_1088F0_Tick(const f3mem_t *m, uint32_t obj)
 {
     sub_0CEC4C(m, obj, 0x00108BDAu);
     sub_0CEE2C(m, obj);
-    sub_0CF1D8(m, obj, rd32(m, obj + 0x10u));
+    Obj_StartScript(m, obj, rd32(m, obj + 0x10u));
 
     uint32_t a1 = 0x00108C72u;
     uint8_t b = rd8(m, obj + 0x36u);

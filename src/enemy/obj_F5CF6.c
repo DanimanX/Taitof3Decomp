@@ -1,4 +1,5 @@
 #include "obj_F5CF6.h"
+#include "../objects/obj_shared.h"
 
 /* ROM 0x0CEC4C */
 static void sub_0CEC4C(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -66,14 +67,6 @@ static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
 }
 
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0F5CF6 */
 int Obj_F5CF6_Tick(const f3mem_t *m, uint32_t obj)
@@ -90,7 +83,7 @@ int Obj_F5CF6_Tick(const f3mem_t *m, uint32_t obj)
     wr32(m, obj + 0x60u, 0x00960000u);
     wr32(m, obj + 0x64u, 0x00960000u);
 
-    uint16_t d0 = sub_0D0E3A(m);
+    uint16_t d0 = Obj_Next4Way(m);
     wr16(m, obj + 0x50u, d0);
     if (d0 == 0u)
         d0 = 1u;

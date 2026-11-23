@@ -1,4 +1,5 @@
 #include "obj_D76F4.h"
+#include "../objects/obj_shared.h"
 #include "../video/sprite.h"
 #include "../player/player_move.h"
 #include "../audio/sound_cmd.h"
@@ -57,19 +58,6 @@ static uint32_t sub_0CBDDE(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CBE34: colour override / blue flash */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) != 0u) {
-        if (rd8(m, obj + 0x1Du) == 0x40u) {
-            wr8(m, obj + 0x35u, 0x00u);
-            wr8(m, obj + 0x1Du, 0x42u);
-        } else {
-            wr8(m, obj + 0x1Du, 0x40u);
-        }
-        return;
-    }
-    wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-}
 
 /* ROM 0x0D76F4 */
 int Obj_D76F4_Tick(const f3mem_t *m, uint32_t obj)
@@ -121,7 +109,7 @@ int Obj_D76F4_Tick(const f3mem_t *m, uint32_t obj)
         wr32(m, a1, obj);
         wr32(m, F3_A5 + 0x0906u, a1 + 4u);
     }
-    sub_0CBE34(m, obj);
+    Obj_BlinkColour(m, obj);
     Obj_DrawSprite(m, obj);
 
     /* 0x0D7788: aim angle <= 0x0A steps the animation at 0x0CBD24 with a

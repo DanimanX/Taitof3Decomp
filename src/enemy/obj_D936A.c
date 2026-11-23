@@ -1,4 +1,5 @@
 #include "obj_D936A.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -30,14 +31,7 @@ static void sub_0CEDE4(const f3mem_t *m, uint32_t obj, uint32_t a1)
     wr8(m, obj + 0x4Fu, 0u);
 }
 
-
 /* ROM 0x0CF1D8: start object script */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));
-}
-
 
 /* ROM 0x0D0678: script pointer + first frame */
 static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -59,10 +53,10 @@ int Obj_D936A_Tick(const f3mem_t *m, uint32_t obj)
     sub_0CEDE4(m, obj, 0x000D94B2u);
     uint16_t a = rd16(m, obj + 0x58u);
     if (a >= 0x5Au && a < 0x10Eu) {
-        sub_0CF1D8(m, obj, 0x000D94D2u);
+        Obj_StartScript(m, obj, 0x000D94D2u);
         sub_0D0678(m, obj, 0x000D9562u);
     } else {
-        sub_0CF1D8(m, obj, 0x000D951Au);
+        Obj_StartScript(m, obj, 0x000D951Au);
         sub_0D0678(m, obj, 0x000D95C2u);
     }
     wr32(m, obj + 0x3Au, rd32(m, obj + 0x3Au) - rd32(m, F3_A5 + 0x4224u));

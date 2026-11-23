@@ -1,4 +1,5 @@
 #include "obj_E04CC.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -181,19 +182,6 @@ static void sub_0CBB2C(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CBE34 */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) != 0u) {
-        if (rd8(m, obj + 0x1Du) == 0x40u) {
-            wr8(m, obj + 0x35u, 0x00u);
-            wr8(m, obj + 0x1Du, 0x42u);
-        } else {
-            wr8(m, obj + 0x1Du, 0x40u);
-        }
-        return;
-    }
-    wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-}
 
 /* ROM 0x0D0DC2 */
 static void sub_0D0DC2(const f3mem_t *m, uint32_t obj)
@@ -220,11 +208,6 @@ static void sub_0D0E04(const f3mem_t *m, uint32_t obj, uint32_t d0)
 }
 
 /* ROM 0x0D0E30 */
-static void sub_0D0E30(const f3mem_t *m, uint32_t d0)
-{
-    uint32_t a1 = rd32(m, F3_A5 + 0x1D50u);
-    wr32(m, a1 + 0x48u, rd32(m, a1 + 0x48u) + d0);
-}
 
 /* ROM 0x0CEF0E */
 static void sub_0CEF0E(const f3mem_t *m, uint32_t obj)
@@ -286,7 +269,7 @@ int Obj_E04CC_Tick(const f3mem_t *m, uint32_t obj)
         if (x >= -0x0A && x <= 0x11C) {
             wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
             /* jmp 0x000E063E */
-            sub_0D0E30(m, 0x0000012Cu);
+            Obj_RelayTimer(m, 0x0000012Cu);
             wr8(m, obj + 0x06u, 0x00u);
             sub_0CEF0E(m, obj);
             return 0;
@@ -380,7 +363,7 @@ draw:
             return -1;                                     /* null table entry */
         }
         sub_0D0DC2(m, obj);
-        sub_0CBE34(m, obj);
+        Obj_BlinkColour(m, obj);
         return 0;
     }
 

@@ -1,4 +1,5 @@
 #include "obj_10963E.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 
 /* Initialisers shared with the script-object family (ROM 0x0CEC4C,
@@ -54,11 +55,6 @@ static void sub_0CEE2C(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CF1D8: script pointer + "run script" bit */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));  /* bset.b #1 */
-}
 
 /* ROM 0x0D0678 */
 static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -75,7 +71,7 @@ int Obj_10963E_Tick(const f3mem_t *m, uint32_t obj)
 {
     sub_0CEC4C(m, obj, 0x001098F8u);        /* 0x10963E: lea (0x2b8,PC) */
     sub_0CEE2C(m, obj);                     /* 0x109648 */
-    sub_0CF1D8(m, obj, 0x00109968u);        /* 0x10964E: lea (0x318,PC) */
+    Obj_StartScript(m, obj, 0x00109968u);        /* 0x10964E: lea (0x318,PC) */
     sub_0D0678(m, obj, 0x00109992u);        /* 0x109658: lea (0x338,PC) */
 
     /* 0x109662 */

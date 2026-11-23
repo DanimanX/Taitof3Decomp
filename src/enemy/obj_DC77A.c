@@ -1,21 +1,9 @@
 #include "obj_DC77A.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
 
 /* ROM 0x0CBE34: blinking colour override (obj+0x35, obj+0x1D, obj+0x4F) */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35) != 0u) {
-        if (rd8(m, obj + 0x1D) != 0x40u) {
-            wr8(m, obj + 0x1D, 0x40u);
-            return;
-        }
-        wr8(m, obj + 0x35, 0u);
-        wr8(m, obj + 0x1D, 0x42u);
-        return;
-    }
-    wr8(m, obj + 0x1D, rd8(m, obj + 0x4F));
-}
 
 /* ROM 0x0CF7FE: arm the script when re-entering the screen */
 static void sub_0CF7FE(const f3mem_t *m, uint32_t obj)
@@ -57,7 +45,7 @@ int Obj_DC77A_Tick(const f3mem_t *m, uint32_t obj)
         wr32(m, a1, obj);
         wr32(m, F3_A5 + 0x8FEu, a1 + 4u);
     }
-    sub_0CBE34(m, obj);
+    Obj_BlinkColour(m, obj);
     if (rd8(m, obj + 0x1Du) != 0u)
         Obj_DrawSprite(m, obj);
     return 0;

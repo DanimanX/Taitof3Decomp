@@ -1,4 +1,5 @@
 #include "obj_E70CE.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../audio/sound_cmd.h"
@@ -143,11 +144,6 @@ static int sub_0CF898(const f3mem_t *m, uint32_t obj,
 }
 
 /* ROM 0x0D0E30 */
-static void sub_0D0E30(const f3mem_t *m, uint32_t d0)
-{
-    uint32_t a1 = rd32(m, F3_A5 + 0x1D50u);
-    wr32(m, a1 + 0x48u, rd32(m, a1 + 0x48u) + d0);
-}
 
 /* ROM 0x0D0E04 */
 static void sub_0D0E04(const f3mem_t *m, uint32_t obj, uint32_t d0)
@@ -173,19 +169,6 @@ static void sub_0D0DC2(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CBE34 */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) != 0u) {
-        if (rd8(m, obj + 0x1Du) == 0x40u) {
-            wr8(m, obj + 0x35u, 0x00u);
-            wr8(m, obj + 0x1Du, 0x42u);
-        } else {
-            wr8(m, obj + 0x1Du, 0x40u);
-        }
-    } else {
-        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-    }
-}
 
 static void play_sound(const f3mem_t *m, uint16_t cmdw)
 {
@@ -233,7 +216,7 @@ int Obj_E70CE_Tick(const f3mem_t *m, uint32_t obj)
         int16_t x = (int16_t)rd16(m, obj + 0x14u);
         if (x >= -0x0A && x <= 0x11C) {
             wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-            sub_0D0E30(m, 0xFA0u);
+            Obj_RelayTimer(m, 0xFA0u);
             goto die;
         }
     }
@@ -274,7 +257,7 @@ int Obj_E70CE_Tick(const f3mem_t *m, uint32_t obj)
             wr32(m, obj + 0x18u, rd32(m, obj + 0x18u) + d1);
         }
         sub_0D0DC2(m, obj);
-        sub_0CBE34(m, obj);
+        Obj_BlinkColour(m, obj);
         return 0;
     }
 die:

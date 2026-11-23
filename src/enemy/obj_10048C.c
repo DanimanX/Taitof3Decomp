@@ -1,4 +1,5 @@
 #include "obj_10048C.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -7,19 +8,6 @@
 #include "../enemy/obj_CEF44.h"
 
 /* ROM 0x0CBE34: hit flash colour on obj+0x1D */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) != 0u) {
-        if (rd8(m, obj + 0x1Du) == 0x40u) {
-            wr8(m, obj + 0x35u, 0x00u);
-            wr8(m, obj + 0x1Du, 0x42u);
-        } else {
-            wr8(m, obj + 0x1Du, 0x40u);
-        }
-    } else {
-        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-    }
-}
 
 /* ROM 0x0D0E04: credit the score to the killer object in obj+0x36 */
 static void sub_0D0E04(const f3mem_t *m, uint32_t obj, uint32_t d0)
@@ -35,11 +23,7 @@ static void sub_0D0E04(const f3mem_t *m, uint32_t obj, uint32_t d0)
     }
 }
 /* ROM 0x0D0E30: add D0 to the score of the object at A5+0x1D50 */
-static void sub_0D0E30(const f3mem_t *m, uint32_t d0)
-{
-    uint32_t a1 = rd32(m, F3_A5 + 0x1D50u);
-    wr32(m, a1 + 0x48u, rd32(m, a1 + 0x48u) + d0);
-}
+
 /* ROM 0x0CEF0E: off-screen / pause handling that follows 0x0D0E30 */
 static void sub_0CEF0E(const f3mem_t *m, uint32_t obj)
 {
@@ -75,7 +59,7 @@ int Obj_10048C_Tick(const f3mem_t *m, uint32_t obj)
         (int16_t)rd16(m, obj + 0x14u) <= 0x011C) {
         wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
         wr16(m, obj + 0x18u, 0u);
-        sub_0D0E30(m, 0x0064u);      /* 0x1005B4 */
+        Obj_RelayTimer(m, 0x0064u);      /* 0x1005B4 */
         sub_0CEF0E(m, obj);          /* 0x1005BC */
         return 0;
     }
@@ -106,7 +90,7 @@ int Obj_10048C_Tick(const f3mem_t *m, uint32_t obj)
             wr32(m, obj + 0x14u, rd32(m, obj + 0x3Au));
             wr32(m, obj + 0x18u, rd32(m, obj + 0x3Eu));
             sub_0D0DC2(m, obj);
-            sub_0CBE34(m, obj);
+            Obj_BlinkColour(m, obj);
             Obj_DrawSprite(m, obj);
             wr32(m, obj + 0x54u, rd32(m, obj + 0x54u) + 0x1388u);
             return 0;

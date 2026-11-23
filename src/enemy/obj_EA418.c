@@ -1,4 +1,5 @@
 #include "obj_EA418.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 
@@ -45,11 +46,6 @@ static void sub_0CEC4C(const f3mem_t *m, uint32_t obj, uint32_t a1)
 }
 
 /* ROM 0x0CF1D8: start object script */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));
-}
 
 /* ROM 0x0EA418: spawn the turret (0xEA836) and start the script */
 int Obj_EA418_Tick(const f3mem_t *m, uint32_t obj)
@@ -60,7 +56,7 @@ int Obj_EA418_Tick(const f3mem_t *m, uint32_t obj)
         return 0;
     }
     sub_0CEC4C(m, obj, 0x000EA03Cu);   /* lea (-0x402,PC) at 0xEA43C */
-    sub_0CF1D8(m, obj, 0x000EA6E6u);   /* lea (0x29e,PC) at 0xEA446 */
+    Obj_StartScript(m, obj, 0x000EA6E6u);   /* lea (0x29e,PC) at 0xEA446 */
     wr8(m, obj + 0x06u, 0x01u);
     wr32(m, obj + 0x00u, 0x000EA45Eu);
     return 0;

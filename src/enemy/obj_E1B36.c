@@ -1,4 +1,5 @@
 #include "obj_E1B36.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 
@@ -58,21 +59,8 @@ static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
 }
 
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0CF1D8: script pointer + "run script" bit */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));  /* bset.b #1 */
-}
 
 /* ROM 0x0E1B36 */
 int Obj_E1B36_Tick(const f3mem_t *m, uint32_t obj)
@@ -84,8 +72,8 @@ int Obj_E1B36_Tick(const f3mem_t *m, uint32_t obj)
     }
     /* 0x0E12EA */
     sub_0CEC4C(m, obj, 0x000E08FCu);
-    uint16_t d0 = (uint16_t)(sub_0D0E3A(m) & 1u);
-    sub_0CF1D8(m, obj, rd32(m, 0x000E14D0u + (uint32_t)d0 * 4u));
+    uint16_t d0 = (uint16_t)(Obj_Next4Way(m) & 1u);
+    Obj_StartScript(m, obj, rd32(m, 0x000E14D0u + (uint32_t)d0 * 4u));
     sub_0D0678(m, obj, rd32(m, 0x000E1616u + (uint32_t)d0 * 4u));
     wr8(m, obj + 0x06u, 1u);
     wr32(m, obj + 0x00u, 0x000E1328u);

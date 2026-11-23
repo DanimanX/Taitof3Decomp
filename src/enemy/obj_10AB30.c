@@ -1,4 +1,5 @@
 #include "obj_10AB30.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 
@@ -50,11 +51,6 @@ static void sub_0CEE2C(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CF1D8: set script, request restart */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));
-}
 
 /* ROM 0x0D0C9E */
 static uint16_t sub_0D0C9E(const f3mem_t *m)
@@ -63,14 +59,7 @@ static uint16_t sub_0D0C9E(const f3mem_t *m)
     return rd16(m, 0x000D0D42u + (uint32_t)d0 * 2u);
 }
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
+
 /* ROM 0x0D0E52 */
 static uint16_t sub_0D0E52(const f3mem_t *m, int16_t d0_in, int16_t d1_in)
 {
@@ -232,7 +221,7 @@ check_best:;
 
     wr16(m, obj + 0x42u, d0);
     uint16_t d1 = (uint16_t)(rd16(m, a1 + 0x10u) + sub_0D0C9E(m));
-    uint16_t rnd = sub_0D0E3A(m);
+    uint16_t rnd = Obj_Next4Way(m);
     if ((int16_t)d1 > (int16_t)rnd)
         wr8(m, obj + 0x23u, (uint8_t)rd16(m, a1 + 0x12u));
     return a2;
@@ -254,7 +243,7 @@ int Obj_10AB30_Tick(const f3mem_t *m, uint32_t obj)
         Obj_StartDying(m, obj);
         return 0;
     }
-    sub_0CF1D8(m, obj, 0x0010AE7Au);
+    Obj_StartScript(m, obj, 0x0010AE7Au);
     wr32(m, obj + 0x3Au, 0x01400000u);
     wr32(m, obj + 0x3Eu, 0x00100000u);
     wr32(m, obj + 0x14u, 0x01170000u);
@@ -267,11 +256,11 @@ int Obj_10AB30_Tick(const f3mem_t *m, uint32_t obj)
             wr16(m, obj + 0x3Eu, (uint16_t)(rd16(m, a2 + 0x18u) - 0x00B5u));
         } else {
             wr16(m, obj + 0x3Eu, (uint16_t)(rd16(m, a2 + 0x18u) + 0x00B3u));
-            sub_0CF1D8(m, obj, 0x0010AEC8u);
+            Obj_StartScript(m, obj, 0x0010AEC8u);
         }
     }
     /* 0x10ABEE */
-    wr16(m, obj + 0x3Au, (uint16_t)(rd16(m, obj + 0x3Au) + (sub_0D0E3A(m) & 0x1Fu)));
+    wr16(m, obj + 0x3Au, (uint16_t)(rd16(m, obj + 0x3Au) + (Obj_Next4Way(m) & 0x1Fu)));
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) & ~0x02u));
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) | 0x04u));
     wr32(m, obj + 0x00u, 0x0010AC10u);

@@ -1,4 +1,5 @@
 #include "obj_104EFA.h"
+#include "../objects/obj_shared.h"
 
 /* ROM 0x0CEC4C: base state + the per-group script chunk at A1 */
 static void sub_0CEC4C(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -43,11 +44,6 @@ static void sub_0CEC4C(const f3mem_t *m, uint32_t obj, uint32_t a1)
 }
 
 /* ROM 0x0CF1D8: start object script */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));
-}
 
 /* ROM 0x0D0678: script pointer + first frame */
 static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -66,7 +62,7 @@ static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
 int Obj_104EFA_Tick(const f3mem_t *m, uint32_t obj)
 {
     sub_0CEC4C(m, obj, 0x001086FCu);   /* lea (0x3800,PC) at 0x104EFA */
-    sub_0CF1D8(m, obj, 0x00105160u);   /* lea (0x25a,PC) at 0x104F04 */
+    Obj_StartScript(m, obj, 0x00105160u);   /* lea (0x25a,PC) at 0x104F04 */
     sub_0D0678(m, obj, 0x00105196u);   /* lea (0x286,PC) at 0x104F0E */
     wr8(m, obj + 0x23u, 0x0Au);
     wr32(m, obj + 0x00u, 0x00104F26u);

@@ -1,4 +1,5 @@
 #include "obj_F30B4.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -69,11 +70,6 @@ static void sub_0CEE2C(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CF1D8 */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u)); /* bset.b #1 */
-}
 
 /* ROM 0x0D0050 */
 static void sub_0D0050(const f3mem_t *m, uint32_t obj)
@@ -89,7 +85,7 @@ int Obj_F30B4_Tick(const f3mem_t *m, uint32_t obj)
     /* 0x0F30B4: lea (0x298,PC),A1 */
     sub_0CEC4C(m, obj, (uint32_t)(0x0F30B6u + 0x298u));
     sub_0CEE2C(m, obj);
-    sub_0CF1D8(m, obj, (uint32_t)(0x0F30C6u + 0x2C0u));
+    Obj_StartScript(m, obj, (uint32_t)(0x0F30C6u + 0x2C0u));
     sub_0D0050(m, obj);
 
     /* 0x0F30D4 */

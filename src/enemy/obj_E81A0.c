@@ -1,4 +1,5 @@
 #include "obj_E81A0.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -58,14 +59,6 @@ static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
 }
 
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0D0E52 */
 static uint16_t sub_0D0E52(const f3mem_t *m, uint16_t d0, uint16_t d1)
@@ -122,7 +115,6 @@ static void sub_0D2D44(const f3mem_t *m, uint16_t d0w, uint16_t d1w,
     *out_d1 = (uint32_t)(d1 * (uint32_t)d1w);
 }
 
-
 /* ROM 0x0D06E0: +0x42 = angle to the nearer live player (0xB4 if none) */
 static void sub_0D06E0(const f3mem_t *m, uint32_t obj)
 {
@@ -160,12 +152,12 @@ int Obj_E81A0_Tick(const f3mem_t *m, uint32_t obj)
     wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x80u));
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) & ~0x02u));
     wr16(m, obj + 0x44u, 0x1A4u);
-    uint32_t a1 = (sub_0D0E3A(m) & 0x80u) ? 0xE8406u : 0xE839Au;
+    uint32_t a1 = (Obj_Next4Way(m) & 0x80u) ? 0xE8406u : 0xE839Au;
     sub_0D0678(m, obj, a1);
     sub_0D06E0(m, obj);
     wr16(m, obj + 0x58u, rd16(m, obj + 0x42u));
-    wr16(m, obj + 0x60u, (uint16_t)((sub_0D0E3A(m) & 3u) + 8u));
-    uint16_t d0 = (uint16_t)((sub_0D0E3A(m) & 0x3Fu) - 0x20u + rd16(m, obj + 0x58u));
+    wr16(m, obj + 0x60u, (uint16_t)((Obj_Next4Way(m) & 3u) + 8u));
+    uint16_t d0 = (uint16_t)((Obj_Next4Way(m) & 0x3Fu) - 0x20u + rd16(m, obj + 0x58u));
     if ((int16_t)d0 < 0)
         d0 = (uint16_t)(d0 + 0x168u);
     else if ((int16_t)d0 >= 0x168)

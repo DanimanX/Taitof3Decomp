@@ -1,4 +1,5 @@
 #include "obj_EBB12.h"
+#include "../objects/obj_shared.h"
 /* ROM 0x0CEC4C: base state + the per-group script chunk at A1 */
 static void sub_0CEC4C(const f3mem_t *m, uint32_t obj, uint32_t a1)
 {
@@ -51,11 +52,6 @@ static void sub_0CEE2C(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CF1D8: start object script */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));
-}
 
 /* ROM 0x0D0678: script pointer + first frame */
 static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -70,13 +66,12 @@ static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
     wr32(m, obj + 0x68u, rd32(m, a1));
 }
 
-
 /* ROM 0xEBB12: init, fn = 0xEBB4A */
 int Obj_EBB12_Tick(const f3mem_t *m, uint32_t obj)
 {
     sub_0CEC4C(m, obj, 0xEBD98u);
     sub_0CEE2C(m, obj);
-    sub_0CF1D8(m, obj, 0xEBDD0u);
+    Obj_StartScript(m, obj, 0xEBDD0u);
     sub_0D0678(m, obj, 0xEBE36u);
     wr8(m, obj + 0x34u, (uint8_t)((rd8(m, obj + 0x34u) & ~0x02u) | 0x04u));
     wr32(m, obj, 0xEBB4Au);

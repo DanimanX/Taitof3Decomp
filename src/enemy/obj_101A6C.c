@@ -1,4 +1,5 @@
 #include "obj_101A6C.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -6,14 +7,7 @@
 #include "../audio/sound_cmd.h"
 
 /* ROM 0x0D0E3A: LCG step at A5+0x1D60 (n = n*5+1); returns n >> 8 */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
+
 /* ROM 0x0D0E52: octant angle of (D0.w, D1.w) in 0x168 units */
 static uint16_t sub_0D0E52(const f3mem_t *m, uint16_t d0, uint16_t d1)
 {
@@ -86,20 +80,20 @@ int Obj_101A6C_Tick(const f3mem_t *m, uint32_t obj)
     uint32_t a1 = child;
     wr16(m, a1 + 0x14u, 0x0140u);
 
-    uint16_t d7 = (uint16_t)(sub_0D0E3A(m) & 0x7Fu);
-    uint16_t d0 = (uint16_t)(sub_0D0E3A(m) & 0x3Fu);
+    uint16_t d7 = (uint16_t)(Obj_Next4Way(m) & 0x7Fu);
+    uint16_t d0 = (uint16_t)(Obj_Next4Way(m) & 0x3Fu);
     d0 = (uint16_t)(d0 + d7 + 0x1Du);
     wr16(m, a1 + 0x18u, d0);
 
-    d7 = (uint16_t)(sub_0D0E3A(m) & 0x7Fu);
-    d0 = (uint16_t)(sub_0D0E3A(m) & 0x3Fu);
+    d7 = (uint16_t)(Obj_Next4Way(m) & 0x7Fu);
+    d0 = (uint16_t)(Obj_Next4Way(m) & 0x3Fu);
     d0 = (uint16_t)(d0 + d7 + 0x1Du);
 
     uint16_t d1 = (uint16_t)(rd16(m, a1 + 0x18u) - d0);
     uint16_t ang = sub_0D0E52(m, 0x0140u, d1);
     wr16(m, a1 + 0x58u, ang);
 
-    d0 = (uint16_t)((sub_0D0E3A(m) & 0x3u) + 5u);
+    d0 = (uint16_t)((Obj_Next4Way(m) & 0x3u) + 5u);
     wr16(m, a1 + 0x60u, d0);
     return 0;
 }

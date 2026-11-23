@@ -46,6 +46,14 @@ MIN_PAIRS = 1
 
 # ---------------------------------------------------------------- discovery
 def decompiled_roms():
+    """Every ROM address that a src/ file actually implements.
+
+    A real translation annotates itself `/* ROM 0x...... */`. The shipped stub
+    says "not decompiled yet". A thin entry point that forwards to an emitted
+    helper carries no annotation of its own (obj_11B288.c -> ObjHelper_11B288
+    in obj_11B262.c): it is owned by src/enemy/obj_<addr>.c and is not a stub,
+    so it counts as decompiled too.
+    """
     out = set()
     for p in glob.glob("src/**/*.c", recursive=True):
         try:
@@ -55,6 +63,9 @@ def decompiled_roms():
         if "not decompiled yet (stub)" in s:
             continue
         out |= {int(x, 16) for x in re.findall(r"ROM 0x([0-9A-Fa-f]{4,6})", s)}
+        m = re.search(r"obj_([0-9A-Fa-f]{5,6})\.c$", p)
+        if m and re.search(r"\bObj_%s_Tick\s*\(" % m.group(1), s):
+            out.add(int(m.group(1), 16))
     return out
 
 
@@ -68,6 +79,28 @@ def bundle_calls(path):
     if not m:
         return None
     return re.findall(r"([0-9a-fA-F]{6})", m.group(1))
+
+
+SHARED_HEADER = "src/objects/obj_shared.h"
+
+
+def shared_roms():
+    """Addresses of the primitives promoted to src/objects/obj_shared.c: those
+    are available to every routine even though no per-routine file owns them."""
+    if not os.path.exists(SHARED_HEADER):
+        return set()
+    s = open(SHARED_HEADER, encoding="utf-8", errors="replace").read()
+    return {int(x, 16) for x in re.findall(r"ROM 0x([0-9A-Fa-f]{4,6})", s)}
+
+
+_SHARED = None
+
+
+def shared_rom(addr):
+    global _SHARED
+    if _SHARED is None:
+        _SHARED = shared_roms()
+    return int(addr, 16) in _SHARED
 
 
 def is_routine_target(t):
@@ -122,8 +155,13 @@ def candidates():
         if not os.path.exists(b):
             continue
         calls = bundle_calls(b) or []
-        missing = sorted({c.upper() for c in calls if is_routine_target(c)
-                          and int(c, 16) not in dec})
+        # 0x0D4F26 is not a call: bundles list its blocks as "(via table ...)"
+        # after an amortised multiply the shared body already models exactly.
+        missing = sorted({c.upper() for c in calls
+                          if is_routine_target(c)
+                          and int(c, 16) not in dec
+                          and not shared_rom(c)
+                          and int(c, 16) != 0x0D4F26})
         pairs = pair_count(name)
         reasons = []
         if missing:

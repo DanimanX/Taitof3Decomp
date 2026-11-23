@@ -1,4 +1,5 @@
 #include "obj_D78C0.h"
+#include "../objects/obj_shared.h"
 #include "../video/sprite.h"
 #include "../player/player_move.h"
 #include "../audio/sound_cmd.h"
@@ -33,19 +34,6 @@ static uint32_t sub_0CBDDE(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CBE34: colour override / blue flash */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) != 0u) {
-        if (rd8(m, obj + 0x1Du) == 0x40u) {
-            wr8(m, obj + 0x35u, 0x00u);
-            wr8(m, obj + 0x1Du, 0x42u);
-        } else {
-            wr8(m, obj + 0x1Du, 0x40u);
-        }
-        return;
-    }
-    wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-}
 
 /* ROM 0x0D78C0 */
 int Obj_D78C0_Tick(const f3mem_t *m, uint32_t obj)
@@ -88,7 +76,7 @@ int Obj_D78C0_Tick(const f3mem_t *m, uint32_t obj)
     wr16(m, obj + 0x62u, (uint16_t)(rd16(m, obj + 0x62u)
                                     + (uint16_t)((int16_t)rd16(m, obj + 0x60u) >> 1)));
     sub_0CBDA4(m, obj);
-    sub_0CBE34(m, obj);
+    Obj_BlinkColour(m, obj);
     Obj_DrawSprite(m, obj);
 
     /* 0x0D7950: still on screen -> repeat at 0x0D78C0 */

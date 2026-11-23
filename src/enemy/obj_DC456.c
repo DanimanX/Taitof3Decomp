@@ -1,4 +1,5 @@
 #include "obj_DC456.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -45,14 +46,6 @@ static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
 }
 
 /* ROM 0x0D0E3A */
-static uint16_t sub_0D0E3A(const f3mem_t *m)
-{
-    uint16_t d0 = rd16(m, F3_A5 + 0x1D60u);
-    uint16_t d1 = (uint16_t)(d0 << 2);
-    d0 = (uint16_t)(d0 + d1 + 1u);
-    wr16(m, F3_A5 + 0x1D60u, d0);
-    return (uint16_t)(d0 >> 8);
-}
 
 /* ROM 0x0D2D44 */
 static int sub_0D2D44(const f3mem_t *m, uint16_t d0w, uint16_t d1w,
@@ -99,7 +92,7 @@ static int sub_0DC36C(const f3mem_t *m, uint32_t obj)
 
     /* ROM 0x0DC39A */
     uint32_t a1 = 0x000DC124u;
-    uint16_t r = sub_0D0E3A(m);
+    uint16_t r = Obj_Next4Way(m);
     if (r > 0x0033u) {
         a1 = 0x000DC1CCu;
         if (r > 0x0099u)

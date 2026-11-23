@@ -1,4 +1,5 @@
 #include "obj_F0D8A.h"
+#include "../objects/obj_shared.h"
 
 /* ROM 0x0CEC4C: base state + the per-group script chunk at A1 */
 static void sub_0CEC4C(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -50,11 +51,6 @@ static void sub_0CEE2C(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CF1D8 */
-static void sub_0CF1D8(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    wr32(m, obj + 0x44u, a1);
-    wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));
-}
 
 /* ROM 0x0D0050 */
 static void sub_0D0050(const f3mem_t *m, uint32_t obj)
@@ -67,7 +63,7 @@ int Obj_F0D8A_Tick(const f3mem_t *m, uint32_t obj)
 {
     sub_0CEC4C(m, obj, 0x000F1046u);
     sub_0CEE2C(m, obj);
-    sub_0CF1D8(m, obj, 0x000F107Eu);
+    Obj_StartScript(m, obj, 0x000F107Eu);
     sub_0D0050(m, obj);
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) | 0x04u));
     wr32(m, obj + 0x00u, 0x000F0DB8u);

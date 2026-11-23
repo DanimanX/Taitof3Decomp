@@ -1,4 +1,5 @@
 #include "obj_10252E.h"
+#include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -7,20 +8,6 @@
 #include "../objects/objscript_CF4B8.h"
 
 /* ROM 0x0CBE34 */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) == 0u) {
-        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-        return;
-    }
-
-    if (rd8(m, obj + 0x1Du) == 0x40u) {
-        wr8(m, obj + 0x35u, 0x00u);
-        wr8(m, obj + 0x1Du, 0x42u);
-    } else {
-        wr8(m, obj + 0x1Du, 0x40u);
-    }
-}
 
 /* ROM 0x0D0690 */
 static void sub_0D0690(const f3mem_t *m, uint32_t obj)
@@ -324,7 +311,7 @@ int Obj_10252E_Tick(const f3mem_t *m, uint32_t obj)
     wr32(m, obj + 0x18u, rd32(m, obj + 0x3Eu));
     sub_0D0690(m, obj);
     sub_0D0DC2(m, obj);
-    sub_0CBE34(m, obj);
+    Obj_BlinkColour(m, obj);
 
     if ((rd8(m, F3_A5 + 0x1D58u) & 0x02u) == 0u)
         return 0;

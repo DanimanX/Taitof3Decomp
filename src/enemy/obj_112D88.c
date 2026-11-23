@@ -1,4 +1,5 @@
 #include "obj_112D88.h"
+#include "../objects/obj_shared.h"
 #include "obj_112C3C.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
@@ -53,17 +54,6 @@ static uint32_t sub_0CBDDE(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x0CBE34: hit flash */
-static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
-{
-    if (rd8(m, obj + 0x35u) == 0u) {
-        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
-    } else if (rd8(m, obj + 0x1Du) == 0x40u) {
-        wr8(m, obj + 0x35u, 0u);
-        wr8(m, obj + 0x1Du, 0x42u);
-    } else {
-        wr8(m, obj + 0x1Du, 0x40u);
-    }
-}
 
 /* ROM 0x0017D6 */
 static void sub_0017D6(const f3mem_t *m, uint32_t a0, uint32_t a1,
@@ -152,7 +142,7 @@ int Obj_112D88_Tick(const f3mem_t *m, uint32_t obj)
         sub_0CBDA4(m, obj);
         Obj_Animate(m, obj, 0x001131B8u);  /* lea (0x3d2,PC) at 0x112DE4 */
         Obj_113400_FollowParent(m, obj);
-        sub_0CBE34(m, obj);
+        Obj_BlinkColour(m, obj);
         Obj_DrawSprite(m, obj);
         wr32(m, obj + 0x00u, 0x00112D88u);
         return 0;

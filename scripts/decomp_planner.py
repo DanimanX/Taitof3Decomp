@@ -137,6 +137,19 @@ def save_state(st):
             f.write(f"{k}\t{st[k]}\n")
 
 
+def duplicate_objects():
+    """Objects whose source exists twice under different padding, e.g.
+    obj_BB746.c and obj_0BB746.c. That happened once (a capture run created
+    padded stubs for routines that already had an unpadded translation, and the
+    suite then counted both). It is never correct, so the planner refuses."""
+    seen = {}
+    for p in glob.glob("src/enemy/obj_*.c"):
+        m = re.search(r"obj_0*([0-9A-Fa-f]{4,6})\.c$", os.path.basename(p))
+        if m:
+            seen.setdefault(m.group(1).upper(), []).append(p)
+    return {k: v for k, v in seen.items() if len(v) > 1}
+
+
 def candidates():
     """[dict] for every stub with a bundle, with the reasons it is not ready.
 
@@ -350,6 +363,13 @@ def main():
     p_ver.add_argument("--all", action="store_true")
     p_ver.add_argument("--addrs", nargs="*", default=None)
     a = ap.parse_args()
+
+    dups = duplicate_objects()
+    if dups:
+        print("REFUSING: duplicate object sources:", file=sys.stderr)
+        for k, v in sorted(dups.items()):
+            print(f"  {k}: {', '.join(v)}", file=sys.stderr)
+        return 2
 
     if a.cmd == "status":
         rows = candidates()

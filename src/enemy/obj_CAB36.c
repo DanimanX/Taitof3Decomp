@@ -6,31 +6,12 @@
 #include "../objects/objscript_CF1E4.h"
 #include "../objects/objscript_CF4B8.h"
 
-/* ROM 0x0CBD24 */
-static int16_t sub_CBD24(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    for (;;) {
-        int16_t d0 = (int16_t)rd16(m, obj + 0x3Au);
-        uint32_t ea = (uint32_t)(a1 + (int32_t)d0) & 0xFFFFFFu;
-        int16_t v = (int16_t)rd16(m, ea);
-        if (v <= 0)
-            return d0;
-        uint16_t timer = (uint16_t)(rd16(m, obj + 0x3Eu) + 1u);
-        wr16(m, obj + 0x3Eu, timer);
-        if ((int16_t)timer <= v) {
-            wr32(m, obj + 0x10u, rd32(m, (uint32_t)(ea + 2u) & 0xFFFFFFu));
-            return d0;
-        }
-        wr16(m, obj + 0x3Eu, 0u);
-        wr16(m, obj + 0x3Au, (uint16_t)(d0 + 6));
-    }
-}
-
 /* ROM 0x0CAB36 */
 int Obj_CAB36_Tick(const f3mem_t *m, uint32_t obj)
 {
     uint32_t a1 = rd32(m, obj + 0x36u);
-    int16_t d0 = sub_CBD24(m, obj, a1);
+    Obj_AnimFrameStep(m, obj, a1);
+    int16_t d0 = (int16_t)rd16(m, obj + 0x3Au);   /* final offset (+0x3A), as in ROM */
     if ((int16_t)rd16(m, (uint32_t)(a1 + (int32_t)d0) & 0xFFFFFFu) <= 0)
         goto lab_0cab9e;
 

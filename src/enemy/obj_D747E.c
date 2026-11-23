@@ -115,25 +115,6 @@ static uint16_t sub_006422(const f3mem_t *m, uint16_t d0, uint16_t d1)
 
 /* ROM 0x0CBE34 */
 
-/* ROM 0x0CBD24 */
-static uint16_t sub_0CBD24(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    for (;;) {
-        uint16_t d0 = rd16(m, obj + 0x3Au);
-        uint32_t entry = a1 + (uint32_t)(int32_t)(int16_t)d0;
-        int16_t dur = (int16_t)rd16(m, entry);
-        if (dur <= 0)
-            return d0;
-        uint16_t d1 = (uint16_t)(rd16(m, obj + 0x3Eu) + 1u);
-        wr16(m, obj + 0x3Eu, d1);
-        if ((int16_t)d1 <= dur) {
-            wr32(m, obj + 0x10u, rd32(m, entry + 2u));
-            return d0;
-        }
-        wr16(m, obj + 0x3Eu, 0u);
-        wr16(m, obj + 0x3Au, (uint16_t)(d0 + 6u));
-    }
-}
 /* ROM 0x0CC1E0 */
 static uint8_t sub_0CC1E0(const f3mem_t *m, uint32_t obj)
 {
@@ -257,7 +238,8 @@ int Obj_D747E_Tick(const f3mem_t *m, uint32_t obj)
     /* 0x0D74B4 */
     {
         uint32_t a1 = 0x000D7614u;
-        uint16_t d0w = sub_0CBD24(m, obj, a1);
+        Obj_AnimFrameStep(m, obj, a1);
+        uint16_t d0w = rd16(m, obj + 0x3Au);   /* final offset (+0x3A), as in ROM */
         if ((int16_t)rd16(m, a1 + (uint32_t)(int32_t)(int16_t)d0w) <= 0) {
             uint8_t b = rd8(m, obj + 0x1Cu);
             wr8(m, obj + 0x1Cu, (uint8_t)(b | 0x01u));

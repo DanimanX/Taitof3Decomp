@@ -4,29 +4,6 @@
 #include "../video/sprite.h"
 #include "../audio/sound_cmd.h"
 
-/* ROM 0x0CBD24: step the animation table at A1 by the index/timer in
- * obj+0x3A/+0x3E; loads obj+0x10 from the frame entry when the duration
- * expires. Returns the (unadvanced) A1 and D0.w = index left by the check. */
-static uint32_t sub_0CBD24(const f3mem_t *m, uint32_t obj, uint32_t a1, uint16_t *out_d0)
-{
-    for (;;) {
-        uint16_t d0w = rd16(m, obj + 0x3Au);
-        if ((int16_t)rd16(m, a1 + (uint32_t)(int32_t)(int16_t)d0w) <= 0) {
-            *out_d0 = d0w;
-            return a1;
-        }
-        wr16(m, obj + 0x3Eu, (uint16_t)(rd16(m, obj + 0x3Eu) + 1u));
-        uint16_t d1w = rd16(m, obj + 0x3Eu);
-        if ((int16_t)d1w <= (int16_t)rd16(m, a1 + (uint32_t)(int32_t)(int16_t)d0w)) {
-            wr32(m, obj + 0x10u, rd32(m, a1 + (uint32_t)(int32_t)(int16_t)d0w + 2u));
-            *out_d0 = d0w;
-            return a1;
-        }
-        wr16(m, obj + 0x3Eu, 0u);
-        wr16(m, obj + 0x3Au, (uint16_t)(rd16(m, obj + 0x3Au) + 6u));
-    }
-}
-
 /* ROM 0x13F238: sound command remap */
 static int16_t sub_13F238(const f3mem_t *m, int16_t cmd)
 {
@@ -91,7 +68,7 @@ int Obj_BC70A_Tick(const f3mem_t *m, uint32_t obj)
     }
 
     /* 0x0BC750 */
-    sub_0CBD24(m, obj, rd32(m, obj + 0x5Cu), &(uint16_t){0});
+    Obj_AnimFrameStep(m, obj, rd32(m, obj + 0x5Cu));
 
     /* 0x0BC75A */
     wr32(m, obj + 0x14u, rd32(m, obj + 0x44u));

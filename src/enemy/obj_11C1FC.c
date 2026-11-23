@@ -1,28 +1,7 @@
 #include "obj_11C1FC.h"
+#include "../objects/obj_common.h"
 #include "../objects/obj_pool.h"
 #include "../video/sprite.h"
-
-/* ROM 0x0CBD24 */
-static uint16_t sub_CBD24(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    uint16_t d0;
-
-    for (;;) {
-        d0 = rd16(m, obj + 0x3Au);
-        uint32_t entry = a1 + (uint32_t)(int32_t)(int16_t)d0;
-        int16_t dur = (int16_t)rd16(m, entry);
-        if (dur <= 0)
-            return d0;
-        uint16_t cnt = (uint16_t)(rd16(m, obj + 0x3Eu) + 1u);
-        wr16(m, obj + 0x3Eu, cnt);
-        if ((int16_t)cnt <= dur) {
-            wr32(m, obj + 0x10u, rd32(m, entry + 2u));
-            return d0;
-        }
-        wr16(m, obj + 0x3Eu, 0u);
-        wr16(m, obj + 0x3Au, (uint16_t)(d0 + 6u));
-    }
-}
 
 /* ROM 0x11C1FC: draw up to 8 packed entries of the list at 0x40B0F6 */
 int Obj_11C1FC_Tick(const f3mem_t *m, uint32_t obj)
@@ -40,7 +19,8 @@ int Obj_11C1FC_Tick(const f3mem_t *m, uint32_t obj)
         wr16(m, obj + 0x3Au, (uint16_t)((v >> 5) & 0x7Fu));
         wr16(m, obj + 0x3Eu, (uint16_t)((v >> 2) & 0x07u));
         uint32_t a1 = 0x0011C2AEu;
-        uint16_t d0 = sub_CBD24(m, obj, a1);
+        Obj_AnimFrameStep(m, obj, a1);
+        uint16_t d0 = rd16(m, obj + 0x3Au);   /* final offset (+0x3A), as in ROM */
         if ((int16_t)rd16(m, a1 + (uint32_t)(int32_t)(int16_t)d0) <= 0) {
             wr32(m, a2, 0u);
             continue;

@@ -3,30 +3,11 @@
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
 
-/* ROM 0x0CBD24: frame animator over a {dur.w, sprdef.l} table A1; frame
- * index obj+0x3A (byte offset), timer obj+0x3E */
-static void sub_0CBD24(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    for (;;) {
-        uint16_t d0w = rd16(m, obj + 0x3Au);
-        if ((int16_t)rd16(m, a1 + (uint32_t)(int16_t)d0w) <= 0)   /* tst.w */
-            return;
-        wr16(m, obj + 0x3Eu, (uint16_t)(rd16(m, obj + 0x3Eu) + 1u));
-        if ((int16_t)rd16(m, obj + 0x3Eu) <= (int16_t)rd16(m, a1 + (uint32_t)(int16_t)d0w)) {
-            /* 0x0CBD4A */
-            wr32(m, obj + 0x10u, rd32(m, a1 + 0x02u + (uint32_t)(int16_t)d0w));
-            return;
-        }
-        wr16(m, obj + 0x3Eu, 0u);
-        wr16(m, obj + 0x3Au, (uint16_t)(d0w + 6u));
-    }
-}
-
 /* ROM 0xBCE52 */
 int Obj_BCE52_Tick(const f3mem_t *m, uint32_t obj)
 {
     /* 0x0BCE52: animate from the fixed table 0x0BCF92 */
-    sub_0CBD24(m, obj, 0x000BCF92u);
+    Obj_AnimFrameStep(m, obj, 0x000BCF92u);
 
     /* 0x0BCE5E: draw 20 shrunk copies (A1 read below with a large A5 offset */
     wr16(m, obj + 0x5Cu, 0x0013u);

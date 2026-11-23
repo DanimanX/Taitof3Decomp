@@ -1,26 +1,6 @@
 #include "obj_12EF40.h"
+#include "../objects/obj_common.h"
 #include "../objects/obj_pool.h"
-
-/* ROM 0x0CBD24: step the animation table at A1 by the index/timer in
- * +0x3A/+0x3E; returns the frame offset (D0w) */
-static uint16_t sub_0CBD24(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    for (;;) {
-        uint16_t d0 = rd16(m, obj + 0x3Au);
-        uint32_t entry = a1 + (uint32_t)(int32_t)(int16_t)d0;
-        int16_t dur = (int16_t)rd16(m, entry);
-        if (dur <= 0)
-            return d0;
-        uint16_t d1 = (uint16_t)(rd16(m, obj + 0x3Eu) + 1u);
-        wr16(m, obj + 0x3Eu, d1);
-        if ((int16_t)d1 <= dur) {
-            wr32(m, obj + 0x10u, rd32(m, entry + 2u));
-            return d0;
-        }
-        wr16(m, obj + 0x3Eu, 0u);
-        wr16(m, obj + 0x3Au, (uint16_t)(d0 + 6u));
-    }
-}
 
 /* bfclr (0x30ee,A5){n:1}: returns the old bit */
 static int bfclr_30ee(const f3mem_t *m, unsigned n)
@@ -44,7 +24,8 @@ static int aborted(const f3mem_t *m) { return (rd8(m, F3_A5 + 0x30F2u) & 0x01u) 
 /* animate with table a1; nonzero if still running (fn set to next) */
 static int animate(const f3mem_t *m, uint32_t obj, uint32_t a1, uint32_t next)
 {
-    uint16_t d0 = sub_0CBD24(m, obj, a1);
+    uint16_t d0 = rd16(m, obj + 0x3Au);   /* D0w before the step, as in ROM */
+    Obj_AnimFrameStep(m, obj, a1);
     if ((int16_t)rd16(m, a1 + (uint32_t)(int32_t)(int16_t)d0) <= 0)
         return 0;
     uint32_t p = rd32(m, obj + 0x0Cu);

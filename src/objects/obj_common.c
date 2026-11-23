@@ -51,6 +51,47 @@ void Obj_Animate(const f3mem_t *m, uint32_t obj, uint32_t anim_tbl)
     }
 }
 
+/* ROM 0x0CBD24: one step of the {dur.w, sprdef.l} table at A1. The index in
+ * +0x3A is a byte offset into the table; +0x3E is the frame timer.
+ *
+ *   0CBD24  move.w (0x3a,A0),D0w
+ *   0CBD28  tst.w (0x0,A1,D0w*0x1)
+ *   0CBD2C  ble.w 0x000cbd50
+ *   0CBD30  addq.w #0x1,(0x3e,A0)
+ *   0CBD34  move.w (0x3e,A0),D1w
+ *   0CBD38  cmp.w (0x0,A1,D0w*0x1),D1w
+ *   0CBD3C  ble.w 0x000cbd4a
+ *   0CBD40  clr.w (0x3e,A0)
+ *   0CBD44  addq.w #0x6,(0x3a,A0)
+ *   0CBD48  bra.b 0x000cbd24
+ *   0CBD4A  move.l (0x2,A1,D0w*0x1),(0x10,A0)
+ *   0CBD50  rts
+ *
+ * The routine ends in `rts` and keeps nothing in D0 that a caller depends on:
+ * D0w still holds the offset loaded at 0x0CBD24, i.e. the offset whose table
+ * entry made `tst.w (0,A1,D0w)` end the loop. A caller that needs it re-reads
+ * obj+0x3A before the call, exactly as the ROM leaves D0. A non-positive
+ * duration (including -1, which only `ble` treats as end-of-script) ends the
+ * step without touching the object beyond the D0 table probe. */
+void Obj_AnimFrameStep(const f3mem_t *m, uint32_t obj, uint32_t anim_tbl)
+{
+    for (;;) {
+        int16_t off = (int16_t)rd16(m, obj + 0x3Au);          /* 0x0CBD24 */
+        uint32_t entry = anim_tbl + (uint32_t)(int32_t)off;
+        int16_t dur = (int16_t)rd16(m, entry);                /* 0x0CBD28 */
+        if (dur <= 0)                                         /* 0x0CBD2C */
+            return;
+        uint16_t cnt = (uint16_t)(rd16(m, obj + 0x3Eu) + 1u); /* 0x0CBD30 */
+        wr16(m, obj + 0x3Eu, cnt);
+        if ((int16_t)cnt <= dur) {                            /* 0x0CBD3C */
+            wr32(m, obj + 0x10u, rd32(m, entry + 2u));        /* 0x0CBD4A */
+            return;
+        }
+        wr16(m, obj + 0x3Eu, 0);                              /* 0x0CBD40 */
+        wr16(m, obj + 0x3Au, (uint16_t)((uint16_t)off + 6u)); /* 0x0CBD44 */
+    }
+}
+
 /* ROM 0x0D0690: advance the object script (obj+0x48) once its frame timer
  * (obj+0x4C) runs out. Copied from the five sibling tick routines that carry
  * this ROM range as a private static helper. */

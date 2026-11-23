@@ -34,27 +34,6 @@ static void stop_free(const f3mem_t *m, uint32_t obj, int16_t cmd)
 
 
 
-/* ROM 0x0CBD24: step the animation table at A1 by the index/timer in
- * +0x3A/+0x3E; returns the frame offset (D0w) */
-static uint16_t sub_0CBD24(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    for (;;) {
-        uint16_t d0 = rd16(m, obj + 0x3Au);
-        uint32_t entry = a1 + (uint32_t)(int32_t)(int16_t)d0;
-        int16_t dur = (int16_t)rd16(m, entry);
-        if (dur <= 0)
-            return d0;
-        uint16_t d1 = (uint16_t)(rd16(m, obj + 0x3Eu) + 1u);
-        wr16(m, obj + 0x3Eu, d1);
-        if ((int16_t)d1 <= dur) {
-            wr32(m, obj + 0x10u, rd32(m, entry + 2u));
-            return d0;
-        }
-        wr16(m, obj + 0x3Eu, 0u);
-        wr16(m, obj + 0x3Au, (uint16_t)(d0 + 6u));
-    }
-}
-
 /* ROM 0x0CBDAE: append to the player-hit list (A5+0x906) */
 static void sub_0CBDAE(const f3mem_t *m, uint32_t obj)
 {
@@ -71,7 +50,8 @@ int Obj_CD646_Tick(const f3mem_t *m, uint32_t obj)
         return 0;
     }
     const uint32_t tbl = 0x000CD72Eu;   /* lea (0xd2,PC) at 0xCD65A */
-    uint16_t d0 = sub_0CBD24(m, obj, tbl);
+    Obj_AnimFrameStep(m, obj, tbl);
+    uint16_t d0 = rd16(m, obj + 0x3Au);   /* final offset (+0x3A), as in ROM */
     if ((int16_t)rd16(m, tbl + (uint32_t)(int32_t)(int16_t)d0) < 0) {
         stop_free(m, obj, 0x002A);
         return 0;

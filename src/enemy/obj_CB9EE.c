@@ -22,35 +22,13 @@ static void sub_005A86(const f3mem_t *m, uint16_t d0w, uint32_t a0)
     }
 }
 
-/* ROM 0x0CBD24 */
-static uint16_t sub_CBD24(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    uint16_t d0;
-
-    for (;;) {
-        d0 = rd16(m, obj + 0x3Au);
-        uint32_t entry = a1 + (uint32_t)(int32_t)(int16_t)d0;
-        int16_t dur = (int16_t)rd16(m, entry);
-        if (dur <= 0)
-            return d0;
-        uint16_t cnt = (uint16_t)(rd16(m, obj + 0x3Eu) + 1u);
-        wr16(m, obj + 0x3Eu, cnt);
-        if ((int16_t)cnt <= dur) {
-            wr32(m, obj + 0x10u, rd32(m, entry + 2u));
-            return d0;
-        }
-        wr16(m, obj + 0x3Eu, 0u);
-        wr16(m, obj + 0x3Au, (uint16_t)(d0 + 6u));
-    }
-}
-
-
 /* ROM 0x0CB9FE: animate (script 0xCBAE6), upload the frame's chars, or free
  * and blank the two map cells at obj+0xC when the script ends. */
 static int lab_0CB9FE(const f3mem_t *m, uint32_t obj)
 {
     uint32_t a1 = 0x000CBAE6u;
-    uint16_t d0 = sub_CBD24(m, obj, a1);
+    Obj_AnimFrameStep(m, obj, a1);
+    uint16_t d0 = rd16(m, obj + 0x3Au);   /* final offset (+0x3A), as in ROM */
     if ((int16_t)rd16(m, a1 + (uint32_t)(int32_t)(int16_t)d0) < 0) {
         /* 0x0CBA36 */
         uint32_t cell = rd32(m, obj + 0x0Cu);

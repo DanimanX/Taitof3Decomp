@@ -1,4 +1,5 @@
 #include "obj_113BC2.h"
+#include "../objects/obj_common.h"
 #include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../player/player_move.h"
@@ -36,28 +37,6 @@ static int out_of(const f3mem_t *m, uint32_t addr, uint16_t v)
     return (int16_t)v < lo || (int16_t)v > hi;
 }
 
-/* ROM 0x0CBD24: advance the {dur.w, frame.l} animation at a1 by +0x3A/+0x3E */
-static uint16_t sub_0CBD24(const f3mem_t *m, uint32_t obj, uint32_t a1)
-{
-    uint16_t d0;
-
-    for (;;) {
-        d0 = rd16(m, obj + 0x3Au);
-        uint32_t entry = a1 + (uint32_t)(int32_t)(int16_t)d0;
-        int16_t dur = (int16_t)rd16(m, entry);
-        if (dur <= 0)
-            return d0;
-        uint16_t cnt = (uint16_t)(rd16(m, obj + 0x3Eu) + 1u);
-        wr16(m, obj + 0x3Eu, cnt);
-        if ((int16_t)cnt <= dur) {
-            wr32(m, obj + 0x10u, rd32(m, entry + 2u));
-            return d0;
-        }
-        wr16(m, obj + 0x3Eu, 0u);
-        wr16(m, obj + 0x3Au, (uint16_t)(d0 + 6u));
-    }
-}
-
 /* ROM 0x113BC2: animate (0x113C52) while moving along +0x20; free when the
  * animation ends or it leaves the screen; scatter on a bomb */
 int Obj_113BC2_Tick(const f3mem_t *m, uint32_t obj)
@@ -72,7 +51,8 @@ int Obj_113BC2_Tick(const f3mem_t *m, uint32_t obj)
         wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) | 0x01u));
     sub_1136BC(m, obj);
     uint32_t a1 = 0x00113C52u;
-    uint16_t d0 = sub_0CBD24(m, obj, a1);
+    uint16_t d0 = rd16(m, obj + 0x3Au);   /* D0w before the step, as in ROM */
+    Obj_AnimFrameStep(m, obj, a1);
     if ((int16_t)rd16(m, a1 + (uint32_t)(int32_t)(int16_t)d0) <= 0) {
         Obj_Free(m, obj);
         return 0;

@@ -183,3 +183,22 @@ Regla para futuros intentos: cuando una captura parezca imposible, antes de
 declararla basura, deduce (speed, ángulo) del propio post con la tabla de senos
 y compáralo con los campos candidatos. Nueve de cada diez veces el campo real
 es otro del que se leyó, o es el byte bajo en vez del alto.
+
+## capture.h: acusación falsa (2026-11-23)
+
+Un worker de la oleada W sostuvo que `tests/capture.h` lee el bloque de
+registros con un offset equivocado (A0 en `0x22`/A5 en `0x35`) y que por eso
+las rutinas de su lote daban 0/60. Falso, y comprobado con el caso que pasa:
+
+- `capture.h` salta **3** campos (`pair`, `which`, `frame`) y lee **16**
+  registros (`CR_N = 16`: D0–D7, A0–A6, SP) desde el campo 4 del TSV.
+- En `obj_115B3E_regs.tsv` el par 0 tiene 19 campos; `regs[8]` (que es
+  `CR_A0 = 8`) vale `0041444C`, exactamente el A0 del objeto.
+- Con ese mapeo, `Obj 0x115B3E` da **60/60**. Si el offset estuviera mal, no
+  podría pasar ninguna rutina.
+
+Séptima acusación de la sesión contra infraestructura compartida que resulta
+falsa. El patrón se mantiene: cuando una traducción no cuadra, se culpa al
+harness/helper. Verificación mínima antes de aceptarlo: ejecutar una rutina
+que YA pasa con el mismo camino de código. Si pasa, el código compartido está
+bien y el problema es la traducción o la captura concreta.

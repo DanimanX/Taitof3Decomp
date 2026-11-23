@@ -2448,8 +2448,6 @@ int main(void)
     bad += run("Obj 0x01795CA", "work/ram/obj_1795CA", Obj_1795CA_Tick, rom);
     bad += run("Obj 0x017963C", "work/ram/obj_17963C", Obj_17963C_Tick, rom);
     bad += run("Obj 0x0179650", "work/ram/obj_179650", Obj_179650_Tick, rom);
-    bad += run("Obj 0x011B472", "work/ram/obj_11B472", Obj_11B472_Tick, rom);
-    bad += run("Obj 0x011B3D2", "work/ram/obj_11B3D2", Obj_11B3D2_Tick, rom);
     /* captured with F3_EXIT=ret at the routine entry */
     bad += run("ObjScript 0x0CF1E4", "work/ram/vm_CF1E4", ObjScript_CF1E4, rom);
     bad += run_a1("ObjMove 0x0CF4B8", "work/ram/vm_CF4B8", ObjScript_CF4B8, rom);

@@ -51,3 +51,14 @@ clean:
 .PHONY: coverage
 coverage:
 	python3 scripts/coverage.py
+
+# Publishing gate. Committing alone does not put the work anywhere the user can
+# see it: on 2026-11-23 the branch sat 28 commits ahead of origin/main for the
+# whole session and the GitHub progress never moved. Run this before reporting
+# completion, and treat `git status -sb` showing a lead count as unfinished.
+.PHONY: publish
+publish:
+	@git status --porcelain | grep -v '^??' | grep . && { \
+	  echo 'publish: uncommitted changes, commit them first'; exit 1; } || true
+	git push origin main
+	@echo "publish: pushed; $(shell git log --oneline @{u}..HEAD 2>/dev/null | wc -l) commit(s) still ahead"

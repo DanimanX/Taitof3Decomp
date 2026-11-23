@@ -239,3 +239,37 @@ disponibles (el `-debug` de MAME no entra en la fase de objetos salvo con
 Esto se comprobó siete veces esta sesión con acusaciones contra
 `Obj_DrawSprite` (×2), `Obj_MoveByAngle`, `Obj_Free`, `Obj_Spawn` (×2) y
 `capture.h`: **todas falsas**.
+
+## El corpus de capturas está SANO — auditoría completa (2026-11-23)
+
+Duda abierta toda la sesión: ¿están rotas las capturas? **No.**
+
+Auditoría de las **1169** capturas `work/ram/obj_*_pairs.bin`: para cada par,
+comprobar que el objeto en `A0` tiene en `+0x00` el puntero a la propia rutina
+(lo que el despachador del pool garantiza al entrar):
+
+```
+capturas con pares: 1169   COHERENTES: 1169   con pares malos: 0
+```
+
+Todas correctas, incluidas las que las oleadas P–X declararon imposibles
+(1270BE, 118B74, 10B93C: `fn` coincide en el par 0).
+
+### La lección: casi todos los «captura rota» eran errores de lectura
+
+`118B74` había sido descartada dos veces. Su captura es correcta y su
+traducción quedó 60/60 en cuanto se corrigió **un solo cálculo**:
+
+```
+0x118B74  43FA 0030   lea (0x30,PC),A1   ->  0x118B74 + 2 + 0x30 = 0x118BA6
+```
+
+Usé `0x118BAC` (PC + 0x30, olvidando el +2 del PC relativo del 68k). La tabla
+real empieza en `0x118BA6` y su entrada 0 es `{dur=3, sprdef=0x0005AD34}`,
+exactamente el `+0x10` del post capturado. Con la base mala, el primer paso
+leía una entrada distinta y todo lo demás divergía.
+
+**Regla que sale de aquí:** antes de declarar una captura rota, verificar que
+el `fn` en `A0` coincide con la rutina (arriba, 1 línea de Python). Si coincide,
+la captura está bien y el error está en la traducción; el sospechoso número uno
+es `(d16,PC)`, donde la base es **PC + 2**, no PC.

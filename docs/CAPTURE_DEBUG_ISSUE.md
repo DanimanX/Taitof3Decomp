@@ -159,3 +159,27 @@ más el RNG de sistema. Ninguna se explica por el pipeline de captura.
 
 Conclusión: **no hay nada que arreglar en la captura**; 11B472 necesita
 trabajo de traducción sobre su rama de re-arme.
+
+## Capturas "imposibles" que no lo eran: 115B3E (2026-11-23)
+
+Dos oleadas seguidas degradaron `obj_115B3E` a stub por "captura incoherente":
+alegaban que las posiciones del par exigían un `|P| ≈ 4.8` que ningún ángulo
+producía, y que la secuencia de ángulo `0x92→0x94→…` no era lo que devuelve
+`Obj_Atan2`.
+
+**La captura era correcta.** Tres errores de lectura, ninguno de la captura:
+
+1. **El speed no es `(0x52,A0)`.** Es la **word `(0x42,A0)`**, que vale
+   `0x0014 = 20`. Con speed 20 y ángulo `0x92`, `20*tab[0x92] = -296200` y
+   `20*tab[0x80+0x92] = -140100`: exactamente los deltas del post.
+2. **El ángulo es un BYTE**, el byte **bajo** de la word `+0x20`, no el alto.
+   Pasar `rd16(obj+0x20) >> 8` da `0x90`; el correcto es `& 0xFF` → `0x92`.
+   (El offset es un byte, no un ángulo 16.16.)
+3. **El signo del giro** se decide con `sub.w (0x20,A0),D0w` — resta **word**,
+   y sólo se prueba el byte bajo. Comparar contra `rd8(obj+0x20)` (el byte
+   alto) invierte el signo y resta 2 donde toca sumar.
+
+Regla para futuros intentos: cuando una captura parezca imposible, antes de
+declararla basura, deduce (speed, ángulo) del propio post con la tabla de senos
+y compáralo con los campos candidatos. Nueve de cada diez veces el campo real
+es otro del que se leyó, o es el byte bajo en vez del alto.

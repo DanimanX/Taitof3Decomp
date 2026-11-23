@@ -1,0 +1,16 @@
+Task: translate 3 already-stubbed Taito F3 object tick routines into C, editing the files in place.
+Scope: src/enemy/obj_126936.c, src/enemy/obj_1266C2.c, src/enemy/obj_1268D4.c. Read-only elsewhere.
+Do:
+  1. Read the finished siblings src/enemy/obj_12681E.c and src/enemy/obj_126AE2.c, and work/disasm/bundle_ADDR.s for each target.
+  2. Replace the whole body of src/enemy/obj_ADDR.c with a register-faithful C tick:
+       #include "obj_ADDR.h"
+       #include "../objects/obj_11B262.h"   (only if the bundle calls those helpers)
+       int Obj_ADDR_Tick(const f3mem_t *m, uint32_t obj) { ... }
+     Rules: obj = A0, A5 = F3_A5; keep byte/word/long sizes; `subq.w #1,(0x6,A0)` stores the
+     new value and the following `bgt` tests THAT value; every `beq` right after an immediate
+     load is not taken; call helpers through their headers, never copy them.
+  3. Compile-check each file: cc -std=c11 -O2 -Wall -Wextra -Werror -I. -c src/enemy/obj_ADDR.c -o /dev/null
+Do not: touch any other file, edit tests/, Makefile or scripts/, copy makefiles, or run make.
+Output: for each ADDR, one line `ADDR compiled=yes|no` plus the exact cc error if it failed.
+Stop when: all three files compile with zero warnings.
+ADDRs: 126936 1266C2 1268D4

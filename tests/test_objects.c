@@ -1197,6 +1197,7 @@
 #include "../src/objects/objscript_CF1E4.h"
 #include "../src/objects/objscript_CF4B8.h"
 #include "../src/objects/obj_shared.h"
+#include "../src/objects/obj_anim.h"
 
 typedef int (*tick_fn)(const f3mem_t *, uint32_t);
 typedef int (*tick_a1_fn)(const f3mem_t *, uint32_t, uint32_t);
@@ -2489,6 +2490,26 @@ int main(void)
         printf("objects: %-22s %3d/%3d ticks bit-exact (shared primitives)\n",
                "Shared primitives", bad_s ? 0 : 6, 6);
         bad += bad_s;
+    }
+    /* 0x179A5C animation engine: index 0 walks a frame list at +0x3A. */
+    {
+        uint8_t w[F3_WRAM_SIZE] = {0}, g2[F3_GFX_SIZE] = {0};
+        f3mem_t am = { w, (const uint8_t *)rom, NULL, NULL, g2 };
+        int bad_a = 0;
+        /* index 0 with a positive duration only counts down */
+        wr32(&am, 0x410100u + 0x3Au, 0x00020000u);
+        wr16(&am, 0x410100u + 0x3Eu, 3u);
+        bad_a += Obj_AnimTick(&am, 0x410100u, 0u) != 0;
+        bad_a += rd16(&am, 0x410100u + 0x3Eu) != 2u;
+        bad_a += rd16(&am, 0x410100u + 0x40u) != 0u;
+        /* non-zero indices must refuse before touching the object */
+        uint16_t keep = rd16(&am, 0x410100u + 0x3Eu);
+        bad_a += Obj_AnimTick(&am, 0x410100u, 3u) != -1;
+        bad_a += Obj_AnimInit(&am, 0x410100u, 5u) != -1;
+        bad_a += rd16(&am, 0x410100u + 0x3Eu) != keep;
+        printf("objects: %-22s %3d/%3d ticks bit-exact (0x179A5C index 0)\n",
+               "Anim engine 0x179A5C", bad_a ? 0 : 4, 4);
+        bad += bad_a;
     }
     free(rom);
     return bad ? 1 : 0;

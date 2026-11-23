@@ -202,3 +202,40 @@ falsa. El patrón se mantiene: cuando una traducción no cuadra, se culpa al
 harness/helper. Verificación mínima antes de aceptarlo: ejecutar una rutina
 que YA pasa con el mismo camino de código. Si pasa, el código compartido está
 bien y el problema es la traducción o la captura concreta.
+
+## El pipeline de captura está correcto (verificado en la ROM, 2026-11-23)
+
+Varios workers de las oleadas P–X culparon al harness del "post un frame tarde".
+Verificado contra `work/maincpu.bin`:
+
+```
+0x104E8  ...         ; bucle del pool
+0x104EE  4E 91       ; jsr (A1)   <- llama al tick del objeto
+0x104F0  4C DF 03 07 ; movem.l (SP)+,{D0,D1,D2,A0}   <- retorno
+```
+
+`[SP]` al entrar al tick es **`0x0104F0`**, y `F3_EXIT=ret` pone el post
+exactamente ahí: la primera instrucción **después** del tick. Es la elección
+correcta. No hay `trap` en el camino: el tick vuelve con `rts`.
+
+Además, medido con instrumentación sobre `11B472` en `run1_120000`:
+
+```
+POST pc=0104F0 sp=405294 ret_sp=405290
+```
+
+`SP` ya vale `entry_SP + 4`: el tick ha retornado de verdad.
+
+### Conclusión práctica
+
+Las capturas que fallan lo hacen por su **contenido** (estado del pool no
+coherente, objeto que no es el del tick, contador entre expiraciones), no por
+el timing del post. Sesenta parejas de una rutina que da 0/60, con todos los
+helpers de la sesión verificados contra ROM, es señal de captura mala — y la
+única solución es recapturar, que hoy no es posible con los savestates
+disponibles (el `-debug` de MAME no entra en la fase de objetos salvo con
+`run1_*`, y esos solo cubren parte del juego).
+
+Esto se comprobó siete veces esta sesión con acusaciones contra
+`Obj_DrawSprite` (×2), `Obj_MoveByAngle`, `Obj_Free`, `Obj_Spawn` (×2) y
+`capture.h`: **todas falsas**.

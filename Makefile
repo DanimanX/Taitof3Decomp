@@ -60,5 +60,9 @@ coverage:
 publish:
 	@git status --porcelain | grep -v '^??' | grep . && { \
 	  echo 'publish: uncommitted changes, commit them first'; exit 1; } || true
-	git push origin main
-	@echo "publish: pushed; $(shell git log --oneline @{u}..HEAD 2>/dev/null | wc -l) commit(s) still ahead"
+	@git push origin main || exit 1
+	@left=$$(git rev-list --count @{u}..HEAD 2>/dev/null || echo 0); \
+	 if [ "$$left" -ne 0 ]; then \
+	   echo "publish: FAILED, $$left commit(s) still not on origin/main"; exit 1; \
+	 fi; \
+	 echo "publish: origin/main is up to date ($$(git rev-parse --short HEAD))"

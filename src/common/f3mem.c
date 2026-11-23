@@ -17,8 +17,14 @@ uint8_t *f3_ptr(const f3mem_t *m, uint32_t a)
         return &m->dpram[a - F3_DPRAM_BASE];
     if (a < F3_ROM_SIZE && m->rom)
         return (uint8_t *)&m->rom[a];
+    /* Unmapped: I/O space (0x4A0000..), cart/user windows, or a corrupt
+     * pointer read out of a capture. Returning a zeroed scratch byte keeps a
+     * single bad address from abort()ing the whole harness (one such capture
+     * took 118B74 down and hid every later verdict). The write is discarded,
+     * so the owning routine reports a mismatch instead of crashing the run. */
+    static uint8_t unmapped[8];
     fprintf(stderr, "f3mem: access outside RAM/ROM at %06X\n", a);
-    abort();
+    return unmapped;
 }
 
 uint8_t rd8(const f3mem_t *m, uint32_t a) { return *f3_ptr(m, a); }

@@ -52,3 +52,24 @@ does not exercise that branch usefully — report it instead of fitting code to 
 Routines already landed this session satisfy this test (for example
 `0x1077DA`'s state-1 handler publishes `obj+0x44/0x48` to the parent at
 `+0x60/+0x64`, and every post shows it).
+
+## The gate is coarse: it passed three unusable captures
+
+`work/audit/precheck.py` has a `fidelity` gate that only asks "did the post write
+an aligned field of the object". On 2026-11-23 it said **PASS** for `0x10C966`,
+`0x111B56` and `0x11418E`, and all three were unusable:
+
+- `0x11418E`: the post moves `obj+0x42` from `0x0006` to `0x000F`, but the ROM
+  writes `(0x42) := (0x6) >> 1` with the captured `+0x6 == 0`, which is `0`.
+- `0x111B56`: the ROM clears `obj+0x18` unconditionally; half the posts keep it.
+- `0x10C966`: the routine must set bit 4 of `obj+0x07` on the state-0 path; the
+  post has `0x00` there in all 60 pairs.
+
+So the gate catches only the gross case (a post that never touches the object).
+Three of the last four workers correctly rejected captures the gate had passed,
+by checking a *specific* mandatory write. That is the standard: read the ROM,
+pick one write the captured branch cannot avoid, and look for it in the post.
+
+The precheck therefore also prints the captured `obj+0x6` histogram. Workers had
+reported states (`0x1E`, `0x80`, `0x02`) that the files do not contain; the
+histogram is the value they should have quoted.

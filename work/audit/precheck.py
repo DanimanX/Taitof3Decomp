@@ -109,7 +109,28 @@ def check_pcindexed(addr):
     return 'ok (%d fixed/table sites)' % n if n else 'ok'
 
 
-CHECKS = [('capture', check_capture), ('fidelity', check_fidelity),
+def check_state(addr):
+    """Report the captured obj+0x6 values. Most late workers passed `obj+0x6`
+    readings that did not exist (0x1E, 0x80, 0x02 where the file holds 0x00):
+    this prints the truth so the brief cannot assert a state we never checked.
+    """
+    got = load(addr)
+    if got is None:
+        return 'NO CAPTURE'
+    data, meta, n = got
+    vals = {}
+    for i in range(n):
+        pre = meta.get((i, 'pre'))
+        if not pre:
+            continue
+        o = int(pre[11], 16) - 0x400000
+        if 0 <= o < W - 6:
+            v = data[i * 2 * W + o + 6]
+            vals[v] = vals.get(v, 0) + 1
+    return 'ok obj+6=' + ','.join('%02X x%d' % (k, v) for k, v in sorted(vals.items()))
+
+
+CHECKS = [('capture', check_capture), ('fidelity', check_fidelity), ('state', check_state),
           ('callees', check_callees), ('pcidx', check_pcindexed)]
 
 if __name__ == '__main__':

@@ -57,6 +57,11 @@ Per-bank map: [`docs/COVERAGE.md`](docs/COVERAGE.md). Code bytes = instruction b
 
 ## Architecture & Workflow
 
+> **Committing is not publishing.** The progress numbers above only reach GitHub
+> when the branch is pushed. Run `make publish` before reporting a block as done:
+> it refuses to push with uncommitted changes and prints the remaining lead.
+> `git status -sb` showing `ahead N` means the work is still local only.
+
 The core strategy revolves around iteratively decompiling 68EC020 machine code into human-readable, matching C code verified against live dynamic execution states:
 
 ```mermaid

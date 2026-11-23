@@ -305,3 +305,28 @@ propia rutina.
 `Obj_MoveByAngle` (0x0CBE12) sí implementa la convención de la ROM
 (`tab[ang]` para Y y `tab[0x80+ang]` para X), así que **es correcta** para
 quien la llame con el ángulo adecuado; el trabajo es encontrar ese ángulo.
+
+## Obj_Atan2: acusación falsa nº 9 (2026-11-23)
+
+Un worker afirmó que `Obj_Atan2` tiene el índice de cuadrante escalado por 2
+de más (`0x6492 + d2*2` con `d2` ya escalado), y que eso lo corrompe en 8 de
+cada 9 casos. Aportó un ejemplo «reproducible»: `Atan2(259,-4)` da 0 y
+«debería dar 39».
+
+**Verificado, y es falso.** El valor correcto de `atan2(-4,259)` en una vuelta
+de 256 es **255**, no 39:
+
+```
+atan2(-4, 259) = -0.886°  ->  (-0.886/360)*256 mod 256 = 255.37  ->  255
+Obj_Atan2(259, -4) = 0
+```
+
+`0` y `255` son adyacentes en el círculo. La diferencia de 1 LSB es la
+truncación normal de una tabla entera.
+
+Además probé el «fix» propuesto (`0x6492 + d2` sin el `*2`) en un worktree
+aislado: **0 regresiones y 0 cambios** — no altera el resultado en ningún
+caso del corpus, lo que confirma que el término no es el problema.
+
+El «39 esperado» no sale de ningún cálculo: es una cifra inventada para
+justificar el diagnóstico.

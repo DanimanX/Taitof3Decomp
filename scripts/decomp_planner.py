@@ -63,8 +63,8 @@ def decompiled_roms():
         if "not decompiled yet (stub)" in s:
             continue
         out |= {int(x, 16) for x in re.findall(r"ROM 0x([0-9A-Fa-f]{4,6})", s)}
-        m = re.search(r"obj_([0-9A-Fa-f]{5,6})\.c$", p)
-        if m and re.search(r"\bObj_%s_Tick\s*\(" % m.group(1), s):
+        m = re.search(r"obj_0*([0-9A-Fa-f]{4,6})\.c$", p)
+        if m and re.search(r"\bObj_0*%s_Tick\s*\(" % m.group(1), s):
             out.add(int(m.group(1), 16))
     return out
 
@@ -138,7 +138,11 @@ def save_state(st):
 
 
 def candidates():
-    """[dict] for every stub with a bundle, with the reasons it is not ready."""
+    """[dict] for every stub with a bundle, with the reasons it is not ready.
+
+    After a fresh savestate session the pool runs objects the golden captures
+    never saw; `--capture-missing` asks for those to be captured first.
+    """
     dec = decompiled_roms()
     state = load_state()
     rows = []

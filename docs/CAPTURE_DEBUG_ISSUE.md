@@ -110,3 +110,18 @@ Lección para futuros workers: antes de acusar a un helper compartido, medir el
 delta con el harness completo en un worktree aislado. Un cambio que baja el
 recuento global es evidencia en contra, no una mejora pendiente de arreglar
 más rutinas.
+
+## Obj_Free (0x00105EC): acusación falsa (2026-11-23)
+
+Un worker de la oleada G afirmó que `Obj_Free` calcula un offset de bit
+~1600 para el grupo 5 y toca la máscara equivocada. Falso: la ROM es
+`move.b (4,A0),D0; lsl.w #5,D0; add.b (5,A0),D0; bfset`, y `src/objects/
+obj_pool.c` lo replica exactamente (el `add.b` sólo afecta al byte bajo).
+Grupo 5, índice 3 → bit **163** = `5*32+3`, que es el correcto. Para obtener
+~1600 haría falta un segundo `<<5` que no existe ni en la ROM ni en la C.
+
+Tercera acusación de esta sesión contra un helper compartido que resulta ser
+falsa (las otras dos: `Obj_DrawSprite`, `Obj_MoveByAngle`). Patrón: cuando una
+traducción no cuadra, el worker culpa al helper. Antes de aceptarlo: leer la
+ROM cruda y, si hay un cambio candidato, medirlo con el harness completo en un
+worktree aislado. Un delta negativo en el recuento global zanja la discusión.

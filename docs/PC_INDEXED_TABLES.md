@@ -48,9 +48,19 @@ The NULLs are real, not a decode error: mode 0 genuinely has no table entry.
 A translation must therefore treat mode 0 (and mode 0 in the `+7` form) as a
 path with no observable effect rather than as untranslated code.
 
+## Signed displacements (a second trap)
+
+`bd` is **signed**. `0x107CD0` uses `22 7B 05 20 FD40`: read as unsigned that
+is `+0xFD40` and lands in garbage at `0x117A12`; read as signed it is `-0x2C0`
+and the base is `0x107A12`, the same table as `0x1078F0`. Three call sites in
+this family (`0x1078F0`, `0x107CD0`, `0x107F08`) reach one of two sibling
+tables (`0x107A12`, `0x107FAC`) that share the shape NULL / 6 modes / NULL /
+6 modes-with-+7.
+
 ## Why this mattered
 
 Three routines were abandoned on the belief that a runtime base register
 needed discovering. They only needed the correct PC-relative arithmetic. Use
 `work/audit/a16_table.py <instr>` to resolve any such instruction; it prints
-the base and the pointed-to records.
+the base and the pointed-to records, treats a NULL entry as legitimate, and
+applies the sign to the displacement.

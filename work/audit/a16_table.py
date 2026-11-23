@@ -26,15 +26,22 @@ def main():
     ext2 = int.from_bytes(d[p + 2:p + 4], 'big')
     ext3 = int.from_bytes(d[p + 4:p + 6], 'big')
     is_full = (ext2 >> 14) & 1
+    # BD is SIGNED: 0xFD40 must be read as -0x2C0 or the base lands in the
+    # wrong bank (that is exactly how this tool first mis-ranked 0x107CD0).
     if is_full:
-        bd = int.from_bytes(d[p + 6:p + 8], 'big') if (ext2 >> 8) & 1 else d[p + 6]
+        if (ext2 >> 8) & 1:
+            bd = int.from_bytes(d[p + 6:p + 8], 'big', signed=True)
+        else:
+            bd = int.from_bytes(d[p + 6:p + 7], 'big', signed=True)
     else:
-        bd = ext3 if (ext2 >> 8) & 1 else ext3
-    print('instruction %06X  ext=%04X ext2=%04X  bd=%#x' % (p, ext2, ext3, bd))
+        bd = int.from_bytes(d[p + 4:p + 6], 'big', signed=True)
+    print('instruction %06X  ext=%04X ext2=%04X  bd=%d' % (p, ext2, ext3, bd))
     base = p + 2 + bd
     e = entries(base)
-    ok = all(0x400 <= v < 0x200000 for v in e)
-    print('  base (P+2+bd) = %06X  %s  %s' % (base, [hex(v) for v in e], 'ALL POINTERS' if ok else 'not pointers'))
+    # A NULL entry is legitimate: those modes have no handler in the ROM.
+    ok = all(v == 0 or 0x400 <= v < 0x200000 for v in e) and any(e)
+    print('  base (P+2+bd) = %06X  %s  %s' % (base, [hex(v) for v in e],
+                                             'POINTERS (0 = NULL entry)' if ok else 'not a table'))
     if ok:
         for i, v in enumerate(e):
             print('    [%d] %06X -> %s' % (i, v, d[v:v + 8].hex(' ')))

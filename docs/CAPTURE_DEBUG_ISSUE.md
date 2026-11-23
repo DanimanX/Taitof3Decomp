@@ -273,3 +273,35 @@ leía una entrada distinta y todo lo demás divergía.
 el `fn` en `A0` coincide con la rutina (arriba, 1 línea de Python). Si coincide,
 la captura está bien y el error está en la traducción; el sospechoso número uno
 es `(d16,PC)`, donde la base es **PC + 2**, no PC.
+
+## La tabla 0x27E40: no es (sin, cos) en dos mitades (2026-11-23)
+
+Dos leyendas circulaban sobre la tabla de 0x27E40 y **ambas son falsas**:
+
+1. **«tab[0x80+i] es el coseno»** — falso. `tab[i] = 16384*sin(2*pi*i/256)`
+   y `tab[0x80+i] = -tab[i]` (seno negado). Con i=0x1A: `tab[0x1A]=9759`,
+   `tab[0x80+0x1A]=-9759`; el coseno real sería 13160. **No hay coseno.**
+2. **«las rutinas usan ang y ang+0x80»** — falso para las que se movieron esta
+   sesión. En `115B3E` el desplazamiento real es `dx=-296200`, `dy=-140100`
+   con speed 20:
+
+   ```
+   20 * tab[0x92] = -140100   -> dy
+   20 * tab[0xAE] = -296200   -> dx
+   ```
+
+   O sea: **dos ángulos distintos**, `0x92` para Y y `0xAE` (`= 0x92 + 0x1C`)
+   para X. El +0x1C es un desfase de fase propio de la rutina, no un +0x80 de
+   cuadrante.
+
+### Cómo aplicar esto a la próxima rutina que se mueva
+
+No asumas `(cos,sin)`. Con el post capturado, calcula `dx/speed` y `dy/speed`
+y busca esos dos valores en la tabla (`python3`, recorre 0..255). Los índices
+que salgan te dicen exactamente qué offsets usa la rutina. En 115B3E fueron
+`0x92` y `0xAE`; el segundo se obtiene del primero sumando una constante de la
+propia rutina.
+
+`Obj_MoveByAngle` (0x0CBE12) sí implementa la convención de la ROM
+(`tab[ang]` para Y y `tab[0x80+ang]` para X), así que **es correcta** para
+quien la llame con el ángulo adecuado; el trabajo es encontrar ese ángulo.

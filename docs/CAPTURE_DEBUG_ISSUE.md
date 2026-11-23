@@ -53,3 +53,32 @@ Lo que no se puede hoy es **capturar rutinas nuevas**.
 3. Mientras tanto, el planner solo puede aceptar rutinas cuyo capture ya exista
    y que ejecuten los caminos observados; las que necesiten capturas nuevas
    quedan bloqueadas con la razón en `work/batches/state.tsv`.
+
+---
+
+## Actualización 2026-11-23 (sesión de continuación)
+
+### Lo que sí funciona ahora
+
+- **Los savestates `run1_*` sí cargan** y sí ejecutan objetos (`run1_120000` tiene
+  11B472 vivo en 10+ slots del grupo 5). La lista de frames del `run1.tsv` es la
+  del *run original*, no la del savestate: para saber qué hay vivo en un
+  savestate hay que leer el pool directamente (`0x410000`/`0x410060`).
+- `capture_fn.sh ... <entry> ret` con un savestate vivo funciona, pero **el
+  "post" se toma un frame después del tick**: el retorno va por `trap`, no por
+  `rts`, así que `F3_EXIT=ret` nunca dispara y el harness compara el estado del
+  frame siguiente. Eso mezcla el RNG del sistema y hay que restar 1 al
+  contador manualmente. Para capturas limpias de rutinas llamadas por
+  `trap` hace falta un hook de retorno por SP (script propio), no `ret`.
+- `03_active_combat.sta` está **muerto** (carga como arranque en frío: 2
+  funciones por frame). Guardado fuera del árbol.
+- La carrera desde `02_stage1_start` con invulnerabilidad
+  (`F3_POKE32=41B1E0+0x24=0`) avanza entre stages en ~5 000 frames cada uno
+  y cubre las zonas 0–5 repetidamente. 200 000 frames no llegan a zonas 6+.
+
+### Lo que sigue sin poder capturarse
+
+- `17F74E`: no aparece en ninguna savestate disponible ni en 200 000 frames
+  de carrera invulnerable. Pertenece a un jefe de zona avanzada.
+- `11B472`: capturado en `run1_120000` (5 pares, rama de muerte). El tick
+  normal necesita un frame distinto del grupo 5.

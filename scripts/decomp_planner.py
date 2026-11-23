@@ -66,6 +66,15 @@ def decompiled_roms():
         m = re.search(r"obj_0*([0-9A-Fa-f]{4,6})\.c$", p)
         if m and re.search(r"\bObj_0*%s_Tick\s*\(" % m.group(1), s):
             out.add(int(m.group(1), 16))
+    # API headers annotate their implementations (`; ROM 0x01057C` next to the
+    # prototype). Without them Obj_Spawn looked undecompiled to the planner and
+    # every routine that spawns anything was refused.
+    for p in glob.glob("src/**/*.h", recursive=True):
+        try:
+            s = open(p, encoding="utf-8", errors="replace").read()
+        except OSError:
+            continue
+        out |= {int(x, 16) for x in re.findall(r"ROM 0x([0-9A-Fa-f]{4,6})", s)}
     return out
 
 
@@ -78,19 +87,31 @@ def bundle_calls(path):
     m = re.search(r"^; calls:(.*)$", first, re.M)
     if not m:
         return None
-    return re.findall(r"([0-9a-fA-F]{6})", m.group(1))
+    # Entries are `ADDR[ NAME][ (note)]` separated by commas. Taking every
+    # 6-hex run splits `0CBD24 FUN_000cbd24` into `0CBD24` + `000cbd`, which
+    # invents a callee at 0x000CBD and blocks the routine forever. Anchor on
+    # the 6-digit address that starts each entry instead.
+    return re.findall(r"(?:^|:|,\s*)([0-9a-fA-F]{6})", m.group(1))
 
 
 SHARED_HEADER = "src/objects/obj_shared.h"
+# Primitives that live in obj_common.c (``ROM 0x...`` annotations in its
+# header) are just as shared as the obj_shared.c ones; the planner must see
+# both or it keeps counting them as missing callees and refuses the batch.
+SHARED_HEADERS = (SHARED_HEADER, "src/objects/obj_common.h")
 
 
 def shared_roms():
-    """Addresses of the primitives promoted to src/objects/obj_shared.c: those
-    are available to every routine even though no per-routine file owns them."""
-    if not os.path.exists(SHARED_HEADER):
-        return set()
-    s = open(SHARED_HEADER, encoding="utf-8", errors="replace").read()
-    return {int(x, 16) for x in re.findall(r"ROM 0x([0-9A-Fa-f]{4,6})", s)}
+    """Addresses of the primitives promoted to a shared translation unit
+    (obj_shared.c / obj_common.c): those are available to every routine even
+    though no per-routine file owns them."""
+    out = set()
+    for hdr in SHARED_HEADERS:
+        if not os.path.exists(hdr):
+            continue
+        s = open(hdr, encoding="utf-8", errors="replace").read()
+        out |= {int(x, 16) for x in re.findall(r"ROM 0x([0-9A-Fa-f]{4,6})", s)}
+    return out
 
 
 _SHARED = None

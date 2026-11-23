@@ -9,12 +9,6 @@
  * sprite.l} into the countdown (+0x3E) and the sprite pointer (+0x10). Lives in
  * src/enemy/obj_179550.c; call it through its header rather than duplicating. */
 
-/* Reproduce `jsr (table[idx].tick)` for index 0 without the ROM indirection. */
-static void anim_tick0_jsr(const f3mem_t *m, uint32_t obj)
-{
-    Obj_AnimTick0(m, obj);
-}
-
 /* ROM 0x179664 */
 void Obj_AnimTick0(const f3mem_t *m, uint32_t obj)
 {
@@ -42,9 +36,11 @@ void Obj_AnimTick0(const f3mem_t *m, uint32_t obj)
             a1 += 2u;
             wr16(m, obj + 0x40u, d0w);              /* 0x17968C */
             wr32(m, obj + 0x3Au, a1);               /* 0x179690 */
-            /* 0x17969A movea.l (0x179A5E,D0w*0x8),A1; jsr (A1) */
+            /* 0x17969A: movea.l (0x0,0x179A5C,D0w*0x8),A1; jsr (A1)
+             * The +0x0 offset selects the INIT slot of the pair (the +4 slot is
+             * the tick), so D0w == 0 re-runs index 0's init, 0x179550. */
             if (d0w == 0u) {
-                anim_tick0_jsr(m, obj);
+                Obj_179550_Tick(m, obj);
             } else {
                 /* the index's tick is not translated: leave 0x179A5C state
                  * untouched rather than guessing */

@@ -57,18 +57,21 @@ int Obj_17F8FC_Tick(const f3mem_t *m, uint32_t obj)
     wr16(m, obj + 0x14u, d0);
     wr16(m, obj + 0x18u, d1);
 
-    /* 0x17F936: D0w = (0x40,A0); movea.l (0x4,0x179A5C,D0w*8),A1; jsr (A1) --
-     * the tick half. The caller has just reloaded the animation base from the
-     * script (script dispatch is the init half, 0x179550, which puts
-     * 0x17F9CC -> {1, 0x0005A4F8} in place), so it is re-applied here before
-     * the tick moves +0x3A onto the first frame record (0x17F9CE). Either
-     * dispatch returning an unknown index leaves the object untouched. */
+    /* 0x17F936: move.w (0x40,A0),D0w ; lea (0x179a5c).l,A1 ;
+     *          movea.l (0x4,A1,D0w*0x8),A1 ; jsr (A1)
+     * A single dispatch, and the entry is the pair's TICK half: 0x179A5C
+     * holds {init.l, tick.l} pairs, and the x4 displacement already selects
+     * the tick slot, so no init runs here. Index 0's tick is the frame walk
+     * at 0x179664. (Running the init as well re-armed the countdown and left
+     * +0x3A on the first record forever.) */
     {
         uint16_t idx = rd16(m, obj + 0x40u);
-        if (Obj_AnimInit(m, obj, idx) < 0)
+        if (idx != 0u) {
+            /* other indices' ticks are not translated yet: report the
+             * unobservable path instead of guessing */
             return -1;
-        if (Obj_AnimTick(m, obj, idx) < 0)
-            return -1;
+        }
+        Obj_AnimTick0(m, obj);
     }
 
     /* 0x17F946: centre the frame on its {w.w, h.w} anchor:

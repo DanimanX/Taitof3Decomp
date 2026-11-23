@@ -82,3 +82,31 @@ Lo que no se puede hoy es **capturar rutinas nuevas**.
   de carrera invulnerable. Pertenece a un jefe de zona avanzada.
 - `11B472`: capturado en `run1_120000` (5 pares, rama de muerte). El tick
   normal necesita un frame distinto del grupo 5.
+
+---
+
+## Obj_DrawSprite (0x001282): dos acusaciones, ambas falsas (2026-11-23)
+
+Un worker de oleada F sostuvo que `0x001282` tenía dos defectos. Ambas
+acusaciones se probaron contra la ROM y el harness y **no se sostienen**:
+
+1. **"Escribe `(d2w>>4)` donde la ROM hace `bfextu D2{16:12}`"** — cierto en el
+   byte, pero `d2w>>4` es el equivalente correcto: D2 es un long, el
+   `move.w (0x18,A0),D2` sólo pisa la palabra baja y el `lsl.w #4` desplaza
+   esa palabra. `bfextu {16:12}` extrae los bits 16..27, que con la palabra
+   alta intacta son exactamente `y<<4 >> 8 = y>>4`. Aplicar `>>8` **rompe 147
+   rutinas** (1228 → 1082 bit-exact) en un worktree aislado: la versión actual
+   es la correcta.
+
+2. **"No emite w*h entradas para defs multi-glifo"** — el bucle anidado de
+   `sprite.c` recorre `cols` × `rows` exactamente como `dbf` en ROM
+   (`0x13C4 51C9` interior, `0x13C0`/`0x13C6` exterior). El caso de 11939E
+   tiene `obj+0x10 = 0x62E54`, y `0x620000..0x62FFFF` **es GFX RAM**, no una
+   def de sprite: el worker pasó un juego de glyphs de texto a la ruta de
+   sprites. La rutina falla por su propio camino de texto (0x59304), no por el
+   dibujante.
+
+Lección para futuros workers: antes de acusar a un helper compartido, medir el
+delta con el harness completo en un worktree aislado. Un cambio que baja el
+recuento global es evidencia en contra, no una mejora pendiente de arreglar
+más rutinas.

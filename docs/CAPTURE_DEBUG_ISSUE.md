@@ -125,3 +125,37 @@ falsa (las otras dos: `Obj_DrawSprite`, `Obj_MoveByAngle`). Patrón: cuando una
 traducción no cuadra, el worker culpa al helper. Antes de aceptarlo: leer la
 ROM cruda y, si hay un cambio candidato, medirlo con el harness completo en un
 worktree aislado. Un delta negativo en el recuento global zanja la discusión.
+
+## Investigación del "post desfasado un frame": falso (2026-11-23)
+
+Hipótesis: `F3_EXIT=ret` toma el post en la dirección guardada en `[SP]`, que
+para un tick despachado por el pool es `0x000104F0` (el despachador), así que
+el post llegaría un frame tarde y contaminaría RNG y estado.
+
+**Medido y refutado.** Instrumenté el post de `capture_fn.lua` para imprimir
+`PC`/`SP` en el punto de captura, con 11B472 en `run1_120000`:
+
+```
+POST pc=0104F0 sp=405294 ret_sp=405290
+```
+
+`SP` es ya exactamente `entry_SP + 4`: el tick **sí** ha retornado; el `PC`
+del despachador es sólo dónde se detiene el emulador. La captura que ya
+teníamos y una captura nueva tomada con esta instrumentación dan **los mismos
+25 bytes de diferencia y el mismo RNG intacto**.
+
+Sí existía un cambio real en el pipeline (se descartó, ver abajo), pero no
+explicaba nada: la mejor forma de comprobarlo fue comprobar que la captura
+alternativa produce el mismo post.
+
+### Lo que sí se aprendió sobre 11B472
+
+Con la captura correcta, la parte de movimiento de la traducción es **exacta**:
+`+0x42 = 7` (velocidad), ángulo `0x1A`, y `7 * tabla[0x1A]` da `dx=92113`,
+`dy=68313`, que son exactamente los deltas del post real (diferencia 0,0).
+Quedan dos divergencias ajenas al movimiento: el byte bajo de `+0x20` y una
+escritura en `+0x00` (`0x11B472 → 0x11B472` con un byte intermedio distinto),
+más el RNG de sistema. Ninguna se explica por el pipeline de captura.
+
+Conclusión: **no hay nada que arreglar en la captura**; 11B472 necesita
+trabajo de traducción sobre su rama de re-arme.

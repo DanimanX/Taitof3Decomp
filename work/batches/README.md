@@ -45,3 +45,25 @@ Reglas que no se saltan:
 `scripts/harvest.sh --push` hace commit+push por su cuenta para el flujo de
 worktrees; este documento es el equivalente para el flujo del planner en el
 checkout principal.
+
+## Una rutina, un fichero
+
+Los nombres SIN el cero de relleno son los canónicos: `obj_BB746.c`, no
+`obj_0BB746.c`. Las capturas (`work/ram/obj_BB746_pairs.bin`) y el bundle
+siguen la misma convención.
+
+`scripts/integrate_obj.sh <ADDR> <draft>` NO comprueba si el objeto ya existe
+con la otra grafía. Si integras un stub para `0BB746` cuando `obj_BB746.c` ya
+existe, acabas con dos implementaciones, dos entradas en `tests/test_objects.c`
+y cada objeto contado dos veces en `object_health.sh` — que fue lo que pasó y
+hubo que revertir.
+
+Antes de integrar cualquier captura nueva:
+
+```bash
+ls src/enemy/obj_$(printf %X $((16#$ADDR))).c src/enemy/obj_$ADDR.c 2>/dev/null
+```
+
+y si alguna existe, la rutina ya está hecha. `scripts/decomp_planner.py`
+ahora se niega a ejecutarse cuando dos ficheros de `src/enemy/` normalizan a la
+misma dirección, así que el error sale en `status`, no en el gate.

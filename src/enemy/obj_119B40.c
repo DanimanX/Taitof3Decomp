@@ -1,21 +1,10 @@
 #include "obj_119B40.h"
-
-/* ROM 0x0CBD86: clear sprite/animation state */
-static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
-{
-    wr16(m, obj + 0x1Cu, 0u);
-    wr16(m, obj + 0x1Eu, 0u);
-    wr16(m, obj + 0x34u, 0u);
-    wr16(m, obj + 0x3Au, 0u);
-    wr16(m, obj + 0x3Eu, 0u);
-    wr32(m, obj + 0x24u, 0u);
-    wr32(m, obj + 0x28u, 0u);
-}
+#include "../objects/obj_common.h"
 
 /* ROM 0x119B40: debris init; +0xC = x:10s | y:10s | angle:8 | 4 */
 int Obj_119B40_Tick(const f3mem_t *m, uint32_t obj)
 {
-    sub_0CBD86(m, obj);
+    Obj_ResetFields(m, obj);
     uint32_t d0 = rd32(m, obj + 0x0Cu);
     wr16(m, obj + 0x14u, (uint16_t)(int16_t)((int32_t)d0 >> 22));
     wr16(m, obj + 0x18u, (uint16_t)(int16_t)((int32_t)(d0 << 10) >> 22));

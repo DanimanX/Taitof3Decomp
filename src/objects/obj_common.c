@@ -92,9 +92,30 @@ void Obj_AnimFrameStep(const f3mem_t *m, uint32_t obj, uint32_t anim_tbl)
     }
 }
 
+/* ROM 0x0CBD86: reset the per-frame object fields. Byte-for-byte from
+ * work/maincpu.bin at 0xCBD86:
+ *   4268 001c    clr.w (0x1c,A0)
+ *   4268 001e    clr.w (0x1e,A0)
+ *   4268 0034    clr.w (0x34,A0)
+ *   4268 003a    clr.w (0x3a,A0)
+ *   4268 003e    clr.w (0x3e,A0)
+ *   42a8 0024    clr.l (0x24,A0)
+ *   42a8 0028    clr.l (0x28,A0)
+ *   4e75         rts
+ */
+void Obj_ResetFields(const f3mem_t *m, uint32_t obj)
+{
+    wr16(m, obj + 0x1Cu, 0u);
+    wr16(m, obj + 0x1Eu, 0u);
+    wr16(m, obj + 0x34u, 0u);
+    wr16(m, obj + 0x3Au, 0u);
+    wr16(m, obj + 0x3Eu, 0u);
+    wr32(m, obj + 0x24u, 0u);
+    wr32(m, obj + 0x28u, 0u);
+}
+
 /* ROM 0x0D0690: advance the object script (obj+0x48) once its frame timer
- * (obj+0x4C) runs out. Copied from the five sibling tick routines that carry
- * this ROM range as a private static helper. */
+ * (obj+0x4C) runs out. */
 void Obj_StepScript(const f3mem_t *m, uint32_t obj)
 {
     uint16_t cnt = (uint16_t)(rd16(m, obj + 0x4Cu) - 1u);

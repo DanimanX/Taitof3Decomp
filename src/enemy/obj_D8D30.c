@@ -5,18 +5,6 @@
 #include "../player/player_move.h"
 #include "../audio/sound_cmd.h"
 
-/* ROM 0x0CBD86: clear animation / motion state */
-static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
-{
-    wr16(m, obj + 0x1Cu, 0u);
-    wr16(m, obj + 0x1Eu, 0u);
-    wr16(m, obj + 0x34u, 0u);
-    wr16(m, obj + 0x3Au, 0u);
-    wr16(m, obj + 0x3Eu, 0u);
-    wr32(m, obj + 0x24u, 0u);
-    wr32(m, obj + 0x28u, 0u);
-}
-
 /* ROM 0x0C666A: OR a column of 16-bit masks {n.w, mask.w...} into the terrain
  * bitmap at 0x40891C (0x280 bits per 8-pixel row) at screen (x, y) */
 static void sub_0C666A(const f3mem_t *m, uint16_t x, uint16_t y, uint32_t a1)
@@ -47,7 +35,7 @@ static int16_t sb(const f3mem_t *m, uint32_t a) { return (int16_t)(int8_t)rd8(m,
  * terrain bitmap */
 int Obj_D8D30_Tick(const f3mem_t *m, uint32_t obj)
 {
-    sub_0CBD86(m, obj);
+    Obj_ResetFields(m, obj);
     wr8(m, obj + 0x4Fu, 0u);
     uint32_t p = rd32(m, obj + 0x08u);
     wr16(m, obj + 0x14u, rd16(m, p + 0x14u));

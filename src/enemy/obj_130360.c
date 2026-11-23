@@ -1,17 +1,6 @@
 #include "obj_130360.h"
+#include "../objects/obj_common.h"
 #include "../audio/sound_cmd.h"
-
-/* ROM 0x0CBD86: clear flip/zoom/speed/anim state */
-static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
-{
-    wr16(m, obj + 0x1Cu, 0u);
-    wr16(m, obj + 0x1Eu, 0u);
-    wr16(m, obj + 0x34u, 0u);
-    wr16(m, obj + 0x3Au, 0u);
-    wr16(m, obj + 0x3Eu, 0u);
-    wr32(m, obj + 0x24u, 0u);
-    wr32(m, obj + 0x28u, 0u);
-}
 
 /* ROM 0x0CBEB0: D0.w = ((A5+0x87E)*8 + 0xC00) *s D0.w, <<4, swap */
 static uint16_t sub_0CBEB0(const f3mem_t *m, uint16_t d0w)
@@ -35,7 +24,7 @@ static int16_t sub_13F238(const f3mem_t *m, int16_t cmd)
 /* ROM 0x130360 */
 int Obj_130360_Tick(const f3mem_t *m, uint32_t obj)
 {
-    sub_0CBD86(m, obj);                             /* 0x130360 */
+    Obj_ResetFields(m, obj);                             /* 0x130360 */
 
     wr16(m, obj + 0x28u, 1u);                       /* 0x130366 */
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) | 0x02u));   /* bset.b #1 */

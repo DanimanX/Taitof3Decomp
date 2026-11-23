@@ -1,21 +1,10 @@
 #include "obj_118E88.h"
-
-/* ROM 0x0CBD86: clear animation / motion state */
-static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
-{
-    wr16(m, obj + 0x1Cu, 0u);
-    wr16(m, obj + 0x1Eu, 0u);
-    wr16(m, obj + 0x34u, 0u);
-    wr16(m, obj + 0x3Au, 0u);
-    wr16(m, obj + 0x3Eu, 0u);
-    wr32(m, obj + 0x24u, 0u);
-    wr32(m, obj + 0x28u, 0u);
-}
+#include "../objects/obj_common.h"
 
 /* ROM 0x118E88: arg = {x:10, y:10, flip:4, ...} (bitfields from the MSB) */
 int Obj_118E88_Tick(const f3mem_t *m, uint32_t obj)
 {
-    sub_0CBD86(m, obj);
+    Obj_ResetFields(m, obj);
     wr32(m, obj + 0x14u, 0u);
     wr32(m, obj + 0x18u, 0u);
     uint32_t d0 = rd32(m, obj + 0x0Cu);

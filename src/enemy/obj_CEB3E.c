@@ -1,21 +1,10 @@
 #include "obj_CEB3E.h"
-
-/* ROM 0x0CBD86: clear the motion/animation block */
-static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
-{
-    wr16(m, obj + 0x1Cu, 0u);
-    wr16(m, obj + 0x1Eu, 0u);
-    wr16(m, obj + 0x34u, 0u);
-    wr16(m, obj + 0x3Au, 0u);
-    wr16(m, obj + 0x3Eu, 0u);
-    wr32(m, obj + 0x24u, 0u);
-    wr32(m, obj + 0x28u, 0u);
-}
+#include "../objects/obj_common.h"
 
 /* ROM 0x0CEB3E: spawn/init body (reached from the spawner, not a live tick) */
 int Obj_CEB3E_Tick(const f3mem_t *m, uint32_t obj)
 {
-    sub_0CBD86(m, obj);
+    Obj_ResetFields(m, obj);
     wr8(m, obj + 0x1Du, 0x2Eu);
 
     /* 0x0CEB4A: no owner -> skip the trampoline link */

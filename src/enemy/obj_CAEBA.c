@@ -26,18 +26,6 @@ static void play_cmd(const f3mem_t *m, int16_t cmd)
     }
 }
 
-/* ROM 0x0CBD86: clear the per-frame sprite state */
-static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
-{
-    wr16(m, obj + 0x1Cu, 0u);
-    wr16(m, obj + 0x1Eu, 0u);
-    wr16(m, obj + 0x34u, 0u);
-    wr16(m, obj + 0x3Au, 0u);
-    wr16(m, obj + 0x3Eu, 0u);
-    wr32(m, obj + 0x24u, 0u);
-    wr32(m, obj + 0x28u, 0u);
-}
-
 /* ROM 0xCAEBA */
 int Obj_CAEBA_Tick(const f3mem_t *m, uint32_t obj)
 {
@@ -54,7 +42,7 @@ int Obj_CAEBA_Tick(const f3mem_t *m, uint32_t obj)
     (void)Obj_Spawn(m, obj, 0x000CB406u, 0u, 1u, 0u);
 
     /* 0x0CAEFA */
-    sub_0CBD86(m, obj);
+    Obj_ResetFields(m, obj);
     wr16(m, F3_A5 + 0x1D5Au, 0u);
     wr16(m, obj + 0x06u, 0u);
     wr32(m, obj + 0x10u, 0x000625F4u);

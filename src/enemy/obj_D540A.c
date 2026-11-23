@@ -6,18 +6,6 @@
 #include "../objects/objscript_CF1E4.h"
 #include "../objects/objscript_CF4B8.h"
 
-/* ROM 0x0CBD86 */
-static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
-{
-    wr16(m, obj + 0x1Cu, 0u);
-    wr16(m, obj + 0x1Eu, 0u);
-    wr16(m, obj + 0x34u, 0u);
-    wr16(m, obj + 0x3Au, 0u);
-    wr16(m, obj + 0x3Eu, 0u);
-    wr32(m, obj + 0x24u, 0u);
-    wr32(m, obj + 0x28u, 0u);
-}
-
 /* ROM 0x0CBE66 */
 static void sub_0CBE66(const f3mem_t *m, uint32_t obj, uint32_t a1)
 {
@@ -93,7 +81,7 @@ static void sub_0CEE2C(const f3mem_t *m, uint32_t obj)
 /* ROM 0x0D540A */
 int Obj_D540A_Tick(const f3mem_t *m, uint32_t obj)
 {
-    sub_0CBD86(m, obj);
+    Obj_ResetFields(m, obj);
     sub_0CBE66(m, obj, 0x000D53BCu);
     sub_0CEE2C(m, obj);
 

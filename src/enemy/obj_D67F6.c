@@ -3,18 +3,6 @@
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
 
-/* ROM 0x0CBD86: clear animation / motion state */
-static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
-{
-    wr16(m, obj + 0x1Cu, 0u);
-    wr16(m, obj + 0x1Eu, 0u);
-    wr16(m, obj + 0x34u, 0u);
-    wr16(m, obj + 0x3Au, 0u);
-    wr16(m, obj + 0x3Eu, 0u);
-    wr32(m, obj + 0x24u, 0u);
-    wr32(m, obj + 0x28u, 0u);
-}
-
 /* ROM 0x0CBE66: hit/collision record at A1 */
 static void sub_0CBE66(const f3mem_t *m, uint32_t obj, uint32_t a1)
 {
@@ -48,7 +36,7 @@ static void sub_0CBEC2(const f3mem_t *m, uint32_t obj)
 /* ROM 0x0D67F6 */
 int Obj_D67F6_Tick(const f3mem_t *m, uint32_t obj)
 {
-    sub_0CBD86(m, obj);
+    Obj_ResetFields(m, obj);
     sub_0CBE66(m, obj, 0xD6AD8u);
     uint16_t d0 = (uint16_t)Rng_NextMem(m);
     d0 = (uint16_t)(((d0 & 7u) + 0xC8u) << 8);

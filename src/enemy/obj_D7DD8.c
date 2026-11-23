@@ -1,16 +1,5 @@
 #include "obj_D7DD8.h"
-
-/* ROM 0x0CBD86: clear animation / motion state */
-static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
-{
-    wr16(m, obj + 0x1Cu, 0u);
-    wr16(m, obj + 0x1Eu, 0u);
-    wr16(m, obj + 0x34u, 0u);
-    wr16(m, obj + 0x3Au, 0u);
-    wr16(m, obj + 0x3Eu, 0u);
-    wr32(m, obj + 0x24u, 0u);
-    wr32(m, obj + 0x28u, 0u);
-}
+#include "../objects/obj_common.h"
 
 /* ROM 0x0CBE66: hit/collision record at A1 */
 static void sub_0CBE66(const f3mem_t *m, uint32_t obj, uint32_t a1)
@@ -35,7 +24,7 @@ static void sub_0CBE66(const f3mem_t *m, uint32_t obj, uint32_t a1)
 int Obj_D7DD8_Tick(const f3mem_t *m, uint32_t obj)
 {
     uint32_t d0;
-    sub_0CBD86(m, obj);
+    Obj_ResetFields(m, obj);
     if (rd8(m, obj + 0x4Eu) != 0u) {
         uint32_t a1 = rd32(m, F3_A5 + 0x1D28u);
         wr32(m, obj + 0x14u, rd32(m, a1 + 0x14u));

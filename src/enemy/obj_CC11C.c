@@ -84,18 +84,6 @@ static void sub_0CFA86(const f3mem_t *m, uint32_t obj, uint32_t a1)
     wr32(m, obj + 0x68u, rd32(m, a1));
 }
 
-/* ROM 0x0CBD86: clear position/animation state */
-static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
-{
-    wr16(m, obj + 0x1Cu, 0u);
-    wr16(m, obj + 0x1Eu, 0u);
-    wr16(m, obj + 0x34u, 0u);
-    wr16(m, obj + 0x3Au, 0u);
-    wr16(m, obj + 0x3Eu, 0u);
-    wr32(m, obj + 0x24u, 0u);
-    wr32(m, obj + 0x28u, 0u);
-}
-
 /* ROM 0x0CBE66: hit/collision record at A1 */
 static void sub_0CBE66(const f3mem_t *m, uint32_t obj, uint32_t a1)
 {
@@ -169,7 +157,7 @@ static void case_0D5EB2(const f3mem_t *m, uint32_t obj)
     (void)a1; (void)d0; (void)d1; (void)d2; (void)d6; (void)d7;
     wr8(m, obj + 0x64u, 0x00u);
     wr16(m, obj + 0x20u, 0x00004000u);
-    sub_0CBD86(m, obj);
+    Obj_ResetFields(m, obj);
     a1 = 0x000D6108u;
     sub_0CBE66(m, obj, a1);
     wr8(m, obj + 0x4Fu, 0x00u);
@@ -186,7 +174,7 @@ static void case_0D616A(const f3mem_t *m, uint32_t obj)
     uint32_t a1 = 0, d0 = 0, d1 = 0, d2 = 0, d6 = 0, d7 = 0;
     (void)a1; (void)d0; (void)d1; (void)d2; (void)d6; (void)d7;
     wr8(m, obj + 0x64u, 0x00u);
-    sub_0CBD86(m, obj);
+    Obj_ResetFields(m, obj);
     a1 = 0x000D641Au;
     sub_0CBE66(m, obj, a1);
     wr8(m, obj + 0x34u, (uint8_t)(rd8(m, obj + 0x34u) | 0x02u));
@@ -200,7 +188,7 @@ static void case_0D8ABA(const f3mem_t *m, uint32_t obj)
 {
     uint32_t a1 = 0, d0 = 0, d1 = 0, d2 = 0, d6 = 0, d7 = 0;
     (void)a1; (void)d0; (void)d1; (void)d2; (void)d6; (void)d7;
-    sub_0CBD86(m, obj);
+    Obj_ResetFields(m, obj);
     wr8(m, obj + 0x4Fu, 0x00u);
     wr16(m, obj + 0x14u, (uint16_t)(rd16(m, obj + 0x14u) - 0x0010u));
     wr16(m, obj + 0x18u, (uint16_t)(rd16(m, obj + 0x18u) - 0x0010u));

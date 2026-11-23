@@ -3,22 +3,10 @@
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
 
-/* ROM 0x0CBD86 */
-static void sub_0CBD86(const f3mem_t *m, uint32_t obj)
-{
-    wr16(m, obj + 0x1Cu, 0u);
-    wr16(m, obj + 0x1Eu, 0u);
-    wr16(m, obj + 0x34u, 0u);
-    wr16(m, obj + 0x3Au, 0u);
-    wr16(m, obj + 0x3Eu, 0u);
-    wr32(m, obj + 0x24u, 0u);
-    wr32(m, obj + 0x28u, 0u);
-}
-
 /* ROM 0x0D853C */
 int Obj_D853C_Tick(const f3mem_t *m, uint32_t obj)
 {
-    sub_0CBD86(m, obj);
+    Obj_ResetFields(m, obj);
     wr32(m, obj + 0x3Au, 0u);
     wr32(m, obj + 0x3Eu, 0u);
     wr16(m, obj + 0x28u, 1u);

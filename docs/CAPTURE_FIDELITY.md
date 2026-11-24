@@ -73,3 +73,26 @@ pick one write the captured branch cannot avoid, and look for it in the post.
 The precheck therefore also prints the captured `obj+0x6` histogram. Workers had
 reported states (`0x1E`, `0x80`, `0x02`) that the files do not contain; the
 histogram is the value they should have quoted.
+
+## `work/audit/fidelity_scan.py` is a screen, not a verdict
+
+The script (built with Hermes, reviewed and validated by the parent) prints per
+routine: pair count, whether `fn(obj)` equals the routine in every pre **and**
+post, the `obj+0x6` histogram, and how many aligned 2-byte fields inside the
+object change.
+
+It is genuinely useful for triage — of 380 routines with a capture, 159 have
+`fn_ok=yes`, and 67 of those also have >=30 pairs and >=8 changing fields. But
+**it ranks the four captures proven unusable today among the best**:
+
+    1074B6, 107BC2, 107E00, 10C966, 10DBE0, 11418E   <- all known-bad, all "pass"
+
+A capture can change many of its own fields and still be the wrong tick. Use the
+scan to throw out the obvious cases (no pairs, `fn` mismatched at the post, an
+object that never changes); decide the real ones by reading the ROM and checking
+one mandatory write, as described above.
+
+One behaviour worth knowing: `fn_ok=no` is not automatically bad. `0x130794`
+returns `no` because the routine legitimately rewrites `obj+0` to its own
+continuation (`0x1307E0`) during the tick — a self-reassigning routine looks
+"wrong" to the check and is in fact correct.

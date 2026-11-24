@@ -474,3 +474,30 @@ reading of the intermediate registers is wrong somewhere.
 
 Next step would be a trace at 0x178B4E, 0x184994 and 0x1849A0 on the *same*
 pair index, filtered to the object under test.
+
+## Solved: the 0x184984 difficulty scaling
+
+The mismatch that blocked 0x178B4A for three passes was a single wrong base
+address. `bfextu $1849d4(pc,d0.w){0:8}` computes PC from the **extension word**
+(0x184992), so the table really starts at 0x1849D6:
+
+    sel 0..15 -> 00 00 0A 0A 14 14 1E 1E 28 28 32 3C 46 50 5A 64
+
+Selectors 0 and 1 read 0, so on the default difficulty the scaling is a no-op
+and `(0x42,A0)` keeps whatever 0x178B4A assigned. That is exactly what the
+0x17C240 capture shows: the record's `+6 = 0x400` is assigned and stays 0x400.
+
+The `+0x80` in `muls.w $80(a1,d2.w*2)` is likewise a byte offset into the sine
+table, so with `+0x42 = 0x400` and `+0x20 = 0x8000` the delta is
+
+    mag = (0x400 + 0x20) >> 6 = 16
+    sn  = table[0x80*2] = 0
+    cs  = table[0x80*2 + 0x80] = -16384
+    16 * -16384 = -0x40000
+
+which matches the captured `+0x50` delta of -0x40000 exactly.
+
+Both handlers are now in Obj_Script10. What is still open is finishing the
+bodies that consume them (0x17C240, 0x17E99A): their scripts run, but the
+paired capture does not go green yet, and the remaining delta has not been
+explained.

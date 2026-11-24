@@ -130,7 +130,42 @@ def check_state(addr):
     return 'ok obj+6=' + ','.join('%02X x%d' % (k, v) for k, v in sorted(vals.items()))
 
 
-CHECKS = [('capture', check_capture), ('fidelity', check_fidelity), ('state', check_state),
+def check_sprite(addr):
+    """obj+0x10 must point at a real {w.w, h.w, ...} sprite definition.
+
+    Validated against every routine that passes: 13/13 have a plausible def
+    (w,h in 1..16). Of 1169 captures, 145 point at zeros or garbage; 0x111B56
+    was one, and its tick calls Obj_DrawSprite with that pointer while the
+    sprite cursor still advances, which no faithful run can do. This is the
+    strongest single signal found so far.
+    """
+    got = load(addr)
+    if got is None:
+        return 'NO CAPTURE'
+    data, meta, n = got
+    rom = open(os.path.join(ROOT, 'work/maincpu.bin'), 'rb').read()
+    bad = 0
+    for i in range(n):
+        pre = meta.get((i, 'pre'))
+        if not pre:
+            continue
+        o = int(pre[11], 16) - 0x400000
+        if not (0 <= o < W - 0x14):
+            continue
+        p = int.from_bytes(data[i * 2 * W + o + 0x10:i * 2 * W + o + 0x14], 'big')
+        if p + 8 > len(rom):
+            bad += 1
+            continue
+        w = int.from_bytes(rom[p:p + 2], 'big')
+        h = int.from_bytes(rom[p + 2:p + 4], 'big')
+        if not (1 <= w <= 16 and 1 <= h <= 16):
+            bad += 1
+    if bad:
+        return 'UNUSABLE: obj+0x10 is not a sprite def in %d pair(s)' % bad
+    return 'ok'
+
+
+CHECKS = [('capture', check_capture), ('sprite', check_sprite), ('fidelity', check_fidelity), ('state', check_state),
           ('callees', check_callees), ('pcidx', check_pcindexed)]
 
 if __name__ == '__main__':

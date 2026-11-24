@@ -165,3 +165,30 @@ the ROM-reconstruction oracle (`scripts/reconstruct_rom.py`) settles any
 None of this says every capture is good: `0x108512` was a real defect, proven by
 a mandatory write absent from all 60 posts. The point is that a rejection needs
 the same standard of proof as a translation.
+
+## Third correction: 111B56's "all-zero sprite def" is false
+
+A second attempt at `0x111B56` reported as its decisive evidence that
+`obj+0x10 = 0x02D768` is "all zeros in every captured WRAM image", so the
+`sprite cursor` advance could not have come from a real draw.
+
+Measured from the ROM:
+
+    0x02D768: 00 0f 00 03 09 e9 00 52 ...
+              w = 15, h = 3
+
+That is a perfectly ordinary 15x3 sprite definition. The rejection was wrong on
+its strongest point.
+
+### Score of the rejections so far
+
+Of seven captures rejected as "unfaithful" on 2026-11-24, re-checked by the
+parent, **three were false** (`0x111B56` twice, on different claims; `0x116E22`
+once). Only `0x108512` has been proven defective, by a mandatory write that is
+absent from all 60 posts.
+
+That is a strong argument that the **attempt** pipeline, not the capture
+pipeline, is the main loss: the workers are rejecting good data on misreadings
+of the ROM. Before spending days on recapture, make every rejection paste
+(a) the ROM bytes, (b) the pre/post bytes, and (c) the exact address each was
+read from. Two of the three false rejections above collapse on step (c).

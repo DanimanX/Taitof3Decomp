@@ -401,3 +401,26 @@ What this does *not* solve: verifying 0x17E1DA still needs 0x17C240 translated,
 and 0x17C240 in turn needs the 0x178982 script opcode 0x178C06 (the record at
 0x17D4E0 selects 0x178B4A then 0x178C06), plus 0x17C50A/0x17C530. The linger
 removes the attribution problem, not the callee chain.
+
+## Two decoder traps that cost real time
+
+Both appeared while chasing 0x178C06, and both produce a *plausible but wrong*
+listing rather than an error:
+
+1. **Block disassembly drifts after a bitfield instruction.** Dumping
+   0x184984..0x1849AA in one call printed `bfexts -$5556(a0){0:16}` and
+   `divs.w #$aaaa,d1`, where the bytes are `bfexts $42(a0)` and `divs.w #$64`.
+   Re-disassembling from each instruction's own offset gives the right answer
+   every time. When a value looks absurd, re-dump from that address rather than
+   trusting the block.
+
+2. **Offsets in `(d16,An)` are byte displacements, not table indices.**
+   `muls.w $80(a1,d2.w*2),d0` reads `table + 0x80 + d2*2`. Indexing the table
+   as `table[d2]` and then adding 0x80 to the *index* gives a value off by a
+   factor of two and silently breaks the trig term.
+
+The 0x27E40 table at 0x27E40 is indeed the sine table (0x0000, 0x0192, 0x0323,
+...), and the difficulty table 0x1849D4 is loaded through
+`bfextu $1849d4(pc,d0.w){0:8}`, i.e. `0x1849D4 + selector` -- so selector 0
+reads 0x4E, the first byte of the preceding `rts`, and the real scale values
+(0x0A, 0x0A, 0x14, ...) start at 0x1849D8.

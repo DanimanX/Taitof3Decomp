@@ -133,3 +133,35 @@ were argued from similar reasoning and deserve the same re-check before any
 recapture is planned. The capture pipeline may be less broken than the attempt
 log suggests, and the workers' fidelity checks are the more likely source of
 false negatives.
+
+## Second correction: check the claim, not the narrative
+
+`0x116E22` was rejected a second time, this time with a list of four "blocking
+facts". Re-checked by the parent, three of the four are wrong:
+
+- "The instruction stream is shifted; `/tmp/f3dis.py` drops 0x116E30". It does
+  not. `python3 /tmp/f3dis.py 116E22 0x40` prints 0x116E30 `movea.l $8(a0),a1`
+  and 0x116E40 `addi.w #0x4000,d0`, contiguous and correct.
+- "The ROM image is damaged at 0x27E40 / 0x1171D0". It is not.
+  `python3 scripts/reconstruct_rom.py` rebuilds the image from roms/dariusg.zip
+  and reports ORACLE MATCH with the MAME dump, byte for byte.
+- "`+0x20 <- A5+0x30BC` is missing from every post (posts show 0x3A00..0x4400)".
+  Measured: `A5+0x30BC` is `0x0000` and `obj+0x20` is `0x0000` in the posts, and
+  the two match in **60/60 pairs**. The rejection quoted values that are not in
+  the file.
+
+### The procedure that would have caught this
+
+Before writing a rejection, print the evidence you are rejecting on:
+
+    python3 -c "..."   # the specific pre/post bytes, and the ROM bytes,
+                       # in the same output block
+
+A rejection is a claim about the data. Paste the numbers, not a description of
+them. Three separate rejections today were refuted by doing exactly that, and
+the ROM-reconstruction oracle (`scripts/reconstruct_rom.py`) settles any
+"the image is corrupt" claim in one command.
+
+None of this says every capture is good: `0x108512` was a real defect, proven by
+a mandatory write absent from all 60 posts. The point is that a rejection needs
+the same standard of proof as a translation.

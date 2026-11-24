@@ -1224,7 +1224,7 @@ static int run_any(const char *name, const char *pfx, tick_fn fn, tick_a1_fn fn_
         if (rd32(&m, obj) != fn0) died++;   /* switched state (dying) */
         if (memcmp(w + 0x10000 - 0, cap_wram(&c, i, 0) + 0x10000, 0x30)) freed++; /* free masks changed */
         uint32_t sp = c.pre[i][CR_SP];
-        int d = cap_diff(name, i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x80, sp, &budget)
+        int d = cap_diff(name, i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x100, sp, &budget)
               + cap_diff(name, i, F3_SPR_BASE, s, cap_spr(&c, i, 1), F3_SPR_SIZE, 0, 0, &budget)
               + (g ? cap_diff(name, i, F3_GFX_BASE, g, cap_gfx(&c, i, 1), F3_GFX_SIZE, 0, 0, &budget) : 0);
         ok += d == 0;

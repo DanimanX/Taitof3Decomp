@@ -29,7 +29,7 @@ def load(addr):
     meta = {}
     for line in open(rg).read().splitlines()[1:]:
         c = line.split('\t')
-        if len(c) > 11:
+        if len(c) > 18:   # pair, which, frame, D0..D7, A0..A6, SP = 19 columns
             meta[(int(c[0]), c[1])] = c
     return open(pb, 'rb').read(), meta, os.path.getsize(pb) // (2 * W)
 
@@ -158,7 +158,7 @@ def check_state(addr):
             continue
         o = int(pre[11], 16) - 0x400000
         if 0 <= o < W - 6:
-            v = data[i * 2 * W + o + 6]
+            v = data[i * 2 * W + o + 6]   # obj+6 state byte
             vals[v] = vals.get(v, 0) + 1
     return 'ok obj+6=' + ','.join('%02X x%d' % (k, v) for k, v in sorted(vals.items()))
 

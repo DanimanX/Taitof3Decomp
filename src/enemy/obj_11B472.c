@@ -107,7 +107,7 @@ static void sub_11B434(const f3mem_t *m, uint32_t obj)
  * follow-up record 0x0CD444[0] (0x0CD3D6 with D0w = 1). */
 int Obj_11B472_Tick(const f3mem_t *m, uint32_t obj)
 {
-    if ((rd8(m, F3_A5 - 0x144Bu) & 0x20u) != 0u)
+    if ((rd8(m, F3_A5 - 0x144Bu) & 0x10u) != 0u) /* btst.b #4 */
         goto follow_up;
 
     if (rd8(m, obj + 0x35u) == 0u) {

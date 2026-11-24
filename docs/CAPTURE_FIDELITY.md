@@ -382,3 +382,22 @@ Practical rule: before translating a tail that appears to move, check whether
 `+(0x14)`/`+(0x18)` change in the pair. If they do and the entry has no writer
 for them, the routine is not verifiable against this capture and should stay a
 stub rather than be fitted to numbers it never produced.
+
+## F3_LINGER: capturing the successor state in the same pair
+
+The movement that made 0x17E1DA and 0x17F038 unverifiable belongs to the
+successor body 0x17C240, which runs after the entry returns. `scripts/lua/
+capture_fn.lua` now accepts `F3_LINGER=N`: the post dump is deferred by N further
+entries of the same tick site, so a pair contains the entry plus the hand-off.
+
+Measured on 0x17E1DA (`LA_032000`, forced exit, `F3_LINGER=1`):
+
+    pair 0   fn=0017e1da  +0x14 0110 -> 010C (dx = -4)   (with linger)
+    pair 0   fn=0017e1da  +0x14 0110 -> 0110 (dx =  0)   (without)
+
+So the movement is real and reproducible, it just lives one dispatch later.
+
+What this does *not* solve: verifying 0x17E1DA still needs 0x17C240 translated,
+and 0x17C240 in turn needs the 0x178982 script opcode 0x178C06 (the record at
+0x17D4E0 selects 0x178B4A then 0x178C06), plus 0x17C50A/0x17C530. The linger
+removes the attribution problem, not the callee chain.

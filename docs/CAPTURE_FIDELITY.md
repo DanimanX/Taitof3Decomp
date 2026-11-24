@@ -244,3 +244,34 @@ defective detail found in a capture that had passed every other check.
 Do not "fix" this by hard-coding `0x045C0002`. The honest options are a recapture
 of `0x111B56`, or accepting the routine as decompiled-but-unverifiable and
 recording that explicitly.
+
+## The first capture proven defective by internal contradiction
+
+After several false rejections and one real one (`0x108512`), here is a second
+genuine defect, and this one needs no ROM reading at all — the capture
+contradicts itself.
+
+`0x17C360` moves the object with:
+
+    17C3AE  d168 0014   add.w d0,$14(a0)
+    17C3B2  d168 0018   add.w d0,$18(a0)
+
+The *same* register is added to both coordinates. Measured in
+`work/ram/obj_17C360_pairs.bin`, object `0x417A4C`, pair 17:
+
+    +0x50 (x): 0x0110 -> 0x010C   delta -4
+    +0x54 (y): 0x009A -> 0x009A   delta  0
+
+That is impossible for this code. Pair 16 of the same object is `0 -> 0` for
+both, so the pair is not simply mislabelled either.
+
+### Why this matters
+
+It is the cleanest detector found so far: **when a routine adds one register to
+two fields, the two deltas must be equal or both zero.** No disassembly, no
+ROM comparison, no address arithmetic — just read both fields in the pre and post
+and compare the deltas. A capture that fails it is broken, regardless of what
+any worker claims about it.
+
+Contrast with the many false rejections this file records: those argued from
+ROM readings and were wrong. This one argues from the data against itself.

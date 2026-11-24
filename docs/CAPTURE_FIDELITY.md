@@ -501,3 +501,27 @@ Both handlers are now in Obj_Script10. What is still open is finishing the
 bodies that consume them (0x17C240, 0x17E99A): their scripts run, but the
 paired capture does not go green yet, and the remaining delta has not been
 explained.
+
+## The script runs one entry per tick, and the trig is exact
+
+Live trace of 0x17E99A (state LE_056000, script record 0x17EBCE):
+
+    PC       D0          D1
+    178B4E   00000001    0000001F     ; 0x178B4A entry, assigns +0x42
+    178C1A   00000264    0000001F     ; 0x178C06 entry, d0 written back to +0x42
+
+and the pair shows `+0x44` moving 0x17EBCE -> 0x17EBD8 (exactly one 10-byte
+entry) with `+0x48 = 0xFFFF` afterwards. So the interpreter advances **one
+entry per tick** here, not the whole list; a model that walks every entry in one
+tick lands on the wrong +0x42.
+
+With `+0x42 = 0x264` the trig term is now confirmed exact:
+
+    mag = (0x264 + 0x20) >> 6 = 10
+    sn  = 0x27E40[0xa0*2]     = -11585
+    mag * sn                  = -115850
+
+which is exactly the captured `+0x50` delta. The `0x178C06` handler and the
+difficulty table are therefore right; what remains unexplained in this routine
+is only how `+0x42` gets from 0x4C8 to 0x264 through the 0x178B4A entry
+(0x200 assigned, 0x264 observed).

@@ -297,3 +297,29 @@ reasoning applies to the `0x41B1E1` case already excluded in `tests/capture.h`.
 A routine should not be failed for a flag another object set -- but neither
 should the harness silently ignore arbitrary globals. The honest fix is to
 decompile `0x1244A2` so the writer is modelled, not to widen the exclusion.
+
+## 0x1244A2: a sound capture proves where the writer is not
+
+`0x1244A2` now models its whole window and passes **58/58** comparable ticks
+(2 pairs take `0x12456A`, which jumps to the shared `0x124B3A` phase start and
+is reported as an undecompiled path, not as a failure).
+
+Two captures in that set settle the `0x30EE` question independently of
+`0x124532`:
+
+* pair 29 goes `30EE 8001 -> E003` while `30DA = 0x00FA` (250, above the 0xC8
+  the routine's own `cmpi.w` needs) and `+0x3E` merely counts `0x0F -> 0x0E`.
+  `0x1244BA` cannot have run: it requires `30DA <= 0xC8` and would have
+  re-armed `+0x3E` to 0x24.
+* pair 59 shows the same `8003 -> E003` with `+0x3E` at 0 (object freed, so
+  `A0` is reused), again without the `+0x3E = 0x24` that `0x1244BA` writes.
+
+In both cases `30D2` moves only by the routine's own `-0x30000`. So the
+`E003` value is written by another object in the same frame, exactly as the
+`0x0400` bit in the `0x124532` case. Failing `0x1244A2` for it would be wrong;
+the honest fix is still to decompile the writer.
+
+One more trap worth recording: `0x1244A2` lives in the `0x124xxx` cluster where
+several different routines share `(A5)` globals and chain through
+`jmp $124B3A(pc)`. Reading a disassembly by a fixed byte window mixed three
+routines into one function; every branch had to be re-read from its own target.

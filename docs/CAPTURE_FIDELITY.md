@@ -525,3 +525,21 @@ which is exactly the captured `+0x50` delta. The `0x178C06` handler and the
 difficulty table are therefore right; what remains unexplained in this routine
 is only how `+0x42` gets from 0x4C8 to 0x264 through the 0x178B4A entry
 (0x200 assigned, 0x264 observed).
+
+## 0x17C240: the +0x42 shift bug is fixed, the body still is not
+
+The bitfield shift that blocked 0x178B4A is fixed: `bfextu $87e(a5){8:4}` reads
+bits 8..11, i.e. `(v >> 4) & 0xF`, and the selector is 4, not 0. With that the
+chain is exact and 0x17E99A verifies 60/60.
+
+0x17C240 itself still disagrees on pair 2 only: `+0x50` moves in the capture
+(0x73 -> 0x6F) while the script in the record never touches it. The observed
+`+0x48` goes 0 -> 0xFFFF, which the interpreter reads as "stop", so 0x178C06
+should not run at all that tick -- yet the position moved. That contradiction is
+unresolved and the routine stays a stub.
+
+Operational note: the capture work/ram/obj_17C240_pairs.bin was overwritten
+during this pass by a F3_LINGER run and its original (60 pairs) is gone; only a
+47-pair version remains. This is the second capture lost that way (131312
+earlier). Before re-running a capture for a routine that already has one, copy
+`work/ram/obj_<ADDR>_pairs.bin` somewhere outside work/ram.

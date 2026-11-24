@@ -2,6 +2,8 @@
 -- debugger (run with: -debug -debugger none). Generic "golden vector" tool.
 -- Env:
 --   F3_ENTRY   hex PC where "pre" is taken   (e.g. C63F2)
+--   F3_LINGER  N: delay the "post" dump by N further entries of F3_ENTRY, so
+--              a successor state's writes land in the same pair
 --   F3_EXIT    hex PC(s) where "post" is taken, comma-separated (e.g. C63F0),
 --              or "ret": post at the return address of the entry call
 --              (entry must be the first instruction of a jsr/bsr target)
@@ -38,6 +40,11 @@ local exit_ret = os.getenv("F3_EXIT") == "ret"
 if not exit_ret then
   for h in string.gmatch(os.getenv("F3_EXIT"), "[^,]+") do exits[tonumber(h, 16)] = true end
 end
+-- F3_LINGER=N: take the "post" dump N entries of the tick-list site *after*
+-- this routine's return, so effects applied by the successor state (e.g.
+-- 0x17C240 adding the velocity to +0x14) are included in the same pair.
+local linger = tonumber(os.getenv("F3_LINGER") or "0")
+local linger_left = 0
 local ret_pc, ret_sp, ret_bp = nil, nil, nil
 local want_dpram = os.getenv("F3_DPRAM") == "1"
 local logs = {}
@@ -153,6 +160,7 @@ emu.register_periodic(function()
     if not pokefn then poke_a0() end
     if sweep > 0 then sp:write_u16(spv + 4, sweep_base + pairs_done % sweep) end
     pre_snap = snapshot(); pre_regs = regline_str(pairs_done, "pre"); pending_logs = {}; have_pre = true
+    linger_left = linger
     if exit_ret then
       ret_sp = spv
       ret_pc = sp:read_u32(ret_sp) & 0xFFFFFF
@@ -160,6 +168,9 @@ emu.register_periodic(function()
     end
   elseif logs[pc] and have_pre then
     pending_logs[#pending_logs + 1] = regline_str(pairs_done, "log")
+  elseif have_pre and linger_left > 0 and pc == entry then
+    -- one more tick went by for this object: count down, then dump
+    linger_left = linger_left - 1
   elseif have_pre and (exits[pc] or (exit_ret and pc == ret_pc and spv == ret_sp + 4)) then
     if ret_bp then cpu.debug:bpclear(ret_bp); ret_bp = nil; ret_pc = nil end
     emit(pre_snap); regs:write(pre_regs); regs:write(table.concat(pending_logs))

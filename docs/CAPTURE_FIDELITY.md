@@ -558,3 +558,22 @@ back from 10 mismatching bytes (and 760 out-of-range reads) to the expected 2.
 
 Rule: before re-running a capture, copy **all four** `obj_<ADDR>_*` files out of
 `work/ram`, and when restoring, restore all four.
+
+## 0x178982 executes the entry, then tests the counter
+
+Traced 0x17C240 pair 2 (object 0x417B24, record 0x17D4E0), PC sequence:
+
+    178B4E   entry 0 (0x178B4A) assigns +0x42 = 0x400
+    178990   tst.w +0x48 -- it is 0, so advance to entry 1 and load 0xFFFF
+    178C1A   entry 1 (0x178C06) DOES run, with arg0 = 0
+    178990   tst.w +0x48 -- now 0xFFFF, blt -> rts
+
+So a `0xFFFF` in the repeat field stops the entry *after* the one that loaded
+it, never the entry that is about to run. Moving the check to the top of the
+loop (so a loaded 0xFFFF blocks the next entry outright) broke 0x17E99A from
+60/60 to 58/60 and was reverted: the existing ordering in Obj_Script10 is right.
+
+The +0x42 / +0x50 values this produces are already correct for 0x17E99A. What
+0x17C240 still gets wrong is narrower than "the script does not run" -- the
+script runs and +0x44 advances exactly as captured; the residual is in how the
+resulting +0x50 is then carried into +0x14 for the draw.

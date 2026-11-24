@@ -82,6 +82,39 @@ def srchay():
     return '\n'.join(hay)
 
 
+def check_indirect(addr):
+    """Follow `movea.l (a2),a1 ; jsr (a1)` tables: `lea (d16,PC),aN` then a run
+    of longs. Counting only direct jsr targets said "0 callees" for 0x18702C,
+    which in fact dispatches five untranslated routines through a table.
+    """
+    d = open(os.path.join(ROOT, 'work/maincpu.bin'), 'rb').read()
+    hay = srchay()
+    base = int(addr, 16)
+    code = d[base:base + 0x400]
+    missing = []
+    # Two shapes occur: `lea (d16,PC),a3` with 4-byte words (thresholds) and
+    # 10-byte {fn.l, w, w} records (what 0x187088 holds). Try both strides and
+    # report any entry that looks like a code pointer but has no translation.
+    for m in re.finditer(rb'(\x47|\x45)\xfa(.)(.)', code):        # lea (d16,PC),a3/a2
+        tbl = base + m.start() + 2 + int.from_bytes(m.group(2) + m.group(3), 'big', signed=True)
+        stride = 10 if int.from_bytes(d[tbl:tbl + 4], 'big') >= 0x400 else 4
+        seen = set()
+        for k in range(24):
+            p = tbl + k * stride
+            if p + 4 > len(d):
+                break
+            v = int.from_bytes(d[p:p + 4], 'big')
+            if v == 0 or v < 0x400 or v >= 0x200000:
+                break
+            if v in seen:
+                break
+            seen.add(v)
+            h = '0x%06x' % v
+            if h not in hay and h.replace('0x0', '0x', 1) not in hay:
+                missing.append('%06X' % v)
+    return 'missing via table: ' + ','.join(sorted(set(missing))) if missing else 'ok'
+
+
 def check_callees(addr):
     d = open(os.path.join(ROOT, 'work/maincpu.bin'), 'rb').read()
     hay = srchay()
@@ -166,7 +199,7 @@ def check_sprite(addr):
 
 
 CHECKS = [('capture', check_capture), ('sprite', check_sprite), ('fidelity', check_fidelity), ('state', check_state),
-          ('callees', check_callees), ('pcidx', check_pcindexed)]
+          ('callees', check_callees), ('indirect', check_indirect), ('pcidx', check_pcindexed)]
 
 if __name__ == '__main__':
     bad = 0

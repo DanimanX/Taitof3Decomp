@@ -577,3 +577,29 @@ The +0x42 / +0x50 values this produces are already correct for 0x17E99A. What
 0x17C240 still gets wrong is narrower than "the script does not run" -- the
 script runs and +0x44 advances exactly as captured; the residual is in how the
 resulting +0x50 is then carried into +0x14 for the draw.
+
+## The remaining blockers are mostly render helpers, not object logic
+
+Profiling what actually stops the 60 stubs whose capture shows real per-tick
+writes, by counting untranslated `jsr` targets inside each body:
+
+    0x00523A  24 stubs   sprite blit with a jump table at 0x5352
+    0x11B2F6   8 stubs
+    0x11B31C   8 stubs
+    0x179434   7 stubs
+    0x17A7FA   7 stubs
+    0x184908   4 stubs
+
+0x54AC, which the precheck flagged for 0x189CCC, turned out to be a tile-fill
+routine called from 0x189E40 with (0x81572, 0x611000) -- a bitmap and a video
+buffer. It does not gate object logic.
+
+So the previous pass's plan ("translate the shared callees to unblock groups")
+was wrong: those callees are draw utilities. Translating them would make the
+stubs run further but would not produce verifiable object ticks, because the
+object state those stubs write is already fully observable -- what is missing is
+that their captured exit never actually happened (1 usable pair with the forced
+poke, e.g. 0x14CC4C and 0x189CCC).
+
+The honest conclusion is that the lifespan-tail project needs longer-lived
+objects in the capture, not more translated helpers.

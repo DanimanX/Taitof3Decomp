@@ -339,3 +339,24 @@ Two consequences worth keeping in mind before spending time on a stub:
 * The capture needs an exit-forcing poke (`F3_POKEA0B` on the timer field) if a
   tail is ever to be verified. Until then, translate only the 45 bodies that
   write every tick and leave the tails documented as pending.
+
+## Re-capturing a tail: the mechanism works, the states do not
+
+`scripts/capture_obj.sh` now forwards `F3_POKEFN` / `F3_POKEA0B` (and the other
+poke env) to `capture_fn.lua`. With `F3_POKEFN=<addr> F3_POKEA0B=3e=1` the
+forced value lands only while that routine is the one being called, before the
+`pre` snapshot, so the pair stays self-consistent.
+
+What blocks using it on the 97 tails is not the mechanism but the savestates:
+
+* `02_stage1_start`, `03_active_combat` and `01_attract` no longer reproduce the
+  frames the existing captures came from. Re-running them for a routine that
+  *does* have a good capture (0x11418E) yields 0 pairs.
+* The `run1_NNNNNN` states do reproduce them (0x11418E captures 5/5 from
+  `run1_010000`).
+* Some routines live in none of the 30 saved states: scanning every `run1_*`
+  for 0x15A264 finds zero pairs, so that routine cannot be re-captured with any
+  current artefact.
+
+So the next real unlock needs a fresh long run that saves state every N frames
+while the missing routines are alive, not another look at the Lua.

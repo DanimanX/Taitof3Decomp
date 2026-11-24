@@ -20,6 +20,9 @@
 --   F3_COND    MAME debugger condition on the entry breakpoint, e.g.
 --              "a1==102fe6" (capture one object routine at the tick call site)
 --   F3_POKEA0B "off=val,..." (hex) byte writes at A0+off at each entry
+--   F3_POKEA0W "off=val,..." (hex) 16-bit writes at A0+off at each entry
+--   F3_POKECAPTURE "1" makes F3_POKEFN poke *and* capture the call, instead
+--              of skipping it (needed to drive a tail through its exit)
 --   F3_POKEA0P "ptr:off=val,..." (hex) byte writes at rd32(A0+ptr)+off,
 --              applied with the A0 pokes (e.g. "8:6=05": parent's +6)
 --   F3_POKEFN  hex fn: apply F3_POKEA0B only when A1==fn, and do not capture
@@ -43,6 +46,8 @@ local pokes = {}
 for a, v in string.gmatch(os.getenv("F3_POKE32") or "", "(%x+)=(%x+)") do pokes[#pokes + 1] = {tonumber(a, 16), tonumber(v, 16)} end
 local pokesa0 = {}
 for o, v in string.gmatch(os.getenv("F3_POKEA0B") or "", "(%x+)=(%x+)") do pokesa0[#pokesa0 + 1] = {tonumber(o, 16), tonumber(v, 16)} end
+local pokesa0w = {}
+for o, v in string.gmatch(os.getenv("F3_POKEA0W") or "", "(%x+)=(%x+)") do pokesa0w[#pokesa0w + 1] = {tonumber(o, 16), tonumber(v, 16)} end
 local pokesa0p = {}
 for q, o, v in string.gmatch(os.getenv("F3_POKEA0P") or "", "(%x+):(%x+)=(%x+)") do pokesa0p[#pokesa0p + 1] = {tonumber(q, 16), tonumber(o, 16), tonumber(v, 16)} end
 local pokefn = os.getenv("F3_POKEFN") and tonumber(os.getenv("F3_POKEFN"), 16)
@@ -63,6 +68,7 @@ local sp = cpu.spaces["program"]
 local function poke_a0()
   local a0 = cpu.state["A0"].value
   for _, pv in ipairs(pokesa0) do sp:write_u8(a0 + pv[1], pv[2]) end
+  for _, pv in ipairs(pokesa0w) do sp:write_u16(a0 + pv[1], pv[2]) end
   for _, pv in ipairs(pokesa0p) do sp:write_u8((sp:read_u32(a0 + pv[1]) & 0xFFFFFF) + pv[2], pv[3]) end
 end
 local p = manager.machine.ioport.ports
@@ -125,8 +131,15 @@ emu.register_periodic(function()
   local pc = cpu.state["PC"].value
   local spv = cpu.state["SP"].value
   if pokefn and pc == entry and not have_pre and cpu.state["A1"].value == pokefn then
+    -- F3_POKEFN has two uses. Without F3_COND naming this routine it marks a
+    -- parent we only want to poke, so return without capturing. With F3_COND
+    -- naming it we are capturing it, and the poke must be applied *and* the
+    -- pair recorded; returning on this path is why every poke-driven capture
+    -- came back with 0 pairs.
     poke_a0()
-    dbg.execution_state = "run"; return
+    if os.getenv("F3_POKECAPTURE") ~= "1" then
+      dbg.execution_state = "run"; return
+    end
   end
   if pc == entry and have_pre and exit_ret and spv ~= ret_sp then
     -- previous call never returned (e.g. a script opcode popped the return

@@ -98,10 +98,11 @@ static void sub_178C06(const f3mem_t *m, uint32_t obj)
     uint16_t mag = (uint16_t)((uint32_t)(int32_t)(int16_t)(uint16_t)(d0 + 0x20u) >> 6);
     uint16_t idx = (uint16_t)(d2 >> 8);
     uint32_t base = 0x0027E40u + (uint32_t)idx * 2u;
-    int32_t sn = (int32_t)(int16_t)rd16(m, base);           /* muls.w (a1,d2*2),d1 */
-    int32_t cs = (int32_t)(int16_t)rd16(m, base + 0x80u);   /* muls.w $80(a1,d2*2),d0 */
-    wr32(m, obj + 0x50u, rd32(m, obj + 0x50u) + (uint32_t)((int32_t)(int16_t)mag * sn));
-    wr32(m, obj + 0x54u, rd32(m, obj + 0x54u) + (uint32_t)((int32_t)(int16_t)mag * cs));
+    int32_t a = (int32_t)(int16_t)rd16(m, base);           /* muls.w (a1,d2*2),d1 */
+    int32_t b = (int32_t)(int16_t)rd16(m, base + 0x80u);   /* muls.w $80(a1,d2*2),d0 */
+    /* d0 (the +0x80 term) lands in +0x50, d1 in +0x54 -- 0x178C3E / 0x178C42 */
+    wr32(m, obj + 0x50u, rd32(m, obj + 0x50u) + (uint32_t)((int32_t)(int16_t)mag * b));
+    wr32(m, obj + 0x54u, rd32(m, obj + 0x54u) + (uint32_t)((int32_t)(int16_t)mag * a));
 }
 
 static int script10_call(const f3mem_t *m, uint32_t obj, uint32_t fn)

@@ -221,3 +221,57 @@ void Video_ClearRect(const f3mem_t *m, uint32_t a0, uint32_t a1)
         a1 = (uint32_t)((int32_t)a1 + (int32_t)stride);
     }
 }
+
+/* ROM 0x0017D6: populate RGB interpolation ramp entries at A5-0x7F50 + d6 */
+static void pal_ramp_fill(const f3mem_t *m, uint32_t a0, uint32_t a1,
+                          uint32_t d1, uint32_t d2, uint32_t d6)
+{
+    uint32_t a2 = (F3_A5 - 0x7F50u) + d6;
+    int32_t div = (int32_t)d1;
+    uint16_t d7 = (uint16_t)((uint16_t)d2 - 1u);
+    for (;;) {
+        uint32_t c0 = rd32(m, a0);
+        a0 += 4u;
+        uint32_t c1 = rd32(m, a1);
+        a1 += 4u;
+        for (int k = 0; k < 3; k++) {
+            unsigned sh = 16u - 8u * (unsigned)k;
+            uint32_t s = ((c0 >> sh) & 0xFFu) << 8;
+            wr16(m, a2 + 2u * (uint32_t)k, (uint16_t)s);
+            uint32_t e = ((c1 >> sh) & 0xFFu) << 8;
+            int32_t step = (int32_t)(e - s) / div;
+            wr16(m, a2 + 6u + 2u * (uint32_t)k, (uint16_t)(uint32_t)step);
+        }
+        a2 += 0x0Cu;
+        d7 = (uint16_t)(d7 - 1u);
+        if (d7 == 0xFFFFu)
+            break;
+    }
+}
+
+/* ROM 0x001792 / 0x00183C: claim a palette-ramp slot at A5-0x6650 and build ramp */
+void Pal_QueueRamp(const f3mem_t *m, uint32_t a0, uint32_t a1,
+                   uint32_t d0, uint32_t d1, uint32_t d2)
+{
+    uint32_t a3 = F3_A5 - 0x6650u;
+    uint32_t d6 = 0u;
+    uint16_t d7 = 0x000Fu;
+    for (;;) {
+        if (rd16(m, a3) == 0u) {
+            wr16(m, a3 + 2u, (uint16_t)d1);
+            if ((int16_t)(uint16_t)d1 <= 0)
+                return;
+            wr16(m, a3, (uint16_t)d2);
+            if ((uint16_t)d2 == 0u)
+                return;
+            wr16(m, a3 + 4u, (uint16_t)d0);
+            pal_ramp_fill(m, a0, a1, d1, d2, d6);
+            return;
+        }
+        d6 = (d6 & 0xFFFF0000u) | (uint16_t)((uint16_t)d6 + 0x0180u);
+        a3 += 6u;
+        d7 = (uint16_t)(d7 - 1u);
+        if (d7 == 0xFFFFu)
+            return;
+    }
+}

@@ -424,3 +424,26 @@ The 0x27E40 table at 0x27E40 is indeed the sine table (0x0000, 0x0192, 0x0323,
 `bfextu $1849d4(pc,d0.w){0:8}`, i.e. `0x1849D4 + selector` -- so selector 0
 reads 0x4E, the first byte of the preceding `rts`, and the real scale values
 (0x0A, 0x0A, 0x14, ...) start at 0x1849D8.
+
+## The script-opcode wall is shared, not per-routine
+
+Chasing 0x17E99A (a body that *does* run on every tick, 9-16 bytes changed per
+pair) ended in the same place as 0x17C240: its 10-byte script record at
+0x17EBCE is
+
+    0x178B4A   +0200
+    0x178C06   ffff
+    0x178B20   +0180
+
+and `Obj_Script10` only implements 0x178B20 and 0x178E4A. So every routine that
+walks a 0x178982 script with 0x178B4A or 0x178C06 is blocked by the same two
+missing handlers, no matter how clean its capture is.
+
+0x178B4A itself is now read correctly: it *assigns* `(0x42,A0) = 0x6(A1)` and
+then calls 0x184984 to scale it. The scaling disagrees with the capture and has
+not been explained, so both handlers stay unimplemented rather than guessed.
+
+Practical consequence: before picking a routine from this family, read its
+script record at `obj+0x44` and check the first dword. If it is 0x178B4A or
+0x178C06, the capture cannot be turned green until those two handlers land, and
+working them needs the register trace that the 0x184994 mismatch is blocking.

@@ -156,3 +156,68 @@ void Obj_StepScript(const f3mem_t *m, uint32_t obj)
 int Obj_Dying1_Tick(const f3mem_t *m, uint32_t obj) { wr32(m, obj, 0x000CEE84u); return 0; }
 int Obj_Dying2_Tick(const f3mem_t *m, uint32_t obj) { wr32(m, obj, 0x000CEE8Cu); return 0; }
 int Obj_Dying3_Tick(const f3mem_t *m, uint32_t obj) { Obj_Free(m, obj); return 0; }
+
+/* ROM 0x11B31C: load +0x50/+0x52 words, clear +0x54/+0x56, sign-extend 4 bytes to +0x2C/+0x30/+0x2E/+0x32 */
+uint32_t Obj_InitPosBox(const f3mem_t *m, uint32_t obj, uint32_t a1)
+{
+    wr16(m, obj + 0x50u, rd16(m, a1)); a1 += 2u;
+    wr16(m, obj + 0x52u, rd16(m, a1)); a1 += 2u;
+    wr16(m, obj + 0x54u, 0u);
+    wr16(m, obj + 0x56u, 0u);
+    wr16(m, obj + 0x2Cu, (uint16_t)(int16_t)(int8_t)rd8(m, a1)); a1 += 1u;
+    wr16(m, obj + 0x30u, (uint16_t)(int16_t)(int8_t)rd8(m, a1)); a1 += 1u;
+    wr16(m, obj + 0x2Eu, (uint16_t)(int16_t)(int8_t)rd8(m, a1)); a1 += 1u;
+    wr16(m, obj + 0x32u, (uint16_t)(int16_t)(int8_t)rd8(m, a1)); a1 += 1u;
+    return a1;
+}
+
+/* ROM 0x17BD68: sign-extend obj+0x0C/+0x0D bytes to +0x16/+0x1A and offset parent (+0x08) +0x50/+0x54 */
+void Obj_InheritOffsetPos(const f3mem_t *m, uint32_t obj)
+{
+    uint16_t ox = (uint16_t)(int16_t)(int8_t)rd8(m, obj + 0x0Cu);
+    uint16_t oy = (uint16_t)(int16_t)(int8_t)rd8(m, obj + 0x0Du);
+    uint32_t parent = rd32(m, obj + 0x08u);
+    uint16_t px = (uint16_t)(rd16(m, parent + 0x50u) + ox);
+    uint16_t py = (uint16_t)(rd16(m, parent + 0x54u) + oy);
+    wr16(m, obj + 0x16u, ox);
+    wr16(m, obj + 0x1Au, oy);
+    wr16(m, obj + 0x50u, px);
+    wr16(m, obj + 0x54u, py);
+    wr16(m, obj + 0x14u, px);
+    wr16(m, obj + 0x18u, py);
+}
+
+/* ROM 0x16AB2C: store (D0, D1) long pair to both A0 and A1 */
+void Mem_WritePair64(const f3mem_t *m, uint32_t a0, uint32_t a1, uint32_t d0, uint32_t d1)
+{
+    wr32(m, a0, d0);
+    wr32(m, a0 + 4u, d1);
+    wr32(m, a1, d0);
+    wr32(m, a1 + 4u, d1);
+}
+
+/* ROM 0x16A19C: copy D0w+1 longs from A0 to A1 */
+void Mem_CopyLongs(const f3mem_t *m, uint32_t a0, uint32_t a1, uint16_t d0w)
+{
+    uint32_t count = (uint32_t)d0w + 1u;
+    for (uint32_t i = 0; i < count; i++) {
+        wr32(m, a1, rd32(m, a0));
+        a0 += 4u;
+        a1 += 4u;
+    }
+}
+
+/* ROM 0x0054AC: clear (rows=A0[0], cols=A0[1]) longs at A1 with 0x80-byte row stride */
+void Video_ClearRect(const f3mem_t *m, uint32_t a0, uint32_t a1)
+{
+    uint16_t rows = rd8(m, a0);
+    uint16_t cols = rd8(m, a0 + 1u);
+    int16_t stride = (int16_t)(0x80u - (cols << 2));
+    for (uint16_t r = 0; r < rows; r++) {
+        for (uint16_t c = 0; c < cols; c++) {
+            wr32(m, a1, 0u);
+            a1 += 4u;
+        }
+        a1 = (uint32_t)((int32_t)a1 + (int32_t)stride);
+    }
+}

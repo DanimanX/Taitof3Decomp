@@ -543,3 +543,18 @@ during this pass by a F3_LINGER run and its original (60 pairs) is gone; only a
 47-pair version remains. This is the second capture lost that way (131312
 earlier). Before re-running a capture for a routine that already has one, copy
 `work/ram/obj_<ADDR>_pairs.bin` somewhere outside work/ram.
+
+## A capture is four files, not one
+
+Overwriting `obj_<ADDR>_pairs.bin` alone leaves `_spr.bin` / `_gfx.bin` /
+`_regs.tsv` from the previous run. If the new run produced a different number of
+pairs, `run_any` reads sprite RAM past the end of the short file and the whole
+test binary aborts with `f3mem: access outside RAM/ROM`, thousands of times.
+
+That is what happened to `obj_17C240`: `pairs.bin` had 47 pairs while
+`obj_17C240_spr.bin` was still the 60-pair file from two days earlier. Deleting
+the stale companions and recapturing all of them together brought the full run
+back from 10 mismatching bytes (and 760 out-of-range reads) to the expected 2.
+
+Rule: before re-running a capture, copy **all four** `obj_<ADDR>_*` files out of
+`work/ram`, and when restoring, restore all four.

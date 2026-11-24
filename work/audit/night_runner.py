@@ -38,8 +38,20 @@ def sh(cmd, cwd=ROOT, timeout=1800):
                           text=True, timeout=timeout)
 
 
+def already_attempted():
+    """Addresses this log already has a TASK line for -- do not retry them."""
+    seen = set()
+    if os.path.exists(LOG):
+        for line in open(LOG):
+            m = re.search(r'TASK ([0-9A-F]{4,6}) ', line)
+            if m:
+                seen.add(m.group(1))
+    return seen
+
+
 def candidates(limit):
     """Stubs whose capture passes the mechanical screen."""
+    tried = already_attempted()
     out = sh('python3 work/audit/fidelity_scan.py').stdout.splitlines()[1:]
     rows = []
     for line in out:
@@ -49,6 +61,8 @@ def candidates(limit):
         addr, pairs, fn_ok, hist, fields = p[0], int(p[1]), p[2], p[3], int(p[4])
         if fn_ok == 'yes' and pairs >= 30 and fields >= 6:
             src = os.path.join(ROOT, 'src/enemy/obj_%s.c' % addr)
+            if addr in tried:
+                continue
             if os.path.exists(src) and 'not decompiled yet (stub)' in open(src).read():
                 rows.append((addr, pairs, fields))
     rows.sort(key=lambda r: (-r[1], -r[2]))
@@ -110,9 +124,10 @@ def run_task(addr, pairs, timeout):
     git_clean_scope(addr)
     # NOT --safe-mode: it demands an explicit model and, with one, produced no
     # output at all within 120 s. The plain route answered "PONG" immediately.
-    p = subprocess.run(['hermes', '-z', hermes_prompt(addr, pairs), '--in', ROOT,
+    p = subprocess.run(['timeout', '-s', 'KILL', str(timeout),
+                        'hermes', '-z', hermes_prompt(addr, pairs), '--in', ROOT,
                         '--checkpoints'],
-                       capture_output=True, text=True, timeout=timeout)
+                       capture_output=True, text=True, timeout=timeout + 60)
     reply = (p.stdout or '') + (p.stderr or '')
     log('  hermes rc=%d, %d bytes of reply' % (p.returncode, len(reply)))
 
@@ -165,10 +180,11 @@ def main():
             if run_task(addr, pairs, a.per_task_timeout):
                 passed += 1
         except subprocess.TimeoutExpired:
-            log('  TIMEOUT on %s' % addr)
+            log('  TIMEOUT on %s (reverting)' % addr)
             sh('git checkout -- src/enemy/obj_%s.c src/enemy/obj_%s.h' % (addr, addr))
         except Exception as e:                                   # noqa: BLE001
-            log('  ERROR on %s: %s' % (addr, e))
+            log('  ERROR on %s: %s (reverting)' % (addr, e))
+            sh('git checkout -- src/enemy/obj_%s.c src/enemy/obj_%s.h' % (addr, addr))
         done += 1
     log('night run end: %d attempted, %d passed' % (done, passed))
 

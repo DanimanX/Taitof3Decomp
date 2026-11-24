@@ -59,7 +59,8 @@ void Obj_Script10_SteerTo(const f3mem_t *m, uint32_t obj)
  * that is what the 0x17C240 capture shows (+0x42 stays at 0x400). */
 static void sub_184984(const f3mem_t *m, uint32_t obj)
 {
-    uint16_t sel = (uint16_t)((rd16(m, F3_A5 + 0x087Eu) >> 8) & 0x0Fu);
+    /* bfextu $87e(a5){8:4}: bits 8..11 of the word, i.e. (v >> 4) & 0xF */
+    uint16_t sel = (uint16_t)((rd16(m, F3_A5 + 0x087Eu) >> 4) & 0x0Fu);
     uint8_t scale = rd8(m, 0x1849D6u + sel);
     int16_t d1 = (int16_t)rd16(m, obj + 0x42u);
     d1 = (int16_t)(d1 / 0x64);

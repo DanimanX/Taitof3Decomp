@@ -15,6 +15,7 @@
 --   F3_SWEEP   "N" overwrites the word arg at SP+4 on entry with pair_index % N
 --              (forces every command id through a routine like Sound_PlayCmd);
 --              F3_SWEEP_BASE adds a starting id
+--   F3_LOGW    hex offset into A0: print that 16-bit field with each F3_LOG hit
 --   F3_LOGA0   hex A0: only record F3_LOG visits whose A0 matches (and the log
 --              column carries the PC so the chain can be walked)
 --   F3_LOG     hex PC(s), comma-separated: every hit between pre and post is
@@ -62,6 +63,9 @@ for q, o, v in string.gmatch(os.getenv("F3_POKEA0P") or "", "(%x+):(%x+)=(%x+)")
 -- F3_LOGA0: hex A0 value; F3_LOG only records visits whose A0 matches, so a
 -- trace is not polluted by other objects entering the same helper in the frame
 local loga0 = os.getenv("F3_LOGA0") and tonumber(os.getenv("F3_LOGA0"), 16)
+-- F3_LOGW: hex offset into A0 to print alongside each F3_LOG hit, so a trace
+-- shows the object field the code is about to touch
+local logw = os.getenv("F3_LOGW") and tonumber(os.getenv("F3_LOGW"), 16)
 local pokefn = os.getenv("F3_POKEFN") and tonumber(os.getenv("F3_POKEFN"), 16)
 local sweep = tonumber(os.getenv("F3_SWEEP") or "0")
 local sweep_base = tonumber(os.getenv("F3_SWEEP_BASE") or "0")
@@ -172,8 +176,9 @@ emu.register_periodic(function()
       ret_bp = cpu.debug:bpset(ret_pc, "", "")
     end
   elseif logs[pc] and have_pre and (not loga0 or cpu.state["A0"].value == loga0) then
-    pending_logs[#pending_logs + 1] = string.format("%s\t%06X\n",
-      (regline_str(pairs_done, "log"):gsub("\n$", "")), pc)
+    pending_logs[#pending_logs + 1] = string.format("%s\t%06X\t%s\n",
+      (regline_str(pairs_done, "log"):gsub("\n$", "")), pc,
+      logw and string.format("%04X", sp:read_u16(cpu.state["A0"].value + logw)) or "----")
   elseif have_pre and linger_left > 0 and pc == entry then
     -- one more tick went by for this object: count down, then dump
     linger_left = linger_left - 1

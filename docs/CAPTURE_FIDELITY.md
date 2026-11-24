@@ -360,3 +360,25 @@ What blocks using it on the 97 tails is not the mechanism but the savestates:
 
 So the next real unlock needs a fresh long run that saves state every N frames
 while the missing routines are alive, not another look at the Lua.
+
+## Where the position movement in a tail capture comes from
+
+Several spawn-wait tails (0x17E1DA, 0x17F038) capture a position change their
+entry never writes:
+
+* 0x17E1DA: pre/post pairs are continuous (post of pair N == pre of pair N+1),
+  so the capture is not mixing objects.
+* Its entry writes only +0x0C/+0x16/+0x1A and the state pointer; the delta in
+  +0x14 (-4, -6, -7 for three pairs) does not match the pre velocity in +0x16
+  (-5, -28, -39), nor `v>>3`, nor the `+0x1F * sprite_word >> 9` term of the
+  successor body 0x17C240.
+* `+0x16` settles at 0x0008 in every pair while the delta keeps varying.
+
+The movement lives in 0x17C240 (`add.w d0,$14(a0)` at 0x17C28E), which runs
+*after* the entry hands over, so a capture anchored at the 0x104EE call site
+cannot attribute it to the entry. The same shape appeared in 0x11B472 earlier.
+
+Practical rule: before translating a tail that appears to move, check whether
+`+(0x14)`/`+(0x18)` change in the pair. If they do and the entry has no writer
+for them, the routine is not verifiable against this capture and should stay a
+stub rather than be fitted to numbers it never produced.

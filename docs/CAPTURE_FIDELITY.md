@@ -447,3 +447,30 @@ Practical consequence: before picking a routine from this family, read its
 script record at `obj+0x44` and check the first dword. If it is 0x178B4A or
 0x178C06, the capture cannot be turned green until those two handlers land, and
 working them needs the register trace that the 0x184994 mismatch is blocking.
+
+## Register trace at 0x184994 (0x17C240, state LD_017000)
+
+Captured with `F3_LOG=184994,18499a,1849a0` on a pair whose object is 0x417B24:
+
+    PC        D0          D1
+    184994    00000000    0000001C
+    18499A    00000000    00000400
+    1849A0    00000000    00000000
+
+and that object's `(0x42,A0)` is 0xFED7 in the pre snapshot and 0x0400 in the
+post.
+
+So `(0x42,A0)` really does become exactly 0x0400, and the intermediate values in
+D1 do not follow the `bfexts -> divs.w #100 -> muls.w scale -> add.w` chain read
+from the listing: 0xFED7 sign-extends to -297, not to the 0x1C seen at 0x184994.
+
+One honest reading of the numbers is that 0x184984 is entered with a different
+`(0x42,A0)` than the one in the pre snapshot (the 0x178B4A handler assigns 0x400
+first), so the scaling runs on 0x400: 0x400/100 = 10, x scale, added back. For
+the result to stay exactly 0x400 the scale term must be zero, which contradicts
+the 0x4E byte the listing points at. The chain is therefore *not* settled by this
+trace alone; what is settled is that the final value is 0x0400 and that my
+reading of the intermediate registers is wrong somewhere.
+
+Next step would be a trace at 0x178B4E, 0x184994 and 0x1849A0 on the *same*
+pair index, filtered to the object under test.

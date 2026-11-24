@@ -96,3 +96,40 @@ One behaviour worth knowing: `fn_ok=no` is not automatically bad. `0x130794`
 returns `no` because the routine legitimately rewrites `obj+0` to its own
 continuation (`0x1307E0`) during the tick — a self-reassigning routine looks
 "wrong" to the check and is in fact correct.
+
+## Correction (2026-11-24): the "mandatory write" test was used wrongly
+
+Five worker attempts rejected their captures as "the post is not this routine's
+tick". At least one of those rejections is **wrong**, and the mistake is
+instructive about the test itself.
+
+`0x111B56` was rejected because the ROM starts with an unconditional
+`clr.l (0x18,A0)` and half the posts show `0x740000` there instead of 0. The
+worker read the head of the routine and stopped. The routine later does, at
+`0x111C56`:
+
+    111C56  06a8 00740000 0018      addi.l #0x740000,$18(a0)
+
+on the odd-frame path. The capture's `+0x18` alternates `0 -> 0x740000 -> 0`,
+which is exactly what the ROM produces. The capture is fine.
+
+### The rule, stated so it cannot be misapplied
+
+A "mandatory write" test is only valid when the write is **unconditional on the
+captured branch**, which means you have read **every** instruction that can
+reach the object's field on that branch — not the first store you meet. If a
+post disagrees with the first store, search the whole routine for a later store
+to the same offset before concluding the capture is wrong.
+
+The cheapest way to avoid this: grep the routine's own range for every store to
+the offset in question (`<offset>` appears as `00<xx>` in `move.w/l/addi` forms)
+and account for all of them.
+
+### What this means for the tally
+
+Of the rejects seen today, `0x111B56` is definitely a false rejection. The
+others (`0x116E22`, `0x116802`, `0x116C9A`, `0x11418E`, `0x10C966`, `0x10DBE0`)
+were argued from similar reasoning and deserve the same re-check before any
+recapture is planned. The capture pipeline may be less broken than the attempt
+log suggests, and the workers' fidelity checks are the more likely source of
+false negatives.

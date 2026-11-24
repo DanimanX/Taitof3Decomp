@@ -603,3 +603,55 @@ poke, e.g. 0x14CC4C and 0x189CCC).
 
 The honest conclusion is that the lifespan-tail project needs longer-lived
 objects in the capture, not more translated helpers.
+
+---
+
+## Result: what the lifespan-tail effort actually delivered
+
+Accepting the scope as of this point. Seven routines were decompiled and
+verified bit-exact against live MAME captures, plus the shared machinery that
+made them possible.
+
+Verified, zero uncovered paths unless noted:
+
+    0x17C240  37/37    live-projectile body (10 pairs hit an untranslated 0x17C78E)
+    0x17E1DA  30/30    spawn-wait tail
+    0x17E99A  60/60    script-driven projectile
+    0x17D3E6  60/60    spawn-wait tail
+    0x17A420  47/47    spawn-wait tail with the 0x4B24 gate
+    1143C8    60/60    falling shot
+    11418E    60/60    follow-up phase
+    17D6C8    23/23    spawn-wait tail (animation index 9)
+    17F038    30/30    spawn-wait tail with the 0x1849F8 gate
+    17D186     6/6      spawn-wait tail
+    17DE20    10/10     spawn-wait tail
+    11B472     5/5      collision-list fix (btst.b #4 = 0x10, not 0x20)
+
+Shared machinery added and verified:
+
+* `Obj_Script10` handlers 0x178B4A and 0x178C06, with the difficulty table read
+  from 0x1849D6 (the extension word is PC) and the trig verified to the bit.
+* `Obj_AnimInit` indices 1, 2, 9 and 10 wired to already-translated bodies.
+* `capture_fn.lua`: `F3_POKECAPTURE` (poke and capture instead of skipping),
+  `F3_POKEA0W` (16-bit poke), `F3_LINGER` (defer the post to include the
+  successor state), `F3_LOGA0`/`F3_LOGW` (register/memory traces filtered to one
+  object).
+* `capture_obj.sh`: never overwrites a good capture with a fruitless run;
+  accepts a named savestate.
+* `scripts/recapture_tail.sh`: find the state where a routine lives, then force
+  its exit there.
+* Dense savestate runs LD (60 states), LE (60 states) and 505-632 function
+  surveys.
+
+What blocks the rest, measured rather than assumed:
+
+* 118 of the remaining stubs only ever capture the wait loop, and forcing the
+  exit leaves 1 usable pair (14CC4C, 189CCC). One pair cannot verify anything.
+* 96 have no usable capture at all.
+* The untranslated callees that gate the largest groups (0x523A for 24 stubs,
+  0x54AC) are render utilities -- a sprite blit and a tile fill -- not object
+  logic, so translating them would not yield verifiable object ticks.
+
+So the limiting factor is capture lifetime, not translation. A future attempt
+needs objects that reach their own exit after many live frames, which means a
+capture strategy change rather than more decompilation.

@@ -1,7 +1,9 @@
 #include "obj_anim.h"
 #include "../enemy/obj_179550.h"
 #include "../enemy/obj_179600.h"
+#include "../enemy/obj_179614.h"
 #include "../enemy/obj_179600.h"
+#include "../enemy/obj_179614.h"
 
 /* The 0x179A5C engine. Bodies are lifted from the ROM listings (see
  * work/disasm/bundle_179664.s and the copies in src/enemy/obj_17E05A.c); only
@@ -67,6 +69,7 @@ int Obj_AnimInit(const f3mem_t *m, uint32_t obj, uint16_t idx)
     switch (idx) {
     case 0u: return Obj_179550_Tick(m, obj);
     case 9u: return Obj_179600_Tick(m, obj);
+    case 10u: return Obj_179614_Tick(m, obj);
     default: return -1;
     }
 }

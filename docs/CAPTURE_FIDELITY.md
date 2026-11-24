@@ -275,3 +275,25 @@ any worker claims about it.
 
 Contrast with the many false rejections this file records: those argued from
 ROM readings and were wrong. This one argues from the data against itself.
+
+## 0x124532: a shared global written by another object in the same tick
+
+`0x124532` sits at 59/60, failing only pair 41 on `A5+0x30EE` (`0x0001 -> 0x0401`).
+Traced to the end, and the routine is not at fault:
+
+* `0x124532` compares `A5+0x30D2`; with the captured value `0x002C3A67` the
+  low word is `0x3A67`, so `bgt 0x12452A` is taken and the routine re-arms
+  itself. It never reaches its own `bfset $30ee(a5){5:1}` at `0x124542` -- which
+  is why bit 5 is absent from the post.
+* Bit 10 (`0x0400`) is what `0x1244BA` writes, in a *different* object:
+  `bfset $30ee(a5){2:1}` operates on the byte at `0x40B0EE`, i.e. bit 2 of that
+  byte = bit 10 of the word. That object is `0x1244A2`, still a stub, and it
+  runs inside the same tick.
+* The flag appears only in pair 41's post and is gone again in pair 42's pre.
+
+So `0x30EE` is a global several objects write during one frame. Comparing it
+byte-for-byte against a single routine's tick is wrong in principle; the same
+reasoning applies to the `0x41B1E1` case already excluded in `tests/capture.h`.
+A routine should not be failed for a flag another object set -- but neither
+should the harness silently ignore arbitrary globals. The honest fix is to
+decompile `0x1244A2` so the writer is modelled, not to widen the exclusion.

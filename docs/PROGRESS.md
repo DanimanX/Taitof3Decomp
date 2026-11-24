@@ -145,6 +145,7 @@ Note on `Obj_Spawn` argument order: the word pushed last (just before the fn lon
 | 0x0D5464 | Obj_D5464_Tick | VERIFIED (MAME) | 150/150 incl. 5 state changes (hermes draft; fixed to use the RAM RNG seed via `Rng_NextMem`) |
 | 0x0CEE7C / 0x0CEE84 / 0x0CEE8C | Obj_Dying1/2/3_Tick | VERIFIED (MAME) | 8/8 each; frees the object on the 3rd frame |
 | 0x1314C2 / 0x128476 / 0x17E89E / 0x11BF5C / 0x11C054 / 0x11B5E6 / 0x125B0C / 0x0D5FFE | Obj_*_Tick (CW1+CW2) | VERIFIED (MAME) | 0x1314C2 3/3, 0x128476 60/60, 0x17E89E 27/27, 0x11BF5C 3/3, 0x11C054 60/60, 0x11B5E6 60/60, 0x125B0C 24/24, 0x0D5FFE 60/60 (codewhale) |
+| 0x107DB2 / 0x10A024 / 0x1177AC / 0x125D22 / 0x11509A / 0x12431E / 0x12604C / 0x11AFA6 | Obj_*_Tick (CW3+H1) | VERIFIED (MAME) | 0x107DB2 1/1, 0x10A024 8/8, 0x1177AC 60/60 (codewhale); 0x125D22 1/1, 0x11509A 1/1, 0x12431E 1/1, 0x12604C 1/1, 0x11AFA6 1/1 (hermes + 1-line fixes) |
 
 Tools: `scripts/capture_obj.sh <addr>` (tries the savestates until enough ticks), `scripts/integrate_obj.sh <addr> <draft.c>` (header + Makefile + test entry). Shared `Rng_NextMem()` in `f3mem.h` (seed in RAM 0x406BAA).
 

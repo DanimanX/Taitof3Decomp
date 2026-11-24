@@ -256,6 +256,13 @@ void Sound_WriteScratch(const f3mem_t *m, uint16_t *idx)
 void Sound_PlayCmd(const f3mem_t *m, int16_t cmd)
 {
     /* ROM 0x39D8 */
+    if (!m->dpram) {
+        uint8_t tmp_dpram[F3_DPRAM_SIZE] = {0};
+        f3mem_t tmp_m = *m;
+        tmp_m.dpram = tmp_dpram;
+        Sound_PlayCmd(&tmp_m, cmd);
+        return;
+    }
     uint16_t d1;
     uint32_t a0;
     uint8_t type;
@@ -303,6 +310,13 @@ void Sound_PlayCmd(const f3mem_t *m, int16_t cmd)
 void Sound_PlayCmdForced(const f3mem_t *m, int16_t cmd)
 {
     /* ROM 0x3B66 */
+    if (!m->dpram) {
+        uint8_t tmp_dpram[F3_DPRAM_SIZE] = {0};
+        f3mem_t tmp_m = *m;
+        tmp_m.dpram = tmp_dpram;
+        Sound_PlayCmdForced(&tmp_m, cmd);
+        return;
+    }
     uint16_t d1 = (uint16_t)(rd16(m, F3_DPRAM_BASE + 0x480u) >> 1);
     uint32_t a0 = rd32(m, F3_A5 - 0x1448u);
     uint8_t type;
@@ -334,6 +348,13 @@ void Sound_PlayCmdForced(const f3mem_t *m, int16_t cmd)
 void Sound_StopAllPart2(const f3mem_t *m)
 {
     /* ROM 0x3C12 */
+    if (!m->dpram) {
+        uint8_t tmp_dpram[F3_DPRAM_SIZE] = {0};
+        f3mem_t tmp_m = *m;
+        tmp_m.dpram = tmp_dpram;
+        Sound_StopAllPart2(&tmp_m);
+        return;
+    }
     uint16_t d1 = (uint16_t)(rd16(m, F3_DPRAM_BASE + 0x480u) >> 1);
 
     snd_stop_part2_3c6e(m, &d1);
@@ -345,6 +366,13 @@ void Sound_StopAllPart2(const f3mem_t *m)
 void Sound_StopAll(const f3mem_t *m)
 {
     /* ROM 0x3C24 */
+    if (!m->dpram) {
+        uint8_t tmp_dpram[F3_DPRAM_SIZE] = {0};
+        f3mem_t tmp_m = *m;
+        tmp_m.dpram = tmp_dpram;
+        Sound_StopAll(&tmp_m);
+        return;
+    }
     uint16_t d1 = (uint16_t)(rd16(m, F3_DPRAM_BASE + 0x480u) >> 1);
     uint16_t d3 = 0u;
     uint16_t d2 = 0x007Fu;

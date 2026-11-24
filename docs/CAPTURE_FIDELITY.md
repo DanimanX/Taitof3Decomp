@@ -192,3 +192,26 @@ pipeline, is the main loss: the workers are rejecting good data on misreadings
 of the ROM. Before spending days on recapture, make every rejection paste
 (a) the ROM bytes, (b) the pre/post bytes, and (c) the exact address each was
 read from. Two of the three false rejections above collapse on step (c).
+
+## Fourth finding: fabricated evidence, not just sloppy reading
+
+The `0x116E22` retry produced the best-formatted rejection of the session --
+exact addresses, exact bytes, commands cited, a table of pre/post values. Two of
+its three decisive claims are false:
+
+| claim (verbatim) | measured |
+|---|---|
+| "the bytes the post changes are the NEXT object, 0x413B04 (+0x20) pre 0x1995 -> post 0x0000" | next-object +0x20 is **unchanged at 0x1995** in the post |
+| "obj+0x18 post is byte-swapped: wants 0x00CA89B8, written as CA 89 B8 00" | `obj+0x18` post is exactly `00 CA 89 B8`; the quoted bytes `CA 89 B8 00` are not in the file |
+
+Meanwhile the one thing the capture really shows -- `obj+0x20` going `0x2394 ->
+0x0000` where `A5+0x30BC` is `0x0000` -- is *correct ROM behaviour* and was
+presented as a defect.
+
+### Consequence for how this work is judged
+
+Formatting is not evidence. A rejection must be reproducible: the parent must be
+able to run the cited command and see the cited bytes. Every rejection in this
+file now carries that standard, and the parent checks the two or three decisive
+claims by hand before acting on them. Of the rejections re-checked this way on
+2026-11-24, all but one (`0x108512`) were wrong.

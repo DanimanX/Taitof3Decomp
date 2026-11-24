@@ -144,6 +144,7 @@ Note: 0x0BDE92 and 0x0BE262 (palette/scroll objects, attract-mode text typer) al
 Note on `Obj_Spawn` argument order: the word pushed last (just before the fn long) is the group, the one before it is ngroups. `tests/test_objects` accepts `F3_ONLY=<substring>` to run a subset.
 | 0x0D5464 | Obj_D5464_Tick | VERIFIED (MAME) | 150/150 incl. 5 state changes (hermes draft; fixed to use the RAM RNG seed via `Rng_NextMem`) |
 | 0x0CEE7C / 0x0CEE84 / 0x0CEE8C | Obj_Dying1/2/3_Tick | VERIFIED (MAME) | 8/8 each; frees the object on the 3rd frame |
+| 0x1314C2 / 0x128476 / 0x17E89E / 0x11BF5C / 0x11C054 / 0x11B5E6 / 0x125B0C / 0x0D5FFE | Obj_*_Tick (CW1+CW2) | VERIFIED (MAME) | 0x1314C2 3/3, 0x128476 60/60, 0x17E89E 27/27, 0x11BF5C 3/3, 0x11C054 60/60, 0x11B5E6 60/60, 0x125B0C 24/24, 0x0D5FFE 60/60 (codewhale) |
 
 Tools: `scripts/capture_obj.sh <addr>` (tries the savestates until enough ticks), `scripts/integrate_obj.sh <addr> <draft.c>` (header + Makefile + test entry). Shared `Rng_NextMem()` in `f3mem.h` (seed in RAM 0x406BAA).
 

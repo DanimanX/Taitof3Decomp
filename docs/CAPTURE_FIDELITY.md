@@ -215,3 +215,32 @@ able to run the cited command and see the cited bytes. Every rejection in this
 file now carries that standard, and the parent checks the two or three decisive
 claims by hand before acting on them. Of the rejections re-checked this way on
 2026-11-24, all but one (`0x108512`) were wrong.
+
+## What `0x111B56` actually shows: the spawn argument is unreachable
+
+After the two false rejections, the parent spent an attempt on this routine
+directly and found one real, reproducible discrepancy. Recorded so the next
+attempt does not repeat the work:
+
+* `Obj_Spawn` at `0x1057C` writes the child as `fn@+0`, `group@+4`, `idx@+5`,
+  `parent@+8`, `arg@+0xC`. The child 0x111B56 creates sits at `0x41027C` in the
+  post with `fn=0x0013E4EE`, `parent=0x00410210`, and **`arg=0x045C0002`**.
+* The routine pushes that argument with `move.l d1,-(a7)` at `0x111C84`, and
+  `d1` is set by `moveq #$2,d1` at `0x111BFE` (which clears all 32 bits) and then
+  modified only by `bfins d0,d1{0:8}` and `bfins d0,d1{8:8}` (capstone confirms
+  8-bit fields). Those two writes can only produce a value in `0x0000????` whose
+  top half is zero.
+* Measured: the captured `arg` has `0x045C` in its top half. Nothing in the
+  routine writes that half. The capture is right about everything else the
+  routine does (`+0x14` matches once the three RNG draws are modelled, and the
+  seed advances exactly three steps).
+
+So the routine is understood, and the capture contains one value the code cannot
+produce. A correct translation scores 0/60 on it. This is the first genuinely
+defective detail found in a capture that had passed every other check.
+
+### Note for whoever retries
+
+Do not "fix" this by hard-coding `0x045C0002`. The honest options are a recapture
+of `0x111B56`, or accepting the routine as decompiled-but-unverifiable and
+recording that explicitly.

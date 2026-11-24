@@ -323,3 +323,19 @@ One more trap worth recording: `0x1244A2` lives in the `0x124xxx` cluster where
 several different routines share `(A5)` globals and chain through
 `jmp $124B3A(pc)`. Reading a disassembly by a fixed byte window mixed three
 routines into one function; every branch had to be re-read from its own target.
+
+## Capturing an object's exit is a separate problem
+
+Of the 142 captured-but-stubbed routines with 60 or more pairs, only 45 write
+their own object on at least 90% of ticks. The other 97 are lifespan tails: the
+routine's observable work happens only on the tick where a timer crosses zero,
+and the capture almost always stops inside the wait loop. Translating such a
+tail yields `0/0 REJECT`, which proves nothing — the model never executes.
+
+Two consequences worth keeping in mind before spending time on a stub:
+
+* A pair count says nothing about coverage. `60 pairs` on a tail routine means
+  sixty samples of the same `subq.w #1,(An)` instruction.
+* The capture needs an exit-forcing poke (`F3_POKEA0B` on the timer field) if a
+  tail is ever to be verified. Until then, translate only the 45 bodies that
+  write every tick and leave the tails documented as pending.

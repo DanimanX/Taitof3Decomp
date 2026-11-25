@@ -538,6 +538,8 @@
 #include "../src/enemy/obj_100D86.h"
 #include "../src/enemy/obj_101390.h"
 #include "../src/enemy/obj_101332.h"
+#include "../src/enemy/obj_E35BE.h"
+#include "../src/enemy/obj_E3624.h"
 #include "../src/enemy/obj_179C6E.h"
 #include "../src/enemy/obj_18657E.h"
 #include "../src/enemy/obj_17A3F4.h"
@@ -1801,6 +1803,8 @@ int main(void)
     bad += run("Obj 0x100D86", "work/ram/obj_100D86", Obj_100D86_Tick, rom);
     bad += run("Obj 0x101390", "work/ram/obj_101390", Obj_101390_Tick, rom);
     bad += run("Obj 0x101332", "work/ram/obj_101332", Obj_101332_Tick, rom);
+    bad += run("Obj 0x0E35BE", "work/ram/obj_E35BE", Obj_E35BE_Tick, rom);
+    bad += run("Obj 0x0E3624", "work/ram/obj_E3624", Obj_E3624_Tick, rom);
     bad += run("Obj 0x179C6E", "work/ram/obj_179C6E", Obj_179C6E_Tick, rom);
     bad += run("Obj 0x18657E", "work/ram/obj_18657E", Obj_18657E_Tick, rom);
     bad += run("Obj 0x17A3F4", "work/ram/obj_17A3F4", Obj_17A3F4_Tick, rom);

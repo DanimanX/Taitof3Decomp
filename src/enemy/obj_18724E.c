@@ -47,33 +47,26 @@ int Obj_18724E_Tick(const f3mem_t *m, uint32_t obj)
     if ((int16_t)rd16(m, a4 + 0x54u) < (int16_t)0x00AEu)
         goto tail;
 
-    /* The pushed argument is D3 << 16 with D3 in {0, 1}: bfextu (A5-0x1456){14:1}
-     * numbers from the MSB of the long at A5-0x1456, i.e. bit 14 -> bit 1 of
-     * the word. */
+    /* 0x1872B2: bfextu $878(A5){14:2},D0 (ext 0x0382) ; 0x1872B8: movea.l
+     * (0x187360,PC,D0.w*4),A1 ; jmp (A1). A memory bit field counts from the
+     * MSB of the byte at the EA, so offset 14 width 2 is bits 1..0 of the
+     * frame-counter word. Each slot pushes a constant packed argument
+     * (move.l #imm,-(SP)), then group/count and the child routine. */
     {
-        uint32_t arg = (uint32_t)((rd16(m, F3_A5 - 0x1456u) >> 1) & 0x01u) << 16;
-        /* 0x1872B2: bfextu $878(A5){14:2},D0 -- NOT settled. If the field is
-         * numbered from the MSB of the long at A5+0x878 it is word bit 8 /
-         * bit 7, i.e. (v >> 8) & 3; the capture cannot arbitrate: its four
-         * ticks that take this path (50..59) come from a ROM build whose
-         * 0x187360 table targets (0x0BDxxx) are not in work/maincpu.bin, so
-         * slot identity there is unknown. Both variants score 50/60 and
-         * switching slot 1 and 3 in the ROM copy changes nothing, so the
-         * spawn slots are not observable from this capture either way. */
-        uint16_t sel = (uint16_t)((rd16(m, F3_A5 + 0x0878u) >> 1) & 0x03u);
+        uint16_t sel = (uint16_t)(rd16(m, F3_A5 + 0x0878u) & 0x03u);
 
         switch (sel) {
         case 0u:                                    /* 0x1872C0 */
-            (void)Obj_Spawn(m, obj, 0x00187370u, 5u, 2u, arg);
-            break;
-        case 2u:                                    /* 0x1872E2 */
-            (void)Obj_Spawn(m, obj, 0x00187370u, 0u, 1u, arg);
+            (void)Obj_Spawn(m, obj, 0x00187370u, 5u, 2u, 0xFFE80000u);
             break;
         case 1u:                                    /* 0x187304 */
-            (void)Obj_Spawn(m, obj, 0x0018747Cu, 5u, 2u, arg);
+            (void)Obj_Spawn(m, obj, 0x0018747Cu, 5u, 2u, 0xFFF80000u);
+            break;
+        case 2u:                                    /* 0x1872E2 */
+            (void)Obj_Spawn(m, obj, 0x00187370u, 0u, 1u, 0xEBD80000u);
             break;
         default:                                    /* 0x187326 */
-            (void)Obj_Spawn(m, obj, 0x0018747Cu, 0u, 1u, arg);
+            (void)Obj_Spawn(m, obj, 0x0018747Cu, 0u, 1u, 0xEBE80000u);
             break;
         }
     }

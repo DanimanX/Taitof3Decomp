@@ -70,11 +70,16 @@ static void sub_0D0678(const f3mem_t *m, uint32_t obj, uint32_t a1)
     wr32(m, obj + 0x68u, rd32(m, a1));
 }
 
-/* ROM 0x0FB526 */
+/* ROM 0x0FB526: clr.w (0x10,A0), then the 0x0FB52A body shared with the
+ * 0x0FCBC4/0x0FCBCE/0x0FCBD8 variants */
 int Obj_FB526_Tick(const f3mem_t *m, uint32_t obj)
 {
     wr16(m, obj + 0x10u, 0u);                               /* 0x0FB526 */
+    return Obj_FB52A_Body(m, obj);
+}
 
+int Obj_FB52A_Body(const f3mem_t *m, uint32_t obj)
+{
     /* 0x0FB52A: lea (0x7DA,PC),A1 -> 0x0FB52C + 0x7DA = 0x0FBD06 */
     sub_0CEC4C(m, obj, 0x000FBD06u);
 

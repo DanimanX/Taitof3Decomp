@@ -546,6 +546,17 @@
 #include "../src/enemy/obj_FF232.h"
 #include "../src/enemy/obj_FF1DA.h"
 #include "../src/enemy/obj_D6794.h"
+#include "../src/enemy/obj_DC076.h"
+#include "../src/enemy/obj_E3CDA.h"
+#include "../src/enemy/obj_FCBC4.h"
+#include "../src/enemy/obj_E78A6.h"
+#include "../src/enemy/obj_E76CE.h"
+#include "../src/enemy/obj_11800C.h"
+#include "../src/enemy/obj_E76FC.h"
+#include "../src/enemy/obj_17ACA2.h"
+#include "../src/enemy/obj_17AC7E.h"
+#include "../src/enemy/obj_115304.h"
+#include "../src/enemy/obj_113A2C.h"
 #include "../src/enemy/obj_179C6E.h"
 #include "../src/enemy/obj_18657E.h"
 #include "../src/enemy/obj_17A3F4.h"
@@ -1817,6 +1828,19 @@ int main(void)
     bad += run("Obj 0x0FF232", "work/ram/obj_FF232", Obj_FF232_Tick, rom);
     bad += run("Obj 0x0FF1DA", "work/ram/obj_FF1DA", Obj_FF1DA_Tick, rom);
     bad += run("Obj 0x0D6794", "work/ram/obj_D6794", Obj_D6794_Tick, rom);
+    bad += run("Obj 0x0DC076", "work/ram/obj_DC076", Obj_DC076_Tick, rom);
+    bad += run("Obj 0x0E3CDA", "work/ram/obj_E3CDA", Obj_E3CDA_Tick, rom);
+    bad += run("Obj 0x0FCBD8", "work/ram/obj_FCBD8", Obj_FCBD8_Tick, rom);
+    bad += run("Obj 0x0FCBCE", "work/ram/obj_FCBCE", Obj_FCBCE_Tick, rom);
+    bad += run("Obj 0x0FCBC4", "work/ram/obj_FCBC4", Obj_FCBC4_Tick, rom);
+    bad += run("Obj 0x0E78A6", "work/ram/obj_E78A6", Obj_E78A6_Tick, rom);
+    bad += run("Obj 0x0E76CE", "work/ram/obj_E76CE", Obj_E76CE_Tick, rom);
+    bad += run("Obj 0x11800C", "work/ram/obj_11800C", Obj_11800C_Tick, rom);
+    bad += run("Obj 0x0E76FC", "work/ram/obj_E76FC", Obj_E76FC_Tick, rom);
+    bad += run("Obj 0x17ACA2", "work/ram/obj_17ACA2", Obj_17ACA2_Tick, rom);
+    bad += run("Obj 0x17AC7E", "work/ram/obj_17AC7E", Obj_17AC7E_Tick, rom);
+    bad += run("Obj 0x115304", "work/ram/obj_115304", Obj_115304_Tick, rom);
+    bad += run("Obj 0x113A2C", "work/ram/obj_113A2C", Obj_113A2C_Tick, rom);
     bad += run("Obj 0x179C6E", "work/ram/obj_179C6E", Obj_179C6E_Tick, rom);
     bad += run("Obj 0x18657E", "work/ram/obj_18657E", Obj_18657E_Tick, rom);
     bad += run("Obj 0x17A3F4", "work/ram/obj_17A3F4", Obj_17A3F4_Tick, rom);

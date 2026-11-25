@@ -18,10 +18,10 @@
  * arrive with the same A0, so a caller that only has the index can use one of
  * the two entry points below.
  *
- * Only index 0 is modelled here: it is the one the blocked routines reach, and
- * its tick (0x179664) was the missing piece. Any other index returns -1 before
- * touching the object, which is the contract every routine in this tree uses
- * for a ROM path that is not translated yet. */
+ * Ticks are modelled for index 0 (the frame-list walk 0x179664, the one the
+ * blocked routines reach) and index 9 (the 16-direction record 0x179898).
+ * Any other index returns -1 before touching the object, which is the contract
+ * every routine in this tree uses for a ROM path that is not translated yet. */
 
 /* Tick-half dispatch: (0x179A5E)[idx] with A0 = obj. 0 on success, -1 for an
  * index without a translation. */

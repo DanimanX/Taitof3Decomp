@@ -1,5 +1,6 @@
 #include "obj_script10.h"
 #include "obj_shared.h"
+#include "obj_shared_ext.h"
 
 /* The 10-byte movement script at obj+0x44, as walked by ROM 0x178982.
  * Bodies lifted from src/enemy/obj_17C05E.c (same ROM addresses), where this
@@ -105,9 +106,53 @@ static void sub_178C06(const f3mem_t *m, uint32_t obj)
     wr32(m, obj + 0x54u, rd32(m, obj + 0x54u) + (uint32_t)((int32_t)(int16_t)mag * a));
 }
 
+static int16_t abs16(int16_t v) { return v < 0 ? (int16_t)(0u - (uint16_t)v) : v; }
+
+/* ROM 0x179074: the aim-between-bounds script. D2 = sign-extended byte of
+ * +0x42 (the heading rate); below zero the call is a no-op. Each axis whose
+ * distance from the target (+0x4C/+0x4E) exceeds |D2| is picked: the heading
+ * error drives 0x006422, the record's +0x06 word is added to +0x42, the
+ * byte-to-byte jitter comes from 0x1794A4 (record +0x08 word) and then the
+ * position moves along the 0x27E40 sine/cosine pair. */
+static void scr_179074(const f3mem_t *m, uint32_t obj)
+{
+    int16_t d2 = (int16_t)(int8_t)rd8(m, obj + 0x43u);
+    if (d2 < 0) {
+        wr16(m, obj + 0x42u, 0u);
+        wr16(m, obj + 0x48u, 0u);
+        return;
+    }
+
+    int16_t ex = (int16_t)(rd16(m, obj + 0x4Cu) - rd16(m, obj + 0x50u));
+    int16_t ey = (int16_t)(rd16(m, obj + 0x4Eu) - rd16(m, obj + 0x54u));
+    if (!(abs16(ex) <= d2 || abs16(ey) <= d2))
+        return;                                     /* 0x179104 */
+
+    uint16_t d0 = Obj_Atan2(m, (uint16_t)ex, (uint16_t)ey); /* 0x1790B2 jsr 0x6422 */
+    uint32_t a1 = rd32(m, obj + 0x44u);
+    int16_t step = (int16_t)rd16(m, a1 + 6u);
+    uint16_t jitter = rd16(m, a1 + 8u);
+    wr16(m, obj + 0x42u, (uint16_t)(rd16(m, obj + 0x42u) + (uint16_t)step));
+
+    /* 0x1790C8: and.b D1b,D0b ; asr.w #8,D1w ; add.b D1b,D0b */
+    uint16_t rnd = Obj_RandRange(m, (uint16_t)(jitter & 0xFFu)); /* 0x1794A4 */
+    uint8_t ang = (uint8_t)((uint8_t)d0 & (uint8_t)rnd);
+    ang = (uint8_t)(ang + (uint8_t)(int8_t)(int16_t)(jitter >> 8));
+    wr8(m, obj + 0x20u, ang);
+
+    uint16_t mag = (uint16_t)(rd16(m, obj + 0x42u) + 0x20u);
+    int16_t m2 = (int16_t)mag >> 6;
+    uint16_t idx = (uint16_t)(rd16(m, obj + 0x20u) >> 8);
+    int32_t vx = (int32_t)m2 * (int16_t)rd16(m, 0x0027E40u + (uint32_t)idx * 2u + 0x80u);
+    int32_t vy = (int32_t)m2 * (int16_t)rd16(m, 0x0027E40u + (uint32_t)idx * 2u);
+    wr32(m, obj + 0x50u, rd32(m, obj + 0x50u) + (uint32_t)vx);
+    wr32(m, obj + 0x54u, rd32(m, obj + 0x54u) + (uint32_t)vy);
+}
+
 static int script10_call(const f3mem_t *m, uint32_t obj, uint32_t fn)
 {
     switch (fn) {
+    case 0x00179074u: scr_179074(m, obj);              return 0;
     case 0x00178B20u: Obj_Script10_SetHeading(m, obj); return 0;
     case 0x00178B4Au: sub_178B4A(m, obj);              return 0;
     case 0x00178C06u: sub_178C06(m, obj);              return 0;

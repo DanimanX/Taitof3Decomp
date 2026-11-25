@@ -4,14 +4,18 @@
 #include "../enemy/obj_179614.h"
 #include "../enemy/obj_1795F6.h"
 #include "../enemy/obj_17960A.h"
+#include "../enemy/obj_17955E.h"
+#include "../enemy/obj_179588.h"
+#include "../enemy/obj_179572.h"
 #include "../enemy/obj_179600.h"
 #include "../enemy/obj_179614.h"
 #include "../enemy/obj_1795F6.h"
 #include "../enemy/obj_17960A.h"
 
 /* The 0x179A5C engine. Bodies are lifted from the ROM listings (see
- * work/disasm/bundle_179664.s and the copies in src/enemy/obj_17E05A.c); only
- * index 0 is translated, the rest return -1 before any side effect. */
+ * work/disasm/bundle_179664.s and the copies in src/enemy/obj_17E05A.c); the
+ * ticks for indices 0 and 9 are translated, the rest return -1 before any side
+ * effect. */
 
 /* ROM 0x179550 (index 0 init): plain frame record at +0x3A -- {duration.w,
  * sprite.l} into the countdown (+0x3E) and the sprite pointer (+0x10). Lives in
@@ -44,38 +48,97 @@ void Obj_AnimTick0(const f3mem_t *m, uint32_t obj)
             a1 += 2u;
             wr16(m, obj + 0x40u, d0w);              /* 0x17968C */
             wr32(m, obj + 0x3Au, a1);               /* 0x179690 */
-            /* 0x17969A: movea.l (0x0,0x179A5C,D0w*0x8),A1; jsr (A1)
-             * The +0x0 offset selects the INIT slot of the pair (the +4 slot is
-             * the tick), so D0w == 0 re-runs index 0's init, 0x179550. */
-            if (d0w == 0u) {
-                Obj_179550_Tick(m, obj);
-            } else {
-                /* the index's tick is not translated: leave 0x179A5C state
-                 * untouched rather than guessing */
+            /* 0x17969A: movea.l (0x179A5C,D0w*0x8),A1; jsr (A1) -- the INIT
+             * slot of the new index, through the same dispatch as the callers */
+            if (Obj_AnimInit(m, obj, d0w) < 0)
                 wr16(m, obj + 0x40u, d0w);
-            }
             /* 0x1796A0 bra.w 0x1796AC */
         }
     }
     wr16(m, obj + 0x3Eu, (uint16_t)(rd16(m, obj + 0x3Eu) - 1u));  /* 0x1796AC */
 }
 
+/* ROM 0x179664 again, for an init that pinned the countdown while its body
+ * already decremented it: the entry's post value is one below the record's.
+ * That only happens on the hand-over pass (0x17D9FE -> 0x17A3F4 -> 0x17A426),
+ * where 0x179664 is called in place of the next index's init. */
+static void walk_after_init(const f3mem_t *m, uint32_t obj)
+{
+    if ((int16_t)rd16(m, obj + 0x3Eu) == 0) {
+        uint32_t a1 = rd32(m, obj + 0x3Au) + 6u;
+        int16_t d = (int16_t)rd16(m, a1);
+        if (d > 0) {
+            wr32(m, obj + 0x3Au, a1);
+            Obj_179550_Tick(m, obj);
+        }
+    }
+    wr16(m, obj + 0x3Eu, (uint16_t)(rd16(m, obj + 0x3Eu) - 1u));
+}
+
+/* ROM 0x179898 (index 9 tick, and the tail of the index 9 init 0x179600):
+ * angle byte (+0x20) + 8 >> 4 picks one of 16 records of 6 bytes at +0x3A,
+ * {spr.l, palette.w}. The init pins the countdown to 1 and so does this body,
+ * which is why a 0x179898 tick shows +0x3E decremented by the index-0 walk
+ * under it rather than by itself. */
+static void anim9_tick(const f3mem_t *m, uint32_t obj)
+{
+    uint16_t d0 = (uint16_t)((uint8_t)(rd8(m, obj + 0x20u) + 8u) >> 4);
+    uint32_t a1 = rd32(m, obj + 0x3Au) + ((uint32_t)d0 * 6u & 0xFFFFu);
+    wr32(m, obj + 0x10u, rd32(m, a1)); a1 += 4u;
+    wr8(m, obj + 0x1Cu, (uint8_t)rd16(m, a1));
+}
+
+/* ROM 0x1796B2 (index 8 tick): the index-0 walk with an 8-byte header; a
+ * positive duration reloads through 0x17955E. */
+static void anim8_tick(const f3mem_t *m, uint32_t obj)
+{
+    if ((int16_t)rd16(m, obj + 0x3Eu) > 0)
+        wr16(m, obj + 0x3Eu, (uint16_t)(rd16(m, obj + 0x3Eu) - 1u));
+    else if ((int16_t)rd16(m, obj + 0x3Eu) == 0) {
+        uint32_t a1 = rd32(m, obj + 0x3Au) + 8u;
+        int16_t d = (int16_t)rd16(m, a1);
+        if (d > 0) {
+            wr32(m, obj + 0x3Au, a1);
+            Obj_17955E_Tick(m, obj);
+        } else if (d == 0) {
+            a1 = rd32(m, a1 + 2u);
+            uint16_t d0w = rd16(m, a1);
+            a1 += 2u;
+            wr16(m, obj + 0x40u, d0w);
+            wr32(m, obj + 0x3Au, a1);
+            if (Obj_AnimInit(m, obj, d0w) < 0)
+                wr16(m, obj + 0x40u, d0w);
+        }
+        wr16(m, obj + 0x3Eu, (uint16_t)(rd16(m, obj + 0x3Eu) - 1u));
+    }
+}
+
 int Obj_AnimTick(const f3mem_t *m, uint32_t obj, uint16_t idx)
 {
-    if (idx != 0u)
-        return -1;
-    Obj_AnimTick0(m, obj);
-    return 0;
+    switch (idx) {
+    case 0u: Obj_AnimTick0(m, obj); return 0;
+    case 8u: anim8_tick(m, obj);    return 0;
+    case 9u: anim9_tick(m, obj);    return 0;
+    default: return -1;
+    }
 }
 
 int Obj_AnimInit(const f3mem_t *m, uint32_t obj, uint16_t idx)
 {
     switch (idx) {
-    case 0u: return Obj_179550_Tick(m, obj);
-    case 1u: return Obj_1795F6_Tick(m, obj);
-    case 2u: return Obj_17960A_Tick(m, obj);
-    case 9u: return Obj_179600_Tick(m, obj);
+    case 0u:  return Obj_179550_Tick(m, obj);
+    case 1u:  return Obj_1795F6_Tick(m, obj);
+    case 2u:  return Obj_17960A_Tick(m, obj);
+    case 8u:  return Obj_17955E_Tick(m, obj);
+    case 9u:  return Obj_179600_Tick(m, obj);
     case 10u: return Obj_179614_Tick(m, obj);
-    default: return -1;
+    case 3u:  return Obj_179572_Tick(m, obj);
+    case 11u:
+        /* 0x179588 loads the timer and returns; the 0x179D9E body's tail then
+         * steps the list again (see walk_after_init) */
+        Obj_179588_Tick(m, obj);
+        walk_after_init(m, obj);
+        return 0;
+    default:  return -1;
     }
 }

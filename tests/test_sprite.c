@@ -98,6 +98,7 @@ int main(void)
         uint8_t *rom = cap_slurp("work/maincpu.bin", &rl);
         (void)rl;
         static const struct { const char *name, *dir; int id; } fn_tests[] = {
+            { "0x0053B2", "work/ram/fn_0053B2", 11 },
             { "0x0055C8", "work/ram/fn_0055C8", 0 },
             { "0x00571A", "work/ram/fn_00571A", 1 },
             { "0x005880", "work/ram/fn_005880", 6 },
@@ -140,6 +141,8 @@ int main(void)
                     Stage_NameEntry13D7A0(&m, c.pre[i][CR_A0], c.pre[i][CR_A1], (uint16_t)c.pre[i][7]);
                 } else if (fn_tests[t].id == 10) {
                     Stage_DrawHighScores13D94C(&m);
+                } else if (fn_tests[t].id == 11) {
+                    Gfx_DrawCompressedTilemap(&m, rd32(&m, sp + 4u), rd32(&m, sp + 8u), rd32(&m, sp + 12u));
                 } else {
                     Gfx_InitLineRam(&m);
                 }

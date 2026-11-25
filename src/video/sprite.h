@@ -12,6 +12,7 @@
 void Obj_DrawSprite(const f3mem_t *m, uint32_t obj);  /* ROM 0x001282 */
 void Obj_DrawSpriteSub(const f3mem_t *m, uint32_t obj, uint16_t d0, uint16_t d1, uint16_t d2); /* ROM 0x001410 */
 void Video_SetSpriteScroll(const f3mem_t *m);         /* ROM 0x001232 */
+void Gfx_DrawCompressedTilemap(const f3mem_t *m, uint32_t src, uint32_t dst, uint32_t flags); /* ROM 0x0053B2 */
 void Gfx_DrawTilemapBlock(const f3mem_t *m, uint32_t src, uint32_t dst, uint16_t flags); /* ROM 0x0055C8 */
 uint32_t Gfx_DrawHex(const f3mem_t *m, uint32_t val, uint16_t digits, uint32_t dst, uint16_t attr); /* ROM 0x005690 */
 uint32_t Gfx_DrawDecimal(const f3mem_t *m, uint32_t val, uint16_t digits, uint32_t dst, uint16_t attr); /* ROM 0x00571A */
@@ -27,5 +28,6 @@ void Gfx_InitLineRam(const f3mem_t *m);               /* ROM 0x005B0C */
 void Stage_DrawBanner13D11E(const f3mem_t *m);        /* ROM 0x13D11E */
 void Stage_NameEntry13D7A0(const f3mem_t *m, uint32_t a0, uint32_t a1, uint16_t d7); /* ROM 0x13D7A0 */
 void Stage_DrawHighScores13D94C(const f3mem_t *m);    /* ROM 0x13D94C */
+void Stage_UploadBgTilemaps(const f3mem_t *m);        /* ROM 0x16A9BC */
 
 #endif

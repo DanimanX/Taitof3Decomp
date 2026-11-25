@@ -141,6 +141,77 @@ static uint32_t fill_lineram_run(const f3mem_t *m, uint32_t a1, uint16_t val)
     return a1 + 0x30u;
 }
 
+/* ROM 0x0053B2 */
+void Gfx_DrawCompressedTilemap(const f3mem_t *m, uint32_t src, uint32_t dst, uint32_t flags)
+{
+    uint32_t a0 = src;
+    int16_t rows = (int16_t)((uint16_t)rd8(m, a0++) - 1u);
+    int16_t cols = (int16_t)((uint16_t)rd8(m, a0++) - 1u);
+    uint32_t d2 = (flags >> 30) & 3u;
+    uint16_t d5_lo = (uint16_t)(dst & 0xFFFFu);
+    uint16_t d6_lo = d5_lo;
+    int16_t row_step = 0x0080;
+    int16_t col_step = 4;
+    if (d2 == 1u) {
+        d6_lo = (uint16_t)(d6_lo + (uint16_t)(cols << 2));
+        col_step = -4;
+    } else if (d2 == 2u) {
+        row_step = -0x0080;
+        d5_lo = (uint16_t)(d5_lo + (uint16_t)(rows << 7));
+    } else if (d2 == 3u) {
+        row_step = -0x0080;
+        d5_lo = (uint16_t)(d5_lo + (uint16_t)(rows << 7));
+        d6_lo = (uint16_t)(d6_lo + (uint16_t)(cols << 2));
+        col_step = -4;
+    }
+    uint32_t d3 = flags & 0xFE000000u;
+    int16_t run_cnt = 0;
+    uint8_t run_op = 0;
+    uint32_t run_val = 0;
+    int16_t r = rows;
+    do {
+        uint16_t d4 = d6_lo;
+        uint32_t row_base = (dst & 0xFFFFF000u) + (d5_lo & 0x0F80u);
+        int16_t c = cols;
+        do {
+            uint16_t off = d4 & 0x007Cu;
+            if (run_cnt == 0) {
+                uint16_t tok = rd16(m, a0);
+                a0 += 2u;
+                if (tok == 0u) {
+                    wr32(m, row_base + off, rd32(m, a0) ^ d3);
+                    a0 += 4u;
+                } else {
+                    run_op = (uint8_t)(tok >> 8);
+                    run_cnt = (int16_t)(tok & 0xFFu);
+                    if (run_op == 1u) {
+                        wr32(m, row_base + off, 0u);
+                    } else {
+                        run_val = rd32(m, a0) ^ d3;
+                        a0 += 4u;
+                        wr32(m, row_base + off, run_val);
+                        if (run_op == 3u) run_val = (run_val & 0xFFFF0000u) | (uint16_t)(run_val + 1u);
+                        else if (run_op == 4u) run_val = (run_val & 0xFFFF0000u) | (uint16_t)(run_val - 1u);
+                    }
+                }
+            } else {
+                run_cnt--;
+                if (run_op == 1u) {
+                    wr32(m, row_base + off, 0u);
+                } else {
+                    wr32(m, row_base + off, run_val);
+                    if (run_op == 3u) run_val = (run_val & 0xFFFF0000u) | (uint16_t)(run_val + 1u);
+                    else if (run_op == 4u) run_val = (run_val & 0xFFFF0000u) | (uint16_t)(run_val - 1u);
+                }
+            }
+            d4 = (uint16_t)(d4 + col_step);
+            c--;
+        } while (c >= 0);
+        d5_lo = (uint16_t)(d5_lo + row_step);
+        r--;
+    } while (r >= 0);
+}
+
 /* ROM 0x0055C8 */
 void Gfx_DrawTilemapBlock(const f3mem_t *m, uint32_t src, uint32_t dst, uint16_t flags)
 {
@@ -510,5 +581,34 @@ void Stage_DrawHighScores13D94C(const f3mem_t *m)
         d4 = (int16_t)(d4 - 9);
         d0 -= (int32_t)(int16_t)(d4 + d4);
         Text_DrawString(m, a0 + 6u, d0, 7u);
+    }
+}
+
+/* ROM 0x16A9BC (with ROM 0x16ABA2) */
+void Stage_UploadBgTilemaps(const f3mem_t *m)
+{
+    static const struct { uint16_t flag_off, clr1, clr2, p1, p2; uint32_t pf_base; } layers[4] = {
+        { 0x4284u, 0x4204u, (uint16_t)(-0x5DA8), 0x4264u, 0x4268u, 0x00610000u },
+        { 0x4285u, 0x420Cu, (uint16_t)(-0x5DA0), 0x426Cu, 0x4270u, 0x00611000u },
+        { 0x4286u, 0x4214u, (uint16_t)(-0x5D98), 0x4274u, 0x4278u, 0x00612000u },
+        { 0x4287u, 0x421Cu, (uint16_t)(-0x5D90), 0x427Cu, 0x4280u, 0x00613000u },
+    };
+    for (int l = 0; l < 4; l++) {
+        if ((rd8(m, F3_A5 + layers[l].flag_off) & 1u) == 0u) continue;
+        wr16(m, F3_A5 + layers[l].clr1, 0u);
+        wr16(m, F3_A5 + (int16_t)layers[l].clr2, 0u);
+        uint32_t a1 = rd32(m, F3_A5 + layers[l].p1);
+        uint32_t a2 = rd32(m, F3_A5 + layers[l].p2);
+        for (int16_t d6 = 3; d6 >= 0; d6--) {
+            for (int16_t d7 = 3; d7 >= 0; d7--) {
+                int16_t idx = (int16_t)((d6 << 2) + d7);
+                int16_t t = (int16_t)rd16(m, a1 + (int32_t)idx * 2);
+                uint32_t src = rd32(m, a2 + (int32_t)(t << 2));
+                int16_t d0 = (int16_t)((d6 & 3) << 3);
+                int16_t d1 = (int16_t)(d7 << 3);
+                uint32_t dst = layers[l].pf_base + (int16_t)(d1 * 0x80 + (d0 << 2));
+                Gfx_DrawCompressedTilemap(m, src, dst, 0u);
+            }
+        }
     }
 }

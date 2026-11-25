@@ -151,7 +151,7 @@ static void test_helpers(const uint8_t *rom)
               "PickActive remainder picks the player (seed bit %d)", bit);
     }
 
-    /* Player_SceneInit: scene words, then it stops at 0x001660 */
+    /* Player_SceneInit: scene words + 4x Pal_QueueUpload (0x001660), then stops at 0x0C6BD6 */
     memset(img, 0, sizeof img);
     wr8(&m, A_CTRL, 0xFFu);
     wr8(&m, A_BOMB, 0x55u);
@@ -163,7 +163,7 @@ static void test_helpers(const uint8_t *rom)
     wr32(&m, A_SHIP_MASK, 0x7FFFFFFFu);
     memset(img + (OBJ_BASE - F3_WRAM_BASE) + 2 * OBJ_GROUP_SIZE, 0, OBJ_GROUP_SIZE);
     int rc = Player_SceneInit(&m);
-    CHECK(rc == -1, "SceneInit stops at the 0x001660 tail");
+    CHECK(rc == -1, "SceneInit stops at the 0x0C6BD6 tail");
     CHECK(rd8(&m, A_CTRL) == 0xE1u, "SceneInit clears ctrl bits 1..4 (got %02X)",
           rd8(&m, A_CTRL));
     CHECK(rd8(&m, A_BOMB) == 0 && rd16(&m, A_FRAME_CNT) == 0 &&
@@ -172,6 +172,16 @@ static void test_helpers(const uint8_t *rom)
     CHECK(rd16(&m, A_TROW1) == 0 && rd16(&m, A_TCNT1) == 0 && rd16(&m, A_TROW2) == 0 &&
           rd16(&m, A_TCNT2) == 0 && rd16(&m, A_SHIELD_ST + 0x1C) == 0 &&
           rd16(&m, A_SHIELD_ST + 0x1E) == 0, "SceneInit runs 0x0C7D9A");
+    CHECK(rd16(&m, F3_A5 - 0x5DF0u) == 4u && rd16(&m, F3_A5 - 0x5DEEu) == 2u,
+          "SceneInit queues 4 palette uploads");
+    CHECK(rd16(&m, F3_A5 - 0x6750u + 0u) == 3u &&
+          rd32(&m, F3_A5 - 0x6750u + 2u) == 0x000C9242u &&
+          rd16(&m, F3_A5 - 0x6750u + 6u) == 0x0354u,
+          "SceneInit palette slot 0");
+    CHECK(rd16(&m, F3_A5 - 0x6750u + 24u + 0u) == 8u &&
+          rd32(&m, F3_A5 - 0x6750u + 24u + 2u) == 0x000C9242u &&
+          rd16(&m, F3_A5 - 0x6750u + 24u + 6u) == 0x00A0u,
+          "SceneInit palette slot 3");
     CHECK(nonzero(&m, OBJ_BASE + 3 * OBJ_GROUP_SIZE, OBJ_GROUP_SIZE) == 0,
           "SceneInit stops before the ship objects are spawned");
     CHECK(rd8(&m, A_DEMO_MODE) == 0, "SceneInit leaves 0x1D40");
@@ -355,6 +365,35 @@ static void run_capture_consistency(const uint8_t *rom, const char *pfx)
     cap_free(&c);
 }
 
+/* ---- 5. HUD row 1 (0x0C8488 + Pal_QueueUpload) & row 2 (0x0C87F8) ------- */
+static void run_hud_capture(const uint8_t *rom, const char *pfx, int is_row1)
+{
+    static capture_t c;
+    if (cap_load(&c, pfx) != 0) {
+        printf("  %s: SKIP (no capture)\n", pfx);
+        return;
+    }
+    uint8_t *img = malloc(F3_WRAM_SIZE);
+    int ok = 0;
+    for (int i = 0; i < c.pairs; i++) {
+        f3mem_t m = mk(img, rom);
+        memcpy(img, cap_wram(&c, i, 0), F3_WRAM_SIZE);
+        if (is_row1)
+            Player_HudRow1(&m);
+        else
+            Player_HudRow2(&m);
+        const uint8_t *want = cap_wram(&c, i, 1);
+        /* Exclude 68K stack (0x404000..0x405400) where MAME holds return PCs/args */
+        if (memcmp(img, want, 0x4000u) == 0 &&
+            memcmp(img + 0x5400u, want + 0x5400u, F3_WRAM_SIZE - 0x5400u) == 0)
+            ok++;
+    }
+    printf("  %s: %d/%d calls bit-exact (Work RAM)\n", pfx, ok, c.pairs);
+    CHECK(ok == c.pairs, "%s: bit-exact Work RAM match", pfx);
+    free(img);
+    cap_free(&c);
+}
+
 int main(int argc, char **argv)
 {
     long rl;
@@ -371,6 +410,8 @@ int main(int argc, char **argv)
     run_capture_consistency(rom, "work/ram/player_c6b16_02_stage1_start");
     run_capture_consistency(rom, "work/ram/player_c6b16_01_attract");
     run_capture_consistency(rom, "work/ram/player_c6b16_03_active_combat");
+    run_hud_capture(rom, "work/ram/fn_0C8488", 1);
+    run_hud_capture(rom, "work/ram/fn_0C87F8", 0);
     printf("player-task: %s (%d/%d checks failed)\n", fails ? "FAIL" : "PASS", fails, checks);
     free(rom);
     return fails != 0;

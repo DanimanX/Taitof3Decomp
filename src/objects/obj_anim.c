@@ -8,10 +8,7 @@
 #include "../enemy/obj_17955E.h"
 #include "../enemy/obj_179588.h"
 #include "../enemy/obj_179572.h"
-#include "../enemy/obj_179600.h"
-#include "../enemy/obj_179614.h"
-#include "../enemy/obj_1795F6.h"
-#include "../enemy/obj_17960A.h"
+#include "../enemy/obj_1795A4.h"
 
 /* The 0x179A5C engine. Bodies are lifted from the ROM listings (see
  * work/disasm/bundle_179664.s and the copies in src/enemy/obj_17E05A.c); the
@@ -135,6 +132,55 @@ static void anim8_tick(const f3mem_t *m, uint32_t obj)
     }
 }
 
+/* ROM 0x17979C (index 5 tick): 18-byte records with hitbox + dx/dy. */
+static void anim5_tick(const f3mem_t *m, uint32_t obj)
+{
+    int16_t timer = (int16_t)rd16(m, obj + 0x3Eu);
+    if (timer == 0) {
+        uint32_t a1 = rd32(m, obj + 0x3Au) + 0x10u;
+        int16_t d = (int16_t)rd16(m, a1);
+        if (d > 0) {
+            wr32(m, obj + 0x3Au, a1);
+            Obj_1795A4_Tick(m, obj);
+            wr16(m, obj + 0x3Eu, (uint16_t)(rd16(m, obj + 0x3Eu) - 1u));
+            return;
+        } else if (d == 0) {
+            a1 = rd32(m, a1 + 2u);
+            uint16_t d0w = rd16(m, a1);
+            a1 += 2u;
+            wr16(m, obj + 0x40u, d0w);
+            wr32(m, obj + 0x3Au, a1);
+            if (Obj_AnimInit(m, obj, d0w) < 0)
+                wr16(m, obj + 0x40u, d0w);
+            wr16(m, obj + 0x3Eu, (uint16_t)(rd16(m, obj + 0x3Eu) - 1u));
+            return;
+        }
+        wr16(m, obj + 0x3Eu, (uint16_t)(rd16(m, obj + 0x3Eu) - 1u));
+    } else if (timer > 0) {
+        wr16(m, obj + 0x3Eu, (uint16_t)(timer - 1));
+    }
+    uint32_t a1 = rd32(m, obj + 0x3Au);
+    int16_t dx = (int16_t)(int8_t)rd8(m, a1 + 0x0Eu);
+    int16_t dy = (int16_t)(int8_t)rd8(m, a1 + 0x0Fu);
+    wr16(m, obj + 0x14u, (uint16_t)((int16_t)rd16(m, obj + 0x14u) + dx));
+    wr16(m, obj + 0x18u, (uint16_t)((int16_t)rd16(m, obj + 0x18u) + dy));
+}
+
+/* ROM 0x17997A (index 14 tick): 16-dir 16-byte record {spr.l, pal.w, 2c.l, 30.l, dx.b, dy.b}. */
+static void anim14_tick(const f3mem_t *m, uint32_t obj)
+{
+    uint16_t d0 = (uint16_t)((uint8_t)(rd8(m, obj + 0x20u) + 8u) >> 4);
+    uint32_t a1 = rd32(m, obj + 0x3Au) + ((uint32_t)d0 << 4);
+    wr32(m, obj + 0x10u, rd32(m, a1));
+    wr8(m, obj + 0x1Cu, (uint8_t)rd16(m, a1 + 4u));
+    wr32(m, obj + 0x2Cu, rd32(m, a1 + 6u));
+    wr32(m, obj + 0x30u, rd32(m, a1 + 10u));
+    int16_t dx = (int16_t)(int8_t)rd8(m, a1 + 14u);
+    int16_t dy = (int16_t)(int8_t)rd8(m, a1 + 15u);
+    wr16(m, obj + 0x14u, (uint16_t)((int16_t)rd16(m, obj + 0x14u) + dx));
+    wr16(m, obj + 0x18u, (uint16_t)((int16_t)rd16(m, obj + 0x18u) + dy));
+}
+
 int Obj_AnimTick(const f3mem_t *m, uint32_t obj, uint16_t idx)
 {
     switch (idx) {
@@ -142,6 +188,7 @@ int Obj_AnimTick(const f3mem_t *m, uint32_t obj, uint16_t idx)
     case 1u: anim_dir_tick(m, obj, 0,  4u, 0, 0);    return 0; /* ROM 0x179880 */
     case 2u: anim_dir_tick(m, obj, 1,  4u, 0, 0);    return 0; /* ROM 0x1798BA */
     case 4u: anim_dir_tick(m, obj, 0, 12u, 1, 0);    return 0; /* ROM 0x1798F8 */
+    case 5u: anim5_tick(m, obj);                     return 0; /* ROM 0x17979C */
     case 6u: anim_dir_tick(m, obj, 0, 14u, 1, 1);    return 0; /* ROM 0x179946 */
     case 7u: anim_dir_tick(m, obj, 1, 14u, 1, 1);    return 0; /* ROM 0x1799B2 */
     case 8u: anim8_tick(m, obj);                     return 0;
@@ -149,6 +196,7 @@ int Obj_AnimTick(const f3mem_t *m, uint32_t obj, uint16_t idx)
     /* ROM 0x1798D4 (index 10 tick): the same 6-byte directional record the
      * index-10 init 0x179614 picks, re-picked from the +0x20 angle byte. */
     case 10u: anim_dir_tick(m, obj, 1, 6u, 0, 0);    return 0;
+    case 14u: anim14_tick(m, obj);                   return 0; /* ROM 0x17997A */
     default: return -1;
     }
 }
@@ -159,6 +207,7 @@ int Obj_AnimInit(const f3mem_t *m, uint32_t obj, uint16_t idx)
     case 0u:  return Obj_179550_Tick(m, obj);
     case 1u:  return Obj_1795F6_Tick(m, obj);
     case 2u:  return Obj_17960A_Tick(m, obj);
+    case 5u:  return Obj_1795A4_Tick(m, obj);
     case 8u:  return Obj_17955E_Tick(m, obj);
     case 9u:  return Obj_179600_Tick(m, obj);
     case 10u: return Obj_179614_Tick(m, obj);
@@ -168,6 +217,10 @@ int Obj_AnimInit(const f3mem_t *m, uint32_t obj, uint16_t idx)
          * steps the list again (see walk_after_init) */
         Obj_179588_Tick(m, obj);
         walk_after_init(m, obj);
+        return 0;
+    case 14u:
+        wr16(m, obj + 0x3Eu, 1u);
+        anim14_tick(m, obj);
         return 0;
     default:  return -1;
     }

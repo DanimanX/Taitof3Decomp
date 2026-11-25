@@ -1,4 +1,5 @@
 #include "palette.h"
+#include "../objects/obj_common.h"
 
 /* ROM 0x001660: queue a palette upload {count.w, src.l, dst.w} at A5-0x6750 (max 0x20) */
 void Pal_QueueUpload(const f3mem_t *m, uint32_t src, uint16_t dst, uint16_t count)
@@ -106,4 +107,35 @@ void Pal_UploadFade163D1A(const f3mem_t *m)
 void Pal_UploadFade16413C(const f3mem_t *m)
 {
     pal_blend_upload_16(m, 0x00164BAAu, 0x00164BEAu, 0x0040B72Eu, 0xFFF0u, 0x3C00u, -0x1110);
+}
+
+/* ROM 0x001866 */
+void Pal_FadeOut001866(const f3mem_t *m, uint32_t a1, uint32_t d0, uint32_t d1, uint32_t d2)
+{
+    (void)Pal_QueueRamp(m, 0x0000190Eu, a1, d0, d1, d2);
+}
+
+/* ROM 0x001890 */
+void Pal_FadeIn001890(const f3mem_t *m, uint32_t a0, uint32_t d0, uint32_t d1, uint32_t d2)
+{
+    (void)Pal_QueueRamp(m, a0, 0x0000190Eu, d0, d1, d2);
+}
+
+/* ROM 0x146006: stage palette fade-in (0x11) / fade-out (0x51) */
+void Stage_Fade146006(const f3mem_t *m)
+{
+    uint16_t d0 = (uint16_t)(rd16(m, F3_A5 + 0x3384u) & 0x007Fu);
+    if (d0 == 0x0011u) {
+        Pal_FadeIn001890(m, 0x0002131Cu, 0x18DCu, 0x30u, 7u);
+        Pal_FadeIn001890(m, 0x0001BCF4u, 0x77F4u, 0x30u, 3u);
+        Pal_FadeIn001890(m, 0x0001BCF4u, 0x45F4u, 0x30u, 3u);
+        Pal_FadeIn001890(m, 0x0001BCF4u, 0x40F4u, 0x30u, 3u);
+        Pal_FadeIn001890(m, 0x0001BCF4u, 0x4174u, 0x30u, 3u);
+    } else if (d0 == 0x0051u) {
+        Pal_FadeOut001866(m, 0x0002131Cu, 0x18DCu, 0x30u, 7u);
+        Pal_FadeOut001866(m, 0x0001BCF4u, 0x77F4u, 0x30u, 3u);
+        Pal_FadeOut001866(m, 0x0001BCF4u, 0x45F4u, 0x30u, 3u);
+        Pal_FadeOut001866(m, 0x0001BCF4u, 0x40F4u, 0x30u, 3u);
+        Pal_FadeOut001866(m, 0x0001BCF4u, 0x4174u, 0x30u, 3u);
+    }
 }

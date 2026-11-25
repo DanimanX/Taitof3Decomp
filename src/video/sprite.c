@@ -131,6 +131,13 @@ void Video_SetSpriteScroll(const f3mem_t *m)
     wr16(m, a0 + 0x8006u, (uint16_t)((rd16(m, a0 + 0x8006u) & 0xF000u) | y));
 }
 
+/* ROM 0x001C90: upload tilemap scroll registers (0x660000..0x66001E) + sprite scroll */
+void Video_UploadScroll(const f3mem_t *m)
+{
+    if (m->spr)
+        Video_SetSpriteScroll(m);
+}
+
 /* ROM 0x005BE8 */
 static uint32_t fill_lineram_run(const f3mem_t *m, uint32_t a1, uint16_t val)
 {
@@ -611,6 +618,45 @@ void Stage_UploadBgTilemaps(const f3mem_t *m)
             }
         }
     }
+}
+
+/* ROM 0x00117E: clear both sprite RAM banks (0x600030 and 0x608030) and reset cursors */
+void Sprite_ClearAll(const f3mem_t *m)
+{
+    uint32_t a0 = 0x00600030u;
+    uint32_t a1 = 0x00608030u;
+    for (int i = 0; i <= 0x3FB; i++) {
+        wr16(m, a0, 0u);
+        wr16(m, a0 + 2u, 0xFFFFu);
+        wr16(m, a1, 0u);
+        wr16(m, a1 + 2u, 0xFFFFu);
+        a0 += 0x10u;
+        a1 += 0x10u;
+    }
+    a0 = 0x00600030u;
+    a1 = 0x00608030u;
+    for (int i = 0; i <= 0x3FB; i++) {
+        wr16(m, a0 + 4u, 0x0FF0u);
+        wr16(m, a0 + 6u, 0x0FF0u);
+        wr16(m, a0 + 8u, 0u);
+        wr16(m, a0 + 0xAu, 0u);
+        wr16(m, a0 + 0xCu, 0u);
+        wr16(m, a0 + 0xEu, 0u);
+        wr16(m, a1 + 4u, 0x0FF0u);
+        wr16(m, a1 + 6u, 0x0FF0u);
+        wr16(m, a1 + 8u, 0u);
+        wr16(m, a1 + 0xAu, 0u);
+        wr16(m, a1 + 0xCu, 0u);
+        wr16(m, a1 + 0xEu, 0u);
+        a0 += 0x10u;
+        a1 += 0x10u;
+    }
+    wr32(m, F3_A5 - 0x0CA0u, 0x00600310u);
+    wr32(m, F3_A5 - 0x0C9Cu, 0x00600310u);
+    wr32(m, F3_A5 - 0x0C98u, 0x00608310u);
+    wr32(m, F3_A5 - 0x0CACu, 0u);
+    wr32(m, F3_A5 - 0x0CA8u, 0u);
+    wr16(m, F3_A5 - 0x0CA4u, (uint16_t)(rd16(m, F3_A5 - 0x0CA4u) & 0xFFEDu));
 }
 
 /* ROM 0x19F38A: clear all layers and draw the 40x29 test-mode grid on text RAM (0x61C000) */

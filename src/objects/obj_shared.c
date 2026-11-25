@@ -462,3 +462,406 @@ void Boss_ResetGlobals(const f3mem_t *m, uint32_t obj)
     wr16(m, obj + 0x16u, 0u);
     wr16(m, obj + 0x1Au, 0u);
 }
+
+/* ROM 0x184888 */
+void Obj_184888(const f3mem_t *m, uint32_t obj, uint32_t a1)
+{
+    wr32(m, obj + 0x24u, 0u);
+    wr32(m, obj + 0x28u, 0u);
+    wr8(m, obj + 0x34u, 0x08u);
+    wr8(m, obj + 0x35u, 0u);
+    wr16(m, obj + 0x64u, 0u);
+    wr16(m, obj + 0x1Cu, rd16(m, a1)); a1 += 2u;
+    wr16(m, obj + 0x1Eu, rd16(m, a1)); a1 += 2u;
+    wr16(m, obj + 0x24u, rd16(m, a1)); a1 += 2u;
+    wr16(m, obj + 0x28u, rd16(m, a1)); a1 += 2u;
+    wr32(m, obj + 0x2Cu, rd32(m, a1)); a1 += 4u;
+    wr32(m, obj + 0x30u, rd32(m, a1)); a1 += 4u;
+    wr16(m, obj + 0x62u, rd16(m, a1)); a1 += 2u;
+    wr32(m, obj + 0x66u, rd32(m, a1));
+    wr8(m, obj + 0x22u, rd8(m, obj + 0x1Du));
+    wr32(m, obj + 0x24u, rd32(m, obj + 0x24u) / 10u);
+}
+
+/* ROM 0x1848D6 */
+void Obj_1848D6(const f3mem_t *m, uint32_t obj, uint32_t a1)
+{
+    wr32(m, obj + 0x10u, rd32(m, a1)); a1 += 4u;
+    wr16(m, obj + 0x1Cu, rd16(m, a1)); a1 += 2u;
+    wr16(m, obj + 0x1Eu, rd16(m, a1)); a1 += 2u;
+    wr32(m, obj + 0x24u, rd32(m, a1)); a1 += 4u;
+    wr32(m, obj + 0x28u, rd32(m, a1)); a1 += 4u;
+    wr16(m, obj + 0x2Cu, rd16(m, a1)); a1 += 2u;
+    wr16(m, obj + 0x30u, rd16(m, a1)); a1 += 2u;
+    wr16(m, obj + 0x2Eu, rd16(m, a1)); a1 += 2u;
+    wr16(m, obj + 0x32u, rd16(m, a1)); a1 += 2u;
+    wr16(m, obj + 0x16u, rd16(m, a1)); a1 += 2u;
+    wr16(m, obj + 0x1Au, rd16(m, a1));
+    wr16(m, obj + 0x34u, 0u);
+}
+
+/* ROM 0x13F238 */
+int16_t Sound_PreCmdHook(const f3mem_t *m, int16_t cmd)
+{
+    if (rd8(m, F3_A5 + 0x3306u) != 0u && cmd >= 1 && cmd <= 0x40)
+        cmd = (int16_t)(cmd + 0x53);
+    return cmd;
+}
+
+/* ROM 0x11B2F6 */
+void Obj_11B2F6(const f3mem_t *m, uint32_t obj)
+{
+    wr16(m, obj + 0x1Cu, 0u);
+    wr16(m, obj + 0x1Eu, 0u);
+    wr32(m, obj + 0x28u, 0x00010000u);
+    wr32(m, obj + 0x24u, 0u);
+    wr16(m, obj + 0x34u, 0u);
+    wr16(m, obj + 0x3Au, 0u);
+    wr16(m, obj + 0x3Eu, 0u);
+    wr8(m, obj + 0x4Fu, 0u);
+}
+
+/* ROM 0x113652 */
+void Obj_113652(const f3mem_t *m, uint32_t obj)
+{
+    wr16(m, obj + 0x34u, 0u);
+    wr16(m, obj + 0x1Cu, 0u);
+    wr16(m, obj + 0x1Eu, 0u);
+    wr16(m, obj + 0x3Au, 0u);
+    wr16(m, obj + 0x3Eu, 0u);
+    wr8(m, obj + 0x4Fu, 0u);
+    uint32_t d0 = rd32(m, obj + 0x0Cu);
+    wr16(m, obj + 0x50u, (uint16_t)(int16_t)(int8_t)(d0 >> 24));
+    wr16(m, obj + 0x52u, (uint16_t)(int16_t)(int8_t)((d0 >> 16) & 0xFFu));
+    wr16(m, obj + 0x20u, (uint16_t)(((d0 >> 8) & 0xFFu) << 8));
+    uint16_t d1 = (uint16_t)(d0 & 0xFFu);
+    wr16(m, obj + 0x22u, d1);
+    if (d1 != 0u)
+        wr8(m, obj + 0x1Cu, (uint8_t)(rd8(m, obj + 0x1Cu) ^ 0x01u));
+    uint32_t a1 = rd32(m, obj + 0x08u);
+    wr32(m, obj + 0x14u, rd32(m, a1 + 0x14u));
+    wr32(m, obj + 0x18u, rd32(m, a1 + 0x18u));
+    wr16(m, obj + 0x14u, (uint16_t)(rd16(m, obj + 0x14u) + rd16(m, obj + 0x50u)));
+    wr16(m, obj + 0x18u, (uint16_t)(rd16(m, obj + 0x18u) + rd16(m, obj + 0x52u)));
+}
+
+/* ROM 0x17A7FA */
+void Obj_17A7FA(const f3mem_t *m, uint32_t obj)
+{
+    wr16(m, obj + 0x14u, 0u);
+    wr16(m, obj + 0x18u, 0u);
+    wr16(m, obj + 0x20u, 0u);
+    wr32(m, obj + 0x50u, 0u);
+    wr32(m, obj + 0x54u, 0u);
+    wr32(m, obj + 0x58u, 0u);
+    wr16(m, obj + 0x16u, 0u);
+    wr16(m, obj + 0x1Au, 0u);
+    wr16(m, obj + 0x42u, 0u);
+    wr16(m, obj + 0x5Cu, 0u);
+    wr16(m, obj + 0x5Eu, 0u);
+    wr16(m, obj + 0x60u, 0u);
+    wr32(m, obj + 0x4Cu, 0xFFFFFFFFu);
+    wr16(m, obj + 0x1Eu, 0u);
+    wr16(m, obj + 0x1Cu, 0u);
+    wr8(m, obj + 0x22u, 0u);
+    wr8(m, obj + 0x23u, 0u);
+    wr8(m, obj + 0x34u, 0u);
+    wr8(m, obj + 0x35u, 0u);
+}
+
+/* ROM 0x18495E */
+void Obj_18495E(const f3mem_t *m, uint32_t obj)
+{
+    uint16_t idx = (uint16_t)((rd8(m, F3_A5 + 0x087Fu) >> 4) & 0x0Fu);
+    uint16_t d0 = (uint16_t)rd8(m, 0x001849E6u + idx);
+    uint16_t d1 = (uint16_t)((rd16(m, obj + 0x24u) / 0x0064u) * d0);
+    wr16(m, obj + 0x24u, (uint16_t)(rd16(m, obj + 0x24u) + d1));
+}
+
+/* ROM 0x11AE2C */
+void Obj_11AE2C(const f3mem_t *m, uint32_t obj)
+{
+    wr8(m, F3_A5 + 0x30F4u, 0u);
+    if (m->gfx) {
+        uint32_t base = 0x00627600u + (uint32_t)(int32_t)(int16_t)rd16(m, F3_A5 - 0x5D56u);
+        for (int i = 0; i < 0xE8; i++)
+            wr16(m, base + (uint32_t)i * 2u, 0xDDDDu);
+    }
+    wr8(m, F3_A5 - 0x144Cu, (uint8_t)(rd8(m, F3_A5 - 0x144Cu) | 0x08u));
+    Obj_Free(m, obj);
+}
+
+/* ROM 0x0CEDE4 */
+void Obj_0CEDE4(const f3mem_t *m, uint32_t obj, uint32_t a1)
+{
+    a1 += 0x14u;
+    wr32(m, obj + 0x1Cu, 0u);
+    wr32(m, obj + 0x24u, 0u);
+    wr16(m, obj + 0x24u, rd16(m, a1)); a1 += 2u;
+    wr32(m, obj + 0x28u, 0u);
+    wr16(m, obj + 0x28u, rd16(m, a1)); a1 += 2u;
+    wr32(m, obj + 0x2Cu, rd32(m, a1)); a1 += 4u;
+    wr32(m, obj + 0x30u, rd32(m, a1));
+    wr16(m, obj + 0x34u, 0x0200u);
+    wr16(m, obj + 0x06u, 0u);
+    wr16(m, obj + 0x20u, 0u);
+    wr16(m, obj + 0x22u, 0u);
+    wr32(m, obj + 0x3Au, rd32(m, obj + 0x14u));
+    wr32(m, obj + 0x3Eu, rd32(m, obj + 0x18u));
+    wr8(m, obj + 0x4Fu, 0u);
+}
+
+/* ROM 0x0CFA7C */
+void Obj_0CFA7C(const f3mem_t *m, uint32_t obj, uint32_t a1, uint16_t d0)
+{
+    int16_t off = (int16_t)rd16(m, 0x000CFA96u + (uint32_t)d0 * 2u);
+    a1 = (uint32_t)((int32_t)a1 + (int32_t)off);
+    wr8(m, obj + 0x1Cu, (uint8_t)rd16(m, a1)); a1 += 2u;
+    wr32(m, obj + 0x10u, rd32(m, a1)); a1 += 4u;
+    wr32(m, obj + 0x68u, rd32(m, a1));
+}
+
+/* ROM 0x0CBDDE */
+uint32_t Obj_0CBDDE(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a1 = rd32(m, obj + 0x36u);
+    if (rd8(m, obj + 0x35u) == 2u)
+        return a1;
+    if (rd8(m, obj + 0x35u) == 1u)
+        return rd32(m, a1 + 0x08u);
+    return a1;
+}
+
+/* ROM 0x13E4D0 */
+uint32_t Obj_13E4D0(const f3mem_t *m, uint32_t obj, uint32_t d0)
+{
+    uint32_t a1 = rd32(m, obj + 0x10u);
+    uint8_t d1_hi = (uint8_t)(rd16(m, a1) << 3);
+    uint8_t d1_lo = (uint8_t)(rd16(m, a1 + 2u) << 3);
+    return (d0 & 0x0000FFFFu) | ((uint32_t)d1_lo << 24) | ((uint32_t)d1_hi << 16);
+}
+
+/* ROM 0x0CC3C6 */
+uint16_t Obj_0CC3C6(const f3mem_t *m, uint32_t obj, uint32_t target)
+{
+    int16_t dx = (int16_t)(((int16_t)rd16(m, target + 0x2Cu) + (int16_t)rd16(m, target + 0x2Eu)
+                            - (int16_t)rd16(m, obj + 0x2Cu) - (int16_t)rd16(m, obj + 0x2Eu)) >> 1);
+    dx = (int16_t)(dx + (int16_t)rd16(m, target + 0x14u) - (int16_t)rd16(m, obj + 0x14u));
+    int16_t dy = (int16_t)(((int16_t)rd16(m, target + 0x30u) + (int16_t)rd16(m, target + 0x32u)
+                            - (int16_t)rd16(m, obj + 0x30u) - (int16_t)rd16(m, obj + 0x32u)) >> 1);
+    dy = (int16_t)(dy + (int16_t)rd16(m, target + 0x18u) - (int16_t)rd16(m, obj + 0x18u));
+    return (uint16_t)Obj_Atan2(m, dx, dy);
+}
+
+/* ROM 0x11C32C */
+void Obj_11C32C(const f3mem_t *m, uint32_t obj)
+{
+    if (rd8(m, obj + 0x35u) != 0u) {
+        if (rd8(m, obj + 0x1Du) == 6u) {
+            wr8(m, obj + 0x35u, 0u);
+            wr8(m, obj + 0x1Du, 8u);
+        } else {
+            wr8(m, obj + 0x1Du, 6u);
+        }
+    } else {
+        wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
+    }
+}
+
+/* ROM 0x11B06E */
+void Obj_11B06E(const f3mem_t *m, uint32_t obj)
+{
+    if (rd8(m, F3_A5 + 0x30F3u) == 0u && rd32(m, obj + 0x2Cu) != 0u) {
+        wr32(m, rd32(m, F3_A5 + 0x08FEu), obj);
+        wr32(m, F3_A5 + 0x08FEu, rd32(m, F3_A5 + 0x08FEu) + 4u);
+        wr32(m, rd32(m, F3_A5 + 0x0906u), obj);
+        wr32(m, F3_A5 + 0x0906u, rd32(m, F3_A5 + 0x0906u) + 4u);
+    }
+    Obj_11C32C(m, obj);
+}
+
+/* ROM 0x11B09A */
+void Obj_11B09A(const f3mem_t *m, uint32_t obj)
+{
+    int16_t x = (int16_t)(rd16(m, obj + 0x50u) + rd16(m, obj + 0x54u) + rd16(m, F3_A5 + 0x30D2u));
+    int16_t y = (int16_t)(rd16(m, obj + 0x52u) + rd16(m, obj + 0x56u) + rd16(m, F3_A5 + 0x30D6u));
+    wr16(m, obj + 0x14u, (uint16_t)x);
+    wr16(m, obj + 0x18u, (uint16_t)y);
+    if (y < 0xE8 && x < 0x140) {
+        uint32_t a1 = rd32(m, obj + 0x10u);
+        int16_t h = (int16_t)((int16_t)rd16(m, a1) << 4);
+        int16_t w = (int16_t)((int16_t)rd16(m, a1 + 2u) << 4);
+        if ((int16_t)(h + y) > 0 && (int16_t)(w + x) > 0)
+            Obj_DrawSprite(m, obj);
+    }
+    wr16(m, obj + 0x14u, (uint16_t)(rd16(m, obj + 0x14u) - rd16(m, obj + 0x54u)));
+    wr16(m, obj + 0x18u, (uint16_t)(rd16(m, obj + 0x18u) - rd16(m, obj + 0x56u)));
+}
+
+/* ROM 0x0D0DC2 */
+void Obj_0D0DC2(const f3mem_t *m, uint32_t obj)
+{
+    wr32(m, rd32(m, F3_A5 + 0x08FEu), obj);
+    wr32(m, F3_A5 + 0x08FEu, rd32(m, F3_A5 + 0x08FEu) + 4u);
+    wr32(m, rd32(m, F3_A5 + 0x0906u), obj);
+    wr32(m, F3_A5 + 0x0906u, rd32(m, F3_A5 + 0x0906u) + 4u);
+}
+
+/* ROM 0x0CEF0E */
+void Obj_0CEF0E(const f3mem_t *m, uint32_t obj)
+{
+    if ((rd8(m, F3_A5 - 0x144Bu) & 0x20u) != 0u) {
+        Obj_StartDying(m, obj);
+        return;
+    }
+    if ((rd8(m, F3_A5 + 0x1D58u) & 0x02u) != 0u) {
+        int16_t x = (int16_t)rd16(m, obj + 0x14u);
+        if (x >= -0x0A && x <= 0x011C) {
+            wr8(m, obj + 0x1Du, rd8(m, obj + 0x4Fu));
+            Obj_ExplodeTick(m, obj);
+            return;
+        }
+    }
+    wr32(m, obj + 0x00u, 0x000CEF44u);
+}
+
+static int sub_0D1EBC_shared(const f3mem_t *m, uint16_t d0w, uint16_t d1w,
+                             uint32_t *out_d0, uint32_t *out_d1)
+{
+    if (d1w > 50u)
+        return -1;
+    uint32_t off = (uint32_t)(int32_t)(int16_t)d0w * 4u;
+    *out_d0 = rd32(m, 0x000D1EDCu + off) * (uint32_t)d1w;
+    *out_d1 = rd32(m, 0x000D2044u + off) * (uint32_t)d1w;
+    return 0;
+}
+
+static int sub_0D25E4_shared(const f3mem_t *m, uint16_t d0w, uint16_t d1w,
+                             uint32_t *out_d0, uint32_t *out_d1)
+{
+    uint16_t d4w = 0u;
+    while (d1w >= 0x0032u) {
+        d4w = (uint16_t)(d4w + 1u);
+        d1w = (uint16_t)(d1w - 0x0032u);
+    }
+    if (d4w > 50u)
+        return -1;
+    uint32_t off = (uint32_t)(int32_t)(int16_t)d0w * 4u;
+    uint32_t d3 = rd32(m, 0x000D1EDCu + off) * (uint32_t)d1w;
+    uint32_t d4 = rd32(m, 0x000D2044u + off) * (uint32_t)d1w;
+    *out_d0 = rd32(m, 0x000D263Cu + off) * (uint32_t)d4w + d3;
+    *out_d1 = rd32(m, 0x000D27A4u + off) * (uint32_t)d4w + d4;
+    return 0;
+}
+
+/* ROM 0x0CF898 */
+int Obj_0CF898(const f3mem_t *m, uint32_t obj, uint32_t *out_d0, uint32_t *out_d1)
+{
+    uint32_t a1 = rd32(m, obj + 0x0Cu);
+    const uint16_t d6w = 0x0168u;
+    uint32_t v;
+
+    v = rd32(m, a1 + 0x08u) + rd32(m, a1 + 0x0Cu);
+    wr32(m, a1 + 0x08u, v);
+    if ((int32_t)v < 0)
+        wr16(m, a1 + 0x08u, (uint16_t)(rd16(m, a1 + 0x08u) + d6w));
+    else if (rd16(m, a1 + 0x08u) >= d6w)
+        wr16(m, a1 + 0x08u, (uint16_t)(rd16(m, a1 + 0x08u) - d6w));
+
+    v = rd32(m, a1 + 0x10u) + rd32(m, a1 + 0x14u);
+    wr32(m, a1 + 0x10u, v);
+    if ((int32_t)v < 0)
+        wr32(m, a1 + 0x10u, 0u);
+    else if (rd16(m, a1 + 0x10u) > 0x0032u)
+        wr16(m, a1 + 0x10u, 0x0032u);
+
+    v = rd32(m, a1 + 0x18u) + rd32(m, a1 + 0x1Cu);
+    wr32(m, a1 + 0x18u, v);
+    if ((int32_t)v < 0)
+        wr16(m, a1 + 0x18u, (uint16_t)(rd16(m, a1 + 0x18u) + d6w));
+    else if (rd16(m, a1 + 0x18u) >= d6w)
+        wr16(m, a1 + 0x18u, (uint16_t)(rd16(m, a1 + 0x18u) - d6w));
+
+    v = rd32(m, a1 + 0x20u) + rd32(m, a1 + 0x24u);
+    wr32(m, a1 + 0x20u, v);
+    if ((int32_t)v < 0)
+        wr16(m, a1 + 0x20u, (uint16_t)(rd16(m, a1 + 0x20u) + d6w));
+    else if (rd16(m, a1 + 0x20u) >= d6w)
+        wr16(m, a1 + 0x20u, (uint16_t)(rd16(m, a1 + 0x20u) - d6w));
+
+    uint16_t d0w = rd16(m, a1 + 0x08u);
+    uint16_t d1w = rd16(m, a1 + 0x10u);
+    uint16_t d2w = d0w;
+    uint16_t d3w = d1w;
+    uint32_t d0, d1;
+    if (sub_0D1EBC_shared(m, d0w, d1w, &d0, &d1) < 0)
+        return -1;
+
+    uint32_t d4 = d0;
+    uint32_t d5 = d1;
+
+    d2w = (uint16_t)(d2w - rd16(m, a1 + 0x18u));
+    if ((int16_t)d2w < 0)
+        d2w = (uint16_t)(d2w + d6w);
+    if (sub_0D1EBC_shared(m, d2w, d3w, &d0, &d1) < 0)
+        return -1;
+
+    d0w = rd16(m, a1 + 0x20u);
+    d1w = (uint16_t)(d1 >> 16);
+    d3w = 0x005Au;
+    if (d2w < 0x00B4u) {
+        d1w = (uint16_t)(0u - d1w);
+        d3w = (uint16_t)(d3w + 0x00B4u);
+    }
+    d2w = d1w;
+    if (sub_0D1EBC_shared(m, d0w, d1w, &d0, &d1) < 0)
+        return -1;
+
+    d0w = (uint16_t)(rd16(m, a1 + 0x18u) + d3w);
+    if (d0w >= d6w)
+        d0w = (uint16_t)(d0w - d6w);
+    d1w = (uint16_t)((uint16_t)(d1 >> 16) + d2w);
+    if (sub_0D25E4_shared(m, d0w, d1w, &d0, &d1) < 0)
+        return -1;
+
+    *out_d0 = d0 + d4;
+    *out_d1 = d1 + d5;
+    return 0;
+}
+
+/* ROM 0x0D0DE4 */
+void Obj_0D0DE4(const f3mem_t *m, uint32_t obj)
+{
+    if ((rd8(m, obj + 0x07u) & 0x80u) != 0u)
+        return;
+    uint32_t a1 = rd32(m, F3_A5 + 0x08FEu);
+    wr32(m, a1, obj);
+    wr32(m, F3_A5 + 0x08FEu, a1 + 4u);
+    a1 = rd32(m, F3_A5 + 0x0906u);
+    wr32(m, a1, obj);
+    wr32(m, F3_A5 + 0x0906u, a1 + 4u);
+}
+
+/* ROM 0x0D0E04 */
+void Obj_0D0E04(const f3mem_t *m, uint32_t obj, uint32_t d0)
+{
+    uint8_t k = rd8(m, obj + 0x35u);
+    if (k == 1u) {
+        uint32_t a1 = rd32(m, rd32(m, obj + 0x36u) + 0x08u);
+        wr32(m, a1 + 0x48u, rd32(m, a1 + 0x48u) + d0);
+    } else if (k == 2u) {
+        uint32_t a1 = rd32(m, obj + 0x36u);
+        wr32(m, a1 + 0x48u, rd32(m, a1 + 0x48u) + d0);
+    }
+}
+
+/* ROM 0x0CEE48 */
+void Obj_0CEE48(const f3mem_t *m, uint32_t obj)
+{
+    if ((rd8(m, F3_A5 - 0x144Bu) & 0x20u) == 0u) {
+        uint8_t d0 = rd8(m, obj + 0x4Eu);
+        if (d0 != 0u)
+            (void)Obj_Spawn(m, obj, 0x00117C28u, 0u, 1u, (uint32_t)d0);
+    }
+    Obj_StartDying(m, obj);
+}

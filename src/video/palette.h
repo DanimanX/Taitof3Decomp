@@ -16,5 +16,8 @@ void Pal_UploadFade154DD0(const f3mem_t *m); /* ROM 0x154DD0 */
 void Pal_UploadFade1551F2(const f3mem_t *m); /* ROM 0x1551F2 */
 void Pal_UploadFade163D1A(const f3mem_t *m); /* ROM 0x163D1A */
 void Pal_UploadFade16413C(const f3mem_t *m); /* ROM 0x16413C */
+void Pal_FadeOut001866(const f3mem_t *m, uint32_t a1, uint32_t d0, uint32_t d1, uint32_t d2); /* ROM 0x001866 */
+void Pal_FadeIn001890(const f3mem_t *m, uint32_t a0, uint32_t d0, uint32_t d1, uint32_t d2);  /* ROM 0x001890 */
+void Stage_Fade146006(const f3mem_t *m);     /* ROM 0x146006 */
 
 #endif

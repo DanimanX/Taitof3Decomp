@@ -1,9 +1,9 @@
 #include "obj_124532.h"
 
-/* bfset (0x30ee,A5){0x5:0x1} — force bit 5 of the global flag word */
+/* bfset (0x30ee,A5){0x5:0x1} — force bit 5 (big-endian bit 2, 0x04) of byte A5+0x30EE */
 static void bfset_bit5(const f3mem_t *m)
 {
-    wr16(m, F3_A5 + 0x30EEu, (uint16_t)(rd16(m, F3_A5 + 0x30EEu) | 0x0020u));
+    wr8(m, F3_A5 + 0x30EEu, (uint8_t)(rd8(m, F3_A5 + 0x30EEu) | 0x04u));
 }
 
 /* ROM 0x12452a: jump-table entry — set fn pointer to OBJ_124532 */

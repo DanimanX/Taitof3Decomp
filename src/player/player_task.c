@@ -21,6 +21,7 @@
 #include "player_task.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
+#include "../video/palette.h"
 
 /* ---- globals (A5-relative) -------------------------------------------- */
 #define G_SCENE_STARTED (F3_A5 + 0x1D1Eu) /* bset.b: scene init done (Z = old) */
@@ -204,11 +205,12 @@ int Player_SceneInit(const f3mem_t *m)
     wr16(m, G_TIMER_ROW_2, 0u);
     wr16(m, G_TIMER_CNT_2, 0u);
 
-    /* 0x0C6B66..0x0C6BD2: jsr 0x001660(TBL_PAL_0C9242, dst, n) x4, called as
-     * 0x001660(a0 = src, (SP+0xC) = dst colour word, (SP+0x8) = count):
-     *   (3, 0x354) (8, 0x360) (3, 0x94) (8, 0xA0)  [frame count, palette row]
-     * 0x001660 is not decompiled yet: the frame stops before the writes. */
-    return -1;
+    /* 0x0C6B66..0x0C6BD2: jsr 0x001660(TBL_PAL_0C9242, dst, n) x4 */
+    Pal_QueueUpload(m, TBL_PAL_0C9242, 0x0354u, 3u);
+    Pal_QueueUpload(m, TBL_PAL_0C9242, 0x0360u, 8u);
+    Pal_QueueUpload(m, TBL_PAL_0C9242, 0x0094u, 3u);
+    Pal_QueueUpload(m, TBL_PAL_0C9242, 0x00A0u, 8u);
+    return -1; /* 0x0C6BD6: two-player spawn loop (Player_Respawn stops at 0x0C8E1A) */
 
 #if 0
     /* 0x0C6BD6.. the two-player spawn loop, verbatim register map:
@@ -323,13 +325,63 @@ LAB_0C7CBE:
 }
 
 /* ======================================================================== */
-/* ROM 0x0C8488 / 0x0C87F8: HUD animation-row advance (per player, then the  */
-/* 0x001660 palette copy which is not decompiled).                          */
+/* ROM 0x0C84E4: queue a 25-entry HUD palette upload and shift the ramp.    */
+/* ======================================================================== */
+static void hud_row1_player(const f3mem_t *m, uint32_t a0, uint32_t a1, uint16_t rem)
+{
+    uint16_t id = rd16(m, a0 + PS_PLAYER_ID);
+    uint16_t pal = (uint16_t)rd8(m, 0x000C8548u + id);
+    uint16_t dst = (uint16_t)((pal << 6) + 0x4004u);
+    Pal_QueueUpload(m, a1, dst, 0x0019u);
+    for (int i = 0; i < 24; i++) {
+        wr32(m, a1, rd32(m, a1 + 4u));
+        a1 += 4u;
+    }
+    if (rd16(m, a0 + PS_SHIELD_TMR) != 0u) {
+        wr32(m, a1, 0x00FF2020u);
+    } else {
+        uint16_t idx = (uint16_t)(rd16(m, a0 + PS_POWER_B) / 5u);
+        uint32_t tbl = rd32(m, 0x000C854Au + 4u * (uint32_t)idx);
+        wr32(m, a1, rd32(m, tbl + 4u * (uint32_t)rem));
+    }
+}
+
+/* ======================================================================== */
+/* ROM 0x0C8488: HUD animation-row 1 advance + 0x001660 palette uploads.    */
 /* ======================================================================== */
 int Player_HudRow1(const f3mem_t *m)
 {
-    (void)m;
-    return -1; /* 0x0C84E4: 0x001660 + palette words; not decompiled */
+    wr16(m, G_TIMER_CNT_1, (uint16_t)(rd16(m, G_TIMER_CNT_1) + 1u));
+    uint16_t d1 = rd16(m, G_TIMER_ROW_1);
+    uint16_t d0 = rd16(m, G_TIMER_CNT_1);
+    if ((int16_t)d0 >= (int16_t)rd16(m, 0x000C8746u + d1)) {
+        wr16(m, G_TIMER_CNT_1, 0u);
+        d1 = (uint16_t)(d1 + 6u);
+        if ((int16_t)rd16(m, 0x000C8746u + d1) < 0)
+            d1 = 0u;
+    }
+    wr16(m, G_TIMER_ROW_1, d1);
+    uint16_t rem = (uint16_t)(rd16(m, G_FRAME_COUNTER) % 0x19u);
+    hud_row1_player(m, P1_STATE_ADDR, TEXT_STATE_P1, rem);
+    hud_row1_player(m, P2_STATE_ADDR, TEXT_STATE_P2, rem);
+    return 0;
+}
+
+/* ======================================================================== */
+/* ROM 0x0C87F8: HUD animation-row 2 advance.                               */
+/* ======================================================================== */
+void Player_HudRow2(const f3mem_t *m)
+{
+    wr16(m, G_TIMER_CNT_2, (uint16_t)(rd16(m, G_TIMER_CNT_2) + 1u));
+    uint16_t d1 = rd16(m, G_TIMER_ROW_2);
+    uint16_t d0 = rd16(m, G_TIMER_CNT_2);
+    if ((int16_t)d0 >= (int16_t)rd16(m, 0x000C8882u + d1)) {
+        wr16(m, G_TIMER_CNT_2, 0u);
+        d1 = (uint16_t)(d1 + 6u);
+        if ((int16_t)rd16(m, 0x000C8882u + d1) < 0)
+            d1 = 0u;
+    }
+    wr16(m, G_TIMER_ROW_2, d1);
 }
 
 

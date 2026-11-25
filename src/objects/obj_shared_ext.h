@@ -49,4 +49,68 @@ void Boss_UploadPalettes(const f3mem_t *m);
 /* ROM 0x1847E8: reset the boss globals at A5+0x4B02.. and object flags. */
 void Boss_ResetGlobals(const f3mem_t *m, uint32_t obj);
 
+/* ROM 0x184888 / 0x1848D6: seed boss/enemy stats & hitboxes from record A1. */
+void Obj_184888(const f3mem_t *m, uint32_t obj, uint32_t a1);
+void Obj_1848D6(const f3mem_t *m, uint32_t obj, uint32_t a1);
+
+/* ROM 0x13F238: remap sound command (+0x53 when A5+0x3306 != 0 and 1 <= cmd <= 0x40). */
+int16_t Sound_PreCmdHook(const f3mem_t *m, int16_t cmd);
+
+/* ROM 0x11B2F6: reset enemy fields. */
+void Obj_11B2F6(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x113652: init child object from +0x0C packed offset/angle and +0x08 parent. */
+void Obj_113652(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x17A7FA: clear common boss/enemy object fields. */
+void Obj_17A7FA(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x18495E: scale boss HP (+0x24 high word) by difficulty nibble A5+0x87F. */
+void Obj_18495E(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x11AE2C: clear bg-scroll/gfx state and free object. */
+void Obj_11AE2C(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x0CEDE4: seed enemy HP/dmg/hitboxes from parameter record A1+0x14. */
+void Obj_0CEDE4(const f3mem_t *m, uint32_t obj, uint32_t a1);
+
+/* ROM 0x0CFA7C: index into offset table at 0x0CFA96 and load sprite/ptr from A1. */
+void Obj_0CFA7C(const f3mem_t *m, uint32_t obj, uint32_t a1, uint16_t d0);
+
+/* ROM 0x0CBDDE: resolve score receiver from +0x36 (or (+0x36)->+0x08 when +0x35 == 1). */
+uint32_t Obj_0CBDDE(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x13E4D0: pack sprite center offset (w*8, h*8) into high 16 bits of d0. */
+uint32_t Obj_13E4D0(const f3mem_t *m, uint32_t obj, uint32_t d0);
+
+/* ROM 0x0CC3C6: angle from obj (A0) hitbox center to target (A1) hitbox center. */
+uint16_t Obj_0CC3C6(const f3mem_t *m, uint32_t obj, uint32_t target);
+
+/* ROM 0x11C32C: update flash/palette byte +0x1D from +0x35/+0x4F. */
+void Obj_11C32C(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x11B06E: push to collision lists if active & hitbox non-zero, then Obj_11C32C. */
+void Obj_11B06E(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x11B09A: compute screen pos from +0x50/+0x54/+0x30D2 and draw if visible. */
+void Obj_11B09A(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x0D0DC2: push obj to list1 (A5+0x8FE) and list3 (A5+0x906). */
+void Obj_0D0DC2(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x0CEF0E: off-screen/bomb handling; parks at 0x000CEF44 when off-screen. */
+void Obj_0CEF0E(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x0CF898: 3D-orbit offset step from descriptor at +0x0C -> (d0, d1). */
+int Obj_0CF898(const f3mem_t *m, uint32_t obj, uint32_t *out_d0, uint32_t *out_d1);
+
+/* ROM 0x0D0DE4: push obj to list1 (A5+0x8FE) and list3 (A5+0x906) if bit7 of +0x07 clear. */
+void Obj_0D0DE4(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x0D0E04: add d0 to parent/grandparent +0x48 timer based on +0x35 (1 or 2). */
+void Obj_0D0E04(const f3mem_t *m, uint32_t obj, uint32_t d0);
+
+/* ROM 0x0CEE48: spawn 0x117C28 score/fx if +0x4E != 0 and not bomb-clear, then Obj_StartDying. */
+void Obj_0CEE48(const f3mem_t *m, uint32_t obj);
+
 #endif

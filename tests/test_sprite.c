@@ -107,6 +107,8 @@ int main(void)
             { "0x005A86", "work/ram/fn_005A86", 4 },
             { "0x005B0C", "work/ram/fn_005B0C", 5 },
             { "0x13D11E", "work/ram/fn_13D11E", 8 },
+            { "0x13D7A0", "work/ram/fn_13D7A0", 9 },
+            { "0x13D94C", "work/ram/fn_13D94C", 10 },
         };
         for (size_t t = 0; t < sizeof(fn_tests) / sizeof(fn_tests[0]); t++) {
             capture_t c;
@@ -134,6 +136,10 @@ int main(void)
                     Gfx_ClearAllLayers(&m);
                 } else if (fn_tests[t].id == 8) {
                     Stage_DrawBanner13D11E(&m);
+                } else if (fn_tests[t].id == 9) {
+                    Stage_NameEntry13D7A0(&m, c.pre[i][CR_A0], c.pre[i][CR_A1], (uint16_t)c.pre[i][7]);
+                } else if (fn_tests[t].id == 10) {
+                    Stage_DrawHighScores13D94C(&m);
                 } else {
                     Gfx_InitLineRam(&m);
                 }

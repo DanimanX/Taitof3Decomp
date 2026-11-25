@@ -2,6 +2,7 @@
  * 0x001282..0x00140E. Register-level faithful: D4 carries the F3 "block"
  * control bits (12: in block, 13/14/15, 31: row has an anchor sprite). */
 #include "sprite.h"
+#include "../enemy/obj_1194C2.h"
 
 static void draw_multi_grid(const f3mem_t *m, uint32_t obj, uint32_t a1, uint32_t a2,
                             uint16_t d0w, uint16_t d1w, int16_t d7)
@@ -181,8 +182,28 @@ void Gfx_DrawTilemapBlock(const f3mem_t *m, uint32_t src, uint32_t dst, uint16_t
     } while (rows > 0);
 }
 
+/* ROM 0x005690 */
+uint32_t Gfx_DrawHex(const f3mem_t *m, uint32_t val, uint16_t digits, uint32_t dst, uint16_t attr)
+{
+    uint16_t d3 = (uint16_t)((attr * 2u) & 0x3Eu);
+    uint32_t a0 = dst + (int16_t)(digits << 1);
+    uint32_t ret = a0;
+    int16_t d1 = (int16_t)digits - 1;
+    while (d1 >= 0) {
+        uint16_t nib = (uint16_t)(val & 0xFu);
+        uint8_t ch = (uint8_t)(nib < 10u ? nib + 0x30u : nib + 0x37u);
+        a0 -= 1u;
+        wr8(m, a0, ch);
+        a0 -= 1u;
+        wr8(m, a0, (uint8_t)d3);
+        val >>= 4;
+        d1--;
+    }
+    return ret;
+}
+
 /* ROM 0x00571A */
-void Gfx_DrawDecimal(const f3mem_t *m, uint32_t val, uint16_t digits, uint32_t dst, uint16_t attr)
+uint32_t Gfx_DrawDecimal(const f3mem_t *m, uint32_t val, uint16_t digits, uint32_t dst, uint16_t attr)
 {
     uint16_t d2 = (uint16_t)(((attr & 0x3Fu) << 1) << 8);
     uint32_t a0 = dst + (int16_t)(digits << 1);
@@ -211,6 +232,7 @@ void Gfx_DrawDecimal(const f3mem_t *m, uint32_t val, uint16_t digits, uint32_t d
         wr16(m, a0, d2);
         d1--;
     } while (d1 >= 0);
+    return end;
 }
 
 /* ROM 0x005880 */
@@ -381,4 +403,112 @@ void Stage_DrawBanner13D11E(const f3mem_t *m)
     uint32_t a0 = rd32(m, 0x0013D558u + (int32_t)idx * 4);
     Gfx_UploadTextTiles(m, a0, rd8(m, 0x00010C05u));
     Gfx_DrawTilemapBlock(m, 0x00010C00u, 0x0061C024u, 0u);
+}
+
+/* ROM 0x13D7A0 */
+void Stage_NameEntry13D7A0(const f3mem_t *m, uint32_t a0, uint32_t a1, uint16_t d7)
+{
+    int16_t idx = (int16_t)rd16(m, a0 + 0x22u);
+    uint32_t a2 = rd32(m, 0x0013D916u + (int32_t)idx * 4);
+    int16_t d1 = 8;
+    int16_t d2 = (int16_t)((int16_t)rd32(m, a0 + 0x48u) * 2 + 0x0D);
+    uint8_t d3 = rd8(m, a2++);
+    uint32_t dst = 0x0061C000u + (int32_t)(int16_t)((d2 << 7) + (d1 << 1));
+    uint32_t d0 = Text_DrawString(m, a2, dst, d3);
+    a2 = d0 + 0x2Au + (int32_t)(int16_t)rd16(m, a0 + 0x3Eu) * 2;
+    if ((d7 & 1u) == 0u) {
+        wr16(m, a2, (uint16_t)((rd16(m, a2) & 0x81FFu) | (5u << 9)));
+    } else {
+        wr16(m, a2, (uint16_t)((rd16(m, 0x000106B6u) & 0x81FFu) | (8u << 9)));
+    }
+    uint32_t inp = rd32(m, a0 + 0x44u);
+    int skip_char = 0;
+    if ((rd8(m, inp) & 0x08u) == 0u) {
+        int16_t t = (int16_t)rd16(m, a0 + 6u);
+        if (t < 0x14) {
+            t++;
+            wr16(m, a0 + 6u, (uint16_t)t);
+            if (t > 1) skip_char = 1;
+        }
+        if (!skip_char) {
+            wr16(m, a0 + 0x3Au, (uint16_t)(rd16(m, a0 + 0x3Au) + 1u));
+        }
+    } else if ((rd8(m, inp) & 0x04u) == 0u) {
+        int16_t t = (int16_t)rd16(m, a0 + 6u);
+        if (t < 0x14) {
+            t++;
+            wr16(m, a0 + 6u, (uint16_t)t);
+            if (t > 1) skip_char = 1;
+        }
+        if (!skip_char) {
+            wr16(m, a0 + 0x3Au, (uint16_t)(rd16(m, a0 + 0x3Au) - 1u));
+        }
+    } else {
+        wr16(m, a0 + 6u, 0u);
+    }
+    if (!skip_char) {
+        int16_t ch = (int16_t)rd16(m, a0 + 0x3Au);
+        if (ch < 0) ch += 0x25;
+        if (ch > 0x24) ch -= 0x25;
+        wr16(m, a0 + 0x3Au, (uint16_t)ch);
+        int16_t pos = (int16_t)rd16(m, a0 + 0x3Eu);
+        wr8(m, a1 + 6u + (int32_t)pos, rd8(m, 0x0013D926u + ch));
+    }
+    if ((int16_t)d7 > 0) {
+        if ((rd8(m, inp + 1u) & 0x20u) == 0u) {
+            int16_t pos = (int16_t)rd16(m, a0 + 0x3Eu) - 1;
+            if (pos < 0) pos = 0;
+            wr16(m, a0 + 0x3Eu, (uint16_t)pos);
+        }
+        if ((rd8(m, inp + 1u) & 0x10u) == 0u) {
+            int16_t pos = (int16_t)rd16(m, a0 + 0x3Eu) + 1;
+            wr16(m, a0 + 0x3Eu, (uint16_t)pos);
+            if (pos >= 3) {
+                wr32(m, a0 + 0x48u, 0xFFFFFFFFu);
+            }
+        }
+    }
+    if (rd32(m, a1 + 6u) == 0x4B4B4B00u || rd32(m, a1 + 6u) == 0x53455800u) {
+        wr32(m, a1 + 6u, 0x41414100u);
+    }
+}
+
+/* ROM 0x13D94C */
+void Stage_DrawHighScores13D94C(const f3mem_t *m)
+{
+    uint32_t lram = 0x00626200u + (int16_t)rd16(m, F3_A5 - 0x5D56u);
+    for (int i = 0; i < 0xE8; i++) {
+        wr16(m, lram + (uint32_t)i * 2u, 0x0CFCu);
+    }
+    Text_DrawString(m, 0x0013DAAAu, 0x0061C41Cu, 5u);
+    Text_DrawString(m, 0x0013DAB6u, 0x0061C590u, 8u);
+    uint32_t a0 = 0x00406CD4u;
+    int16_t d1 = 1;
+    int16_t d2 = 0x0D;
+    for (; d1 <= 5; d1++, d2 += 2, a0 += 0x0Cu) {
+        int16_t d3 = 0x0B;
+        uint32_t dst = 0x0061C000u + (int32_t)(int16_t)((d2 << 7) + (d3 << 1));
+        uint32_t d0 = Gfx_DrawHex(m, (uint32_t)(uint16_t)d1, 1u, dst, 0x0Au);
+        d0 += 2u;
+        d0 = Gfx_DrawDecimal(m, rd32(m, a0), 8u, d0, 7u);
+        d0 += 2u;
+        int16_t col = 0;
+        int16_t d4 = 0;
+        uint32_t a1 = 0x0013D5C8u;
+        int8_t limit = (int8_t)rd8(m, a0 + 4u);
+        do {
+            d4++;
+            uint16_t d5 = (d4 < limit) ? 6u : 4u;
+            d0 = Text_DrawString(m, a1 + (int32_t)col * 2, d0, d5);
+            if (col == 0x15 || col == 0x1B) {
+                d0 = Text_DrawString(m, 0x0013DAD1u, d0, d5);
+                d0 -= 2u;
+            }
+            uint16_t bit = (rd8(m, a0 + 5u) >> 2) & 1u;
+            col = (int16_t)(col + d4 + bit);
+        } while (d4 < 7 && d4 < limit);
+        d4 = (int16_t)(d4 - 9);
+        d0 -= (int32_t)(int16_t)(d4 + d4);
+        Text_DrawString(m, a0 + 6u, d0, 7u);
+    }
 }

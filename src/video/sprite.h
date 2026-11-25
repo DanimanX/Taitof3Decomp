@@ -12,5 +12,6 @@
 void Obj_DrawSprite(const f3mem_t *m, uint32_t obj);  /* ROM 0x001282 */
 void Obj_DrawSpriteSub(const f3mem_t *m, uint32_t obj, uint16_t d0, uint16_t d1, uint16_t d2); /* ROM 0x001410 */
 void Video_SetSpriteScroll(const f3mem_t *m);         /* ROM 0x001232 */
+void Gfx_InitLineRam(const f3mem_t *m);               /* ROM 0x005B0C */
 
 #endif

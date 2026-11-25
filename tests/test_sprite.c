@@ -92,5 +92,32 @@ int main(void)
         }
     }
 
+    /* ROM 0x005B0C (Gfx_InitLineRam) */
+    {
+        capture_t c;
+        long rl;
+        uint8_t *rom = cap_slurp("work/maincpu.bin", &rl);
+        (void)rl;
+        if (rom && !cap_load(&c, "work/ram/fn_005B0C") && c.gfx) {
+            uint8_t *w = malloc(F3_WRAM_SIZE), *g = malloc(F3_GFX_SIZE);
+            int ok = 0, budget = 10;
+            for (int i = 0; i < c.pairs; i++) {
+                memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
+                memcpy(g, c.gfx + ((size_t)i * 2) * F3_GFX_SIZE, F3_GFX_SIZE);
+                f3mem_t m = { w, rom, NULL, NULL, g };
+                Gfx_InitLineRam(&m);
+                uint32_t sp = c.pre[i][CR_SP];
+                int d = cap_diff("wram", i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x40, sp, &budget)
+                      + cap_diff("gfx", i, F3_GFX_BASE, g, c.gfx + ((size_t)i * 2 + 1) * F3_GFX_SIZE, F3_GFX_SIZE, 0, 0, &budget);
+                ok += d == 0;
+            }
+            printf("sprite: %-20s %d/%d calls bit-exact (Work RAM + gfx RAM)\n", "0x005B0C", ok, c.pairs);
+            bad += c.pairs - ok;
+            free(w); free(g);
+            cap_free(&c);
+        }
+        free(rom);
+    }
+
     return bad == 0 ? 0 : 1;
 }

@@ -129,3 +129,50 @@ void Video_SetSpriteScroll(const f3mem_t *m)
     wr16(m, a0 + 0x0006u, (uint16_t)((rd16(m, a0 + 0x0006u) & 0xF000u) | y));
     wr16(m, a0 + 0x8006u, (uint16_t)((rd16(m, a0 + 0x8006u) & 0xF000u) | y));
 }
+
+/* ROM 0x005BE8 */
+static uint32_t fill_lineram_run(const f3mem_t *m, uint32_t a1, uint16_t val)
+{
+    for (int i = 0; i < 0xE8; i++) {
+        wr16(m, a1, val);
+        a1 += 2u;
+    }
+    return a1 + 0x30u;
+}
+
+/* ROM 0x005B0C */
+void Gfx_InitLineRam(const f3mem_t *m)
+{
+    uint32_t a0 = 0x00005BF8u;
+    uint32_t a1 = 0x00624000u;
+    uint16_t d0 = rd8(m, F3_A5 - 0x5D58u) ? 0u : 0x30u;
+    a1 += d0;
+    wr16(m, F3_A5 - 0x5D56u, d0);
+    for (int r = 0; r < 8; r++) {
+        for (int k = 0; k < 4; k++) {
+            a1 = fill_lineram_run(m, a1, rd16(m, a0));
+            a0 += 2u;
+        }
+        a1 += 0x800u;
+    }
+    a1 = 0x00620000u;
+    d0 = 0x100Fu;
+    for (int r = 0; r < 8; r++) {
+        for (int i = 0; i < 0x100; i++) {
+            wr16(m, a1, d0);
+            a1 += 2u;
+        }
+        d0 = (uint16_t)(d0 + 0x0400u);
+    }
+    if (rd16(m, F3_A5 - 0x5D58u) == 0u) {
+        wr16(m, 0x00626000u, 0x0800u);
+        wr16(m, 0x006275FEu, (uint16_t)(rd16(m, 0x006275FEu) | 0x0080u));
+        wr16(m, 0x006257FEu, 0x6E00u);
+        wr16(m, 0x006247FEu, (uint16_t)(rd16(m, 0x006247FEu) | 0x8000u));
+    } else {
+        wr16(m, 0x006261FEu, 0x0800u);
+        wr16(m, 0x00627400u, (uint16_t)(rd16(m, 0x00627400u) | 0x0080u));
+        wr16(m, 0x00625600u, 0x6E00u);
+        wr16(m, 0x00624600u, (uint16_t)(rd16(m, 0x00624600u) | 0x8000u));
+    }
+}

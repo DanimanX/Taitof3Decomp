@@ -290,6 +290,17 @@ static void scr_179312(const f3mem_t *m, uint32_t obj)
     wr8(m, F3_A5 + 0x4B26u, (uint8_t)(rd8(m, F3_A5 + 0x4B26u) & (uint8_t)~0x04u));
 }
 
+/* ROM 0x1793F6: load the heading (+0x42) and the two bytes at +0x5C/+0x5E from
+ * the entry's words +0x06/+0x08/+0x0A. Plain moves, no side effect beyond
+ * those three fields. */
+static void scr_1793F6(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a1 = rd32(m, obj + 0x44u);
+    wr16(m, obj + 0x42u, rd16(m, a1 + 6u));
+    wr16(m, obj + 0x5Cu, rd16(m, a1 + 8u));
+    wr16(m, obj + 0x5Eu, rd16(m, a1 + 0x0Au));
+}
+
 /* ROM 0x18F5B2 */
 static void scr_18F5B2(const f3mem_t *m, uint32_t obj)
 {
@@ -314,6 +325,7 @@ static int script10_call(const f3mem_t *m, uint32_t obj, uint32_t fn)
     case 0x00179276u: scr_179276(m, obj);              return 0;
     case 0x001792B0u: scr_1792B0(m, obj);              return 0;
     case 0x00179312u: scr_179312(m, obj);              return 0;
+    case 0x001793F6u: scr_1793F6(m, obj);              return 0;
     case 0x0018F5B2u: scr_18F5B2(m, obj);              return 0;
     default:          return -1;
     }

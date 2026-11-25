@@ -16,6 +16,7 @@ int Obj_Dying3_Tick(const f3mem_t *m, uint32_t obj);  /* ROM 0x0CEE8C: Obj_Free 
 
 uint32_t Obj_InitPosBox(const f3mem_t *m, uint32_t obj, uint32_t a1); /* ROM 0x11B31C */
 void Obj_InheritOffsetPos(const f3mem_t *m, uint32_t obj);             /* ROM 0x17BD68 */
+int  Obj_PolarPlace(const f3mem_t *m, uint32_t obj);                   /* ROM 0x17BDA2 */
 void Mem_WritePair64(const f3mem_t *m, uint32_t a0, uint32_t a1, uint32_t d0, uint32_t d1); /* ROM 0x16AB2C */
 void Mem_CopyLongs(const f3mem_t *m, uint32_t a0, uint32_t a1, uint16_t d0w);              /* ROM 0x16A19C */
 void Video_ClearRect(const f3mem_t *m, uint32_t a0, uint32_t a1);                         /* ROM 0x0054AC */

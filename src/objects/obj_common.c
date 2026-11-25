@@ -157,6 +157,52 @@ int Obj_Dying1_Tick(const f3mem_t *m, uint32_t obj) { wr32(m, obj, 0x000CEE84u);
 int Obj_Dying2_Tick(const f3mem_t *m, uint32_t obj) { wr32(m, obj, 0x000CEE8Cu); return 0; }
 int Obj_Dying3_Tick(const f3mem_t *m, uint32_t obj) { Obj_Free(m, obj); return 0; }
 
+/* ROM 0x17BDA2: {dx.b, dy.b, radius.b, angle.b} at +0x0C. The signed offset
+ * bytes go to +0x16/+0x1A, the angle byte (the 0x27E40*4 index) to +0x20, and
+ * the radial step (table entry * radius*4) >> 16 is added to the offsets. The
+ * position is then the PARENT's +0x50/+0x54 plus those offsets -- confirmed by
+ * the 0x17ED40 capture (parent 213/137 + the d=0 step 0xFFF8/0x0005 -> 205/142,
+ * not the object's own stale 1/-2). 0x17EA0A's call reaches the same entry with
+ * its own +0x0C record. Verifies the unpacked-table decode through *shift. */
+int Obj_PolarPlace(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a4 = rd32(m, obj + 0x08u);
+    uint16_t d0 = (uint16_t)(int16_t)(int8_t)rd8(m, obj + 0x0Cu);
+    uint16_t d1 = (uint16_t)(int16_t)(int8_t)rd8(m, obj + 0x0Du);
+    uint16_t d2 = rd8(m, obj + 0x0Eu);
+    uint16_t d3 = rd8(m, obj + 0x0Fu);
+    uint16_t px = rd16(m, a4 + 0x50u);
+    uint16_t py = rd16(m, a4 + 0x54u);
+
+    wr16(m, obj + 0x16u, d0);
+    wr16(m, obj + 0x1Au, d1);
+    wr16(m, obj + 0x20u, 0u);
+    wr8(m, obj + 0x20u, (uint8_t)d3);
+
+    {
+        /* ROM 0x17BDCA: lea (0x27E40).l,A1; move.w (0x80,A1,D3w*2),D0w (cos) ;
+         * move.w (0x0,A1,D3w*2),D1w (sin) ; lsl.w #2 the radius; muls.w both;
+         * swap: the high halves land in the offset words. */
+        int32_t c = (int32_t)(int16_t)rd16(m, 0x00027E40u + 0x80u + (uint32_t)d3 * 2u);
+        int32_t s = (int32_t)(int16_t)rd16(m, 0x00027E40u + (uint32_t)d3 * 2u);
+        int32_t r = (int32_t)(int16_t)(uint16_t)(d2 << 2);
+        uint32_t p0 = (uint32_t)(c * r);
+        uint32_t p1 = (uint32_t)(s * r);
+        wr16(m, obj + 0x16u, (uint16_t)(rd16(m, obj + 0x16u) + (uint16_t)(p0 >> 16)));
+        wr16(m, obj + 0x1Au, (uint16_t)(rd16(m, obj + 0x1Au) + (uint16_t)(p1 >> 16)));
+    }
+
+    {
+        uint16_t x = (uint16_t)(px + rd16(m, obj + 0x16u));
+        uint16_t y = (uint16_t)(py + rd16(m, obj + 0x1Au));
+        wr16(m, obj + 0x50u, x);
+        wr16(m, obj + 0x54u, y);
+        wr16(m, obj + 0x14u, x);
+        wr16(m, obj + 0x18u, y);
+    }
+    return 0;
+}
+
 /* ROM 0x11B31C: load +0x50/+0x52 words, clear +0x54/+0x56, sign-extend 4 bytes to +0x2C/+0x30/+0x2E/+0x32 */
 uint32_t Obj_InitPosBox(const f3mem_t *m, uint32_t obj, uint32_t a1)
 {

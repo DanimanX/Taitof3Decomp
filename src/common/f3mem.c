@@ -16,7 +16,7 @@ uint8_t *f3_ptr(const f3mem_t *m, uint32_t a)
     if (m->dpram && a >= F3_DPRAM_BASE && a < F3_DPRAM_BASE + F3_DPRAM_SIZE)
         return &m->dpram[a - F3_DPRAM_BASE];
     if (a < F3_ROM_SIZE && m->rom)
-        return (uint8_t *)&m->rom[a];
+        return &((uint8_t *)m->rom)[a];
     /* Unmapped: I/O space (0x4A0000..), cart/user windows, or a corrupt
      * pointer read out of a capture. Returning a zeroed scratch byte keeps a
      * single bad address from abort()ing the whole harness (one such capture

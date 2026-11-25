@@ -153,6 +153,7 @@ def main():
     ap.add_argument("--samples", type=int, default=60, help="Samples per stub (default 60)")
     ap.add_argument("--dry-run", action="store_true", help="Print capture plan without running MAME")
     ap.add_argument("--resume", action="store_true", help="Skip addresses already in work/recapture_ok.txt")
+    ap.add_argument("--only-long", action="store_true", help="Only use L[A-E]_* savestates")
     args = ap.parse_args()
 
     stubs, test_names = find_stubs(ready_only=args.ready_only)
@@ -172,6 +173,8 @@ def main():
         k = addr.lstrip("0")
         if k in plan and k not in done_ok:
             delta, st, grp = plan[k]
+            if args.only_long and not re.match(r"^L[ABCDE]_", st):
+                continue
             ram_name = test_names.get(k, addr)
             ordered.append((delta, addr, ram_name, st, grp))
     ordered.sort()

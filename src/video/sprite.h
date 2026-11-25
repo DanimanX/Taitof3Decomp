@@ -10,5 +10,7 @@
 #define SPR_CURSOR (F3_A5 - 0x0CA0)
 
 void Obj_DrawSprite(const f3mem_t *m, uint32_t obj);  /* ROM 0x001282 */
+void Obj_DrawSpriteSub(const f3mem_t *m, uint32_t obj, uint16_t d0, uint16_t d1, uint16_t d2); /* ROM 0x001410 */
+void Video_SetSpriteScroll(const f3mem_t *m);         /* ROM 0x001232 */
 
 #endif

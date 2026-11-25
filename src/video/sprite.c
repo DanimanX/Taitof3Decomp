@@ -3,29 +3,12 @@
  * control bits (12: in block, 13/14/15, 31: row has an anchor sprite). */
 #include "sprite.h"
 
-void Obj_DrawSprite(const f3mem_t *m, uint32_t obj)
+static void draw_multi_grid(const f3mem_t *m, uint32_t obj, uint32_t a1, uint32_t a2,
+                            uint16_t d0w, uint16_t d1w, int16_t d7)
 {
-    uint32_t a1 = rd32(m, SPR_CURSOR);
-    uint32_t a2 = rd32(m, obj + 0x10);
     uint8_t colour = rd8(m, obj + 0x1D);
     uint16_t zoom = rd16(m, obj + 0x1E);
-
-    if (rd32(m, a2) == 0x00010001u) {                 /* single sprite, 0x13CE */
-        wr16(m, a1 + 2, zoom);
-        uint32_t d0 = ((uint32_t)rd16(m, obj + 0x14) << 16) | rd16(m, obj + 0x18);
-        wr32(m, a1 + 4, d0 & 0x0FFF0FFFu);
-        wr16(m, a1, rd16(m, a2 + 4));
-        uint16_t attr = (uint16_t)(rd16(m, a2 + 6) ^ (rd16(m, obj + 0x1C) & 0xFF00u));
-        if (colour) attr = (uint16_t)((attr & 0xFF00u) | colour);
-        wr16(m, a1 + 8, attr);
-        wr32(m, SPR_CURSOR, a1 + 0x10);
-        return;
-    }
-
-    uint16_t d0w = rd16(m, a2), d1w = rd16(m, a2 + 2);
-    a2 += 4;
-    int16_t d7 = (int16_t)d0w, d6;
-    d0w--; d1w--;
+    int16_t d6;
     uint32_t d4 = rd16(m, obj + 0x1C) & 0xFF00u;
     switch (rd8(m, obj + 0x1C)) {                     /* jump table 0x12B8 */
     case 0:
@@ -86,4 +69,63 @@ void Obj_DrawSprite(const f3mem_t *m, uint32_t obj)
         d4 |= 1u << 15;
     } while (rows-- != 0);
     wr32(m, SPR_CURSOR, a1);
+}
+
+void Obj_DrawSprite(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a1 = rd32(m, SPR_CURSOR);
+    uint32_t a2 = rd32(m, obj + 0x10);
+    uint8_t colour = rd8(m, obj + 0x1D);
+    uint16_t zoom = rd16(m, obj + 0x1E);
+
+    if (rd32(m, a2) == 0x00010001u) {                 /* single sprite, 0x13CE */
+        wr16(m, a1 + 2, zoom);
+        uint32_t d0 = ((uint32_t)rd16(m, obj + 0x14) << 16) | rd16(m, obj + 0x18);
+        wr32(m, a1 + 4, d0 & 0x0FFF0FFFu);
+        wr16(m, a1, rd16(m, a2 + 4));
+        uint16_t attr = (uint16_t)(rd16(m, a2 + 6) ^ (rd16(m, obj + 0x1C) & 0xFF00u));
+        if (colour) attr = (uint16_t)((attr & 0xFF00u) | colour);
+        wr16(m, a1 + 8, attr);
+        wr32(m, SPR_CURSOR, a1 + 0x10);
+        return;
+    }
+
+    uint16_t d0w = rd16(m, a2), d1w = rd16(m, a2 + 2);
+    a2 += 4;
+    int16_t d7 = (int16_t)d0w;
+    d0w--; d1w--;
+    draw_multi_grid(m, obj, a1, a2, d0w, d1w, d7);
+}
+
+/* ROM 0x001410 */
+void Obj_DrawSpriteSub(const f3mem_t *m, uint32_t obj, uint16_t d0, uint16_t d1, uint16_t d2)
+{
+    uint32_t a1 = rd32(m, SPR_CURSOR);
+    uint32_t a2 = rd32(m, obj + 0x10);
+    int16_t d7 = (int16_t)rd16(m, a2);
+    int16_t d6 = (int16_t)rd16(m, a2 + 2);
+    a2 += 4;
+    if (d2 & 1u) {
+        int16_t d3 = (int16_t)(d7 - (int16_t)d1);
+        a2 += (uint32_t)((int32_t)d3 * 4);
+    }
+    if (d2 & 2u) {
+        int16_t d3 = (int16_t)(d6 - (int16_t)d0);
+        a2 += (uint32_t)((int32_t)d3 * (int32_t)d7 * 4);
+    }
+    uint16_t cols = (uint16_t)(d1 - 1u);
+    uint16_t rows = (uint16_t)(d0 - 1u);
+    draw_multi_grid(m, obj, a1, a2, cols, rows, d7);
+}
+
+/* ROM 0x001232 */
+void Video_SetSpriteScroll(const f3mem_t *m)
+{
+    uint32_t a0 = 0x00600020u;
+    uint16_t x = rd16(m, F3_A5 - 0x0CACu) & 0x0FFFu;
+    uint16_t y = rd16(m, F3_A5 - 0x0CA8u) & 0x0FFFu;
+    wr16(m, a0 + 0x0004u, (uint16_t)((rd16(m, a0 + 0x0004u) & 0xF000u) | x));
+    wr16(m, a0 + 0x8004u, (uint16_t)((rd16(m, a0 + 0x8004u) & 0xF000u) | x));
+    wr16(m, a0 + 0x0006u, (uint16_t)((rd16(m, a0 + 0x0006u) & 0xF000u) | y));
+    wr16(m, a0 + 0x8006u, (uint16_t)((rd16(m, a0 + 0x8006u) & 0xF000u) | y));
 }

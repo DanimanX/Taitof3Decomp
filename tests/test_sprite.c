@@ -40,5 +40,57 @@ int main(void)
     static const char *caps[] = { "work/ram/spr", "work/ram/spr_flip1", "work/ram/spr_flip2", "work/ram/spr_flip3" };
     int bad = 0, total = 0;
     for (int k = 0; k < 4; k++) bad += run(caps[k], &total);
+
+    /* ROM 0x001410 (Obj_DrawSpriteSub) */
+    {
+        capture_t c;
+        long rl;
+        uint8_t *rom = cap_slurp("work/maincpu.bin", &rl);
+        (void)rl;
+        if (rom && !cap_load(&c, "work/ram/fn_001410") && c.spr) {
+            uint8_t *w = malloc(F3_WRAM_SIZE), *s = malloc(F3_SPR_SIZE);
+            int ok = 0, budget = 10;
+            for (int i = 0; i < c.pairs; i++) {
+                memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
+                memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
+                f3mem_t m = { w, rom, NULL, s, NULL };
+                Obj_DrawSpriteSub(&m, c.pre[i][CR_A0], (uint16_t)c.pre[i][CR_D0],
+                                  (uint16_t)c.pre[i][CR_D0 + 1], (uint16_t)c.pre[i][CR_D0 + 2]);
+                uint32_t sp = c.pre[i][CR_SP];
+                int d = cap_diff("wram", i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x40, sp, &budget)
+                      + cap_diff("spr", i, F3_SPR_BASE, s, cap_spr(&c, i, 1), F3_SPR_SIZE, 0, 0, &budget);
+                ok += d == 0;
+            }
+            printf("sprite: %-20s %d/%d calls bit-exact (Work RAM + sprite RAM)\n", "0x001410", ok, c.pairs);
+            bad += c.pairs - ok;
+            free(w); free(s);
+            cap_free(&c);
+        }
+        free(rom);
+    }
+
+    /* ROM 0x001232 (Video_SetSpriteScroll) */
+    {
+        capture_t c;
+        if (!cap_load(&c, "work/ram/fn_001232") && c.spr) {
+            uint8_t *w = malloc(F3_WRAM_SIZE), *s = malloc(F3_SPR_SIZE);
+            int ok = 0, budget = 10;
+            for (int i = 0; i < c.pairs; i++) {
+                memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
+                memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
+                f3mem_t m = { w, NULL, NULL, s, NULL };
+                Video_SetSpriteScroll(&m);
+                uint32_t sp = c.pre[i][CR_SP];
+                int d = cap_diff("wram", i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x40, sp, &budget)
+                      + cap_diff("spr", i, F3_SPR_BASE, s, cap_spr(&c, i, 1), F3_SPR_SIZE, 0, 0, &budget);
+                ok += d == 0;
+            }
+            printf("sprite: %-20s %d/%d calls bit-exact (Work RAM + sprite RAM)\n", "0x001232", ok, c.pairs);
+            bad += c.pairs - ok;
+            free(w); free(s);
+            cap_free(&c);
+        }
+    }
+
     return bad == 0 ? 0 : 1;
 }

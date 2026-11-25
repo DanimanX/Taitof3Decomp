@@ -547,6 +547,11 @@
 #include "../src/enemy/obj_FF1DA.h"
 #include "../src/enemy/obj_D6794.h"
 #include "../src/enemy/obj_DC076.h"
+#include "../src/enemy/obj_18037A.h"
+#include "../src/enemy/obj_DC49A.h"
+#include "../src/enemy/obj_C9A78.h"
+#include "../src/enemy/obj_185EB2.h"
+#include "../src/enemy/obj_E3C48.h"
 #include "../src/enemy/obj_E3CDA.h"
 #include "../src/enemy/obj_FCBC4.h"
 #include "../src/enemy/obj_E78A6.h"
@@ -1829,6 +1834,11 @@ int main(void)
     bad += run("Obj 0x0FF1DA", "work/ram/obj_FF1DA", Obj_FF1DA_Tick, rom);
     bad += run("Obj 0x0D6794", "work/ram/obj_D6794", Obj_D6794_Tick, rom);
     bad += run("Obj 0x0DC076", "work/ram/obj_DC076", Obj_DC076_Tick, rom);
+    bad += run("Obj 0x18037A", "work/ram/obj_18037A", Obj_18037A_Tick, rom);
+    bad += run("Obj 0x0DC49A", "work/ram/obj_DC49A", Obj_DC49A_Tick, rom);
+    bad += run("Obj 0x0C9A78", "work/ram/obj_C9A78", Obj_C9A78_Tick, rom);
+    bad += run("Obj 0x185EB2", "work/ram/obj_185EB2", Obj_185EB2_Tick, rom);
+    bad += run("Obj 0x0E3C48", "work/ram/obj_E3C48", Obj_E3C48_Tick, rom);
     bad += run("Obj 0x0E3CDA", "work/ram/obj_E3CDA", Obj_E3CDA_Tick, rom);
     bad += run("Obj 0x0FCBD8", "work/ram/obj_FCBD8", Obj_FCBD8_Tick, rom);
     bad += run("Obj 0x0FCBCE", "work/ram/obj_FCBCE", Obj_FCBCE_Tick, rom);

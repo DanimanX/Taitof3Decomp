@@ -64,6 +64,17 @@ static int dispatch_tick(const f3mem_t *m, uint32_t obj, uint32_t fn)
         wr16(m, obj + 0x14u, rd16(m, a1 + 0x14u));
         return 0;
     }
+    case 0x17D9CE: {
+        /* 0x17D9CE: every third call spawn one 0x17A3F4 shot (group 5, one
+         * slot... pushed #0, #2, #5, #0x17A3F4) and restart the +0x64 count */
+        int16_t n = (int16_t)(rd16(m, obj + 0x64u) + 1u);
+        wr16(m, obj + 0x64u, (uint16_t)n);
+        if (n >= 3) {
+            (void)Obj_Spawn(m, obj, 0x0017A3F4u, 5u, 2u, 0u);
+            wr16(m, obj + 0x64u, 0u);
+        }
+        return 0;
+    }
     default:
         return -1;
     }

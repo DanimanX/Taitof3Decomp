@@ -612,3 +612,33 @@ void Stage_UploadBgTilemaps(const f3mem_t *m)
         }
     }
 }
+
+/* ROM 0x19F38A: clear all layers and draw the 40x29 test-mode grid on text RAM (0x61C000) */
+void Gfx_DrawTestGrid19F38A(const f3mem_t *m)
+{
+    uint32_t a2 = 0x0061C000u;
+    Gfx_ClearAllLayers(m);
+
+    for (uint32_t d3 = 0; d3 < 0x0Eu; d3++) {
+        for (uint32_t d2 = 0; d2 < 0x28u; d2++) {
+            uint32_t off = (d3 << 7) + (d2 << 1);
+            uint32_t tbl = (d3 < 2u || d2 < 2u || d2 > 0x25u) ? 0x001A1E9Cu : 0x001A1E94u;
+            uint32_t idx = ((d2 & 1u) << 1) + ((d3 & 1u) << 2);
+            wr16(m, a2 + off, rd16(m, tbl + idx));
+        }
+    }
+
+    for (uint32_t d2 = 0; d2 < 0x28u; d2++) {
+        uint32_t off = (0x0Eu << 7) + (d2 << 1);
+        wr16(m, a2 + off, rd16(m, 0x001A1EA4u + ((d2 & 1u) << 1)));
+    }
+
+    for (uint32_t d3 = 0x0Fu; d3 < 0x1Du; d3++) {
+        for (uint32_t d2 = 0; d2 < 0x28u; d2++) {
+            uint32_t off = (d3 << 7) + (d2 << 1);
+            uint32_t tbl = (d3 > 0x1Au && (d2 < 2u || d2 > 0x25u)) ? 0x001A1E9Cu : 0x001A1E94u;
+            uint32_t idx = ((d2 & 1u) << 1) + (((d3 + 1u) & 1u) << 2);
+            wr16(m, a2 + off, rd16(m, tbl + idx));
+        }
+    }
+}

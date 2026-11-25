@@ -2,6 +2,7 @@
  *   F3_SPR=1 scripts/capture_fn.sh 1282 13CC,140E 400 work/ram/spr */
 #include "capture.h"
 #include "../src/video/sprite.h"
+#include "../src/video/palette.h"
 
 static int run(const char *pfx, int *total)
 {
@@ -156,6 +157,29 @@ int main(void)
             cap_free(&c);
         }
         free(rom);
+    }
+
+    /* ROM 0x001660 (Pal_QueueUpload) */
+    {
+        static const char *pals[] = { "work/ram/fn_001660", "work/ram/fn_001660_att" };
+        for (int k = 0; k < 2; k++) {
+            capture_t c;
+            if (cap_load(&c, pals[k])) continue;
+            uint8_t *w = malloc(F3_WRAM_SIZE);
+            int ok = 0, budget = 10;
+            for (int i = 0; i < c.pairs; i++) {
+                memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
+                f3mem_t m = { w, NULL, NULL, NULL, NULL };
+                uint32_t sp = c.pre[i][CR_SP];
+                Pal_QueueUpload(&m, rd32(&m, sp + 4u), (uint16_t)rd32(&m, sp + 8u), (uint16_t)rd32(&m, sp + 12u));
+                int d = cap_diff("wram", i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x40, sp, &budget);
+                ok += d == 0;
+            }
+            printf("sprite: %-20s %d/%d calls bit-exact (Work RAM)\n", "0x001660", ok, c.pairs);
+            bad += c.pairs - ok;
+            free(w);
+            cap_free(&c);
+        }
     }
 
     return bad == 0 ? 0 : 1;

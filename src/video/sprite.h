@@ -29,5 +29,6 @@ void Stage_DrawBanner13D11E(const f3mem_t *m);        /* ROM 0x13D11E */
 void Stage_NameEntry13D7A0(const f3mem_t *m, uint32_t a0, uint32_t a1, uint16_t d7); /* ROM 0x13D7A0 */
 void Stage_DrawHighScores13D94C(const f3mem_t *m);    /* ROM 0x13D94C */
 void Stage_UploadBgTilemaps(const f3mem_t *m);        /* ROM 0x16A9BC */
+void Gfx_DrawTestGrid19F38A(const f3mem_t *m);        /* ROM 0x19F38A */
 
 #endif

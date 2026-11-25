@@ -289,11 +289,9 @@ static void pal_ramp_fill(const f3mem_t *m, uint32_t a0, uint32_t a1,
         for (int k = 0; k < 3; k++) {
             unsigned sh = 16u - 8u * (unsigned)k;
             uint32_t s = ((c0 >> sh) & 0xFFu) << 8;
+            uint32_t e = ((c1 >> sh) & 0xFFu) << 8;
             wr16(m, a2 + 2u * (uint32_t)k, (uint16_t)s);
-            /* the end colour only sizes the dividend: it is never stored */
-            (void)(((c1 >> sh) & 0xFFu) << 8);
-            int32_t dividend = (int32_t)((d6 & 0xFFFF0000u) | (uint32_t)d7);
-            int32_t step = dividend / div;                 /* divs.l D6,D3 */
+            int32_t step = ((int32_t)e - (int32_t)s) / div; /* divsl.l D6,D3:D3 */
             wr16(m, a2 + 6u + 2u * (uint32_t)k, (uint16_t)(uint32_t)step);
         }
         a2 += 0x0Cu;

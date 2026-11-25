@@ -149,6 +149,7 @@ Note on `Obj_Spawn` argument order: the word pushed last (just before the fn lon
 | 0x1289EA | Obj_1289EA_Tick | VERIFIED (MAME) | 21/21 ticks, 21 state changes, 21 alloc/free (codewhale CW6) |
 | 0x189C7C / 0x189D20 / 0x189EDC / 0x18A01E / 0x18A0C2 / 0x18A27E / 0x18A4CA / 0x189E6A / 0x18A20C | Obj_*_Tick (CW7) | VERIFIED (MAME) | 8/8 each, 1 state change each (codewhale CW7) |
 | 0x111D9C / 0x126FA4 / 0x126D92 / 0x116C48 / 0x12706C / 0x17AD18 / 0x116DD2 / 0x1281C4 / 0x1285FC | Obj_*_Tick (CW8) | VERIFIED (MAME) | 0x111D9C 2/2, 0x126FA4 1/1, 0x126D92 1/1, 0x116C48 24/24, 0x12706C 1/1, 0x17AD18 2/2, 0x116DD2 8/8, 0x1281C4 4/4, 0x1285FC 4/4 (codewhale CW8) |
+| 0x17AE0A / 0x184170 / 0x183F18 / 0x0EF904 / 0x14CB96 / 0x186388 / 0x186482 / 0x1865A0 / 0x001660 | Obj_*_Tick + Pal_QueueUpload | VERIFIED (MAME) | 0x17AE0A 1/1, 0x184170 60/60, 0x183F18 60/60, 0x0EF904 6/6, 0x14CB96 38/38, 0x186388 60/60, 0x186482 60/60, 0x1865A0 8/8 (52 unobs), 0x001660 20/20 |
 
 Tools: `scripts/capture_obj.sh <addr>` (tries the savestates until enough ticks), `scripts/integrate_obj.sh <addr> <draft.c>` (header + Makefile + test entry). Shared `Rng_NextMem()` in `f3mem.h` (seed in RAM 0x406BAA).
 

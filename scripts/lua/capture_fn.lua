@@ -35,7 +35,8 @@
 --              matches the children to capture)
 --   F3_MAXFRAMES stop after this many frames even if short of samples
 --              (default 6000; a stopped -debug MAME ignores SIGTERM)
---   F3_INPUT   "fire" = P1 autofire + sweeping joystick (default), "none"
+--   F3_INPUT   "fire" = P1 autofire + sweeping joystick (default), "up"/"down" = autofire
+--              holding one direction, "none"
 local ROOT = "/PROCESOS/Taitof3Decomp"
 local entry = tonumber(os.getenv("F3_ENTRY"), 16)
 local exits = {}
@@ -211,5 +212,13 @@ emu.register_frame_done(function()
     p[":IN.1"].fields["P1 Right"]:set_value(k == 1 and 1 or 0)
     p[":IN.1"].fields["P1 Down"]:set_value(k == 2 and 1 or 0)
     p[":IN.1"].fields["P1 Left"]:set_value(k == 3 and 1 or 0)
+  end
+  -- "up" / "down": autofire while holding one direction, so the stage-end
+  -- route choice (player height) takes the upper or lower branch.
+  if inmode == "up" or inmode == "down" then
+    local t = n + noffset
+    p[":IN.0"].fields["P1 Button 1"]:set_value((t // 3) % 2)
+    p[":IN.1"].fields["P1 Up"]:set_value(inmode == "up" and 1 or 0)
+    p[":IN.1"].fields["P1 Down"]:set_value(inmode == "down" and 1 or 0)
   end
 end)

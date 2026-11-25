@@ -1,7 +1,7 @@
 -- Survey which object tick routines run: at each frame end, read the fn
 -- field (+0) of every live pool slot (12 groups x 32 slots, free bitmap (1 = free) at
 -- 0x410000, 68020 bit order) and record first frame / count per fn.
--- Env: F3_FRAMES (default 30000), F3_OUT (tsv path), F3_INPUT fire|none,
+-- Env: F3_FRAMES (default 30000), F3_OUT (tsv path), F3_INPUT fire|none|up|down,
 --      F3_POKE32 "addr=val,..." written every frame (e.g. invincibility)
 --      F3_SAVEEVERY N: save state <F3_SAVEPFX>_<frame> every N frames (+ <out>.progress)
 --      F3_POKE16 "addr=val,..." 16-bit writes every frame (P1 invuln: 41B1E0=00D2)
@@ -39,6 +39,13 @@ emu.register_frame_done(function()
     p[":IN.1"].fields["P1 Right"]:set_value(k == 1 and 1 or 0)
     p[":IN.1"].fields["P1 Down"]:set_value(k == 2 and 1 or 0)
     p[":IN.1"].fields["P1 Left"]:set_value(k == 3 and 1 or 0)
+  end
+  -- "up" / "down": autofire while holding one direction, so the stage-end
+  -- route choice (player height) takes the upper or lower branch.
+  if inmode == "up" or inmode == "down" then
+    p[":IN.0"].fields["P1 Button 1"]:set_value((n // 3) % 2)
+    p[":IN.1"].fields["P1 Up"]:set_value(inmode == "up" and 1 or 0)
+    p[":IN.1"].fields["P1 Down"]:set_value(inmode == "down" and 1 or 0)
   end
   if saveevery > 0 and n % saveevery == 0 then
     manager.machine:save(string.format("%s_%06d", savepfx, n))

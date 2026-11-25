@@ -21,6 +21,7 @@ int  Player_Respawn(const f3mem_t *m, uint32_t player);    /* ROM 0x0C6D0E */
 void Player_PickActive(const f3mem_t *m);                  /* ROM 0x0C6E10 */
 int  Player_CoinCheckA(const f3mem_t *m, uint32_t player); /* ROM 0x0C77BE */
 int  Player_DefeatBookKeeping(const f3mem_t *m, uint32_t player); /* ROM 0x0C7C60 */
+int  Player_AliveShipTick(const f3mem_t *m, uint32_t player, uint32_t io_ptr); /* ROM 0x0C7946 */
 int  Player_HudRow1(const f3mem_t *m);                     /* ROM 0x0C8488 */
 void Player_HudRow2(const f3mem_t *m);                     /* ROM 0x0C87F8 */
 int  Player_Hud(const f3mem_t *m);                         /* ROM 0x0C8A5E */

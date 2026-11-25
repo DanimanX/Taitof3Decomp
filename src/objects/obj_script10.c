@@ -1,6 +1,8 @@
 #include "obj_script10.h"
 #include "obj_shared.h"
 #include "obj_shared_ext.h"
+#include "obj_pool.h"
+#include "../audio/sound_cmd.h"
 
 /* The 10-byte movement script at obj+0x44, as walked by ROM 0x178982.
  * Bodies lifted from src/enemy/obj_17C05E.c (same ROM addresses), where this
@@ -214,16 +216,105 @@ static void scr_178ECC(const f3mem_t *m, uint32_t obj)
     }
 }
 
+/* ROM 0x178AC6 */
+static void scr_178AC6(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a1 = rd32(m, obj + 0x44u);
+    wr16(m, obj + 0x50u, rd16(m, a1 + 6u));
+    wr16(m, obj + 0x54u, rd16(m, a1 + 8u));
+    wr16(m, obj + 0x52u, 0u);
+    wr16(m, obj + 0x56u, 0u);
+}
+
+/* ROM 0x178B0E */
+static void scr_178B0E(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a1 = rd32(m, obj + 0x44u);
+    wr16(m, obj + 0x42u, rd16(m, a1 + 6u));
+    wr16(m, obj + 0x20u, rd16(m, a1 + 8u));
+}
+
+/* ROM 0x179222 */
+static void scr_179222(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a1 = rd32(m, obj + 0x44u);
+    int16_t d0 = (int16_t)rd16(m, a1 + 6u);
+    if (d0 >= 0)
+        wr8(m, F3_A5 + 0x4B3Au, (uint8_t)(rd8(m, F3_A5 + 0x4B3Au) | (0x80u >> ((uint16_t)d0 & 7u))));
+    d0 = (int16_t)rd16(m, a1 + 8u);
+    if (d0 >= 0)
+        wr8(m, F3_A5 + 0x4B3Au, (uint8_t)(rd8(m, F3_A5 + 0x4B3Au) | (0x80u >> ((uint16_t)d0 & 7u))));
+}
+
+/* ROM 0x17924C */
+static void scr_17924C(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a1 = rd32(m, obj + 0x44u);
+    int16_t d0 = (int16_t)rd16(m, a1 + 6u);
+    if (d0 >= 0)
+        wr8(m, F3_A5 + 0x4B3Au, (uint8_t)(rd8(m, F3_A5 + 0x4B3Au) & (uint8_t)~(0x80u >> ((uint16_t)d0 & 7u))));
+    d0 = (int16_t)rd16(m, a1 + 8u);
+    if (d0 >= 0)
+        wr8(m, F3_A5 + 0x4B3Au, (uint8_t)(rd8(m, F3_A5 + 0x4B3Au) & (uint8_t)~(0x80u >> ((uint16_t)d0 & 7u))));
+}
+
+/* ROM 0x179276 */
+static void scr_179276(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a1 = rd32(m, obj + 0x44u);
+    int16_t d0 = (int16_t)rd16(m, a1 + 6u);
+    if (d0 >= 0)
+        Sound_PlayCmd(m, Sound_PreCmdHook(m, d0));
+    d0 = (int16_t)rd16(m, a1 + 8u);
+    if (d0 >= 0)
+        Sound_PlayCmd(m, Sound_PreCmdHook(m, d0));
+}
+
+/* ROM 0x1792B0 */
+static void scr_1792B0(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a1 = rd32(m, obj + 0x44u);
+    int16_t d0 = (int16_t)rd16(m, a1 + 6u);
+    if (d0 >= 0)
+        Sound_PlayCmdForced(m, Sound_PreCmdHook(m, d0));
+    d0 = (int16_t)rd16(m, a1 + 8u);
+    if (d0 >= 0)
+        Sound_PlayCmdForced(m, Sound_PreCmdHook(m, d0));
+}
+
+/* ROM 0x179312 */
+static void scr_179312(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a1 = rd32(m, obj + 0x44u);
+    Obj_Spawn(m, obj, 0x0017933Au, 3u, 2u, rd32(m, a1 + 6u));
+    wr8(m, F3_A5 + 0x4B26u, (uint8_t)(rd8(m, F3_A5 + 0x4B26u) & (uint8_t)~0x04u));
+}
+
+/* ROM 0x18F5B2 */
+static void scr_18F5B2(const f3mem_t *m, uint32_t obj)
+{
+    Obj_Spawn(m, obj, 0x001915AEu, 9u, 2u, 0u);
+}
+
 static int script10_call(const f3mem_t *m, uint32_t obj, uint32_t fn)
 {
     switch (fn) {
     case 0x00179074u: scr_179074(m, obj);              return 0;
+    case 0x00178AC6u: scr_178AC6(m, obj);              return 0;
+    case 0x00178B0Eu: scr_178B0E(m, obj);              return 0;
     case 0x00178B20u: Obj_Script10_SetHeading(m, obj); return 0;
     case 0x00178B4Au: sub_178B4A(m, obj);              return 0;
     case 0x00178C06u: sub_178C06(m, obj);              return 0;
     case 0x00178E4Au: Obj_Script10_SteerTo(m, obj);    return 0;
     case 0x00178CCEu: sub_178CCE(m, obj);              return 0;
     case 0x00178ECCu: scr_178ECC(m, obj);              return 0;
+    case 0x0017921Au:                                  return 0; /* ROM 0x17921A: rts */
+    case 0x00179222u: scr_179222(m, obj);              return 0;
+    case 0x0017924Cu: scr_17924C(m, obj);              return 0;
+    case 0x00179276u: scr_179276(m, obj);              return 0;
+    case 0x001792B0u: scr_1792B0(m, obj);              return 0;
+    case 0x00179312u: scr_179312(m, obj);              return 0;
+    case 0x0018F5B2u: scr_18F5B2(m, obj);              return 0;
     default:          return -1;
     }
 }

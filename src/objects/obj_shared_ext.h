@@ -125,4 +125,24 @@ void Obj_0D8294(const f3mem_t *m, uint32_t obj);
 /* ROM 0x0D8378: step +0x42/+0x22/+0x21 and integrate +0x54/+0x58 via 0x027E40 sin/cos. */
 void Obj_0D8378(const f3mem_t *m, uint32_t obj);
 
+/* ROM 0x0D70AE: Terrain_TestPoint wrapper applying +0x64 flip bits and +0x14/+0x18 pos. */
+uint16_t Obj_0D70AE(const f3mem_t *m, uint32_t obj, int16_t d0, int16_t d1);
+
+/* ROM 0x11B39A: init spawner at X=0x140, Y=0x2D+(rng&0x7F), spawn 0x11B3D2. */
+void Obj_11B39A(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x16AB26: write (d0, d1) longs to (a0)+. */
+void Obj_16AB26(const f3mem_t *m, uint32_t a0, uint32_t d0, uint32_t d1);
+
+/* ROM 0x116BE6 / 0x117058 / 0x1170EE / 0x117102 / 0x117154 / 0x117186 / 0x116F12 / 0x116FB0:
+ * multi-segment 3D chain/boss helpers. */
+void Obj_116BE6(const f3mem_t *m, uint32_t obj);
+void Obj_1170EE(const f3mem_t *m, uint32_t obj, uint32_t a1);
+void Obj_117058(const f3mem_t *m, uint32_t obj, uint32_t a1);
+void Obj_117102(const f3mem_t *m, uint32_t a1);
+void Obj_117154(const f3mem_t *m, uint32_t obj, uint16_t d0);
+void Obj_117186(const f3mem_t *m, uint32_t obj, uint16_t d0, uint16_t d1);
+void Obj_116F12(const f3mem_t *m, uint32_t a1);
+void Obj_116FB0(const f3mem_t *m, uint32_t a1);
+
 #endif

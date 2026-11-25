@@ -28,4 +28,8 @@ int StageTimeline_Step(const f3mem_t *m, int *spawned);
  * (ROM 0x16A3E0..0x16A9BA, plus local helpers 0x16AB70..0x16ABC0). */
 void StageScroll_Step(const f3mem_t *m);
 
+/* One frame of Task_StageBackground loop (ROM 0x144BB6..0x144CF0,
+ * plus 0x145CCA / 0x14551C / 0x14561C / 0x145638 / 0x145F48). */
+int StageBg_Step(const f3mem_t *m);
+
 #endif

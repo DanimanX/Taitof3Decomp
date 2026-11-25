@@ -2503,7 +2503,7 @@ int main(void)
         /* unimplemented indices must refuse before touching the object */
         uint16_t keep = rd16(&am, 0x410100u + 0x3Eu);
         bad_a += Obj_AnimTick(&am, 0x410100u, 3u) != -1;
-        bad_a += Obj_AnimInit(&am, 0x410100u, 15u) != -1;
+        bad_a += Obj_AnimInit(&am, 0x410100u, 17u) != -1;
         bad_a += rd16(&am, 0x410100u + 0x3Eu) != keep;
         printf("objects: %-22s %3d/%3d ticks bit-exact (0x179A5C index 0)\n",
                "Anim engine 0x179A5C", bad_a ? 0 : 4, 4);

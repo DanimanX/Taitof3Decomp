@@ -2,6 +2,8 @@
  * Decompiled from ROM 0x0015D0..0x00161C and 0x13F2D4..0x13F340. */
 #include "stage_timeline.h"
 #include "../objects/obj_pool.h"
+#include "../objects/obj_common.h"
+#include "../video/palette.h"
 #include "../video/sprite.h"
 
 static void fx_start(const f3mem_t *m, uint32_t table, uint16_t mode, uint8_t id, uint8_t n)
@@ -164,4 +166,93 @@ void StageScroll_Step(const f3mem_t *m)
     }
     for (int layer = 0; layer < 4; layer++)
         scroll_layer(m, layer);
+}
+
+/* ROM 0x145638: run frame-keyed background script entries {frame.w, fn.l} */
+static int bg_run_frame_events(const f3mem_t *m)
+{
+    uint16_t frame = rd16(m, F3_A5 + 0x3384u);
+    for (;;) {
+        uint32_t a0 = rd32(m, F3_A5 + 0x3BB6u);
+        if ((int16_t)rd16(m, a0) > (int16_t)frame)
+            return 0;
+        return -1; /* callback at rd32(m, a0 + 2) not yet dispatched */
+    }
+}
+
+/* ROM 0x14551C: advance/rewind scroll-keyed line-RAM opacity table A5+0x3BAE */
+static void bg_step_line_table(const f3mem_t *m)
+{
+    uint32_t a0 = rd32(m, F3_A5 + 0x3BAEu);
+    int32_t d0 = (int32_t)rd32(m, a0);
+    int32_t prev = (int32_t)rd32(m, F3_A5 + 0x41E4u);
+    int32_t cur = (int32_t)rd32(m, F3_A5 - 0x5DA8u);
+    if (d0 > prev && d0 <= cur) {
+        /* 0x626200 line-RAM blend table write (unmodeled in f3mem) */
+        wr32(m, F3_A5 + 0x3BAEu, a0 + 6u);
+        return;
+    }
+    int32_t prev_entry = (int32_t)rd32(m, a0 - 6u);
+    if (prev_entry <= prev && prev_entry > cur) {
+        /* 0x626200 line-RAM blend table write (unmodeled in f3mem) */
+        wr32(m, F3_A5 + 0x3BAEu, a0 - 6u);
+    }
+}
+
+/* ROM 0x14561C: run scroll-keyed background script entries {pos.l, fn.l} */
+static int bg_run_scroll_events(const f3mem_t *m)
+{
+    int32_t cur = (int32_t)rd32(m, F3_A5 - 0x5DA8u);
+    for (;;) {
+        uint32_t a0 = rd32(m, F3_A5 + 0x3BB2u);
+        if ((int32_t)rd32(m, a0) > cur)
+            return 0;
+        return -1; /* callback at rd32(m, a0 + 4) not yet dispatched */
+    }
+}
+
+/* ROM 0x145F48: stage 1 periodic palette ramp */
+static void stage1_fade_145F48(const f3mem_t *m)
+{
+    uint16_t d0 = (uint16_t)(rd16(m, F3_A5 + 0x3384u) & 0x007Fu);
+    if (d0 == 1u) {
+        Pal_QueueRamp(m, 0x00146244u, 0x001462C4u, 0x1B00u, 0x30u, 0x10u);
+        Pal_QueueRamp(m, 0x001462B8u, 0x00146338u, 0x1B74u, 0x30u, 0x03u);
+    } else if (d0 == 0x41u) {
+        Pal_QueueRamp(m, 0x001462C4u, 0x00146244u, 0x1B00u, 0x40u, 0x10u);
+        Pal_QueueRamp(m, 0x00146338u, 0x001462B8u, 0x1B74u, 0x40u, 0x03u);
+    }
+}
+
+/* ROM 0x1458D0 / 0x145CCA: stage 1 background tick */
+static int stage1_bg_tick(const f3mem_t *m)
+{
+    if (rd16(m, F3_A5 + 0x3384u) == 0u)
+        return -1; /* 0x1458D8 init path not yet decompiled */
+    if (bg_run_frame_events(m) < 0)
+        return -1;
+    bg_step_line_table(m);
+    if (bg_run_scroll_events(m) < 0)
+        return -1;
+    stage1_fade_145F48(m);
+    Stage_Fade146006(m);
+    return 0;
+}
+
+/* ROM 0x144BB6..0x144CF0 (frame body of Task_StageBackground, ROM 0x144B60) */
+int StageBg_Step(const f3mem_t *m)
+{
+    if (rd8(m, F3_A5 - 0x144Bu) & 0x02u)
+        return 0;
+    uint16_t st = rd16(m, F3_A5 + 0x3384u);
+    if (st < 0x40u)
+        return -1; /* 0x144BC6..0x144CDA initial line-RAM fade-in */
+    uint32_t fn = rd32(m, F3_A5 + 0x3BDAu);
+    if (fn != 0x001458D0u)
+        return -1;
+    StageScroll_Step(m);
+    if (stage1_bg_tick(m) < 0)
+        return -1;
+    wr16(m, F3_A5 + 0x3384u, (uint16_t)(rd16(m, F3_A5 + 0x3384u) + 1u));
+    return 0;
 }

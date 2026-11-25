@@ -86,25 +86,45 @@ static void anim9_tick(const f3mem_t *m, uint32_t obj)
     wr8(m, obj + 0x1Cu, (uint8_t)rd16(m, a1));
 }
 
-/* ROM 0x179880 / 0x1798BA / 0x1798F8 / 0x179946 / 0x1799B2: directional
- * sprite (+hitbox/+offset) ticks indexed by +0x20 angle (16 or 32 dirs). */
-static void anim_dir_tick(const f3mem_t *m, uint32_t obj, int dirs32, uint32_t stride, int copy_boxes, int add_xy)
+/* ROM 0x179880 / 0x1798BA / 0x1798F8 / 0x17991C / 0x179946 / 0x17997A /
+ * 0x1799B2 / 0x1799E6: directional sprite (+pal/+hitbox/+offset) ticks
+ * indexed by +0x20 angle (16 or 32 dirs). */
+static void anim_dir_tick(const f3mem_t *m, uint32_t obj, int dirs32, uint32_t stride,
+                          int has_pal, int copy_boxes, int add_xy)
 {
     uint8_t ang = rd8(m, obj + 0x20u);
     uint16_t d0 = dirs32 ? (uint16_t)((uint8_t)(ang + 4u) >> 3)
                          : (uint16_t)((uint8_t)(ang + 8u) >> 4);
     uint32_t a1 = rd32(m, obj + 0x3Au) + ((uint32_t)d0 * stride & 0xFFFFu);
     wr32(m, obj + 0x10u, rd32(m, a1));
+    a1 += 4u;
+    if (has_pal) {
+        wr8(m, obj + 0x1Cu, (uint8_t)rd16(m, a1));
+        a1 += 2u;
+    }
     if (copy_boxes) {
-        wr32(m, obj + 0x2Cu, rd32(m, a1 + 4u));
-        wr32(m, obj + 0x30u, rd32(m, a1 + 8u));
+        wr32(m, obj + 0x2Cu, rd32(m, a1));
+        wr32(m, obj + 0x30u, rd32(m, a1 + 4u));
+        a1 += 8u;
     }
     if (add_xy) {
-        int16_t dx = (int16_t)(int8_t)rd8(m, a1 + 12u);
-        int16_t dy = (int16_t)(int8_t)rd8(m, a1 + 13u);
+        int16_t dx = (int16_t)(int8_t)rd8(m, a1);
+        int16_t dy = (int16_t)(int8_t)rd8(m, a1 + 1u);
         wr16(m, obj + 0x14u, (uint16_t)((int16_t)rd16(m, obj + 0x14u) + dx));
         wr16(m, obj + 0x18u, (uint16_t)((int16_t)rd16(m, obj + 0x18u) + dy));
     }
+}
+
+/* ROM 0x179A1E (index 16 tick): clamped 16-step sector [0x20..0x60], 6-byte {spr.l, pal.w}. */
+static void anim16_tick(const f3mem_t *m, uint32_t obj)
+{
+    int8_t b = (int8_t)(uint8_t)(rd8(m, obj + 0x20u) - 0x20u);
+    if (b < 0) b = 0;
+    if (b > 0x40) b = 0x40;
+    uint16_t d0 = (uint16_t)((uint8_t)(b + 2) >> 2);
+    uint32_t a1 = rd32(m, obj + 0x3Au) + (uint32_t)d0 * 6u;
+    wr32(m, obj + 0x10u, rd32(m, a1));
+    wr8(m, obj + 0x1Cu, (uint8_t)rd16(m, a1 + 4u));
 }
 
 /* ROM 0x1796B2 (index 8 tick): the index-0 walk with an 8-byte header; a
@@ -184,20 +204,23 @@ static void anim14_tick(const f3mem_t *m, uint32_t obj)
 int Obj_AnimTick(const f3mem_t *m, uint32_t obj, uint16_t idx)
 {
     switch (idx) {
-    case 0u: Obj_AnimTick0(m, obj);                  return 0;
-    case 1u: anim_dir_tick(m, obj, 0,  4u, 0, 0);    return 0; /* ROM 0x179880 */
-    case 2u: anim_dir_tick(m, obj, 1,  4u, 0, 0);    return 0; /* ROM 0x1798BA */
-    case 4u: anim_dir_tick(m, obj, 0, 12u, 1, 0);    return 0; /* ROM 0x1798F8 */
-    case 5u: anim5_tick(m, obj);                     return 0; /* ROM 0x17979C */
-    case 6u: anim_dir_tick(m, obj, 0, 14u, 1, 1);    return 0; /* ROM 0x179946 */
-    case 7u: anim_dir_tick(m, obj, 1, 14u, 1, 1);    return 0; /* ROM 0x1799B2 */
-    case 8u: anim8_tick(m, obj);                     return 0;
-    case 9u: anim9_tick(m, obj);                     return 0;
+    case 0u:  Obj_AnimTick0(m, obj);                     return 0;
+    case 1u:  anim_dir_tick(m, obj, 0,  4u, 0, 0, 0);    return 0; /* ROM 0x179880 */
+    case 2u:  anim_dir_tick(m, obj, 1,  4u, 0, 0, 0);    return 0; /* ROM 0x1798BA */
+    case 4u:  anim_dir_tick(m, obj, 0, 12u, 0, 1, 0);    return 0; /* ROM 0x1798F8 */
+    case 5u:  anim5_tick(m, obj);                        return 0; /* ROM 0x17979C */
+    case 6u:  anim_dir_tick(m, obj, 0, 14u, 0, 1, 1);    return 0; /* ROM 0x179946 */
+    case 7u:  anim_dir_tick(m, obj, 1, 14u, 0, 1, 1);    return 0; /* ROM 0x1799B2 */
+    case 8u:  anim8_tick(m, obj);                        return 0;
+    case 9u:  anim9_tick(m, obj);                        return 0;
     /* ROM 0x1798D4 (index 10 tick): the same 6-byte directional record the
      * index-10 init 0x179614 picks, re-picked from the +0x20 angle byte. */
-    case 10u: anim_dir_tick(m, obj, 1, 6u, 0, 0);    return 0;
-    case 14u: anim14_tick(m, obj);                   return 0; /* ROM 0x17997A */
-    default: return -1;
+    case 10u: anim_dir_tick(m, obj, 1,  6u, 0, 0, 0);    return 0;
+    case 12u: anim_dir_tick(m, obj, 0, 14u, 1, 1, 0);    return 0; /* ROM 0x17991C */
+    case 14u: anim14_tick(m, obj);                      return 0; /* ROM 0x17997A */
+    case 15u: anim_dir_tick(m, obj, 1, 16u, 1, 1, 1);    return 0; /* ROM 0x1799E6 */
+    case 16u: anim16_tick(m, obj);                      return 0; /* ROM 0x179A1E */
+    default:  return -1;
     }
 }
 
@@ -207,21 +230,27 @@ int Obj_AnimInit(const f3mem_t *m, uint32_t obj, uint16_t idx)
     case 0u:  return Obj_179550_Tick(m, obj);
     case 1u:  return Obj_1795F6_Tick(m, obj);
     case 2u:  return Obj_17960A_Tick(m, obj);
+    case 3u:  return Obj_179572_Tick(m, obj);
+    case 4u:  wr16(m, obj + 0x3Eu, 1u); anim_dir_tick(m, obj, 0, 12u, 0, 1, 0); return 0; /* ROM 0x17961E */
     case 5u:  return Obj_1795A4_Tick(m, obj);
+    case 6u:  wr16(m, obj + 0x3Eu, 1u); anim_dir_tick(m, obj, 0, 14u, 0, 1, 1); return 0; /* ROM 0x179632 */
+    case 7u:  wr16(m, obj + 0x3Eu, 1u); anim_dir_tick(m, obj, 1, 14u, 0, 1, 1); return 0; /* ROM 0x179646 */
     case 8u:  return Obj_17955E_Tick(m, obj);
     case 9u:  return Obj_179600_Tick(m, obj);
     case 10u: return Obj_179614_Tick(m, obj);
-    case 3u:  return Obj_179572_Tick(m, obj);
     case 11u:
         /* 0x179588 loads the timer and returns; the 0x179D9E body's tail then
          * steps the list again (see walk_after_init) */
         Obj_179588_Tick(m, obj);
         walk_after_init(m, obj);
         return 0;
+    case 12u: wr16(m, obj + 0x3Eu, 1u); anim_dir_tick(m, obj, 0, 14u, 1, 1, 0); return 0; /* ROM 0x179628 */
     case 14u:
         wr16(m, obj + 0x3Eu, 1u);
         anim14_tick(m, obj);
         return 0;
+    case 15u: wr16(m, obj + 0x3Eu, 1u); anim_dir_tick(m, obj, 1, 16u, 1, 1, 1); return 0; /* ROM 0x179650 */
+    case 16u: wr16(m, obj + 0x3Eu, 1u); anim16_tick(m, obj); return 0; /* ROM 0x17965A */
     default:  return -1;
     }
 }

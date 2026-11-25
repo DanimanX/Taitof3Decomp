@@ -65,7 +65,7 @@
 
 /* Bytes per state that the 0x0B9080 script pass / collision slot own (see the
  * header comment); the test fails when this count grows. */
-#define MAX_RESIDUAL 9
+#define MAX_RESIDUAL 7
 
 static int fails, checks;
 #define CHECK(c, ...) do { checks++; if (!(c)) { fails++; printf("FAIL: "); \
@@ -73,10 +73,12 @@ static int fails, checks;
 
 static f3mem_t mk(uint8_t *wram, const uint8_t *rom)
 {
+    static uint8_t spr[F3_SPR_SIZE];
     f3mem_t m;
     memset(&m, 0, sizeof m);
     m.wram = wram;
     m.rom = rom;
+    m.spr = spr;
     return m;
 }
 
@@ -284,9 +286,9 @@ static void test_runframe_contract(const uint8_t *rom)
     wr8(&m, A_CTRL, 0x0Fu);
     wr8(&m, A_SCENE, 0x01u);
     rc = PlayerControl_RunFrame(&m);
-    CHECK(rc == -1, "RunFrame stops at the scene-init tail (2nd call)");
+    CHECK(rc == -1, "RunFrame stops at unimplemented P1 tick fn 0 (2nd call)");
     CHECK(rd16(&m, A_DEMO_MODE) == 0x0055u, "RunFrame leaves 0x1D40 after the first scene");
-    CHECK(rd8(&m, A_CTRL) == 0x01u, "RunFrame skips the bset block (got %02X)",
+    CHECK(rd8(&m, A_CTRL) == 0x0Fu, "RunFrame skips SceneInit on resumed frames (got %02X)",
           rd8(&m, A_CTRL));
 }
 
@@ -336,7 +338,7 @@ static void run_boot(const uint8_t *rom, const char *state)
             printf("  %s: diff span %06X..%06X (other slots write these too)\n",
                    state, first, last);
     }
-    CHECK(rc == -1, "%s: RunFrame must stop at 0x0B9080", state);
+    CHECK(rc == 0, "%s: RunFrame must complete", state);
     CHECK(bad <= MAX_RESIDUAL, "%s: %d bytes differ from MAME (max %d)", state, bad,
           MAX_RESIDUAL);
     CHECK(phantom == 0, "%s: %d model writes MAME did not make", state, phantom);
@@ -360,7 +362,7 @@ static void run_capture_consistency(const uint8_t *rom, const char *pfx)
         if (PlayerControl_RunFrame(&m) != 0) stopped++;
     }
     printf("  %s: frames=%d stopped=%d\n", pfx, c.pairs, stopped);
-    CHECK(stopped == c.pairs, "%s: every frame must reach the 0x0B9080 stop", pfx);
+    CHECK(stopped < c.pairs, "%s: frames must advance past 0x0B9080", pfx);
     free(img);
     cap_free(&c);
 }

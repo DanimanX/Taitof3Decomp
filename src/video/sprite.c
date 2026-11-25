@@ -140,6 +140,132 @@ static uint32_t fill_lineram_run(const f3mem_t *m, uint32_t a1, uint16_t val)
     return a1 + 0x30u;
 }
 
+/* ROM 0x0055C8 */
+void Gfx_DrawTilemapBlock(const f3mem_t *m, uint32_t src, uint32_t dst, uint16_t flags)
+{
+    uint32_t a0 = src;
+    uint32_t a1 = dst;
+    int16_t rows = (int16_t)rd16(m, a0);
+    a0 += 2u;
+    int16_t cols = (int16_t)rd16(m, a0);
+    a0 += 2u;
+    uint16_t d5 = (uint16_t)(flags << 8);
+    uint16_t d4 = (uint16_t)(flags << 1);
+    d4 = (uint16_t)((d4 & 0xFF00u) | (uint8_t)(d4 << 6));
+    d4 >>= 5;
+    int16_t step_col = 2, step_row = 0x80;
+    uint32_t mode = rd32(m, 0x00005616u + d4);
+    if (mode == 0x00005630u) {
+        step_col = -2;
+        a1 += (int16_t)(cols - 2);
+    } else if (mode == 0x0000563Eu) {
+        step_row = -0x80;
+        a1 += (int16_t)((rows - 1) << 7);
+    } else if (mode == 0x00005650u) {
+        step_col = -2;
+        step_row = -0x80;
+        a1 += (int16_t)(cols - 2);
+        a1 += (int16_t)((rows - 1) << 7);
+    }
+    do {
+        uint32_t a2 = a1;
+        int16_t c = cols;
+        do {
+            wr16(m, a1, (uint16_t)(rd16(m, a0) ^ d5));
+            a0 += 2u;
+            a1 += step_col;
+            c--;
+        } while (c > 0);
+        a1 = a2 + step_row;
+        rows--;
+    } while (rows > 0);
+}
+
+/* ROM 0x00571A */
+void Gfx_DrawDecimal(const f3mem_t *m, uint32_t val, uint16_t digits, uint32_t dst, uint16_t attr)
+{
+    uint16_t d2 = (uint16_t)(((attr & 0x3Fu) << 1) << 8);
+    uint32_t a0 = dst + (int16_t)(digits << 1);
+    int16_t d1 = (int16_t)(digits - 1u);
+    uint32_t end = a0;
+    uint32_t d4 = val & 0xFFFFu;
+    uint32_t d3 = (val >> 16) & 0xFFFFu;
+    do {
+        if ((d3 & 0xFFFFu) == 0u && (d4 & 0xFFFFu) == 0u) {
+            if (a0 == end) {
+                d2 = (uint16_t)((d2 & 0xFF00u) | (uint8_t)((d2 & 0xFFu) + 0x30u));
+            } else {
+                d2 = (uint16_t)((d2 & 0xFF00u) | 0x30u);
+            }
+        } else {
+            uint32_t q3 = d3 / 10u;
+            uint32_t r3 = d3 % 10u;
+            d4 += r3 << 16;
+            d3 = q3;
+            uint32_t q4 = d4 / 10u;
+            uint32_t r4 = d4 % 10u;
+            d4 = q4;
+            d2 = (uint16_t)((d2 & 0xFF00u) | (uint8_t)((r4 & 0xFFu) + 0x30u));
+        }
+        a0 -= 2u;
+        wr16(m, a0, d2);
+        d1--;
+    } while (d1 >= 0);
+}
+
+/* ROM 0x0058AE */
+void Gfx_ClearPf3(const f3mem_t *m)
+{
+    uint32_t a0 = 0x0061C000u;
+    for (int r = 0; r < 30; r++) {
+        for (int c = 0; c < 20; c++) {
+            wr32(m, a0 + (uint32_t)c * 4u, 0u);
+        }
+        a0 += 0x80u;
+    }
+}
+
+/* ROM 0x005956 */
+void Gfx_ClearPf1AndLineRam(const f3mem_t *m)
+{
+    for (uint32_t i = 0; i < 0x400u; i++) {
+        wr32(m, 0x00612000u + i * 4u, 0u);
+    }
+    for (uint32_t i = 0; i < 0x100u; i++) {
+        wr16(m, 0x0062A400u + i * 2u, 0u);
+    }
+    for (uint32_t i = 0; i < 0x100u; i++) {
+        wr16(m, 0x00628400u + i * 2u, 0x0080u);
+        wr16(m, 0x00624400u + i * 2u, (uint16_t)(rd16(m, 0x00624400u + i * 2u) & 0xFE00u));
+    }
+    wr32(m, F3_A5 - 0x5D98u, 0u);
+    wr16(m, F3_A5 - 0x5D94u, 0u);
+    wr32(m, F3_A5 - 0x5D70u, 0u);
+    wr16(m, F3_A5 - 0x5D6Cu, 0u);
+}
+
+/* ROM 0x005A86 */
+void Gfx_UploadTextTiles(const f3mem_t *m, uint32_t src, uint16_t slot)
+{
+    uint32_t a1 = 0x0061E000u + (uint16_t)(slot << 5);
+    uint32_t a2 = 0x0001120Au;
+    int16_t count = (int16_t)rd16(m, src);
+    src += 2u;
+    do {
+        uint16_t idx = rd16(m, src);
+        src += 2u;
+        uint32_t a3 = a2 + (uint16_t)(idx << 5);
+        for (int k = 0; k < 8; k++) {
+            uint32_t v = rd32(m, a3);
+            a3 += 4u;
+            v = (v >> 16) | (v << 16);
+            wr32(m, a1, v);
+            a1 += 4u;
+        }
+        count--;
+    } while (count >= 0);
+}
+
 /* ROM 0x005B0C */
 void Gfx_InitLineRam(const f3mem_t *m)
 {

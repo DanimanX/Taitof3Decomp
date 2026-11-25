@@ -92,26 +92,47 @@ int main(void)
         }
     }
 
-    /* ROM 0x005B0C (Gfx_InitLineRam) */
+    /* ROM 0x0055C8, 0x00571A, 0x0058AE, 0x005956, 0x005A86, 0x005B0C */
     {
-        capture_t c;
         long rl;
         uint8_t *rom = cap_slurp("work/maincpu.bin", &rl);
         (void)rl;
-        if (rom && !cap_load(&c, "work/ram/fn_005B0C") && c.gfx) {
+        static const struct { const char *name, *dir; int id; } fn_tests[] = {
+            { "0x0055C8", "work/ram/fn_0055C8", 0 },
+            { "0x00571A", "work/ram/fn_00571A", 1 },
+            { "0x0058AE", "work/ram/fn_0058AE", 2 },
+            { "0x005956", "work/ram/fn_005956", 3 },
+            { "0x005A86", "work/ram/fn_005A86", 4 },
+            { "0x005B0C", "work/ram/fn_005B0C", 5 },
+        };
+        for (size_t t = 0; t < sizeof(fn_tests) / sizeof(fn_tests[0]); t++) {
+            capture_t c;
+            if (!rom || cap_load(&c, fn_tests[t].dir) || !c.gfx) continue;
             uint8_t *w = malloc(F3_WRAM_SIZE), *g = malloc(F3_GFX_SIZE);
             int ok = 0, budget = 10;
             for (int i = 0; i < c.pairs; i++) {
                 memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
                 memcpy(g, c.gfx + ((size_t)i * 2) * F3_GFX_SIZE, F3_GFX_SIZE);
                 f3mem_t m = { w, rom, NULL, NULL, g };
-                Gfx_InitLineRam(&m);
                 uint32_t sp = c.pre[i][CR_SP];
-                int d = cap_diff("wram", i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x40, sp, &budget)
+                if (fn_tests[t].id == 0) {
+                    Gfx_DrawTilemapBlock(&m, rd32(&m, sp + 4u), rd32(&m, sp + 8u), rd16(&m, sp + 12u));
+                } else if (fn_tests[t].id == 1) {
+                    Gfx_DrawDecimal(&m, rd32(&m, sp + 4u), rd16(&m, sp + 8u), rd32(&m, sp + 10u), rd16(&m, sp + 14u));
+                } else if (fn_tests[t].id == 2) {
+                    Gfx_ClearPf3(&m);
+                } else if (fn_tests[t].id == 3) {
+                    Gfx_ClearPf1AndLineRam(&m);
+                } else if (fn_tests[t].id == 4) {
+                    Gfx_UploadTextTiles(&m, c.pre[i][CR_A0], (uint16_t)c.pre[i][CR_D0]);
+                } else {
+                    Gfx_InitLineRam(&m);
+                }
+                int d = cap_diff("wram", i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x60, sp, &budget)
                       + cap_diff("gfx", i, F3_GFX_BASE, g, c.gfx + ((size_t)i * 2 + 1) * F3_GFX_SIZE, F3_GFX_SIZE, 0, 0, &budget);
                 ok += d == 0;
             }
-            printf("sprite: %-20s %d/%d calls bit-exact (Work RAM + gfx RAM)\n", "0x005B0C", ok, c.pairs);
+            printf("sprite: %-20s %d/%d calls bit-exact (Work RAM + gfx RAM)\n", fn_tests[t].name, ok, c.pairs);
             bad += c.pairs - ok;
             free(w); free(g);
             cap_free(&c);

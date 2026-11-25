@@ -1,6 +1,7 @@
 #include "obj_116802.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_shared.h"
+#include "../player/player_move.h"
 
 /* ROM 0x116802: the Ameoba boss's entry tick (armed by 0x1166EA and by the
  * segment spawners, which reload 0x1167FA / 0x1167EE). It holds the boss alive
@@ -72,12 +73,12 @@ static void sub_1169D8(const f3mem_t *m, uint32_t obj)
                     wr16(m, obj + 0x22u, (uint16_t)(phase + 1u));
                 }
             } else {
-                /* 0x116A6C: sink the scale, blink on alternate frames, then
-                 * run the +0x42 timer down to -0x14 */
+                /* 0x116A6C: sink the scale, drift along the latched aim angle
+                 * (+0x20, jsr 0x0CBE12), then run the +0x42 timer down to -0x14 */
                 wr16(m, F3_A5 + 0x30BCu, (uint16_t)(rd16(m, F3_A5 + 0x30BCu) - 0x400u));
                 if ((int16_t)rd16(m, F3_A5 + 0x30BCu) < -0x800)
                     wr16(m, F3_A5 + 0x30BCu, 0xF800u);
-                Obj_BlinkColour(m, obj);
+                Obj_MoveByAngle(m, obj, rd16(m, obj + 0x20u));
                 if ((rd16(m, F3_A5 + 0x878u) & 1u) == 0u) {
                     int16_t t = (int16_t)(rd16(m, obj + 0x42u) - 1u);
                     wr16(m, obj + 0x42u, (uint16_t)t);
@@ -175,8 +176,12 @@ int Obj_116802_Tick(const f3mem_t *m, uint32_t obj)
         /* 0x116848: shadow the target at +0x8C/+0x10 and count the relatch
          * timer before starting a fresh dive toward 0x258/0x50 */
         uint32_t a1 = rd32(m, obj + 0x3Au);
-        wr32(m, obj + 0x2Cu, rd32(m, a1 + 0x14u) + 0x8Cu);
-        wr32(m, obj + 0x30u, rd32(m, a1 + 0x18u) + 0x10u);
+        /* the offsets are added to the high word only (68k addi.w on the
+         * longword's first word); the low word is copied unchanged */
+        wr32(m, obj + 0x2Cu, rd32(m, a1 + 0x14u));
+        wr16(m, obj + 0x2Cu, (uint16_t)(rd16(m, obj + 0x2Cu) + 0x8Cu));
+        wr32(m, obj + 0x30u, rd32(m, a1 + 0x18u));
+        wr16(m, obj + 0x30u, (uint16_t)(rd16(m, obj + 0x30u) + 0x10u));
         int16_t t = (int16_t)(rd16(m, obj + 0x56u) - 1u);
         wr16(m, obj + 0x56u, (uint16_t)t);
         if (t <= 0) {

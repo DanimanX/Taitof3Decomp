@@ -12,6 +12,18 @@ static void bf_set1(const f3mem_t *m, uint32_t base, uint32_t off, int v)
     wr8(m, a, v ? (uint8_t)(b | bit) : (uint8_t)(b & ~bit));
 }
 
+/* The 256-bit free-mask table at 0x410000 is one bitfield: a slot's bit number
+ * is `group << 5 | index`, i.e. 0x000 for group 0 slot 0 up to 0x11F for group
+ * 8 slot 31. 0x0D0 (group 6 slot 16) is therefore the MSB of the byte at
+ * 0x41001A, NOT bit 0x10 of the long at 0x410010 -- masking with a byte-sized
+ * offset would mark and hand out slots of the wrong object. Confirmed against
+ * capture pair 1 of 0x183CBA, where 0x0105EC clears bit 0x121 and turns
+ * 0x3807FFFF at 0x410024 into 0x7807FFFF. */
+static void mask_set1(const f3mem_t *m, uint32_t bit, int v)
+{
+    bf_set1(m, OBJ_FREE_MASKS, bit, v);
+}
+
 uint32_t Obj_Spawn(const f3mem_t *m, uint32_t parent_a0, uint32_t fn,
                    uint16_t group, uint16_t ngroups, uint32_t arg)
 {
@@ -23,8 +35,7 @@ uint32_t Obj_Spawn(const f3mem_t *m, uint32_t parent_a0, uint32_t fn,
         if (field) {                                  /* bfffo (A1){0:32} */
             uint32_t idx = 0;
             while (!(field & (0x80000000u >> idx))) idx++;
-            bf_set1(m, a1, idx, 0);                   /* bfclr: allocate */
-            a2 += (uint32_t)(int32_t)(int16_t)(idx * OBJ_SIZE);
+            bf_set1(m, a1, idx, 0);                   /* bfclr: allocate */            a2 += (uint32_t)(int32_t)(int16_t)(idx * OBJ_SIZE);
             wr32(m, a2 + 0x0, fn);
             wr8(m, a2 + 0x4, (uint8_t)g);
             wr8(m, a2 + 0x5, (uint8_t)idx);
@@ -42,17 +53,19 @@ void Obj_Free(const f3mem_t *m, uint32_t obj)
 {
     uint16_t d0 = (uint16_t)(rd8(m, obj + 4) << 5);
     d0 = (uint16_t)((d0 & 0xFF00u) | ((d0 + rd8(m, obj + 5)) & 0xFFu)); /* add.b */
-    bf_set1(m, OBJ_FREE_MASKS, d0, 1);
+    mask_set1(m, d0, 1);                             /* bfset $410000{0:1} */
 }
 
+/* 0x01060E / 0x010638 / 0x010672: free bits `g*32 .. (g+n)*32-1` through the
+ * same bitfield as 0x010600. The snapshot copy at 0x410030 is the group-relative
+ * table (`both`), not a continuation of this one. */
 static void reset_masks(const f3mem_t *m, uint16_t g, uint16_t n, int both)
 {
-    uint16_t end = (uint16_t)(g + n);
-    do {
-        wr32(m, OBJ_FREE_MASKS + 4u * g, 0xFFFFFFFFu);
-        if (both) wr32(m, OBJ_SNAP_MASKS + 4u * g, 0xFFFFFFFFu);
-        g++;
-    } while ((int16_t)g < (int16_t)end);
+    uint16_t end = (uint16_t)((g + n) * 32u);
+    for (uint16_t bit = (uint16_t)(g * 32u); bit < end; bit++) {
+        mask_set1(m, bit, 1);
+        if (both) mask_set1(m, OBJ_SNAP_MASKS - OBJ_FREE_MASKS + bit, 1);
+    }
 }
 
 void Obj_ResetGroups(const f3mem_t *m, uint16_t group, uint16_t n) { reset_masks(m, group, n, 0); }

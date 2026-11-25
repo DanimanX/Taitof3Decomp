@@ -15,7 +15,12 @@ void Video_SetSpriteScroll(const f3mem_t *m);         /* ROM 0x001232 */
 void Gfx_DrawTilemapBlock(const f3mem_t *m, uint32_t src, uint32_t dst, uint16_t flags); /* ROM 0x0055C8 */
 void Gfx_DrawDecimal(const f3mem_t *m, uint32_t val, uint16_t digits, uint32_t dst, uint16_t attr); /* ROM 0x00571A */
 void Gfx_ClearPf3(const f3mem_t *m);                  /* ROM 0x0058AE */
+void Gfx_ClearTextLayer(const f3mem_t *m);            /* ROM 0x005880 */
+void Gfx_ClearPf0(const f3mem_t *m);                  /* ROM 0x0058DA */
+void Gfx_ClearPf0b(const f3mem_t *m);                 /* ROM 0x005918 */
 void Gfx_ClearPf1AndLineRam(const f3mem_t *m);        /* ROM 0x005956 */
+void Gfx_ClearPf2AndLineRam(const f3mem_t *m);        /* ROM 0x0059B4 */
+void Gfx_ClearAllLayers(const f3mem_t *m);            /* ROM 0x005A12 */
 void Gfx_UploadTextTiles(const f3mem_t *m, uint32_t src, uint16_t slot); /* ROM 0x005A86 */
 void Gfx_InitLineRam(const f3mem_t *m);               /* ROM 0x005B0C */
 

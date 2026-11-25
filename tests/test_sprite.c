@@ -100,8 +100,10 @@ int main(void)
         static const struct { const char *name, *dir; int id; } fn_tests[] = {
             { "0x0055C8", "work/ram/fn_0055C8", 0 },
             { "0x00571A", "work/ram/fn_00571A", 1 },
+            { "0x005880", "work/ram/fn_005880", 6 },
             { "0x0058AE", "work/ram/fn_0058AE", 2 },
             { "0x005956", "work/ram/fn_005956", 3 },
+            { "0x005A12", "work/ram/fn_005A12", 7 },
             { "0x005A86", "work/ram/fn_005A86", 4 },
             { "0x005B0C", "work/ram/fn_005B0C", 5 },
         };
@@ -125,6 +127,10 @@ int main(void)
                     Gfx_ClearPf1AndLineRam(&m);
                 } else if (fn_tests[t].id == 4) {
                     Gfx_UploadTextTiles(&m, c.pre[i][CR_A0], (uint16_t)c.pre[i][CR_D0]);
+                } else if (fn_tests[t].id == 6) {
+                    Gfx_ClearTextLayer(&m);
+                } else if (fn_tests[t].id == 7) {
+                    Gfx_ClearAllLayers(&m);
                 } else {
                     Gfx_InitLineRam(&m);
                 }

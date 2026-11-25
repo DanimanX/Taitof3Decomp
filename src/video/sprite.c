@@ -213,6 +213,18 @@ void Gfx_DrawDecimal(const f3mem_t *m, uint32_t val, uint16_t digits, uint32_t d
     } while (d1 >= 0);
 }
 
+/* ROM 0x005880 */
+void Gfx_ClearTextLayer(const f3mem_t *m)
+{
+    for (uint32_t i = 0; i < 0x800u; i++) {
+        wr32(m, 0x0061C000u + i * 4u, 0u);
+    }
+    wr32(m, F3_A5 - 0x5D88u, 0u);
+    wr16(m, F3_A5 - 0x5D84u, 0u);
+    wr32(m, F3_A5 - 0x5D60u, 0u);
+    wr16(m, F3_A5 - 0x5D5Cu, 0u);
+}
+
 /* ROM 0x0058AE */
 void Gfx_ClearPf3(const f3mem_t *m)
 {
@@ -223,6 +235,36 @@ void Gfx_ClearPf3(const f3mem_t *m)
         }
         a0 += 0x80u;
     }
+}
+
+/* ROM 0x0058DA */
+void Gfx_ClearPf0(const f3mem_t *m)
+{
+    for (uint32_t i = 0; i < 0x400u; i++) {
+        wr32(m, 0x00610000u + i * 4u, 0u);
+    }
+    for (uint32_t i = 0; i < 0x100u; i++) {
+        wr16(m, 0x0062A000u + i * 2u, 0u);
+    }
+    wr32(m, F3_A5 - 0x5DA8u, 0u);
+    wr16(m, F3_A5 - 0x5DA4u, 0u);
+    wr32(m, F3_A5 - 0x5D80u, 0u);
+    wr16(m, F3_A5 - 0x5D7Cu, 0u);
+}
+
+/* ROM 0x005918 */
+void Gfx_ClearPf0b(const f3mem_t *m)
+{
+    for (uint32_t i = 0; i < 0x400u; i++) {
+        wr32(m, 0x00611000u + i * 4u, 0u);
+    }
+    for (uint32_t i = 0; i < 0x100u; i++) {
+        wr16(m, 0x0062A200u + i * 2u, 0u);
+    }
+    wr32(m, F3_A5 - 0x5DA0u, 0u);
+    wr16(m, F3_A5 - 0x5D9Cu, 0u);
+    wr32(m, F3_A5 - 0x5D78u, 0u);
+    wr16(m, F3_A5 - 0x5D74u, 0u);
 }
 
 /* ROM 0x005956 */
@@ -242,6 +284,35 @@ void Gfx_ClearPf1AndLineRam(const f3mem_t *m)
     wr16(m, F3_A5 - 0x5D94u, 0u);
     wr32(m, F3_A5 - 0x5D70u, 0u);
     wr16(m, F3_A5 - 0x5D6Cu, 0u);
+}
+
+/* ROM 0x0059B4 */
+void Gfx_ClearPf2AndLineRam(const f3mem_t *m)
+{
+    for (uint32_t i = 0; i < 0x400u; i++) {
+        wr32(m, 0x00613000u + i * 4u, 0u);
+    }
+    for (uint32_t i = 0; i < 0x100u; i++) {
+        wr16(m, 0x0062A600u + i * 2u, 0u);
+    }
+    for (uint32_t i = 0; i < 0x100u; i++) {
+        wr16(m, 0x00628600u + i * 2u, 0x0080u);
+        wr16(m, 0x00624600u + i * 2u, (uint16_t)(rd16(m, 0x00624600u + i * 2u) & 0xFE00u));
+    }
+    wr32(m, F3_A5 - 0x5D90u, 0u);
+    wr16(m, F3_A5 - 0x5D8Cu, 0u);
+    wr32(m, F3_A5 - 0x5D68u, 0u);
+    wr16(m, F3_A5 - 0x5D64u, 0u);
+}
+
+/* ROM 0x005A12 */
+void Gfx_ClearAllLayers(const f3mem_t *m)
+{
+    Gfx_ClearTextLayer(m);
+    Gfx_ClearPf0(m);
+    Gfx_ClearPf0b(m);
+    Gfx_ClearPf1AndLineRam(m);
+    Gfx_ClearPf2AndLineRam(m);
 }
 
 /* ROM 0x005A86 */

@@ -31,6 +31,11 @@ int Obj_AnimTick(const f3mem_t *m, uint32_t obj, uint16_t idx);
  * index without a translation. */
 int Obj_AnimInit(const f3mem_t *m, uint32_t obj, uint16_t idx);
 
+/* ROM 0x179B06: pick one of two 0x179A5C frame lists with Obj_RandRange(1),
+ * latch (+0x40 = index, +0x3A = record body) and run that list's INIT half.
+ * Returns 0, or -1 through Obj_AnimInit for a list body not translated yet. */
+int Obj_AnimList179B06(const f3mem_t *m, uint32_t obj);
+
 /* ROM 0x179664: index-0 tick. Walks the frame list at +0x3A: a zero duration
  * advances to the next record (0x179550 reload), a positive one counts down in
  * +0x3E, a negative one ends the walk. */

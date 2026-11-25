@@ -268,7 +268,13 @@ void Video_ClearRect(const f3mem_t *m, uint32_t a0, uint32_t a1)
     }
 }
 
-/* ROM 0x0017D6: populate RGB interpolation ramp entries at A5-0x7F50 + d6 */
+/* ROM 0x0017D6: populate RGB interpolation ramp entries at A5-0x7F50 + d6
+ *
+ * The step is `divs.l D6,D3`. On the 68k that is the LONG form
+ * (mode 6, size 2) with a mandatory padding 0 word after the extension, so
+ * the dividend is the pair (D6h:D6l) = D6:D7 rather than D3:D7, and the
+ * quotient is left in D3. That matters for the callers that pre-load the
+ * step count into D7 and rely on the high half of the dividend being 0. */
 static void pal_ramp_fill(const f3mem_t *m, uint32_t a0, uint32_t a1,
                           uint32_t d1, uint32_t d2, uint32_t d6)
 {
@@ -284,8 +290,10 @@ static void pal_ramp_fill(const f3mem_t *m, uint32_t a0, uint32_t a1,
             unsigned sh = 16u - 8u * (unsigned)k;
             uint32_t s = ((c0 >> sh) & 0xFFu) << 8;
             wr16(m, a2 + 2u * (uint32_t)k, (uint16_t)s);
-            uint32_t e = ((c1 >> sh) & 0xFFu) << 8;
-            int32_t step = (int32_t)(e - s) / div;
+            /* the end colour only sizes the dividend: it is never stored */
+            (void)(((c1 >> sh) & 0xFFu) << 8);
+            int32_t dividend = (int32_t)((d6 & 0xFFFF0000u) | (uint32_t)d7);
+            int32_t step = dividend / div;                 /* divs.l D6,D3 */
             wr16(m, a2 + 6u + 2u * (uint32_t)k, (uint16_t)(uint32_t)step);
         }
         a2 += 0x0Cu;
@@ -295,9 +303,12 @@ static void pal_ramp_fill(const f3mem_t *m, uint32_t a0, uint32_t a1,
     }
 }
 
-/* ROM 0x001792 / 0x00183C: claim a palette-ramp slot at A5-0x6650 and build ramp */
-void Pal_QueueRamp(const f3mem_t *m, uint32_t a0, uint32_t a1,
-                   uint32_t d0, uint32_t d1, uint32_t d2)
+/* ROM 0x001792 / 0x00183C: claim a palette-ramp slot at A5-0x6650 and build
+ * ramp. Returns the claimed slot entry (what 0x00183C hands back in A0/D0) or
+ * 0 when no slot could be claimed -- which is exactly the `sub.l A0,A0` the
+ * abort path at 0x17C8 performs. */
+uint32_t Pal_QueueRamp(const f3mem_t *m, uint32_t a0, uint32_t a1,
+                       uint32_t d0, uint32_t d1, uint32_t d2)
 {
     uint32_t a3 = F3_A5 - 0x6650u;
     uint32_t d6 = 0u;
@@ -306,18 +317,18 @@ void Pal_QueueRamp(const f3mem_t *m, uint32_t a0, uint32_t a1,
         if (rd16(m, a3) == 0u) {
             wr16(m, a3 + 2u, (uint16_t)d1);
             if ((int16_t)(uint16_t)d1 <= 0)
-                return;
+                return 0u;
             wr16(m, a3, (uint16_t)d2);
             if ((uint16_t)d2 == 0u)
-                return;
+                return 0u;
             wr16(m, a3 + 4u, (uint16_t)d0);
             pal_ramp_fill(m, a0, a1, d1, d2, d6);
-            return;
+            return a3;
         }
         d6 = (d6 & 0xFFFF0000u) | (uint16_t)((uint16_t)d6 + 0x0180u);
         a3 += 6u;
         d7 = (uint16_t)(d7 - 1u);
         if (d7 == 0xFFFFu)
-            return;
+            return 0u;
     }
 }

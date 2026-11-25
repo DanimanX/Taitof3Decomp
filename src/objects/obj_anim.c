@@ -1,4 +1,5 @@
 #include "obj_anim.h"
+#include "obj_shared_ext.h"
 #include "../enemy/obj_179550.h"
 #include "../enemy/obj_179600.h"
 #include "../enemy/obj_179614.h"
@@ -145,6 +146,9 @@ int Obj_AnimTick(const f3mem_t *m, uint32_t obj, uint16_t idx)
     case 7u: anim_dir_tick(m, obj, 1, 14u, 1, 1);    return 0; /* ROM 0x1799B2 */
     case 8u: anim8_tick(m, obj);                     return 0;
     case 9u: anim9_tick(m, obj);                     return 0;
+    /* ROM 0x1798D4 (index 10 tick): the same 6-byte directional record the
+     * index-10 init 0x179614 picks, re-picked from the +0x20 angle byte. */
+    case 10u: anim_dir_tick(m, obj, 1, 6u, 0, 0);    return 0;
     default: return -1;
     }
 }
@@ -167,4 +171,25 @@ int Obj_AnimInit(const f3mem_t *m, uint32_t obj, uint16_t idx)
         return 0;
     default:  return -1;
     }
+}
+
+/* ROM 0x179B06: choose between the frame lists at 0x179B3A and 0x179B8C.
+ *
+ *   0x179B06  lea 0x179B3A(pc),A1
+ *   0x179B0C  moveq #1,D0 ; jsr 0x1794A4 (Obj_RandRange) ; tst.w D0
+ *   0x179B16  beq -> 0x179B20 (keep 0x179B3A) ; else A1 = 0x179B8C
+ *   0x179B22  move.w (A1)+,D0w ; (0x40,A0) = D0w ; (0x3A,A0) = A1
+ *   0x179B32  movea.l (0x179A5C,D0w*8),A1 ; jsr (A1)       -- the INIT half
+ */
+int Obj_AnimList179B06(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a1 = 0x00179B3Au;
+    if (Obj_RandRange(m, 1u) != 0u)
+        a1 = 0x00179B8Cu;
+
+    uint16_t d0 = rd16(m, a1);
+    a1 += 2u;
+    wr16(m, obj + 0x40u, d0);
+    wr32(m, obj + 0x3Au, a1);
+    return Obj_AnimInit(m, obj, d0);
 }

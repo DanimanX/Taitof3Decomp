@@ -20,6 +20,8 @@ int  Obj_PolarPlace(const f3mem_t *m, uint32_t obj);                   /* ROM 0x
 void Mem_WritePair64(const f3mem_t *m, uint32_t a0, uint32_t a1, uint32_t d0, uint32_t d1); /* ROM 0x16AB2C */
 void Mem_CopyLongs(const f3mem_t *m, uint32_t a0, uint32_t a1, uint16_t d0w);              /* ROM 0x16A19C */
 void Video_ClearRect(const f3mem_t *m, uint32_t a0, uint32_t a1);                         /* ROM 0x0054AC */
-void Pal_QueueRamp(const f3mem_t *m, uint32_t a0, uint32_t a1, uint32_t d0, uint32_t d1, uint32_t d2); /* ROM 0x001792 / 0x00183C */
+/* ROM 0x001792 / 0x00183C: claim a ramp slot and build it. Returns the slot
+ * (A5-0x6650 + n*6) or 0 when no slot could be claimed. */
+uint32_t Pal_QueueRamp(const f3mem_t *m, uint32_t a0, uint32_t a1, uint32_t d0, uint32_t d1, uint32_t d2);
 
 #endif

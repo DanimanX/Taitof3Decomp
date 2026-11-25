@@ -171,6 +171,47 @@ static void sub_178CCE(const f3mem_t *m, uint32_t obj)
     wr32(m, obj + 0x54u, rd32(m, obj + 0x54u) + (uint32_t)((int32_t)mag * s));
 }
 
+/* ROM 0x178ECC: the steer-to command of 0x178E4A with the heading-speed
+ * section replaced by a random heading byte. Where 0x178E80..0x178E9A does
+ *
+ *     sub.b (0x20,A0),D0 ; beq/bgt/neg + add.w D1,(0x20,A0)
+ *
+ * this one does  and.b D1b,D0 ; asr.w #8,D1 ; add.b D1b,D0 ; move.b D0,(0x20,A0)
+ * (D1 = the record's +0x8 word), then moves along 0x27E40 exactly like its
+ * sibling. The two are NOT interchangeable: the speed word +0x20 is replaced
+ * rather than accumulated, so this needs its own body. */
+static void scr_178ECC(const f3mem_t *m, uint32_t obj)
+{
+    if ((int32_t)rd32(m, obj + 0x4Cu) <= 0)
+        return;                                       /* 0x178ECC tst.l/ble */
+
+    uint32_t tgt = rd32(m, obj + 0x4Cu);              /* 0x178ED4 */
+    uint16_t dx = (uint16_t)(rd16(m, tgt + 0x14u) + 0x18u - rd16(m, obj + 0x50u));
+    uint16_t dy = (uint16_t)(rd16(m, tgt + 0x18u) + 0x10u - rd16(m, obj + 0x54u));
+    uint16_t d0 = Obj_Atan2(m, dx, dy);               /* 0x178EF0 jsr 0x006422 */
+
+    uint32_t a1 = rd32(m, obj + 0x44u);
+    uint16_t d2 = rd16(m, a1 + 0x06u);
+    uint16_t d1 = rd16(m, a1 + 0x08u);
+    wr16(m, obj + 0x42u, (uint16_t)(rd16(m, obj + 0x42u) + d2));   /* 0x178F02 */
+
+    /* 0x178F06: and.b D1b,D0b ; asr.w #8,D1w ; add.b D1b,D0b */
+    uint8_t ang = (uint8_t)((uint8_t)d0 & (uint8_t)d1);
+    ang = (uint8_t)(ang + (uint8_t)(int8_t)(int16_t)((int16_t)d1 >> 8));
+    wr8(m, obj + 0x20u, ang);                         /* 0x178F0C */
+
+    /* 0x178F10..0x178F38: the 0x27E40 sine/cosine pair */
+    {
+        int16_t mag = (int16_t)(uint16_t)(rd16(m, obj + 0x42u) + 0x20u) >> 6;
+        uint16_t idx = (uint16_t)(rd16(m, obj + 0x20u) >> 8);
+        uint32_t base = 0x0027E40u + (uint32_t)idx * 2u;
+        int32_t vx = (int32_t)mag * (int16_t)rd16(m, base + 0x80u);
+        int32_t vy = (int32_t)mag * (int16_t)rd16(m, base);
+        wr32(m, obj + 0x50u, rd32(m, obj + 0x50u) + (uint32_t)vx);
+        wr32(m, obj + 0x54u, rd32(m, obj + 0x54u) + (uint32_t)vy);
+    }
+}
+
 static int script10_call(const f3mem_t *m, uint32_t obj, uint32_t fn)
 {
     switch (fn) {
@@ -180,6 +221,7 @@ static int script10_call(const f3mem_t *m, uint32_t obj, uint32_t fn)
     case 0x00178C06u: sub_178C06(m, obj);              return 0;
     case 0x00178E4Au: Obj_Script10_SteerTo(m, obj);    return 0;
     case 0x00178CCEu: sub_178CCE(m, obj);              return 0;
+    case 0x00178ECCu: scr_178ECC(m, obj);              return 0;
     default:          return -1;
     }
 }

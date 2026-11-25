@@ -88,6 +88,27 @@ static void anim9_tick(const f3mem_t *m, uint32_t obj)
     wr8(m, obj + 0x1Cu, (uint8_t)rd16(m, a1));
 }
 
+/* ROM 0x179880 / 0x1798BA / 0x1798F8 / 0x179946 / 0x1799B2: directional
+ * sprite (+hitbox/+offset) ticks indexed by +0x20 angle (16 or 32 dirs). */
+static void anim_dir_tick(const f3mem_t *m, uint32_t obj, int dirs32, uint32_t stride, int copy_boxes, int add_xy)
+{
+    uint8_t ang = rd8(m, obj + 0x20u);
+    uint16_t d0 = dirs32 ? (uint16_t)((uint8_t)(ang + 4u) >> 3)
+                         : (uint16_t)((uint8_t)(ang + 8u) >> 4);
+    uint32_t a1 = rd32(m, obj + 0x3Au) + ((uint32_t)d0 * stride & 0xFFFFu);
+    wr32(m, obj + 0x10u, rd32(m, a1));
+    if (copy_boxes) {
+        wr32(m, obj + 0x2Cu, rd32(m, a1 + 4u));
+        wr32(m, obj + 0x30u, rd32(m, a1 + 8u));
+    }
+    if (add_xy) {
+        int16_t dx = (int16_t)(int8_t)rd8(m, a1 + 12u);
+        int16_t dy = (int16_t)(int8_t)rd8(m, a1 + 13u);
+        wr16(m, obj + 0x14u, (uint16_t)((int16_t)rd16(m, obj + 0x14u) + dx));
+        wr16(m, obj + 0x18u, (uint16_t)((int16_t)rd16(m, obj + 0x18u) + dy));
+    }
+}
+
 /* ROM 0x1796B2 (index 8 tick): the index-0 walk with an 8-byte header; a
  * positive duration reloads through 0x17955E. */
 static void anim8_tick(const f3mem_t *m, uint32_t obj)
@@ -116,9 +137,14 @@ static void anim8_tick(const f3mem_t *m, uint32_t obj)
 int Obj_AnimTick(const f3mem_t *m, uint32_t obj, uint16_t idx)
 {
     switch (idx) {
-    case 0u: Obj_AnimTick0(m, obj); return 0;
-    case 8u: anim8_tick(m, obj);    return 0;
-    case 9u: anim9_tick(m, obj);    return 0;
+    case 0u: Obj_AnimTick0(m, obj);                  return 0;
+    case 1u: anim_dir_tick(m, obj, 0,  4u, 0, 0);    return 0; /* ROM 0x179880 */
+    case 2u: anim_dir_tick(m, obj, 1,  4u, 0, 0);    return 0; /* ROM 0x1798BA */
+    case 4u: anim_dir_tick(m, obj, 0, 12u, 1, 0);    return 0; /* ROM 0x1798F8 */
+    case 6u: anim_dir_tick(m, obj, 0, 14u, 1, 1);    return 0; /* ROM 0x179946 */
+    case 7u: anim_dir_tick(m, obj, 1, 14u, 1, 1);    return 0; /* ROM 0x1799B2 */
+    case 8u: anim8_tick(m, obj);                     return 0;
+    case 9u: anim9_tick(m, obj);                     return 0;
     default: return -1;
     }
 }

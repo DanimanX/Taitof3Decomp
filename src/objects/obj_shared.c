@@ -343,3 +343,83 @@ uint16_t Obj_DistScaled(const f3mem_t *m, int16_t x, int16_t y, uint16_t *shift)
         *shift = d1w;
     return (uint16_t)((r << 16) | (r >> 16));
 }
+
+/* ROM 0x179434 */
+void Obj_BossMapScreenPos(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t d1 = rd32(m, obj + 0x58u) & 0x00FFFF00u;
+    if (d1 == 0u)
+        return;
+    d1 += 0x00010000u;
+    {
+        int32_t d0 = (int32_t)rd32(m, obj + 0x18u) - 0x00820000;
+        d0 /= (int32_t)d1;
+        wr16(m, obj + 0x18u, (uint16_t)(d0 + 0x82));
+    }
+    {
+        int32_t d0 = (int32_t)rd32(m, obj + 0x14u) - 0x00900000;
+        d0 /= (int32_t)d1;
+        wr16(m, obj + 0x14u, (uint16_t)(d0 + 0x90));
+    }
+}
+
+/* ROM 0x17AF9A */
+uint8_t Obj_AimAtPlayer17AF9A(const f3mem_t *m, uint32_t p, uint16_t x, uint16_t y)
+{
+    if ((int32_t)p <= 0)
+        return (uint8_t)p;
+    uint16_t dx = (uint16_t)(rd16(m, p + 0x14u) + 0x18u - x);
+    uint16_t dy = (uint16_t)(rd16(m, p + 0x18u) + 0x10u - y);
+    return (uint8_t)Obj_AtanByte(m, (int16_t)dx, (int16_t)dy);
+}
+
+/* ROM 0x001660: queue a palette upload {count.w, src.l, dst.w} (max 0x20) */
+static void queue_pal_upload(const f3mem_t *m, uint32_t src, uint16_t dst, uint16_t count)
+{
+    uint16_t n = rd16(m, F3_A5 - 0x5DF0u);
+    if ((int16_t)n >= 0x20)
+        return;
+    uint32_t a2 = F3_A5 - 0x6750u + (uint32_t)(int32_t)(int16_t)(uint16_t)(n << 3);
+    wr16(m, a2, count);
+    wr32(m, a2 + 2u, src);
+    wr16(m, a2 + 6u, dst);
+    wr16(m, F3_A5 - 0x5DEEu, 0x0002u);
+    wr16(m, F3_A5 - 0x5DF0u, (uint16_t)(n + 1u));
+}
+
+/* ROM 0x17B3AE */
+void Boss_UploadPalettes(const f3mem_t *m)
+{
+    uint32_t a2 = 0x0017B4ACu;
+    if (rd16(m, F3_A5 + 0x32DCu) == 0x0001u)
+        a2 = 0x0017B6ECu;
+    for (uint32_t i = 0; i < 8u; i++)
+        queue_pal_upload(m, a2 + i * 0x40u, (uint16_t)(0x6800u + i * 0x80u), 0x20u);
+}
+
+/* ROM 0x1847E8 */
+void Boss_ResetGlobals(const f3mem_t *m, uint32_t obj)
+{
+    static const uint16_t clrw[] = { 0x4B02, 0x4B22, 0x4B24, 0x4B26, 0x4B36, 0x4B38, 0x4B3A };
+    for (unsigned i = 0; i < sizeof clrw / sizeof clrw[0]; i++)
+        wr16(m, F3_A5 + clrw[i], 0u);
+    wr32(m, F3_A5 + 0x4B1Cu, 0u);
+    wr16(m, F3_A5 + 0x4B20u, 0u);
+    wr16(m, F3_A5 + 0x4B34u, 0u);
+    wr32(m, F3_A5 + 0x4B3Cu, rd32(m, F3_A5 - 0x1456u));
+    wr32(m, F3_A5 + 0x4B0Cu, 0x00010000u);
+    wr32(m, F3_A5 + 0x4B10u, 0x00010000u);
+    wr32(m, F3_A5 + 0x4B14u, 0x00010000u);
+    wr8(m, F3_A5 + 0x4B28u, 0x02u);
+    wr8(m, F3_A5 + 0x4B29u, 0x00u);
+    wr16(m, F3_A5 + 0x4B2Au, 0x0064u);
+    wr16(m, F3_A5 + 0x4B2Cu, 0x0064u);
+    wr16(m, F3_A5 + 0x4B2Eu, 0x0064u);
+    for (uint32_t a = 0x4B44u; a <= 0x4B50u; a += 2u)
+        wr16(m, F3_A5 + a, 0u);
+    wr8(m, obj + 0x34u, 0x10u);
+    wr8(m, obj + 0x35u, 0u);
+    wr8(m, obj + 0x23u, 0u);
+    wr16(m, obj + 0x16u, 0u);
+    wr16(m, obj + 0x1Au, 0u);
+}

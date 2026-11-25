@@ -34,4 +34,19 @@ uint16_t Obj_AtanByte(const f3mem_t *m, int16_t x, int16_t y);
  * the scaled form the 0xD0E52-family callers expect; *shift gets D1.w. */
 uint16_t Obj_DistScaled(const f3mem_t *m, int16_t x, int16_t y, uint16_t *shift);
 
+/* ROM 0x179434: map absolute position (+0x14/+0x18) back to screen-relative
+ * coordinates through the velocity/scale word in +0x58. */
+void Obj_BossMapScreenPos(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x17AF9A: byte angle from (x, y) toward player object p (with +0x18/+0x10
+ * centre offset) via 0x006422; returns (uint8_t)p if p <= 0. */
+uint8_t Obj_AimAtPlayer17AF9A(const f3mem_t *m, uint32_t p, uint16_t x, uint16_t y);
+
+/* ROM 0x17B3AE: queue upload of the 8 boss palettes (alternate set when
+ * A5+0x32DC == 1) via 0x001660. */
+void Boss_UploadPalettes(const f3mem_t *m);
+
+/* ROM 0x1847E8: reset the boss globals at A5+0x4B02.. and object flags. */
+void Boss_ResetGlobals(const f3mem_t *m, uint32_t obj);
+
 #endif

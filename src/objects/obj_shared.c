@@ -327,7 +327,7 @@ uint16_t Obj_Atan256(const f3mem_t *m, int16_t x, int16_t y)
     if ((int16_t)d0 < 0) { d2 = (uint16_t)(d2 + 2u); d0 = (uint16_t)(0u - d0); }
     if ((int16_t)d1 < 0) { d2 = (uint16_t)(d2 + 4u); d1 = (uint16_t)(0u - d1); }
 
-    uint16_t src = ((int16_t)d1 > (int16_t)d0) ? d1 : d0;
+    uint16_t src = (d1 > d0) ? d1 : d0;   /* cmp.w D0,D1 ; bls: unsigned */
     uint16_t d3 = 0x20u;
     for (uint16_t i = 0u; i < 16u; i++) {
         if (src & (uint16_t)(0x8000u >> i)) { d3 = (uint16_t)(0x10u + i); break; }
@@ -344,7 +344,9 @@ uint16_t Obj_Atan256(const f3mem_t *m, int16_t x, int16_t y)
     d1 = (uint16_t)(d1 << 6);
     d1 = (uint16_t)(d1 + d0);
     uint16_t r = rd8(m, 0x000D0EBCu + (uint32_t)d1);
-    r = (uint16_t)(r + rd16(m, 0x000D0EB4u + (uint32_t)d2 * 2u));
+    /* add.w (0x18,PC,D2.w),D0 -- ext 0x2018: index D2.w, scale x1. D2 is
+     * already a byte offset (0/2/4/6) into {0x5A, 0, 0xB4, 0x10E}. */
+    r = (uint16_t)(r + rd16(m, 0x000D0EB4u + (uint32_t)d2));
     if (r == 0x0168u)
         r = 0u;
     return r;

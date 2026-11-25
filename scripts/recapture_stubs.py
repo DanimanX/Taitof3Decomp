@@ -26,6 +26,7 @@ SURVEY_DIR = ROOT / "work" / "survey"
 PRECHECK = ROOT / "work" / "audit" / "precheck.py"
 CAPTURE_FN = ROOT / "scripts" / "capture_fn.sh"
 LOG_OK = ROOT / "work" / "recapture_ok.txt"
+LOG_SKIP = ROOT / "work" / "recapture_skip.txt"
 
 PFX_MAP = {
     "long_A": "LA_",
@@ -159,10 +160,12 @@ def main():
     plan = find_best_capture_plan(stubs, stas, by_pfx)
 
     done_ok = set()
-    if args.resume and LOG_OK.exists():
-        for ln in LOG_OK.read_text().splitlines():
-            if ln.strip():
-                done_ok.add(ln.split()[0].upper().lstrip("0"))
+    if args.resume:
+        for lf in (LOG_OK, LOG_SKIP):
+            if lf.exists():
+                for ln in lf.read_text().splitlines():
+                    if ln.strip():
+                        done_ok.add(ln.split()[0].upper().lstrip("0"))
 
     ordered = []
     for addr in stubs:
@@ -231,6 +234,8 @@ def main():
             print(f"[{idx}/{len(ordered)}] PASS {ram_name} state={st} pairs={pairs} ({dt:.1f}s)", flush=True)
         else:
             restore_backup(bak)
+            with open(LOG_SKIP, "a") as sf:
+                sf.write(f"{ram_name}\t{st}\tpairs={pairs}\n")
             print(f"[{idx}/{len(ordered)}] SKIP {ram_name} state={st} pairs={pairs} ({dt:.1f}s)", flush=True)
 
     print(f"Done: {ok_count}/{len(ordered)} freshly captured & precheck-verified.")

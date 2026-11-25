@@ -1,4 +1,5 @@
 #include "obj_shared.h"
+#include "obj_shared_ext.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
@@ -204,4 +205,141 @@ void Obj_StartScript(const f3mem_t *m, uint32_t obj, uint32_t a1)
 {
     wr32(m, obj + 0x44u, a1);
     wr8(m, obj + 0x07u, (uint8_t)(rd8(m, obj + 0x07u) | 0x02u));
+}
+
+/* ---- 0x0CEC4C block init --------------------------------------------- */
+
+/* ROM 0x0CEE2C */
+void Obj_ClassColour(const f3mem_t *m, uint32_t obj)
+{
+    uint8_t c = rd8(m, 0x000CEE40u + (uint32_t)rd8(m, obj + 0x4Eu));
+    wr8(m, obj + 0x1Du, c);
+    wr8(m, obj + 0x4Fu, c);
+}
+
+/* ROM 0x0D0678 */
+void Obj_StartBehaviour(const f3mem_t *m, uint32_t obj, uint32_t a1)
+{
+    wr32(m, obj + 0x48u, a1);
+    wr16(m, obj + 0x4Cu, rd16(m, a1));
+    a1 += 2u;
+    wr8(m, obj + 0x1Cu, (uint8_t)rd16(m, a1));
+    a1 += 2u;
+    wr32(m, obj + 0x10u, rd32(m, a1));
+    a1 += 4u;
+    wr32(m, obj + 0x68u, rd32(m, a1));
+}
+
+/* ROM 0x1794A4: D0w = value in [-(d0-1)..d0-1] from the LCG at A5+0x4B3C,
+ * stepping the generator once (x' = 5x - 1, halves swapped back). */
+uint16_t Obj_RandRange(const f3mem_t *m, uint16_t d0)
+{
+    uint16_t r = d0;
+    if (d0 != 0u) {
+        int off = 0;
+        while (off < 32 && !((uint32_t)d0 & (0x80000000u >> off)))
+            off++;
+        int16_t d1w = (int16_t)(off - 16);
+        uint16_t d2w = rd16(m, 0x00179530u + (uint32_t)((int32_t)d1w * 2));
+        uint16_t v = (uint16_t)(rd16(m, F3_A5 + 0x4B3Cu) & d2w);
+        if ((int16_t)r < (int16_t)v)
+            v = (uint16_t)(v - r);
+        r = v;
+        if (rd8(m, F3_A5 + 0x4B3Cu) & 1u)
+            r = (uint16_t)(0u - r);
+    }
+    uint32_t s = rd32(m, F3_A5 + 0x4B3Cu) * 5u - 1u;
+    wr32(m, F3_A5 + 0x4B3Cu, (s << 16) | (s >> 16));
+    return r;
+}
+
+/* ROM 0x0D0E52: unlike 0x006422 this one reads its quadrant offsets from
+ * 0xD0EB4, where the +y half (entries 2 and 4) needs no axis swap; its 0xD0EBC
+ * table is indexed by D1*0x40 + D0 after the BFFFO scale, and a result of
+ * 0x168 (the seam between the last two half-turns) folds to 0. */
+uint16_t Obj_Atan256(const f3mem_t *m, int16_t x, int16_t y)
+{
+    uint16_t d0 = (uint16_t)y;   /* D0: second axis */
+    uint16_t d1 = (uint16_t)x;   /* D1: first axis */
+    uint16_t d2 = 0u;
+    if ((int16_t)d0 < 0) { d2 = (uint16_t)(d2 + 2u); d0 = (uint16_t)(0u - d0); }
+    if ((int16_t)d1 < 0) { d2 = (uint16_t)(d2 + 4u); d1 = (uint16_t)(0u - d1); }
+
+    uint16_t src = ((int16_t)d1 > (int16_t)d0) ? d1 : d0;
+    uint16_t d3 = 0x20u;
+    for (uint16_t i = 0u; i < 16u; i++) {
+        if (src & (uint16_t)(0x8000u >> i)) { d3 = (uint16_t)(0x10u + i); break; }
+    }
+    d3 = (uint16_t)(d3 - 0x1Au);
+    if ((int16_t)d3 < 0) {
+        d3 = (uint16_t)(0u - d3);
+        d0 = (uint16_t)(d0 >> (d3 & 63u));
+        d1 = (uint16_t)(d1 >> (d3 & 63u));
+    }
+    if (d2 != 2u && d2 != 4u) {
+        uint16_t t = d0; d0 = d1; d1 = t;
+    }
+    d1 = (uint16_t)(d1 << 6);
+    d1 = (uint16_t)(d1 + d0);
+    uint16_t r = rd8(m, 0x000D0EBCu + (uint32_t)d1);
+    r = (uint16_t)(r + rd16(m, 0x000D0EB4u + (uint32_t)d2 * 2u));
+    if (r == 0x0168u)
+        r = 0u;
+    return r;
+}
+
+/* ROM 0x006422, kept as its own entry because 0x0CBB2C calls it with the
+ * (D0 = x, D1 = y) register order the ROM uses, which is not the order of
+ * Obj_Atan2's (dy, dx) parameters. */
+uint16_t Obj_AtanByte(const f3mem_t *m, int16_t x, int16_t y)
+{
+    uint16_t d0 = (uint16_t)x;
+    uint16_t d1 = (uint16_t)y;
+    uint32_t a0 = 0x026E40u;
+    uint16_t d2 = 0u;
+
+    if ((int16_t)d0 < 0) { d2 |= 0x0002u; d0 = (uint16_t)(0u - d0); }
+    if ((int16_t)d1 < 0) { d2 |= 0x0004u; d1 = (uint16_t)(0u - d1); }
+
+    uint16_t src = ((int16_t)d1 > (int16_t)d0) ? d1 : d0;
+    uint16_t d3 = 0x20u;
+    for (uint16_t i = 0u; i < 16u; i++) {
+        if (src & (uint16_t)(0x8000u >> i)) { d3 = (uint16_t)(0x10u + i); break; }
+    }
+    d3 = (uint16_t)(d3 - 0x1Au);
+    if ((int16_t)d3 < 0) {
+        d3 = (uint16_t)(0u - d3);
+        d0 = (uint16_t)(d0 >> (d3 & 63u));
+        d1 = (uint16_t)(d1 >> (d3 & 63u));
+    }
+    if (d2 != 0u && d2 != 6u) {
+        uint16_t t = d0; d0 = d1; d1 = t;
+    }
+    d1 = (uint16_t)(d1 << 6);
+    a0 += (uint32_t)(int32_t)(int16_t)d1;
+    uint8_t tbl = rd8(m, a0 + (uint32_t)(int32_t)(int16_t)d0);
+    d0 = (uint16_t)((d0 & 0xFF00u) | (uint16_t)tbl);
+    d0 = (uint16_t)(d0 + rd16(m, 0x006492u + (uint32_t)(int32_t)(int16_t)d2));
+    return (uint16_t)(d0 & 0x00FFu);
+}
+
+/* ROM 0x00649A */
+uint16_t Obj_DistScaled(const f3mem_t *m, int16_t x, int16_t y, uint16_t *shift)
+{
+    uint32_t d0 = (uint32_t)((int32_t)x * (int32_t)x);
+    uint32_t d1 = (uint32_t)((int32_t)y * (int32_t)y);
+    d0 += d1;
+    d0 += d0;
+    uint16_t d1w = 4u;
+    for (int i = 0; i < 3; i++) {
+        if ((int32_t)d0 < 0x200)
+            break;
+        d0 >>= 8;
+        d1w = (uint16_t)(d1w + 4u);
+    }
+    uint16_t v = rd16(m, 0x028340u + (uint32_t)(int32_t)(int16_t)(uint16_t)d0 * 2u);
+    uint32_t r = (uint32_t)v << (d1w & 63u);
+    if (shift)
+        *shift = d1w;
+    return (uint16_t)((r << 16) | (r >> 16));
 }

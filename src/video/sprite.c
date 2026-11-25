@@ -373,3 +373,12 @@ void Gfx_InitLineRam(const f3mem_t *m)
         wr16(m, 0x00624600u, (uint16_t)(rd16(m, 0x00624600u) | 0x8000u));
     }
 }
+
+/* ROM 0x13D11E */
+void Stage_DrawBanner13D11E(const f3mem_t *m)
+{
+    int16_t idx = (int16_t)rd16(m, F3_A5 + 0x32DCu);
+    uint32_t a0 = rd32(m, 0x0013D558u + (int32_t)idx * 4);
+    Gfx_UploadTextTiles(m, a0, rd8(m, 0x00010C05u));
+    Gfx_DrawTilemapBlock(m, 0x00010C00u, 0x0061C024u, 0u);
+}

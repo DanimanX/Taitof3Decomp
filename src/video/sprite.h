@@ -23,5 +23,6 @@ void Gfx_ClearPf2AndLineRam(const f3mem_t *m);        /* ROM 0x0059B4 */
 void Gfx_ClearAllLayers(const f3mem_t *m);            /* ROM 0x005A12 */
 void Gfx_UploadTextTiles(const f3mem_t *m, uint32_t src, uint16_t slot); /* ROM 0x005A86 */
 void Gfx_InitLineRam(const f3mem_t *m);               /* ROM 0x005B0C */
+void Stage_DrawBanner13D11E(const f3mem_t *m);        /* ROM 0x13D11E */
 
 #endif

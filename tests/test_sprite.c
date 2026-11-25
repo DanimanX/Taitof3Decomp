@@ -106,6 +106,7 @@ int main(void)
             { "0x005A12", "work/ram/fn_005A12", 7 },
             { "0x005A86", "work/ram/fn_005A86", 4 },
             { "0x005B0C", "work/ram/fn_005B0C", 5 },
+            { "0x13D11E", "work/ram/fn_13D11E", 8 },
         };
         for (size_t t = 0; t < sizeof(fn_tests) / sizeof(fn_tests[0]); t++) {
             capture_t c;
@@ -131,6 +132,8 @@ int main(void)
                     Gfx_ClearTextLayer(&m);
                 } else if (fn_tests[t].id == 7) {
                     Gfx_ClearAllLayers(&m);
+                } else if (fn_tests[t].id == 8) {
+                    Stage_DrawBanner13D11E(&m);
                 } else {
                     Gfx_InitLineRam(&m);
                 }

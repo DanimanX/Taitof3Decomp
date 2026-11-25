@@ -30,7 +30,7 @@ int  Player_StageFail(const f3mem_t *m, uint32_t player);  /* ROM 0x0C6E5A */
  * is written by this lane; the ship fn the scene init spawns reads 0x0C7946 in
  * all three states, the task itself is armed with 0x0C7480. */
 #define PLAYER_FN_STAGE_FAIL 0x0C7480u /* task fn of the 0x0C6E5A fail loop */
-#define PLAYER_FN_SHIP       0x0C77BEu /* alive ship: input/HUD (0x0C7C60 tail) */
+#define PLAYER_FN_SHIP       0x0C7946u /* alive ship tick (0x0C7946, set by 0x0C793E) */
 #define PLAYER_FN_RESPAWN    0x0C793Eu /* respawn tick = 0x0C6CE6 / 0x0C6D0E */
 
 #endif

@@ -113,4 +113,16 @@ void Obj_0D0E04(const f3mem_t *m, uint32_t obj, uint32_t d0);
 /* ROM 0x0CEE48: spawn 0x117C28 score/fx if +0x4E != 0 and not bomb-clear, then Obj_StartDying. */
 void Obj_0CEE48(const f3mem_t *m, uint32_t obj);
 
+/* ROM 0x0D825E: 3D perspective screen pos from +0x54/+0x58/+0x60 -> +0x14/+0x18/+0x1E/+0x1F. */
+void Obj_0D825E(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x0D8318: draw scaled sub-part sprite at (d0, d1) offset from obj. */
+void Obj_0D8318(const f3mem_t *m, uint32_t obj, uint32_t a2, int16_t d0, int16_t d1);
+
+/* ROM 0x0D8294: draw multi-part scaled boss/enemy sprite from table 0x0D8446[+0x5C]. */
+void Obj_0D8294(const f3mem_t *m, uint32_t obj);
+
+/* ROM 0x0D8378: step +0x42/+0x22/+0x21 and integrate +0x54/+0x58 via 0x027E40 sin/cos. */
+void Obj_0D8378(const f3mem_t *m, uint32_t obj);
+
 #endif

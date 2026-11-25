@@ -439,8 +439,8 @@ int PlayerControl_RunFrame(const f3mem_t *m)
     if (rd8(m, G_PAUSE) & 0x02u)
         return 0;                        /* paused: the whole frame is the yield */
 
-    /* 0C6AA8: A0 = active player list head */
-    wr32(m, G_ACTIVE_LIST, P1_STATE_ADDR);
+    /* 0C6AA8: move.l #0x41a988,(0x1d4c,A5) -- COLL_LIST1 head */
+    wr32(m, G_ACTIVE_LIST, 0x0041A988u);
 
     /* 0C6AB0: jsr 0x0B9080 -- object-script pass, A0 = 0x41B190, A5 = 0x408000.
      * Not decompiled in src/: stop before its effects. */

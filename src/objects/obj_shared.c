@@ -865,3 +865,98 @@ void Obj_0CEE48(const f3mem_t *m, uint32_t obj)
     }
     Obj_StartDying(m, obj);
 }
+
+/* ROM 0x0D825E */
+void Obj_0D825E(const f3mem_t *m, uint32_t obj)
+{
+    int16_t d0 = (int16_t)rd16(m, obj + 0x60u);
+    wr8(m, obj + 0x1Fu, (uint8_t)d0);
+    wr8(m, obj + 0x1Eu, (uint8_t)d0);
+    d0 = (int16_t)(0x100 - d0);
+    int32_t x = ((int32_t)d0 * (int16_t)rd16(m, obj + 0x54u)) << 8;
+    int32_t y = ((int32_t)d0 * (int16_t)rd16(m, obj + 0x58u)) << 8;
+    wr32(m, obj + 0x14u, (uint32_t)(x + 0x00A00000));
+    wr32(m, obj + 0x18u, (uint32_t)(y + 0x00740000));
+}
+
+/* ROM 0x0D8318 */
+void Obj_0D8318(const f3mem_t *m, uint32_t obj, uint32_t a2, int16_t d0, int16_t d1)
+{
+    uint16_t save_x = rd16(m, obj + 0x14u);
+    uint16_t save_y = rd16(m, obj + 0x18u);
+    if (rd8(m, obj + 0x64u) != 0u) {
+        d0 = (int16_t)(-d0);
+        wr8(m, obj + 0x1Cu, (uint8_t)(rd8(m, obj + 0x1Cu) ^ 0x01u));
+    }
+    int16_t ox = (int16_t)(rd16(m, a2 + 2u) << 3);
+    int16_t oy = (int16_t)(rd16(m, a2) << 3);
+    d0 = (int16_t)(d0 - ox);
+    d1 = (int16_t)(d1 - oy);
+    int16_t sx = (int16_t)((uint16_t)rd8(m, obj + 0x1Fu) - 0x100u);
+    int16_t sy = (int16_t)((uint16_t)rd8(m, obj + 0x1Eu) - 0x100u);
+    int32_t dx = ((int32_t)sx * (int32_t)d0) >> 8;
+    int32_t dy = ((int32_t)sy * (int32_t)d1) >> 8;
+    wr16(m, obj + 0x14u, (uint16_t)((int16_t)save_x - (int16_t)dx));
+    wr16(m, obj + 0x18u, (uint16_t)((int16_t)save_y - (int16_t)dy));
+    Obj_DrawSprite(m, obj);
+    wr16(m, obj + 0x18u, save_y);
+    wr16(m, obj + 0x14u, save_x);
+}
+
+/* ROM 0x0D8294 */
+void Obj_0D8294(const f3mem_t *m, uint32_t obj)
+{
+    uint16_t save_1c = rd16(m, obj + 0x1Cu);
+    uint32_t a1 = rd32(m, 0x000D8446u + (uint32_t)rd16(m, obj + 0x5Cu) * 4u);
+    uint8_t idx = rd8(m, a1++);
+    Obj_Animate(m, obj, rd32(m, 0x000D83E6u + (uint32_t)idx * 4u));
+    wr8(m, obj + 0x1Cu, rd8(m, a1++));
+    wr8(m, obj + 0x1Du, 0x82u);
+    int16_t d0 = (int8_t)rd8(m, a1++);
+    int16_t d1 = (int8_t)rd8(m, a1++);
+    Obj_0D8318(m, obj, rd32(m, obj + 0x10u), d0, d1);
+    wr16(m, obj + 0x1Cu, save_1c);
+
+    for (;;) {
+        uint16_t save_34 = rd16(m, obj + 0x34u);
+        uint16_t save_1c2 = rd16(m, obj + 0x1Cu);
+        uint32_t a2 = rd32(m, a1); a1 += 4u;
+        wr32(m, obj + 0x10u, a2);
+        d0 = (int8_t)rd8(m, a1++);
+        d1 = (int8_t)rd8(m, a1++);
+        wr8(m, obj + 0x1Cu, rd8(m, a1++));
+        wr8(m, obj + 0x4Fu, rd8(m, a1++));
+        Obj_BlinkColour(m, obj);
+        Obj_0D8318(m, obj, a2, d0, d1);
+        wr16(m, obj + 0x1Cu, save_1c2);
+        wr16(m, obj + 0x34u, save_34);
+        if ((int16_t)rd16(m, a1) < 0)
+            break;
+    }
+    Obj_BlinkColour(m, obj);
+}
+
+/* ROM 0x0D8378 */
+void Obj_0D8378(const f3mem_t *m, uint32_t obj)
+{
+    if (rd8(m, obj + 0x22u) == 0u) {
+        int16_t v = (int16_t)(rd16(m, obj + 0x42u) + 4);
+        wr16(m, obj + 0x42u, (uint16_t)v);
+        if (v >= 0x100)
+            wr8(m, obj + 0x22u, 0xFFu);
+    } else {
+        int16_t v = (int16_t)(rd16(m, obj + 0x42u) - 4);
+        wr16(m, obj + 0x42u, (uint16_t)v);
+        if (v <= 0) {
+            wr8(m, obj + 0x22u, 0x00u);
+            uint8_t r = (uint8_t)((Rng_NextMem(m) & 0x0Fu) - 0x88u);
+            wr8(m, obj + 0x21u, (uint8_t)(rd8(m, obj + 0x21u) + r));
+        }
+    }
+    uint16_t d0 = rd16(m, obj + 0x20u);
+    int16_t d1 = (int16_t)rd16(m, obj + 0x42u);
+    int16_t cos_v = (int16_t)rd16(m, 0x00027E40u + 0x80u + (uint32_t)d0 * 2u);
+    int16_t sin_v = (int16_t)rd16(m, 0x00027E40u + (uint32_t)d0 * 2u);
+    wr32(m, obj + 0x54u, (uint32_t)((int32_t)rd32(m, obj + 0x54u) + (((int32_t)cos_v * (int32_t)d1) >> 8)));
+    wr32(m, obj + 0x58u, (uint32_t)((int32_t)rd32(m, obj + 0x58u) + (((int32_t)sin_v * (int32_t)d1) >> 8)));
+}

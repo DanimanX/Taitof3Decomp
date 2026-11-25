@@ -1,3 +1,40 @@
 #include "obj_11151A.h"
-/* ROM 0x11151A: not decompiled yet (stub) */
-int Obj_11151A_Tick(const f3mem_t *m, uint32_t obj) { (void)m; (void)obj; return -1; }
+#include "../objects/obj_pool.h"
+#include "../objects/obj_common.h"
+#include "../video/sprite.h"
+
+/* ROM 0x1115F2: scroll-derived draw angle word */
+static uint16_t angle_1115F2(const f3mem_t *m)
+{
+    uint16_t d0 = (uint16_t)(((uint16_t)(0u - rd16(m, F3_A5 + 0x4218u)) + 0x7Fu) & 0xFFu);
+    uint16_t d1, q, hi;
+    if ((int16_t)d0 <= 0x73) {
+        d1 = (uint16_t)(0x74u - d0);
+        q = (uint16_t)(((uint32_t)d1 << 6) / 0x28u);
+        hi = (uint16_t)((((uint32_t)q * 0xE000u) << 1) >> 16);
+        d0 = (uint16_t)(d0 - hi);
+    } else {
+        d1 = (uint16_t)(d0 - 0x73u);
+        q = (uint16_t)(((uint32_t)d1 << 6) / 0x28u);
+        hi = (uint16_t)((((uint32_t)q * 0xE000u) << 1) >> 16);
+        d0 = (uint16_t)(d0 + hi);
+    }
+    return (uint16_t)(d0 - 0x30u);
+}
+
+/* ROM 0x11151A: step the anim table at 0x1115C0, drift +0x14, free when it ends */
+int Obj_11151A_Tick(const f3mem_t *m, uint32_t obj)
+{
+    const uint32_t tbl = 0x1115C0u;
+    Obj_AnimFrameStep(m, obj, tbl);
+    int16_t off = (int16_t)rd16(m, obj + 0x3Au);
+    if ((int16_t)rd16(m, tbl + (uint32_t)(int32_t)off) <= 0) {
+        Obj_Free(m, obj);
+        return 0;
+    }
+    wr32(m, obj + 0x14u, rd32(m, obj + 0x14u) - 0x28000u);
+    wr16(m, obj + 0x18u, angle_1115F2(m));
+    Obj_DrawSprite(m, obj);
+    wr32(m, obj + 0x00u, 0x11151Au);
+    return 0;
+}

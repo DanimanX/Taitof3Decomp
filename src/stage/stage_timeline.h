@@ -24,4 +24,8 @@ void Fx_StartB(const f3mem_t *m, uint8_t id);        /* ROM 0x0015EC (table 0x16
  * else 0. *spawned counts wave objects spawned. */
 int StageTimeline_Step(const f3mem_t *m, int *spawned);
 
+/* Advance 4-layer background scroll timeline, parallax, and tilemap streaming
+ * (ROM 0x16A3E0..0x16A9BA, plus local helpers 0x16AB70..0x16ABC0). */
+void StageScroll_Step(const f3mem_t *m);
+
 #endif

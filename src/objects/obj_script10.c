@@ -116,8 +116,9 @@ static int16_t abs16(int16_t v) { return v < 0 ? (int16_t)(0u - (uint16_t)v) : v
  * position moves along the 0x27E40 sine/cosine pair. */
 static void scr_179074(const f3mem_t *m, uint32_t obj)
 {
-    int16_t d2 = (int16_t)(int8_t)rd8(m, obj + 0x43u);
-    if (d2 < 0) {
+    uint8_t d2b = rd8(m, obj + 0x42u);              /* bfextu (0x42,A0){0:8} */
+    int16_t d2 = (int16_t)d2b;
+    if (d2b & 0x80u) {
         wr16(m, obj + 0x42u, 0u);
         wr16(m, obj + 0x48u, 0u);
         return;
@@ -125,8 +126,10 @@ static void scr_179074(const f3mem_t *m, uint32_t obj)
 
     int16_t ex = (int16_t)(rd16(m, obj + 0x4Cu) - rd16(m, obj + 0x50u));
     int16_t ey = (int16_t)(rd16(m, obj + 0x4Eu) - rd16(m, obj + 0x54u));
-    if (!(abs16(ex) <= d2 || abs16(ey) <= d2))
-        return;                                     /* 0x179104 */
+    if (!(abs16(ex) > d2 || abs16(ey) > d2)) {
+        wr16(m, obj + 0x48u, 0u);                   /* 0x179104 */
+        return;
+    }
 
     uint16_t d0 = Obj_Atan2(m, (uint16_t)ex, (uint16_t)ey); /* 0x1790B2 jsr 0x6422 */
     uint32_t a1 = rd32(m, obj + 0x44u);
@@ -135,8 +138,7 @@ static void scr_179074(const f3mem_t *m, uint32_t obj)
     wr16(m, obj + 0x42u, (uint16_t)(rd16(m, obj + 0x42u) + (uint16_t)step));
 
     /* 0x1790C8: and.b D1b,D0b ; asr.w #8,D1w ; add.b D1b,D0b */
-    uint16_t rnd = Obj_RandRange(m, (uint16_t)(jitter & 0xFFu)); /* 0x1794A4 */
-    uint8_t ang = (uint8_t)((uint8_t)d0 & (uint8_t)rnd);
+    uint8_t ang = (uint8_t)((uint8_t)d0 & (uint8_t)jitter);
     ang = (uint8_t)(ang + (uint8_t)(int8_t)(int16_t)(jitter >> 8));
     wr8(m, obj + 0x20u, ang);
 

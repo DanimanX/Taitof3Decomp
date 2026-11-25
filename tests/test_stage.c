@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "capture.h"
 #include "../src/stage/stage_timeline.h"
 
 static uint8_t *slurp(const char *path, long *len)
@@ -25,7 +26,7 @@ static int run_one(const char *pfx)
     char p1[256], p2[256];
     snprintf(p1, sizeof p1, "%s_pairs.bin", pfx);
     snprintf(p2, sizeof p2, "%s_regs.tsv", pfx);
-    long cl, rl;
+    long cl = 0, rl = 0;
     uint8_t *cap = slurp(p1, &cl), *rom = slurp("work/maincpu.bin", &rl);
     FILE *rf = fopen(p2, "r");
     if (!cap || !rom || !rf) { printf("stage: SKIP (need %s_* and work/maincpu.bin)\n", pfx); if (rf) fclose(rf); free(cap); free(rom); return -1; }
@@ -71,6 +72,35 @@ static int run_one(const char *pfx)
     return pairs - ok;
 }
 
+static int test_stage_scroll(void)
+{
+    capture_t c;
+    long rl = 0;
+    uint8_t *rom = slurp("work/maincpu.bin", &rl);
+    (void)rl;
+    if (!rom || cap_load(&c, "work/ram/fn_16A3E0") || !c.gfx) {
+        printf("stage: StageScroll_Step SKIP (need work/ram/fn_16A3E0_* and work/maincpu.bin)\n");
+        free(rom);
+        return 0;
+    }
+    uint8_t *work = malloc(F3_WRAM_SIZE), *gfx = malloc(F3_GFX_SIZE);
+    int ok = 0, budget = 10;
+    for (int i = 0; i < c.pairs; i++) {
+        memcpy(work, cap_wram(&c, i, 0), F3_WRAM_SIZE);
+        memcpy(gfx, cap_gfx(&c, i, 0), F3_GFX_SIZE);
+        f3mem_t m = { work, rom, NULL, NULL, gfx };
+        StageScroll_Step(&m);
+        uint32_t sp = c.pre[i][CR_SP];
+        int d = cap_diff("wram", i, F3_WRAM_BASE, work, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x100u, sp, &budget)
+              + cap_diff("gfx", i, F3_GFX_BASE, gfx, cap_gfx(&c, i, 1), F3_GFX_SIZE, 0, 0, &budget);
+        ok += d == 0;
+    }
+    printf("stage: StageScroll_Step %-24s %3d/%3d calls bit-exact (Work RAM + gfx RAM)\n",
+           "work/ram/fn_16A3E0", ok, c.pairs);
+    free(work); free(gfx); free(rom); cap_free(&c);
+    return c.pairs - ok;
+}
+
 int main(void)
 {
     /* natural play; forced end marker (F3_POKE32=40B308=0013FC34,40B30C=173F0000);
@@ -82,6 +112,7 @@ int main(void)
         if (r < 0) continue;
         any = 1; bad += r;
     }
+    bad += test_stage_scroll();
     if (!any) return 0;
     return bad == 0 && total_spawned > 0 ? 0 : 1;
 }

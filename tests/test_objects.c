@@ -1202,7 +1202,7 @@
 typedef int (*tick_fn)(const f3mem_t *, uint32_t);
 typedef int (*tick_a1_fn)(const f3mem_t *, uint32_t, uint32_t);
 
-static int run_any(const char *name, const char *pfx, tick_fn fn, tick_a1_fn fn_a1, const uint8_t *rom)
+static int run_any(const char *name, const char *pfx, tick_fn fn, tick_a1_fn fn_a1, int reg, const uint8_t *rom)
 {
     capture_t c;
     if (cap_load(&c, pfx) || !c.spr) { printf("objects: %-22s SKIP (no %s)\n", name, pfx); return 0; }
@@ -1215,7 +1215,7 @@ static int run_any(const char *name, const char *pfx, tick_fn fn, tick_a1_fn fn_
         f3mem_t m = { w, (uint8_t *)rom, NULL, s, g };
         uint32_t obj = c.pre[i][CR_A0];
         uint32_t fn0 = rd32(&m, obj);   /* tick fn before the call */
-        int r = fn ? fn(&m, obj) : fn_a1(&m, obj, c.pre[i][CR_A1]);
+        int r = fn ? fn(&m, obj) : fn_a1(&m, obj, c.pre[i][reg]);
         if (r < 0) {
             /* the tick's effect is unobservable, so this pair cannot be
              * compared; strict mode (harvest gates) refuses to count it */
@@ -1247,9 +1247,13 @@ static int run_any(const char *name, const char *pfx, tick_fn fn, tick_a1_fn fn_
 static int skip(const char *name)
 { const char *o = getenv("F3_ONLY"); return o && *o && !strstr(name, o); }
 static int run(const char *name, const char *pfx, tick_fn fn, const uint8_t *rom)
-{ return skip(name) ? 0 : run_any(name, pfx, fn, NULL, rom); }
+{ return skip(name) ? 0 : run_any(name, pfx, fn, NULL, 0, rom); }
 static int run_a1(const char *name, const char *pfx, tick_a1_fn fn, const uint8_t *rom)
-{ return skip(name) ? 0 : run_any(name, pfx, NULL, fn, rom); }
+{ return skip(name) ? 0 : run_any(name, pfx, NULL, fn, CR_A1, rom); }
+/* the pool runner (0x104D0..0x104EE) does not set D3: a tick that reads it
+ * sees whatever the previous object's tick left there */
+static int run_d3(const char *name, const char *pfx, tick_a1_fn fn, const uint8_t *rom)
+{ return skip(name) ? 0 : run_any(name, pfx, NULL, fn, CR_D0 + 3, rom); }
 
 int main(void)
 {
@@ -1697,7 +1701,7 @@ int main(void)
     bad += run("Obj 0x12D1E0", "work/ram/obj_12D1E0", Obj_12D1E0_Tick, rom);
     bad += run("Obj 0x118E88", "work/ram/obj_118E88", Obj_118E88_Tick, rom);
     bad += run("Obj 0x1302F8", "work/ram/obj_1302F8", Obj_1302F8_Tick, rom);
-    bad += run("Obj 0x130312", "work/ram/obj_130312", Obj_130312_Tick, rom);
+    bad += run_d3("Obj 0x130312", "work/ram/obj_130312", Obj_130312_TickD3, rom);
     bad += run("Obj 0x12D1C6", "work/ram/obj_12D1C6", Obj_12D1C6_Tick, rom);
     bad += run("Obj 0x12D2B4", "work/ram/obj_12D2B4", Obj_12D2B4_Tick, rom);
     bad += run("Obj 0x0CCE6E", "work/ram/obj_CCE6E", Obj_CCE6E_Tick, rom);

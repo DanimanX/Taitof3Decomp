@@ -293,6 +293,28 @@ uint16_t Obj_RandRange(const f3mem_t *m, uint16_t d0)
     return r;
 }
 
+/* ROM 0x1794F0: the unsigned twin of 0x1794A4 -- same bfffo mask and fold,
+ * but no `btst #0,(0x4B3C,A5) ; neg.w D0` before the generator step, so the
+ * result is always in [0..d0-1]. */
+uint16_t Obj_RandRangeU(const f3mem_t *m, uint16_t d0)
+{
+    uint16_t r = d0;
+    if (d0 != 0u) {
+        int off = 0;
+        while (off < 32 && !((uint32_t)d0 & (0x80000000u >> off)))
+            off++;
+        int16_t d1w = (int16_t)(off - 16);
+        uint16_t d2w = rd16(m, 0x00179530u + (uint32_t)((int32_t)d1w * 2));
+        uint16_t v = (uint16_t)(rd16(m, F3_A5 + 0x4B3Cu) & d2w);
+        if ((int16_t)r < (int16_t)v)
+            v = (uint16_t)(v - r);
+        r = v;
+    }
+    uint32_t s = rd32(m, F3_A5 + 0x4B3Cu) * 5u - 1u;
+    wr32(m, F3_A5 + 0x4B3Cu, (s << 16) | (s >> 16));
+    return r;
+}
+
 /* ROM 0x0D0E52: unlike 0x006422 this one reads its quadrant offsets from
  * 0xD0EB4, where the +y half (entries 2 and 4) needs no axis swap; its 0xD0EBC
  * table is indexed by D1*0x40 + D0 after the BFFFO scale, and a result of

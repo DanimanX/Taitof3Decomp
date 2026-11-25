@@ -21,6 +21,7 @@ void Obj_StartBehaviour(const f3mem_t *m, uint32_t obj, uint32_t a1);
 /* ROM 0x1794A4: random value in [-(n-1)..n-1] from the LCG at A5+0x4B3C
  * (x' = 5x - 1, halves swapped back), n = 0 returns 0. */
 uint16_t Obj_RandRange(const f3mem_t *m, uint16_t n);
+uint16_t Obj_RandRangeU(const f3mem_t *m, uint16_t n); /* ROM 0x1794F0: [0..n-1], no sign flip */
 
 /* ROM 0x0D0E52: 256-step direction of the point (x, y) -- quadrant offset from
  * 0xD0EB4 plus the BFFFO-scaled 0xD0EBC byte table. */

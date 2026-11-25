@@ -51,7 +51,7 @@ int Obj_17DBB8_Tick(const f3mem_t *m, uint32_t obj)
 
     /* 0x17DBFA: move.l #0xC8,D0 ; jsr 0x1794F0 ; addi.w #0x50,D0 ;
      * move.w D0,(0x64,A0) */
-    wr16(m, obj + 0x64u, (uint16_t)(Obj_RandRange(m, 0x00C8u) + 0x0050u));
+    wr16(m, obj + 0x64u, (uint16_t)(Obj_RandRangeU(m, 0x00C8u) + 0x0050u));
 
     /* 0x17DC0E: move.w (A5-0x1456),D0 ; move.b D0,(0x5C,A0) */
     wr8(m, obj + 0x5Cu, (uint8_t)rd16(m, F3_A5 - 0x1456u));

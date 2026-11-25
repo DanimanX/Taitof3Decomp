@@ -74,7 +74,7 @@ int Obj_18747C_Tick(const f3mem_t *m, uint32_t obj)
 
     /* 0x1874DE: move.l #0x200,D0 ; jsr 0x1794F0 ; addi.w #0x200,D0 ;
      * neg.w D0 ; move.w D0,(0x5C,A0) */
-    wr16(m, obj + 0x5Cu, (uint16_t)(0u - (uint16_t)(Obj_RandRange(m, 0x0200u) + 0x0200u)));
+    wr16(m, obj + 0x5Cu, (uint16_t)(0u - (uint16_t)(Obj_RandRangeU(m, 0x0200u) + 0x0200u)));
 
     wr16(m, obj + 0x42u, 0xFA00u);               /* 0x1874F4 */
     wr16(m, obj + 0x64u, rd16(m, obj + 0x54u));  /* 0x1874FA */

@@ -22,7 +22,7 @@ int Obj_18B230_Tick(const f3mem_t *m, uint32_t obj)
 
     /* 0x18B236: move.l #0x200,D0 ; jsr 0x1794F0 ; addi.w #0x200,D0w ;
      *           move.w D0w,(A0+0x42) */
-    uint16_t d0 = Obj_RandRange(m, 0x0200u);
+    uint16_t d0 = Obj_RandRangeU(m, 0x0200u);
     wr16(m, obj + 0x42u, (uint16_t)(d0 + 0x0200u));
 
     /* 0x18B24A: move.w #0x1F4,(A0+0x50) ; moveq #0x20,D0 ; jsr 0x1794A4 ;

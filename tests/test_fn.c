@@ -23,6 +23,7 @@
 #include "../src/enemy/obj_1194C2.h"      /* Text_DrawString (0x005666) */
 #include "../src/player/player_task.h"    /* Player_CoinCheckA (0x0C77BE) */
 #include "../src/enemy/obj_CBF04.h"       /* Obj_CBEEA (0x0CBEEA) */
+#include "../src/video/linefx_176390.h"   /* LineFx_176390 */
 
 typedef struct { uint32_t d[8], a[8]; } f3regs_t;   /* a[7] = SP */
 
@@ -60,10 +61,29 @@ static int ad_0CBEEA(const f3mem_t *m, f3regs_t *r)
     return Obj_CBEEA(m, r->a[0], (uint16_t)r->d[1], r->a[1]);
 }
 
+/* ROM 0x176390: D0 height, D1 depth, D7 first row, A0..A3 line tables */
+static int ad_176390(const f3mem_t *m, f3regs_t *r)
+{
+    LineFx_176390(m, r->d[0], r->d[1], r->d[7], r->a[0], r->a[1], r->a[2], r->a[3]);
+    return 0;
+}
+
+/* ROM 0x13D638: A0 = player, returns D1.w = slot (or -1), A1 = record */
+static int ad_13D638(const f3mem_t *m, f3regs_t *r)
+{
+    uint32_t a1;
+    int16_t d1 = Hiscore_Insert(m, r->a[0], &a1);
+    r->d[1] = (r->d[1] & 0xFFFF0000u) | (uint16_t)d1;
+    r->a[1] = a1;
+    return 0;
+}
+
 static const fn_entry_t fns[] = {
     { "Fn 0x005666 Text_DrawString",   "work/ram/fn_005666", ad_005666, { { CR_D0, 0xFFFFFFFFu } } },
     { "Fn 0x0C77BE Player_CoinCheckA", "work/ram/fn_0C77BE", ad_0C77BE, { { CR_D0, 0x000000FFu } } },
     { "Fn 0x0CBEEA Obj_CBEEA",         "work/ram/fn_0CBEEA", ad_0CBEEA, { { 0, 0u } } },
+    { "Fn 0x13D638 Hiscore_Insert",    "work/ram/fn_13D638", ad_13D638, { { CR_D0 + 1, 0x0000FFFFu }, { CR_A0 + 1, 0xFFFFFFFFu }, { 0, 0u }, { 0, 0u } } },
+    { "Fn 0x176390 LineFx_176390",     "work/ram/fn_176390", ad_176390, { { 0, 0u } } },
 };
 
 /* ---- runner ------------------------------------------------------------ */

@@ -39,4 +39,5 @@ int  Player_StageFail(const f3mem_t *m, uint32_t player);  /* ROM 0x0C6E5A */
 #define PLAYER_FN_SHIP       0x0C7946u /* alive ship tick (0x0C7946, set by 0x0C793E) */
 #define PLAYER_FN_RESPAWN    0x0C793Eu /* respawn tick = 0x0C6CE6 / 0x0C6D0E */
 
+int16_t Hiscore_Insert(const f3mem_t *m, uint32_t a0, uint32_t *slot); /* ROM 0x13D638 */
 #endif

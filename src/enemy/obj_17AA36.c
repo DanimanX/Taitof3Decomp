@@ -34,3 +34,11 @@ int Obj_17AA36_Tick(const f3mem_t *m, uint32_t obj)
     wr32(m, obj + 0x00u, 0x0017AA36u);
     return 0;
 }
+
+/* ROM 0x17AA2E: entry reached by fall-through and by jmp 0x17AA2E at
+ * 0x18BB34 -- just arms 0x17AA36 for the next tick. */
+int Obj_17AA2E_Tick(const f3mem_t *m, uint32_t obj)
+{
+    wr32(m, obj + 0x00u, 0x0017AA36u);
+    return 0;
+}

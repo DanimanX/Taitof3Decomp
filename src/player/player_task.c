@@ -360,6 +360,37 @@ void Player_FailText(const f3mem_t *m, uint8_t d0b, uint16_t d2w, uint16_t d3w)
 }
 
 /* ======================================================================== */
+/* ROM 0x13D638: insert the +0x48 score into the five 12-byte hi-score      */
+/* records at 0x406CD4 {score.l, ?.b, ?.b, name.l, ...}. Returns the slot   */
+/* (D1w) or -1 when the score does not beat any entry; *slot = record (A1). */
+/* Lower records shift down one place (bytes 0..9; 10..11 stay).           */
+/* ======================================================================== */
+int16_t Hiscore_Insert(const f3mem_t *m, uint32_t a0, uint32_t *slot)
+{
+    uint32_t d0 = rd32(m, a0 + 0x48u);
+    uint32_t a1 = 0x00406CD4u;
+    int16_t d1 = 0;
+    while ((int32_t)d0 <= (int32_t)rd32(m, a1)) {          /* cmp.l ; bgt */
+        d1++;
+        a1 += 0x0Cu;
+        if (d1 >= 5) {
+            *slot = a1;
+            return -1;
+        }
+    }
+    for (uint32_t a2 = 0x00406D04u; a2 != 0x00406CD4u && a2 != a1; a2 -= 0x0Cu) {
+        wr32(m, a2, rd32(m, a2 - 0x0Cu));
+        wr16(m, a2 + 4u, rd16(m, a2 - 8u));
+        wr32(m, a2 + 6u, rd32(m, a2 - 6u));
+    }
+    wr8(m, a1 + 4u, rd8(m, a0 + 0x68u));
+    wr8(m, a1 + 5u, rd8(m, F3_A5 + 0x32E0u));
+    wr32(m, a1, d0);
+    *slot = a1;
+    return d1;
+}
+
+/* ======================================================================== */
 /* ROM 0x0C7C60: defeat bookkeeping of the alive-ship tick.                 */
 /* ======================================================================== */
 int Player_DefeatBookKeeping(const f3mem_t *m, uint32_t a0)
@@ -368,16 +399,24 @@ int Player_DefeatBookKeeping(const f3mem_t *m, uint32_t a0)
     if ((int16_t)rd16(m, a0 + PS_CHILD_PTR) < 0)
         goto LAB_0C7CBE;
 
-    /* jsr 0x13D638 (hi-score slot lookup, not decompiled) then 0x0C7C94,
-     * which only feeds D1w:
-     *   bfset (0x66,A0){0:1}; clr.l (0x48,A0); Obj_Spawn(A0, 0x11A956, g2..7, 0)
-     * and rejoins at LAB_0C7CC2. Which of the two branches runs depends on
-     * D1w from 0x13D638, so both effects are left out until it exists. */
-    return -1;
+    {
+        uint32_t a1;
+        if (Hiscore_Insert(m, a0, &a1) >= 0) {      /* 0x0C7C70 ; tst.w D1 */
+            wr8(m, a1 + 6u, 0x43u);                 /* default name "CNT" */
+            wr8(m, a1 + 7u, 0x4Eu);
+            wr8(m, a1 + 8u, 0x54u);
+            wr8(m, a1 + 9u, 0x00u);
+        }
+    }
+    /* 0x0C7C94: bfset (0x66,A0){0:1} = bit 7 of the byte */
+    wr8(m, a0 + 0x66u, (uint8_t)(rd8(m, a0 + 0x66u) | 0x80u));
+    wr32(m, a0 + 0x48u, 0u);
+    (void)Obj_Spawn(m, a0, 0x0011A956u, 7u, 2u, 0u);   /* pea 0 ; #2 ; #7 */
+    goto LAB_0C7CC2;
 
 LAB_0C7CBE:
     wr32(m, a0 + PS_SCORE, 0u);
-    /* LAB_0C7CC2 */
+LAB_0C7CC2:
     if (Player_Respawn(m, a0) != 0)
         return -1;
     Player_ArmRespawn(m, a0);

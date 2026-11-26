@@ -89,3 +89,10 @@ int Obj_D78C0_Tick(const f3mem_t *m, uint32_t obj)
     Obj_Free(m, obj);
     return 0;
 }
+
+/* ROM 0x0D79B0: armed by 0x0D79A8 -- free the object on its next tick */
+int Obj_D79B0_Tick(const f3mem_t *m, uint32_t obj)
+{
+    Obj_Free(m, obj);
+    return 0;
+}

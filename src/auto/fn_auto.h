@@ -470,5 +470,32 @@ int Fn_0F1B30(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F1B30 */
 int Fn_0F1E84(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F1E84 */
 int Fn_0F82E0(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F82E0 */
 int Fn_0FA1C4(const f3mem_t *m, f3regs_t *r); /* ROM 0x0FA1C4 */
+int Fn_0C065C(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C065C */
+int Fn_0CEFF8(const f3mem_t *m, f3regs_t *r); /* ROM 0x0CEFF8 */
+int Fn_0D87F2(const f3mem_t *m, f3regs_t *r); /* ROM 0x0D87F2 */
+int Fn_0F1F48(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F1F48 */
+int Fn_0F5532(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F5532 */
+int Fn_0FA5FC(const f3mem_t *m, f3regs_t *r); /* ROM 0x0FA5FC */
+int Fn_0FADDE(const f3mem_t *m, f3regs_t *r); /* ROM 0x0FADDE */
+int Fn_0FB002(const f3mem_t *m, f3regs_t *r); /* ROM 0x0FB002 */
+int Fn_0FB160(const f3mem_t *m, f3regs_t *r); /* ROM 0x0FB160 */
+int Fn_0CC570(const f3mem_t *m, f3regs_t *r); /* ROM 0x0CC570 */
+int Fn_0CF138(const f3mem_t *m, f3regs_t *r); /* ROM 0x0CF138 */
+int Fn_0DF592(const f3mem_t *m, f3regs_t *r); /* ROM 0x0DF592 */
+int Fn_0F1922(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F1922 */
+int Fn_0F4858(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F4858 */
+int Fn_0F5750(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F5750 */
+int Fn_0F61C8(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F61C8 */
+int Fn_0F917A(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F917A */
+int Fn_0FA236(const f3mem_t *m, f3regs_t *r); /* ROM 0x0FA236 */
+int Fn_0CF098(const f3mem_t *m, f3regs_t *r); /* ROM 0x0CF098 */
+int Fn_0F3984(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F3984 */
+int Fn_0F3BB4(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F3BB4 */
+int Fn_0F4AA6(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F4AA6 */
+int Fn_0F4C8C(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F4C8C */
+int Fn_0F9120(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F9120 */
+int Fn_0F9FCC(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F9FCC */
+int Fn_0FB1DE(const f3mem_t *m, f3regs_t *r); /* ROM 0x0FB1DE */
+int Fn_0FB22E(const f3mem_t *m, f3regs_t *r); /* ROM 0x0FB22E */
 /* END generated */
 #endif

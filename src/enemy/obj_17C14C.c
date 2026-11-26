@@ -1,4 +1,5 @@
 #include "obj_17C14C.h"
+#include "obj_17BE1C.h"
 #include "../objects/obj_anim.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_script10.h"
@@ -64,6 +65,8 @@ static int dispatch_tick(const f3mem_t *m, uint32_t obj, uint32_t fn)
         wr16(m, obj + 0x14u, rd16(m, a1 + 0x14u));
         return 0;
     }
+    case 0x17C704:
+        return Obj_17C704_Body(m, obj);             /* obj_17BE1C.c */
     case 0x17D9CE: {
         /* 0x17D9CE: every third call spawn one 0x17A3F4 shot (group 5, one
          * slot... pushed #0, #2, #5, #0x17A3F4) and restart the +0x64 count */

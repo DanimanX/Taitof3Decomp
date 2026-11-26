@@ -25,7 +25,7 @@ static void lab_17BE14(const f3mem_t *m, uint32_t obj)
  * +0x62 to the receiver +0x35 names, clear the hit-colour override, play sound
  * 0x35 and hand over to 0x17C614, which runs the movement script, animates,
  * centres, and either frees (+0x3E < 0) or draws and latches 0x17C660. */
-static int lab_17C704(const f3mem_t *m, uint32_t obj)
+int Obj_17C704_Body(const f3mem_t *m, uint32_t obj)
 {
     /* 0x17C704: reward(0x62) through 0x17B02E: 1 -> (+0x36)->+0x8, 2 -> +0x36 */
     {
@@ -39,6 +39,8 @@ static int lab_17C704(const f3mem_t *m, uint32_t obj)
         if ((int32_t)rcv >= 0)
             wr32(m, rcv + 0x48u, rd32(m, rcv + 0x48u) + d1);
     }
+    if (Obj_AnimList179B06(m, obj) < 0)                /* 0x17C71C jsr 0x179B06 */
+        return -1;
     wr8(m, obj + 0x1Du, 0u);                           /* 0x17C722 */
     {
         int16_t cmd = (int16_t)0x0035;
@@ -121,7 +123,7 @@ int Obj_17BE1C_Tick(const f3mem_t *m, uint32_t obj)
             lab_17E0B4(m, obj);
             return 0;
         case 0x0017C704u:
-            return lab_17C704(m, obj);
+            return Obj_17C704_Body(m, obj);
         case 0x0017C59Au:
             return lab_17C59A(m, obj);
         default:

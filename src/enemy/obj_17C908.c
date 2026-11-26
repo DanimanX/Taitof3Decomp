@@ -13,7 +13,7 @@
 
 /* ROM 0x17C97A: motion + animation tick. Returns 0, or -1 through the 0x179A5C
  * dispatch (indices 6/7 have no translation) before any of its writes. */
-static int lab_17C97A(const f3mem_t *m, uint32_t obj)
+int Obj_17C97A_Body(const f3mem_t *m, uint32_t obj)
 {
     uint32_t a4 = rd32(m, obj + 0x08u);             /* parent */
     uint16_t d0w = (uint16_t)(rd16(m, a4 + 0x50u) + rd16(m, obj + 0x16u));
@@ -81,5 +81,5 @@ int Obj_17C908_Tick(const f3mem_t *m, uint32_t obj)
     wr16(m, obj + 0x1Au, (uint16_t)((int16_t)rd16(m, obj + 0x1Au) + by));
     wr16(m, obj + 0x1Eu, 0u);                       /* 0x17C976 */
 
-    return lab_17C97A(m, obj);                      /* 0x17C97A */
+    return Obj_17C97A_Body(m, obj);                      /* 0x17C97A */
 }

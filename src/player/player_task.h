@@ -19,7 +19,12 @@ void Player_ShotPoolReset(const f3mem_t *m);               /* ROM 0x0C6DEC */
 void Player_ArmRespawn(const f3mem_t *m, uint32_t player); /* ROM 0x0C6CE6 */
 int  Player_Respawn(const f3mem_t *m, uint32_t player);    /* ROM 0x0C6D0E */
 void Player_PickActive(const f3mem_t *m);                  /* ROM 0x0C6E10 */
-int  Player_CoinCheckA(const f3mem_t *m, uint32_t player); /* ROM 0x0C77BE */
+uint8_t Coin_CheckStartReady(const f3mem_t *m);           /* ROM 0x000FEC */
+uint8_t Coin_CoinsNeeded(const f3mem_t *m);               /* ROM 0x001016 */
+uint8_t Player_CoinCheckA(const f3mem_t *m, uint32_t player); /* ROM 0x0C77BE: D0.b */
+/* Text at text RAM 0x61C000 + (row << 7) + col*2, colour 7 (returns the end) */
+uint32_t Player_PanelText(const f3mem_t *m, uint32_t str, uint16_t col, uint16_t row);
+void Player_FailText(const f3mem_t *m, uint8_t d0b, uint16_t col, uint16_t row); /* ROM 0x0C7814 */
 int  Player_DefeatBookKeeping(const f3mem_t *m, uint32_t player); /* ROM 0x0C7C60 */
 int  Player_AliveShipTick(const f3mem_t *m, uint32_t player, uint32_t io_ptr); /* ROM 0x0C7946 */
 int  Player_HudRow1(const f3mem_t *m);                     /* ROM 0x0C8488 */

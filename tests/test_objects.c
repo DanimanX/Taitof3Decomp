@@ -552,6 +552,8 @@
 #include "../src/enemy/obj_11912C.h"
 #include "../src/enemy/obj_119CAC.h"
 #include "../src/enemy/obj_17C908.h"
+#include "../src/enemy/obj_C74CC.h"
+#include "../src/enemy/obj_C7480.h"
 #include "../src/enemy/obj_14D75A.h"
 #include "../src/enemy/obj_11967A.h"
 #include "../src/enemy/obj_BDB1A.h"
@@ -1865,6 +1867,8 @@ int main(void)
     bad += run("Obj 0x11912C", "work/ram/obj_11912C", Obj_11912C_Tick, rom);
     bad += run("Obj 0x119CAC", "work/ram/obj_119CAC", Obj_119CAC_Tick, rom);
     bad += run("Obj 0x17C908", "work/ram/obj_17C908", Obj_17C908_Tick, rom);
+    bad += run("Obj 0x0C74CC", "work/ram/obj_0C74CC", Obj_C74CC_Tick, rom);
+    bad += run("Obj 0x0C7480", "work/ram/obj_0C7480", Obj_C7480_Tick, rom);
     bad += run("Obj 0x14D75A", "work/ram/obj_14D75A", Obj_14D75A_Tick, rom);
     bad += run("Obj 0x11967A", "work/ram/obj_11967A", Obj_11967A_Tick, rom);
     bad += run("Obj 0x0BDB1A", "work/ram/obj_0BDB1A", Obj_BDB1A_Tick, rom);

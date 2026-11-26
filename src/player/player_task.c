@@ -24,6 +24,7 @@
 #include "../video/palette.h"
 #include "../video/sprite.h"
 #include "../audio/sound_cmd.h"
+#include "../enemy/obj_1194C2.h"                      /* Text_DrawString */
 
 /* ---- globals (A5-relative) -------------------------------------------- */
 #define G_SCENE_STARTED (F3_A5 + 0x1D1Eu) /* bset.b: scene init done (Z = old) */
@@ -272,14 +273,46 @@ void Player_PickActive(const f3mem_t *m)
 
 /* ======================================================================== */
 /* ROM 0x0C77BE / 0x0C77E8: credit-entry checks of the alive-ship tick      */
-/* (0x0CFEC, 0x01016, 0x01034, 0x0103A: none decompiled).                    */
+/* (0x0FEC/0x1016 below; 0x1034/0x103A of 0x0C77E8 not decompiled).        */
 /* ======================================================================== */
-int Player_CoinCheckA(const f3mem_t *m, uint32_t a0)
+/* ROM 0x000FEC Coin_CheckStartReady: D0.b < 0 while a start is pending
+ * with no credit, else the credits left over (low byte of a word result). */
+uint8_t Coin_CheckStartReady(const f3mem_t *m)
+{
+    if (rd16(m, F3_A5 - 0x7F5Eu) == 0u)                     /* 0x0FEC beq 0x100E */
+        return rd16(m, F3_A5 - 0x7F70u) == 0u ? 0xFFu : 0x00u;  /* seq */
+    if (rd16(m, F3_A5 - 0x7F70u) != 0u)
+        return 0x00u;                                       /* moveq #0 */
+    uint16_t d0 = rd16(m, F3_A5 - 0x7F6Eu);
+    if (d0 == 0u)
+        return 0xFFu;                                       /* moveq #-1 */
+    return (uint8_t)(uint16_t)(rd16(m, F3_A5 - 0x7F5Cu) - d0);   /* neg ; add */
+}
+
+/* ROM 0x001016 Coin_CoinsNeeded: D0.b = coins still needed to play, 0 when
+ * enough credit (or free play); 0xFF/0 by A5-0x7F70 with no price set. */
+uint8_t Coin_CoinsNeeded(const f3mem_t *m)
+{
+    uint16_t d0 = rd16(m, F3_A5 - 0x7F5Eu);
+    if (d0 == 0u)
+        return rd16(m, F3_A5 - 0x7F70u) == 0u ? 0xFFu : 0x00u;
+    d0 = (uint16_t)(d0 - rd16(m, F3_A5 - 0x7F6Eu));
+    if ((int16_t)d0 <= 0 || rd16(m, F3_A5 - 0x7F70u) != 0u)
+        return 0x00u;
+    return (uint8_t)d0;
+}
+
+/* ROM 0x0C77BE: credit check of the continue panel; returns D0.b (0 while
+ * the coin guard is up; else 0x0FEC for a player in the game (+0x62 < 0),
+ * or 0x1016 after raising bit 7 of A5-0x144C). */
+uint8_t Player_CoinCheckA(const f3mem_t *m, uint32_t a0)
 {
     if (rd8(m, G_COIN_BUSY) != 0u)
-        return 0;
-    (void)a0;
-    return -1; /* 0x0C77C8: tst.w (0x62,A0); jsr 0x0CFEC / 0x01016 */
+        return 0x00u;                                       /* sf D0b */
+    if ((int16_t)rd16(m, a0 + 0x62u) < 0)
+        return Coin_CheckStartReady(m);
+    wr8(m, F3_A5 - 0x144Cu, (uint8_t)(rd8(m, F3_A5 - 0x144Cu) | 0x80u));
+    return Coin_CoinsNeeded(m);
 }
 
 void Player_CoinCheckB(const f3mem_t *m, uint32_t a0)
@@ -292,13 +325,38 @@ void Player_CoinCheckB(const f3mem_t *m, uint32_t a0)
 }
 
 /* ======================================================================== */
-/* ROM 0x0C7814: per-player stage-fail text (labels TBL_FAIL_TEXT_A/B/C are
- * picked by D0b, then written with 0x571A/0x5566).                          */
+/* ROM 0x0C7814: per-player coin line of the continue panel at (col d2, row
+ * d3): blank while A5-0x5D53 bit 5 is set, else by D0.b: < 0 "INSERT COIN",
+ * 0 "PUSH BUTTON", n > 0 "   ADD " n " COIN"/" COINS". D0/D1 preserved.  */
 /* ======================================================================== */
-int Player_FailText(const f3mem_t *m, int32_t d0, uint16_t d2w, uint16_t d3w)
+static uint32_t panel_dst(uint16_t d2w, uint16_t d3w)
 {
-    (void)m; (void)d0; (void)d2w; (void)d3w;
-    return -1; /* 0x0C7814 body: text writes only */
+    /* lsl.w #7,D3 ; add.w D2,D2 ; add.w D3,D2 ; ext.l ; addi.l #0x61C000 */
+    return 0x0061C000u + (uint32_t)(int32_t)(int16_t)(uint16_t)((d3w << 7) + d2w + d2w);
+}
+
+uint32_t Player_PanelText(const f3mem_t *m, uint32_t str, uint16_t d2w, uint16_t d3w)
+{
+    return Text_DrawString(m, str, panel_dst(d2w, d3w), 0x0007u);
+}
+
+void Player_FailText(const f3mem_t *m, uint8_t d0b, uint16_t d2w, uint16_t d3w)
+{
+    if ((rd8(m, F3_A5 - 0x5D53u) & 0x20u) != 0u) {
+        (void)Player_PanelText(m, 0x000C9599u, d2w, d3w);   /* 0x0C790C */
+        return;
+    }
+    int8_t d1b = (int8_t)d0b;
+    if (d1b < 0) {
+        (void)Player_PanelText(m, 0x000C950Bu, d2w, d3w);   /* "INSERT COIN" */
+    } else if (d1b == 0) {
+        (void)Player_PanelText(m, 0x000C951Eu, d2w, d3w);   /* "PUSH BUTTON" */
+    } else {
+        uint32_t d0 = Player_PanelText(m, 0x000C9531u, d2w, d3w);   /* "   ADD " */
+        d0 = Gfx_DrawDecimal(m, (uint32_t)d0b, 1u, d0, 0x0007u);
+        /* pea (0x1C59,PC) -> 0x0C9539 " COIN" ; pea (0x1C49,PC) -> 0x0C9543 " COINS" */
+        (void)Text_DrawString(m, d1b > 1 ? 0x000C9543u : 0x000C9539u, d0, 0x0007u);
+    }
 }
 
 /* ======================================================================== */

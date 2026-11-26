@@ -32,11 +32,10 @@ static uint32_t divs_w_imm(int32_t n, uint16_t d)
 static void sub_176198(const f3mem_t *m, uint32_t a0, uint16_t d0w)
 {
     uint32_t a = a0 + (uint32_t)(int32_t)(int16_t)rd16(m, F3_A5 - 0x5D56u);
-    a += 0x1D0u;
-    for (int i = 0; i < 0x40; i++) {
-        wr16(m, a, d0w);
-        a -= 2u;
-    }
+    /* D0 = d0w:d0w in D0..D7, then 14 x movem.l 8 regs + 1 x 4 regs with
+     * -(A0) from +0x1D0: 116 longs fill [a, a + 0x1D0) */
+    for (uint32_t off = 0x1D0u; off != 0u; off -= 2u)
+        wr16(m, a + off - 2u, d0w);
 }
 
 /* ROM 0x176832: line-RAM zoom ramp. Lines D7..D6 of the tables at A0 (word,

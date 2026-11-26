@@ -41,9 +41,17 @@ int Obj_17CCBE_Tick(const f3mem_t *m, uint32_t obj)
     /* 0x17CD14: move.w #0x29,-(SP) ; jsr 0x13F238 ; jsr 0x39D8 ; lea (0x2,SP),SP */
     Sound_PlayHooked(m, 0x0029u);
 
+    return Obj_17CD28_Body(m, obj);                /* falls into 0x17CD28 */
+}
+
+/* ROM 0x17CD28: grow step -- follow the parent, animate, centre, shrink the
+ * +0x1E/+0x1F scale bytes by 0x10, re-centre by the scaled size, draw, arm
+ * 0x17CDA6. -1 from an untranslated 0x179A5C index. */
+int Obj_17CD28_Body(const f3mem_t *m, uint32_t obj)
+{
     /* 0x17CD28: movea.l (0x8,A0),A4 ; add the parent velocity to +0x50/+0x54,
      * write back and mirror into +0x14/+0x18 */
-    a4 = rd32(m, obj + 0x08u);
+    uint32_t a4 = rd32(m, obj + 0x08u);
     uint16_t d0 = rd16(m, a4 + 0x50u);
     uint16_t d1 = rd16(m, a4 + 0x54u);
     d0 = (uint16_t)(d0 + rd16(m, obj + 0x16u));
@@ -54,13 +62,13 @@ int Obj_17CCBE_Tick(const f3mem_t *m, uint32_t obj)
     wr16(m, obj + 0x18u, d1);
 
     /* 0x17CD4C: TICK half of the 0x179A5C entry (+0x4,A1,D0w*8) */
-    d0w = rd16(m, obj + 0x40u);
+    uint16_t d0w = rd16(m, obj + 0x40u);
     if (Obj_AnimTick(m, obj, d0w) < 0)
         return -1;
 
     /* 0x17CD5C..0x17CD6C: (A1)+ = +0x50 correction, (A1)+ = +0x54 correction,
      * each <<3, subtracted from +0x14/+0x18 */
-    a1 = rd32(m, obj + 0x10u);
+    uint32_t a1 = rd32(m, obj + 0x10u);
     uint16_t e1 = rd16(m, a1);
     a1 += 2u;
     uint16_t e0 = rd16(m, a1);

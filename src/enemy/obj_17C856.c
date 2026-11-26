@@ -20,7 +20,13 @@ int Obj_17C856_Tick(const f3mem_t *m, uint32_t obj)
     wr16(m, obj + 0x1Eu, 0x0000u);
     wr16(m, obj + 0x1Cu, 0x0008u);
 
-    /* 0x17C88E */
+    return Obj_17C88E_Body(m, obj);                 /* 0x17C88E */
+}
+
+/* ROM 0x17C88E: centre on +0x50/+0x54, animation tick, frame-size centre,
+ * draw, arm 0x17C8CC. */
+int Obj_17C88E_Body(const f3mem_t *m, uint32_t obj)
+{
     wr16(m, obj + 0x14u, rd16(m, obj + 0x50u));
     wr16(m, obj + 0x18u, rd16(m, obj + 0x54u));
     if (Obj_AnimTick(m, obj, rd16(m, obj + 0x40u)) < 0)

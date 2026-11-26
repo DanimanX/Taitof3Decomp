@@ -1,4 +1,5 @@
 #include "obj_17CDA6.h"
+#include "obj_17CCBE.h"
 #include "../objects/obj_common.h"
 #include "../objects/obj_anim.h"
 #include "../video/sprite.h"
@@ -33,11 +34,9 @@ static void lab_17CDAE(const f3mem_t *m, uint32_t obj)
 
 int Obj_17CDA6_Tick(const f3mem_t *m, uint32_t obj)
 {
-    /* 0x17CDA6: tst.b (0x1E,A0); bne 0x17CD28 -- still growing: the 0x17CD28
-     * body (move/animate/centre, +0x1E/+0x1F += 0xF0). Its animation dispatch
-     * has no translation here, so the tick is genuinely unimplemented. */
+    /* 0x17CDA6: tst.b (0x1E,A0); bne 0x17CD28 -- still growing */
     if (rd8(m, obj + 0x1Eu) != 0u)
-        return -1;
+        return Obj_17CD28_Body(m, obj);
 
     /* 0x17CDAE fall-through: the 0x17CD66 tail installs 0x17CDA6 and returns;
      * +0x1E is still zero on this tick. */

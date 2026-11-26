@@ -41,6 +41,13 @@ int Obj_17CE04_Tick(const f3mem_t *m, uint32_t obj)
         return 0;
     }
 
+    return Obj_17CE0A_Body(m, obj);
+}
+
+/* ROM 0x17CE0A: grow-out step -- follow the parent, animate, centre, grow
+ * +0x1E/+0x1F by 0x20, re-centre by the scaled size, draw, arm 0x17CE88. */
+int Obj_17CE0A_Body(const f3mem_t *m, uint32_t obj)
+{
     /* 0x17CE0A: parent-relative move, animation tick, sprite centre */
     {
         uint32_t a4 = rd32(m, obj + 0x08u);
@@ -51,7 +58,8 @@ int Obj_17CE04_Tick(const f3mem_t *m, uint32_t obj)
         wr16(m, obj + 0x14u, d0);
         wr16(m, obj + 0x18u, d1);
     }
-    Obj_AnimTick(m, obj, rd16(m, obj + 0x40u)); /* 0x17CE2E */
+    if (Obj_AnimTick(m, obj, rd16(m, obj + 0x40u)) < 0)   /* 0x17CE2E */
+        return -1;
     {
         uint32_t a1 = rd32(m, obj + 0x10u);
         uint16_t d1c = (uint16_t)(rd16(m, a1) << 3);

@@ -34,7 +34,7 @@ static int in_box(const f3mem_t *m, uint32_t base, uint16_t v)
 /* ROM 0x1789FC: per-frame depth step at (0x5E,A0) from the behaviour's +0xA
  * word, integrated into the 4.24 speed long at +0x58 (a negative sum wraps to
  * its low nibble), then the +0x44 script walk (0x178A2C runs the same command
- * loop as the shared 0x178982 engine). */
+ * loop as 0x178982, with 12-byte records). */
 static int sub_1789FC(const f3mem_t *m, uint32_t obj)
 {
     uint32_t a1 = rd32(m, obj + 0x44u);
@@ -49,13 +49,8 @@ static int sub_1789FC(const f3mem_t *m, uint32_t obj)
         acc &= 0x0F;                                 /* andi.l #0xF */
     wr32(m, obj + 0x58u, (uint32_t)acc);
 
-    /* 0x178A2C..0x178A38: the +0x44 command walk (0x178A40 = 0x178982's body).
-     * NOTE: this ROM copy of the walk unwinds to the loop marker on the first
-     * unknown command and returns 0, where the shared 0x178982 engine returns
-     * -1. The one command the 17D586 capture reaches here -- 0x1793F6, the
-     * {+0x42, +0x5C, +0x5E} arm of the three-field records -- is not in the
-     * shared table, so those ticks take the -1 path. */
-    return Obj_Script10(m, obj);
+    /* 0x178A2C: the +0x44 command walk over 12-byte records */
+    return Obj_Script12(m, obj);
 }
 
 /* ROM 0x17940E: perspective zoom byte +0x1E/+0x1F from the +0x58 speed long. */

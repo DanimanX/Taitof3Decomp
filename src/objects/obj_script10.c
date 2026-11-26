@@ -307,6 +307,26 @@ static void scr_18F5B2(const f3mem_t *m, uint32_t obj)
     Obj_Spawn(m, obj, 0x001915AEu, 9u, 2u, 0u);
 }
 
+/* ROM 0x178B7A: aim at the record's point: +0x4C/+0x4E = point (+6/+8 of
+ * the record at +0x44); with a positive step count +0x48, back off by one
+ * step of (point - position) / count; then +0x48 = 0. */
+static void scr_178B7A(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t a1 = rd32(m, obj + 0x44u);
+    int16_t d0 = (int16_t)rd16(m, a1 + 6u);
+    int16_t d1 = (int16_t)rd16(m, a1 + 8u);
+    wr16(m, obj + 0x4Cu, (uint16_t)d0);
+    wr16(m, obj + 0x4Eu, (uint16_t)d1);
+    int32_t x = (int16_t)(uint16_t)(d0 - (int16_t)rd16(m, obj + 0x50u));   /* sub.w ; ext.l */
+    int32_t y = (int16_t)(uint16_t)(d1 - (int16_t)rd16(m, obj + 0x54u));
+    int16_t n = (int16_t)rd16(m, obj + 0x48u);
+    if (n > 0) {                                        /* ble 0x178BAE */
+        wr16(m, obj + 0x4Cu, (uint16_t)(rd16(m, obj + 0x4Cu) - (uint16_t)(x / n)));  /* divs.w */
+        wr16(m, obj + 0x4Eu, (uint16_t)(rd16(m, obj + 0x4Eu) - (uint16_t)(y / n)));
+    }
+    wr16(m, obj + 0x48u, 0u);
+}
+
 static int script10_call(const f3mem_t *m, uint32_t obj, uint32_t fn)
 {
     switch (fn) {
@@ -315,6 +335,7 @@ static int script10_call(const f3mem_t *m, uint32_t obj, uint32_t fn)
     case 0x00178B0Eu: scr_178B0E(m, obj);              return 0;
     case 0x00178B20u: Obj_Script10_SetHeading(m, obj); return 0;
     case 0x00178B4Au: sub_178B4A(m, obj);              return 0;
+    case 0x00178B7Au: scr_178B7A(m, obj);              return 0;
     case 0x00178C06u: sub_178C06(m, obj);              return 0;
     case 0x00178E4Au: Obj_Script10_SteerTo(m, obj);    return 0;
     case 0x00178CCEu: sub_178CCE(m, obj);              return 0;
@@ -331,8 +352,9 @@ static int script10_call(const f3mem_t *m, uint32_t obj, uint32_t fn)
     }
 }
 
-/* ROM 0x178982 */
-int Obj_Script10(const f3mem_t *m, uint32_t obj)
+/* The command walk of 0x178982 (10-byte records) and 0x178A2C (12-byte
+ * records): {fn.l, count.w, next.l, ...}. */
+static int script_walk(const f3mem_t *m, uint32_t obj, uint32_t stride)
 {
     uint32_t a1;
 
@@ -353,12 +375,12 @@ int Obj_Script10(const f3mem_t *m, uint32_t obj)
             wr16(m, obj + 0x48u, (uint16_t)n);
             if (n > 0)
                 return 0;
-            a1 = rd32(m, obj + 0x44u) + 0x0Au;
+            a1 = rd32(m, obj + 0x44u) + stride;
             if ((int32_t)rd32(m, a1) > 0)
                 goto store;
             goto loop_marker;
         }
-        a1 = rd32(m, obj + 0x44u) + 0x0Au;
+        a1 = rd32(m, obj + 0x44u) + stride;
         wr32(m, obj + 0x44u, a1);
         wr16(m, obj + 0x48u, rd16(m, a1 + 4u));
     }
@@ -371,7 +393,7 @@ loop_marker: {
             c = (int16_t)(rd16(m, obj + 0x4Au) - 1u);
             wr16(m, obj + 0x4Au, (uint16_t)c);
             if (c == 0) {
-                a1 += 0x0Au;
+                a1 += stride;
                 goto store;
             }
         }
@@ -382,4 +404,16 @@ store:
     wr32(m, obj + 0x44u, a1);
     wr16(m, obj + 0x48u, rd16(m, a1 + 4u));
     return 0;
+}
+
+/* ROM 0x178982 */
+int Obj_Script10(const f3mem_t *m, uint32_t obj)
+{
+    return script_walk(m, obj, 0x0Au);
+}
+
+/* ROM 0x178A2C: the same walk over 12-byte records (tail of 0x1789FC) */
+int Obj_Script12(const f3mem_t *m, uint32_t obj)
+{
+    return script_walk(m, obj, 0x0Cu);
 }

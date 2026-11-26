@@ -28,4 +28,5 @@ void Obj_Script10_SetHeading(const f3mem_t *m, uint32_t obj);
  * as turn rate and speed. */
 void Obj_Script10_SteerTo(const f3mem_t *m, uint32_t obj);
 
+int Obj_Script12(const f3mem_t *m, uint32_t obj); /* ROM 0x178A2C: 12-byte-record walk */
 #endif

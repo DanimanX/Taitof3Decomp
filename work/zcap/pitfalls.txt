@@ -1,0 +1,19 @@
+Known pitfalls in earlier drafts (check each before finishing):
+- PC-relative EA = address of the EXTENSION WORD + displacement; for full-format (d16) indexed modes the base is also the first extension word. Dump tables from work/maincpu.bin with python to confirm.
+- `movea.l (tbl,PC,Dn*4),A1` loads a POINTER from a long table.
+- Immediates: moveq and move.w #-0xNNN are sign-extended / two's complement (move.w #-0xF10 = 0xF0F0).
+- `.w` ops on a long field touch its HIGH word (offset+0). `(A1)` without + does not advance.
+- Keep the ROM's write order when a callee reads the field just written (e.g. +0x3A before the 0x179A5C init).
+- Translate only up to the entry's own rts / the re-arm `move.l #X,(A0) ; rts`; a `bra` to a thunk `move.l #X,(A0)` stores X.
+- A beq/bne right after a move of a non-zero constant is never/always taken: fold it.
+- The 0x179A5C dispatch is Obj_AnimInit/Obj_AnimTick (src/objects/obj_anim.h); 0x178982 is Obj_Script10; 0x1D8A is Rng_NextMem(m) (src/common/f3mem.h); jsr 0x13F238 + jsr 0x39D8 with a pushed word is Sound_PlayHooked(m, id) (src/enemy/obj_E8B72.h).
+- A5 = 0x408000; d16(A5) offsets are SIGNED 16-bit: $4298(a5) = 0x40C298, -$5d58(a5) = 0x402AA8. Never drop digits of the offset.
+- Brief extension word (indexed EA): bit15 D/A, bits14-12 reg, bit11 .w/.l index, bits10-9 SCALE (00=1,01=2,10=4,11=8), bits7-0 signed disp. Capstone omits the scale: decode it yourself from work/maincpu.bin.
+- divu.w/divs.w: 32-bit dividend (whole Dn) / 16-bit divisor -> quotient low word, remainder high word; on overflow Dn is UNCHANGED. divu.l/divs.l with ext bit10=0 is 32/32.
+- bset/bclr/bchg/btst on a DATA REGISTER act on bit (n mod 32) of the long and leave every other bit alone. On memory they act on a byte, bit n mod 8.
+- bfins/bfextu/bfset on a data register count the offset from bit 31; on memory from the MSB of the first byte ({2:1} at A5+0x30EE = bit 5 of that byte = word mask 0x2000).
+- ori.l/andi.l #imm on Dn: work out which half the immediate touches (ori.l #$8080000 sets only the high word).
+- cmp + Bcc: 'cmp.w X,Dn ; ble L' branches when Dn <= X (signed). Re-read every branch sense against the bytes.
+- Stack-args: push order 'move.l arg ; move.w count ; move.w group ; move.l fn ; jsr 0x1057C' = Obj_Spawn(m, obj, fn, group, count, arg).
+- ROM is NEVER in a capture image: the pre/post files hold Work RAM, sprite RAM and gfx RAM only. A table at a ROM address (< 0x200000) read from the capture is zero by construction; that does NOT mean the harness reads zero. test_fn passes work/maincpu.bin as m->rom and rd8/rd16/rd32(m, addr) return the real ROM bytes. Dump tables with python3 -c "d=open('work/maincpu.bin','rb').read(); print(d[0xADDR:0xADDR+32].hex())".
+- Post registers come from the return of the SAME call (SP-matched). If a post register looks like some other routine's return address, re-read the bytes: it is the value this routine leaves there (e.g. a lea/jsr target), not a capture error.

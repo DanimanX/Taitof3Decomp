@@ -151,7 +151,18 @@ static int ad_11BC6E(const f3mem_t *m, f3regs_t *r)
     return 0;
 }
 
+#define ALLREGS { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } }
+#ifdef FN1
+/* One-routine build for drafting (scripts/strata_fn.py):
+ * cc -DFN1=Fn_ADDR -DFN1_ADDR='"ADDR"' tests/test_fn.c draft.c build/libf3.a */
+int FN1(const f3mem_t *m, f3regs_t *r);
 static const fn_entry_t fns[] = {
+    { "Fn 0x" FN1_ADDR " draft", "work/ram/fn_" FN1_ADDR, FN1, ALLREGS },
+};
+#else
+#include "../src/auto/fn_auto.h"
+static const fn_entry_t fns[] = {
+#include "fn_auto.inc"
     { "Fn 0x005666 Text_DrawString",   "work/ram/fn_005666", ad_005666, { { CR_D0, 0xFFFFFFFFu } } },
     { "Fn 0x0C77BE Player_CoinCheckA", "work/ram/fn_0C77BE", ad_0C77BE, { { CR_D0, 0x000000FFu } } },
     { "Fn 0x0CBEEA Obj_CBEEA",         "work/ram/fn_0CBEEA", ad_0CBEEA, { { 0, 0u } } },
@@ -178,6 +189,7 @@ static const fn_entry_t fns[] = {
     { "Fn 0x11BC6E Obj_11BC6E_Wave",   "work/ram/fn_11BC6E", ad_11BC6E, { { CR_D0, 0xFFFFFFFFu } } },
     { "Fn 0x176390 LineFx_176390",     "work/ram/fn_176390", ad_176390, { { 0, 0u } } },
 };
+#endif
 
 /* ---- runner ------------------------------------------------------------ */
 

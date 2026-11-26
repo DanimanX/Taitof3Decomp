@@ -14,6 +14,14 @@ test: build/test_kernel build/test_player build/test_player_task build/test_coll
 	./build/test_sprite
 	./build/test_objects
 
+SRC += $(wildcard src/auto/*.c)
+LIBOBJ = $(SRC:%.c=build/o/%.o)
+build/o/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+build/libf3.a: $(LIBOBJ)
+	rm -f $@ && ar rcs $@ $^
+
 build/test_kernel: tests/test_kernel.c tests/capture.h $(SRC) src/kernel/rng.h src/io/input.h src/kernel/soundque.h src/kernel/devboard.h src/kernel/frametick.h
 	@mkdir -p build
 	$(CC) $(CFLAGS) -o $@ tests/test_kernel.c src/kernel/rng.c src/io/input.c src/kernel/soundque.c src/kernel/devboard.c src/kernel/frametick.c src/common/f3mem.c
@@ -72,6 +80,6 @@ publish:
 	 fi; \
 	 echo "publish: origin/main is up to date ($$(git rev-parse --short HEAD))"
 
-build/test_fn: tests/test_fn.c tests/capture.h $(SRC)
+build/test_fn: tests/test_fn.c tests/capture.h tests/fn_auto.inc src/auto/fn_auto.h $(SRC)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -o $@ tests/test_fn.c $(SRC)

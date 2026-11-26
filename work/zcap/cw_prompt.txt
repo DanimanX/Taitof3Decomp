@@ -1,0 +1,25 @@
+You are in a git worktree of a Darius Gaiden (Taito F3, MC68EC020) decompilation: WTDIR. Goal: translate each ROM routine listed in work/batch.list to C so that it is BIT-EXACT against its MAME capture, verifying YOURSELF with the test runner until it passes. Do not stop at a draft.
+
+Setup facts:
+- ROM image: work/maincpu.bin (file offset = address). The ROM is NOT in the capture files (they hold Work RAM, sprite RAM and gfx RAM only); the test harness passes the real ROM, so rd16(m, 0x0C9012) returns the ROM word. Dump tables with python3 from work/maincpu.bin, never from a capture.
+- Disassembly: work/disasm/bundle_<ADDR without leading zeros>.s (the routine plus its callees; "STOP (already decompiled)" callees have C helpers). Raw disassembler: python3 work/m68kdis.py <hexaddr> <hexlen> (capstone; it omits the index scale and decodes junk past the end).
+- Captures: work/ram/fn_<ADDR>_{pairs,regs,gfx,spr}. Each pair is one call: pre = at entry, post = at the return of THAT SAME call (SP-matched). work/ram/fn_<ADDR>_regs.tsv lists the registers.
+- Memory API: src/common/f3mem.h (rd8/rd16/rd32/wr8/wr16/wr32, F3_A5 = 0x408000, Rng_NextMem). Before writing a callee: grep -rn "ROM 0x<ADDR>" src/ (6 hex digits) and reuse it.
+- READ work/pitfalls.txt FIRST and re-check every rule against each routine before declaring it done.
+
+What to write, per routine ADDR (6 hex digits, e.g. 193F30):
+- src/auto/fn_<ADDR>.c containing  int Fn_<ADDR>(const f3mem_t *m, f3regs_t *r)  starting with  #include "fn_auto.h"  and a comment "/* ROM 0x<ADDR>: <what it does> */". r holds the 68k registers at entry (a[7] = SP, stack args at SP+4..); leave every register as the ROM leaves it at rts. Return 0, or -1 before any side effect of a path that needs a routine you cannot translate. Untranslated callees go in the same file as static functions (register-level).
+- Add its prototype  int Fn_<ADDR>(const f3mem_t *m, f3regs_t *r); /* ROM 0x<ADDR> */  before "/* END generated */" in src/auto/fn_auto.h.
+- Add its test entry line to tests/fn_auto.inc:
+      { "Fn 0x<ADDR> auto", "work/ram/fn_<ADDR>", Fn_<ADDR>, ALLREGS },
+  (ALLREGS compares D0, D1, A0, A1 at return plus every RAM byte outside the stack window). The Makefile picks up src/auto/*.c by itself.
+- Test one routine:  make -s build/test_fn && F3_ONLY="Fn 0x<ADDR>" ./build/test_fn   -> must print "N/ N calls bit-exact". On a mismatch the runner prints addresses/registers got vs want: re-read the bytes for that address and fix. Iterate.
+- Code style: C11, -Wall -Wextra -Werror clean, uintN_t, comments cite ROM addresses, keep ROM write order.
+
+Rules:
+- Do routines in list order; after ~3 failed fix attempts on one, remove its line from tests/fn_auto.inc and its prototype, delete its .c, note why, and move on.
+- A routine whose capture a do-nothing body would also pass proves nothing: say so in the report instead of claiming PASS.
+- Do NOT change existing passing behaviour or shared files outside src/auto/ and tests/fn_auto.inc unless a shared helper is genuinely wrong (then say exactly what and why). At the end run  make -s build/test_fn build/test_objects && ./build/test_fn | tail -3 && ./build/test_objects | tail -3  and make sure nothing that passed before fails.
+- Do not commit.
+
+Final report: one line per routine: PASS (N/N) / SKIPPED (reason), then any shared file you touched.

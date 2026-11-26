@@ -116,10 +116,16 @@ def build_run(a, src):
     if c.returncode:
         return None, "COMPILE ERROR:\n" + (c.stderr or c.stdout)[:3000]
     try:
-        r = subprocess.run([exe], capture_output=True, text=True, timeout=120)
-        out = r.stdout + r.stderr[:1500]
+        # output goes to a file, never into memory: a draft that loops while
+        # printing mismatches once grew this process to 50 GB
+        with open(f"{exe}.out", "wb") as fo:
+            subprocess.run([exe], stdout=fo, stderr=subprocess.STDOUT, timeout=120)
     except subprocess.TimeoutExpired:
         return None, "TIMEOUT: the translation loops forever on the captured input"
+    with open(f"{exe}.out", "rb") as fo:
+        fo.seek(0, 2); n = fo.tell(); fo.seek(max(0, n - 20000))
+        out = fo.read().decode("utf-8", "replace")
+    os.remove(f"{exe}.out")
     m = re.search(r"(\d+)/\s*(\d+) calls bit-exact \((\d+) undecompiled", out)
     if not m: return None, out[-2500:]
     return (int(m.group(1)), int(m.group(2)), int(m.group(3))), out[-2500:]
@@ -133,6 +139,8 @@ def null_passes(a):
 def accept(a, src):
     code = open(src).read()
     dst = f"src/auto/fn_{a}.c"
+    if os.path.exists(dst):  # merged by another agent while this batch ran
+        return
     open(dst, "w").write(f"/* ROM 0x{a}: drafted by Strata (scripts/strata_fn.py), bit-exact in test_fn. */\n" + code)
     h = open("src/auto/fn_auto.h").read()
     proto = f"int Fn_{a}(const f3mem_t *m, f3regs_t *r); /* ROM 0x{a} */\n"
@@ -173,6 +181,7 @@ def main():
     subprocess.run(["make", "-s", "-j16", "build/libf3.a"], check=True)
     for a in todo:
         t0 = time.time()
+        if os.path.exists(f"src/auto/fn_{a}.c"): continue  # merged meanwhile
         text = bundle(a)
         if not text: log([a, sizes.get(a, 0), "nobundle", ""]); continue
         if null_passes(a): log([a, sizes.get(a, 0), "weak", "empty draft passes the capture"]); continue

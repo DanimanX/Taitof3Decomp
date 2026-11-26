@@ -91,9 +91,10 @@ Disassembly (the routine first, then its callees):
 {text}
 ```"""
 
-def ask(msgs):
+def ask(msgs, think=None):
+    think = THINK if think is None else think
     body = {"model": "qwen3.6-35b-a3b", "messages": msgs, "temperature": 0.2, "max_tokens": 32000,
-            "stream": False, "chat_template_kwargs": {"enable_thinking": THINK}, "reasoning_effort": "medium" if THINK else "none"}
+            "stream": False, "chat_template_kwargs": {"enable_thinking": think}, "reasoning_effort": "medium" if think else "none"}
     req = urllib.request.Request(URL, json.dumps(body).encode(), {"Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=900) as f:
         out = json.load(f)["choices"][0]["message"]["content"] or ""
@@ -172,21 +173,23 @@ def main():
         if null_passes(a): log([a, sizes.get(a, 0), "weak", "empty draft passes the capture"]); continue
         msgs = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": prompt(a, text)}]
         verdict, detail = "fail", ""
-        for attempt in range(1 + o.retries):
+        nothink = False
+        for attempt in range(2 + o.retries):
+            if attempt == 1 + o.retries and not nothink: break
             try:
-                reply = ask(msgs)
+                reply = ask(msgs, think=False if nothink else None)
             except Exception as e:
                 verdict, detail = "error", repr(e)[:200]; break
             code = code_of(reply)
             src = f"{DR}/fn_{a}.c"
             if not code:
-                detail = "no code block"; msgs += [{"role": "assistant", "content": reply},
-                                                   {"role": "user", "content": "Reply with one ```c block."}]; continue
+                # thinking ran out of tokens before any code: ask again without thinking
+                detail = "no code block"; nothink = True; continue
             open(src, "w").write(code)
             res, out = build_run(a, src)
-            if res and res[1] >= o.min_pairs and res[0] == res[1]:
+            if res and res[1] >= o.min_pairs and res[0] == res[1] and res[2] == 0:
                 accept(a, src); verdict = "accepted"; detail = f"{res[0]}/{res[1]} undec={res[2]} try={attempt}"; break
-            detail = (f"{res[0]}/{res[1]} undec={res[2]}" if res else out.splitlines()[0][:80]) + f" try={attempt}"
+            detail = (f"{res[0]}/{res[1]} undec={res[2]}" if res else (out.strip().splitlines() or ["no output"])[0][:80]) + f" try={attempt}"
             msgs += [{"role": "assistant", "content": "```c\n" + code + "```"},
                      {"role": "user", "content": "test_fn against the MAME capture says:\n" + out +
                       "\nFix the translation (re-read the bytes for each mismatching address/register) and reply with the whole corrected ```c file."}]

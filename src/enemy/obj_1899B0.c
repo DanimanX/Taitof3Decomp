@@ -71,8 +71,20 @@ int Obj_1899B0_Tick(const f3mem_t *m, uint32_t obj)
         a5_bits_set(m, 0x4B7Cu, x > px ? 0x20u : 0x10u);
     if ((rd8(m, A5_(0x4B3Bu)) & 0x02u) != 0u) {
         a5_bits_clr(m, 0x4B3Bu, 0x02u);
-        if ((int16_t)rd16(m, A5_(0x4B72u)) != 8)
-            return -1; /* jump table 0x189B70: not translated */
+        int16_t step = (int16_t)rd16(m, A5_(0x4B72u));
+        if (step != 8) {                            /* 0x189B9A beq 0x189A8E */
+            /* 0x189BA4: clr.b (0x1D,A0) ; addq.w #1,A5+0x4B72 ; jmp via the
+             * longword table 0x189B70 (D0.w*4). Only entry 0 is translated. */
+            if ((int16_t)(step + 1) != 0)
+                return -1;
+            wr8(m, obj + 0x1Du, 0u);
+            wr16(m, A5_(0x4B72u), (uint16_t)(step + 1));
+            /* 0x189BB6: pea 0 ; move.w #2 ; move.w #3 ; move.l #0x18B3CC */
+            (void)Obj_Spawn(m, obj, 0x0018B3CCu, 3, 2, 0u);
+            wr16(m, obj + 0x06u, 2u);               /* 0x189BD2 (beq never) */
+            wr32(m, obj, 0x00189BE2u);              /* 0x189BDA */
+            return 0;
+        }
     }
     wr8(m, A5_(0x4B36u), 0u);
     if (rd8(m, A5_(0x4B28u)) == rd8(m, obj + 0x1Du))

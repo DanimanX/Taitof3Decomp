@@ -385,7 +385,7 @@ static uint16_t sub_0D0C9E(const f3mem_t *m)
 }
 
 /* ROM 0x0D0DE4: append the object to both per-frame hit lists */
-static void sub_0D0DE4(const f3mem_t *m, uint32_t obj)
+void Coll_ListAppend0D0DE4(const f3mem_t *m, uint32_t obj)
 {
     uint32_t a1;
 
@@ -699,7 +699,7 @@ int Obj_EAD28_Tick(const f3mem_t *m, uint32_t obj)
     }
 
     sub_0D0690(m, obj);
-    sub_0D0DE4(m, obj);
+    Coll_ListAppend0D0DE4(m, obj);
     sub_0CBE34(m, obj);
     Obj_DrawSprite(m, obj);
     return 0;

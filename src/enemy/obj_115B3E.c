@@ -24,7 +24,7 @@ static void sub_0CBE34(const f3mem_t *m, uint32_t obj)
  * (0x180 - A5+0x87E) * D0w, shifted and byte-swapped; divu gives the counter
  * quotient in the low word and the remainder in the high word (`swap D0`).
  * Callers test the LOW word of D0, so the quotient is what they see. */
-static uint16_t sub_0CC2BC(const f3mem_t *m, uint16_t d0w)
+uint16_t Rand_0CC2BC(const f3mem_t *m, uint16_t d0w)
 {
     uint32_t d1 = (uint32_t)(uint16_t)(0x0180u - rd16(m, F3_A5 + 0x087Eu));
     d1 = ((uint32_t)(uint16_t)d0w * d1) & 0xFFFFFFFFu;  /* mulu.w */
@@ -117,7 +117,7 @@ int Obj_115B3E_Tick(const f3mem_t *m, uint32_t obj)
 
         /* 0x115BC8 */
         if ((int16_t)rd16(m, obj + 0x56u) > 0 && rd8(m, obj + 0x22u) != 0u) {
-            if (sub_0CC2BC(m, 0x00B4u) == 0u)          /* 0x115BE2: tst.w D0w */
+            if (Rand_0CC2BC(m, 0x00B4u) == 0u)          /* 0x115BE2: tst.w D0w */
                 wr8(m, obj + 0x51u, (uint8_t)(rd8(m, obj + 0x51u) | 0x01u));
             /* 0x115BEE: btst.l #5 / andi.w #3 on A5+0x878 */
             if ((rd16(m, F3_A5 + 0x0878u) & 0x20u) == 0u &&

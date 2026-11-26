@@ -33,8 +33,8 @@ static uint16_t sub_0CC2BC(const f3mem_t *m, uint16_t d0w)
  * 0x006422. With no target the result is the fixed 0x80. *out_a1 mirrors the
  * A1 the ROM leaves behind; the -1 case returns to the caller's `rts` before
  * its `addi.b`/`lsl.w`/`move.w` sequence can store anything. */
-static uint16_t sub_0CC33A(const f3mem_t *m, uint32_t a0, uint16_t d0w,
-                           uint16_t d1w, uint32_t *out_a1)
+uint16_t Aim_0CC33A(const f3mem_t *m, uint32_t a0, uint16_t d0w,
+                    uint16_t d1w, uint32_t *out_a1)
 {
     uint32_t d2 = rd32(m, F3_A5 + 0x1D28u);
     if (d2 == 0u) {
@@ -103,7 +103,7 @@ int Obj_124E30_Tick(const f3mem_t *m, uint32_t obj)
     } else {
         /* 0x124F00: move.w #0x4E,D0w ; move.w #0x50,D1w ; jsr 0x0CC33A */
         uint32_t a1;
-        uint16_t d0 = sub_0CC33A(m, obj, 0x004Eu, 0x0050u, &a1);
+        uint16_t d0 = Aim_0CC33A(m, obj, 0x004Eu, 0x0050u, &a1);
         if (a1 != 0xFFFFFFFFu) {                       /* no-target path skips to the rts */
             d0 = (uint16_t)(d0 + 0x20u);               /* addi.b #0x20,D0b */
             wr16(m, obj + 0x20u, (uint16_t)(d0 << 8)); /* lsl.w #8: heading HIGH byte */

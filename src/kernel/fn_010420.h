@@ -1,0 +1,17 @@
+#ifndef TAITOF3_KERNEL_FN_010420_H
+#define TAITOF3_KERNEL_FN_010420_H
+#include "../common/f3mem.h"
+/* ROM 0x010420: coin-insert / start reset. Returns to the caller at 0x010478
+ * when the two A5-0x5DE3 test-mode bits are set; otherwise clears three status
+ * bytes, re-initialises sprites / layers / line RAM, reloads sound banks 0 and
+ * 1 into 0x440000 and restarts the sound driver. */
+void Kernel_CoinStart010420(const f3mem_t *m);
+
+/* ROM 0x0014DA: load sound bank 0; ROM 0x0014E0 path: sound bank 1.
+ * ROM 0x0014E8 / 0x001504 + 0x001520: index = D0.b mod 6 (bank 0) or mod 8
+ * (bank 1) selects block table 0x16890 / 0x168C0; each block is
+ * {count.w, {src_off.w, dst_off.w}*count} and its words are copied through
+ * to the upload buffer at 0x440000. A negative block count stops the loop. */
+void Kernel_SoundBank0_0014DA(const f3mem_t *m);
+void Kernel_SoundBank1_001504(const f3mem_t *m);
+#endif

@@ -25,6 +25,12 @@
 #include "../src/enemy/obj_CBF04.h"       /* Obj_CBEEA (0x0CBEEA) */
 #include "../src/video/linefx_176390.h"   /* LineFx_176390 */
 #include "../src/common/fn_leaf1.h"        /* Leaf_* (Strata draft) */
+#include "../src/kernel/fn_010352.h"      /* Kernel_CreditLine010352 (0x010352) */
+#include "../src/kernel/fn_010420.h"      /* Kernel_CoinStart010420 (0x010420) */
+#include "../src/enemy/fn_18BF46.h"       /* Obj_18BF46_Step */
+#include "../src/enemy/fn_0D5E56.h"       /* Obj_0D5E56_AI */
+#include "../src/enemy/fn_0D5B70.h"       /* Obj_0D5B70_Step */
+#include "../src/enemy/fn_11BC6E.h"       /* Obj_11BC6E_SpawnWave */
 
 #ifndef F3REGS_T_DEFINED
 #define F3REGS_T_DEFINED
@@ -97,6 +103,54 @@ static int ad_L13E994(const f3mem_t *m, f3regs_t *r) { Leaf_13E994(m, r); return
 static int ad_L1766BE(const f3mem_t *m, f3regs_t *r) { Leaf_1766BE(m, r); return 0; }
 static int ad_L13CAAE(const f3mem_t *m, f3regs_t *r) { Leaf_13CAAE(m, r); return 0; }
 
+/* ROM 0x010352: no arguments; A5-relative state + ROM strings decide it */
+static int ad_010352(const f3mem_t *m, f3regs_t *r)
+{
+    (void)r;
+    Kernel_CreditLine010352(m);
+    return 0;
+}
+
+/* ROM 0x010420: no arguments */
+static int ad_010420(const f3mem_t *m, f3regs_t *r)
+{
+    (void)r;
+    Kernel_CoinStart010420(m);
+    return 0;
+}
+
+/* ROM 0x18BF46: A0 = object; D0 = 0 on the paths it returns from */
+static int ad_18BF46(const f3mem_t *m, f3regs_t *r)
+{
+    r->d[0] = (uint32_t)Obj_18BF46_Step(m, r->a[0]);
+    return 0;
+}
+
+/* ROM 0x0D5E56: A0 = object. No register output is checked: the
+ * 0x0D5E56-0x0D5EAC prologue's callees leave D0 = 0xFFFF in the capture on
+ * every pair, which none of 0x0CC1E0/0x0CC24A/0x0CC306 produces when they
+ * pass. */
+static int ad_0D5E56(const f3mem_t *m, f3regs_t *r)
+{
+    (void)Obj_0D5E56_AI(m, r->a[0]);
+    return 0;
+}
+
+/* ROM 0x0D5B70: A0 = object; no result register, Work RAM only */
+static int ad_0D5B70(const f3mem_t *m, f3regs_t *r)
+{
+    Obj_0D5B70_Step(m, r->a[0]);
+    return 0;
+}
+
+/* ROM 0x11BC6E: A0 = parent of the spawned children; D0 is pushed and
+ * popped unchanged */
+static int ad_11BC6E(const f3mem_t *m, f3regs_t *r)
+{
+    Obj_11BC6E_SpawnWave(m, r->a[0]);
+    return 0;
+}
+
 static const fn_entry_t fns[] = {
     { "Fn 0x005666 Text_DrawString",   "work/ram/fn_005666", ad_005666, { { CR_D0, 0xFFFFFFFFu } } },
     { "Fn 0x0C77BE Player_CoinCheckA", "work/ram/fn_0C77BE", ad_0C77BE, { { CR_D0, 0x000000FFu } } },
@@ -116,6 +170,12 @@ static const fn_entry_t fns[] = {
     { "Fn 0x13E994 Leaf_13E994", "work/ram/fn_13E994", ad_L13E994, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
     { "Fn 0x1766BE Leaf_1766BE", "work/ram/fn_1766BE", ad_L1766BE, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
     { "Fn 0x13CAAE Leaf_13CAAE", "work/ram/fn_13CAAE", ad_L13CAAE, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x010352 Kernel_CreditLine", "work/ram/fn_010352", ad_010352, { { 0, 0u } } },
+    { "Fn 0x010420 Kernel_CoinStart",  "work/ram/fn_010420", ad_010420, { { 0, 0u } } },
+    { "Fn 0x18BF46 Obj_18BF46_Step",   "work/ram/fn_18BF46", ad_18BF46, { { 0, 0u } } },
+    { "Fn 0x0D5E56 Obj_0D5E56_AI",      "work/ram/fn_0D5E56", ad_0D5E56, { { 0, 0u } } },
+    { "Fn 0x0D5B70 Obj_0D5B70_Step",  "work/ram/fn_0D5B70", ad_0D5B70, { { 0, 0u } } },
+    { "Fn 0x11BC6E Obj_11BC6E_Wave",   "work/ram/fn_11BC6E", ad_11BC6E, { { CR_D0, 0xFFFFFFFFu } } },
     { "Fn 0x176390 LineFx_176390",     "work/ram/fn_176390", ad_176390, { { 0, 0u } } },
 };
 

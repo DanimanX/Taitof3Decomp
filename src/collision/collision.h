@@ -21,5 +21,6 @@ void Coll_PlayerShotsVsEnemies(const f3mem_t *m); /* ROM 0x0C6446 */
 void Coll_PlayersVsHazards(const f3mem_t *m);     /* ROM 0x0C64FC */
 void Terrain_SyncScroll(const f3mem_t *m);        /* ROM 0x0C6624 */
 void Task_Collision_Body(const f3mem_t *m);       /* ROM 0x0C63F2..0x0C6408 */
+void Coll_ListAppend0D0DE4(const f3mem_t *m, uint32_t obj); /* ROM 0x0D0DE4 */
 
 #endif

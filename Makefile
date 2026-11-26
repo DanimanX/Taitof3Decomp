@@ -71,3 +71,7 @@ publish:
 	   echo "publish: FAILED, $$left commit(s) still not on origin/main"; exit 1; \
 	 fi; \
 	 echo "publish: origin/main is up to date ($$(git rev-parse --short HEAD))"
+
+build/test_fn: tests/test_fn.c tests/capture.h $(SRC)
+	@mkdir -p build
+	$(CC) $(CFLAGS) -o $@ tests/test_fn.c $(SRC)

@@ -35,3 +35,18 @@
     { "Fn 0x1332BA auto", "work/ram/fn_1332BA", Fn_1332BA, ALLREGS },
     { "Fn 0x196BE8 auto", "work/ram/fn_196BE8", Fn_196BE8, ALLREGS },
     { "Fn 0x132F06 auto", "work/ram/fn_132F06", Fn_132F06, ALLREGS },
+    { "Fn 0x137B80 auto", "work/ram/fn_137B80", Fn_137B80, ALLREGS },
+    { "Fn 0x17A85C auto", "work/ram/fn_17A85C", Fn_17A85C, ALLREGS },
+    { "Fn 0x1292A8 auto", "work/ram/fn_1292A8", Fn_1292A8, ALLREGS },
+    { "Fn 0x13334E auto", "work/ram/fn_13334E", Fn_13334E, ALLREGS },
+    { "Fn 0x133240 auto", "work/ram/fn_133240", Fn_133240, ALLREGS },
+    { "Fn 0x1226E6 auto", "work/ram/fn_1226E6", Fn_1226E6, ALLREGS },
+    { "Fn 0x121AEE auto", "work/ram/fn_121AEE", Fn_121AEE, ALLREGS },
+    { "Fn 0x137BF2 auto", "work/ram/fn_137BF2", Fn_137BF2, ALLREGS },
+    { "Fn 0x16374A auto", "work/ram/fn_16374A", Fn_16374A, ALLREGS },
+    { "Fn 0x121C60 auto", "work/ram/fn_121C60", Fn_121C60, ALLREGS },
+    { "Fn 0x133370 auto", "work/ram/fn_133370", Fn_133370, ALLREGS },
+    { "Fn 0x1378F6 auto", "work/ram/fn_1378F6", Fn_1378F6, ALLREGS },
+    { "Fn 0x10C2F4 auto", "work/ram/fn_10C2F4", Fn_10C2F4, { { 0, 0u } } },  /* RAM only: D0/D1/A1 are callee leftovers */
+    { "Fn 0x12B624 auto", "work/ram/fn_12B624", Fn_12B624, { { 0, 0u } } },  /* RAM only: D0/D1/A1 are callee leftovers */
+    { "Fn 0x12B236 auto", "work/ram/fn_12B236", Fn_12B236, { { 0, 0u } } },  /* RAM only: D0/D1/A1 are callee leftovers */

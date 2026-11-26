@@ -51,7 +51,7 @@ branch_13796e:
     /* ROM 0x13797E: jsr 0x39d8.l */
     r->a[7] -= 4u;
     wr32(m, r->a[7], 0x00137984u);
-    Sound_PlayCmd(m, 0x003au);
+    /* 0x39D8 already sent by Sound_PlayHooked (13F238 + 39D8) */
     r->a[7] += 4u;
     /* ROM 0x137984: lea (0x2,SP),SP */
     r->a[7] += 2u;

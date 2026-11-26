@@ -17,6 +17,7 @@ What to write, per routine ADDR (6 hex digits, e.g. 193F30):
 - Code style: C11, -Wall -Wextra -Werror clean, uintN_t, comments cite ROM addresses, keep ROM write order.
 
 Rules:
+- PASS means the WHOLE routine is translated: every path, including the ones the capture never exercises, with 0 undecompiled calls. Returning -1 on a path you could translate, or leaving a branch "approximated", is NOT a pass; report such a routine as PARTIAL. The captures usually exercise only the common path, so after the test passes, re-read every untested branch against the bytes instruction by instruction (stack balance after push/jsr/lea, where each branch goes, rts vs fall-through) and say which branches the capture did not cover.
 - Do routines in list order; after ~3 failed fix attempts on one, remove its line from tests/fn_auto.inc and its prototype, delete its .c, note why, and move on.
 - A routine whose capture a do-nothing body would also pass proves nothing: say so in the report instead of claiming PASS.
 - Do NOT change existing passing behaviour or shared files outside src/auto/ and tests/fn_auto.inc unless a shared helper is genuinely wrong (then say exactly what and why). At the end run  make -s build/test_fn build/test_objects && ./build/test_fn | tail -3 && ./build/test_objects | tail -3  and make sure nothing that passed before fails.

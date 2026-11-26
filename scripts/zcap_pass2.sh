@@ -5,7 +5,7 @@
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
 A=$1
-cur() { [ -f "work/ram/fn_${A}_regs.tsv" ] && grep -c $'\tpost\t' "work/ram/fn_${A}_regs.tsv" || echo 0; }
+cur() { awk -F"\t" '$2=="post"{n++} END{print n+0}' "work/ram/fn_${A}_regs.tsv" 2>/dev/null || echo 0; }
 best=$(cur)
 for f in work/zcap/hitsz/Z*.tsv; do
   z=$(basename "$f" .tsv); z=${z#Z}
@@ -15,7 +15,7 @@ done | sort -n | while read fr z; do
   [ "$best" -ge 10 ] && break
   t="work/ram/zc2_${A}"
   ZCAP_OUT=$t scripts/zcap_one.sh "$A" "$z" "$fr" >/dev/null
-  n=$([ -f "${t}_regs.tsv" ] && grep -c $'\tpost\t' "${t}_regs.tsv" || echo 0)
+  n=$(awk -F"\t" '$2=="post"{n++} END{print n+0}' "${t}_regs.tsv" 2>/dev/null || echo 0)
   if [ "$n" -gt "$best" ]; then
     for s in pairs regs gfx spr; do [ -f "${t}_$s.bin" ] && mv "${t}_$s.bin" "work/ram/fn_${A}_$s.bin"; done
     mv "${t}_regs.tsv" "work/ram/fn_${A}_regs.tsv"; best=$n; echo "$A Z$z pairs=$n"

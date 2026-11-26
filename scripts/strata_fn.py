@@ -106,6 +106,11 @@ def code_of(reply):
 
 def build_run(a, src):
     exe = f"build/fn1_{a}"
+    # the file must also build under the project's own flags (no -Wno-unused-function)
+    c0 = subprocess.run(["cc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror", "-iquote", "src/auto",
+                         "-c", src, "-o", "/dev/null"], capture_output=True, text=True)
+    if c0.returncode:
+        return None, "COMPILE ERROR (project flags):\n" + (c0.stderr or c0.stdout)[:3000]
     c = subprocess.run(["cc", *CFLAGS, f"-DFN1=Fn_{a}", f'-DFN1_ADDR="{a}"', "-o", exe,
                         "tests/test_fn.c", src, "build/libf3.a"], capture_output=True, text=True)
     if c.returncode:

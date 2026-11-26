@@ -17,3 +17,8 @@ Known pitfalls in earlier drafts (check each before finishing):
 - Stack-args: push order 'move.l arg ; move.w count ; move.w group ; move.l fn ; jsr 0x1057C' = Obj_Spawn(m, obj, fn, group, count, arg).
 - ROM is NEVER in a capture image: the pre/post files hold Work RAM, sprite RAM and gfx RAM only. A table at a ROM address (< 0x200000) read from the capture is zero by construction; that does NOT mean the harness reads zero. test_fn passes work/maincpu.bin as m->rom and rd8/rd16/rd32(m, addr) return the real ROM bytes. Dump tables with python3 -c "d=open('work/maincpu.bin','rb').read(); print(d[0xADDR:0xADDR+32].hex())".
 - Post registers come from the return of the SAME call (SP-matched). If a post register looks like some other routine's return address, re-read the bytes: it is the value this routine leaves there (e.g. a lea/jsr target), not a capture error.
+- Sound calls (the test runs without sound DPRAM, so a wrong sound call is INVISIBLE to it; get these right from the bytes):
+  `move.w #id,-(SP) ; jsr 0x13F238 ; jsr 0x39D8 ; lea (2,SP),SP` = ONE call Sound_PlayHooked(m, id) (src/enemy/obj_E8B72.h). Do NOT also call Sound_PlayCmd: that plays it twice.
+  `... jsr 0x13F238 ; jsr 0x3B66 ...` = c = Sound_PreCmdHook(m, id) (src/objects/obj_shared_ext.h, it only remaps) then Sound_PlayCmdForced(m, c) (src/audio/sound_cmd.h).
+  `jsr 0x39D8` alone = Sound_PlayCmd(m, id). Push the word first (SP -= 2, then write), then the return address.
+- Every static helper you write must be called (the project builds with -Werror, unused functions fail).

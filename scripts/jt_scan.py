@@ -7,7 +7,7 @@ cites the handler address in a comment or constant counts as covering it."""
 import glob, os, re, struct
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 rom = open("work/maincpu.bin", "rb").read()
-SHARED = {0x0D4F26}  # 0x0D1EBC multiply table, verified equivalent
+SHARED = {0x0D4F26, 0x0D4E5A}  # multiply-by-index tables (handler k = D0*k), verified
 for c in sorted(glob.glob("src/auto/fn_*.c")):
     a = os.path.basename(c)[3:-2]
     bp = f"work/disasm/bundle_{a.lstrip('0')}.s"

@@ -12,7 +12,7 @@ N,lo,hi=sys.argv[1],int(sys.argv[2]),int(sys.argv[3])
 res={}
 for l in open('work/zcap/strata_results.tsv'):
     p=l.rstrip('\n').split('\t'); res[p[0]]=p[2]
-bad={'13A0EE','13C852','19C648','12AC6C','18CAB4','193096','1346B6','1100C6','105356','10EDA0','13C43E'}
+bad=set()  # former codewhale skips, now handed to agy
 pairs={l.split()[0]:int(l.split()[1]) for l in open('work/zcap/pairs_now.txt')}
 rows=[(a,int(s)) for a,s,*_ in (l.split() for l in open('work/zcap/todo.tsv'))]
 ok=lambda a: a not in bad and res.get(a) in (None,'fail') and not os.path.exists(f'src/auto/fn_{a}.c') and os.path.exists(f'work/disasm/bundle_{a.lstrip("0")}.s')

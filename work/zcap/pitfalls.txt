@@ -22,3 +22,4 @@ Known pitfalls in earlier drafts (check each before finishing):
   `... jsr 0x13F238 ; jsr 0x3B66 ...` = c = Sound_PreCmdHook(m, id) (src/objects/obj_shared_ext.h, it only remaps) then Sound_PlayCmdForced(m, c) (src/audio/sound_cmd.h).
   `jsr 0x39D8` alone = Sound_PlayCmd(m, id). Push the word first (SP -= 2, then write), then the return address.
 - Every static helper you write must be called (the project builds with -Werror, unused functions fail).
+- Jump tables (jsr ([d,PC],Dn*4), movea.l (tbl,PC,Dn*4),A1 ; jsr (A1)): dump the WHOLE table from work/maincpu.bin until the entries stop being code addresses, and handle every entry. Captures usually hit only a few indices; a table can have more real handlers past them (0x12ADBC has 15 entries: 0-8 handlers, 9-14 a shared bare rts). An entry pointing at a bare rts is a no-op, not an error; an entry 0 (null) is a state the game never uses.

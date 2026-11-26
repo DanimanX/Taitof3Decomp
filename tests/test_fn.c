@@ -22,6 +22,7 @@
 #include "capture.h"
 #include "../src/enemy/obj_1194C2.h"      /* Text_DrawString (0x005666) */
 #include "../src/player/player_task.h"    /* Player_CoinCheckA (0x0C77BE) */
+#include "../src/enemy/obj_CBF04.h"       /* Obj_CBEEA (0x0CBEEA) */
 
 typedef struct { uint32_t d[8], a[8]; } f3regs_t;   /* a[7] = SP */
 
@@ -53,9 +54,16 @@ static int ad_0C77BE(const f3mem_t *m, f3regs_t *r)
     return 0;
 }
 
+/* ROM 0x0CBEEA: jmp target, A0 = obj, D1.w = child count, A1 = child fn */
+static int ad_0CBEEA(const f3mem_t *m, f3regs_t *r)
+{
+    return Obj_CBEEA(m, r->a[0], (uint16_t)r->d[1], r->a[1]);
+}
+
 static const fn_entry_t fns[] = {
     { "Fn 0x005666 Text_DrawString",   "work/ram/fn_005666", ad_005666, { { CR_D0, 0xFFFFFFFFu } } },
     { "Fn 0x0C77BE Player_CoinCheckA", "work/ram/fn_0C77BE", ad_0C77BE, { { CR_D0, 0x000000FFu } } },
+    { "Fn 0x0CBEEA Obj_CBEEA",         "work/ram/fn_0CBEEA", ad_0CBEEA, { { 0, 0u } } },
 };
 
 /* ---- runner ------------------------------------------------------------ */

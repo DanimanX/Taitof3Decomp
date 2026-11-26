@@ -153,8 +153,8 @@ static void sub_0CDFC8(const f3mem_t *m, uint32_t a0)
     } while (a0 != 0u);
 }
 
-/* ROM 0x0CDF68 -> 0x0CDEF4: snake segment */
-int Obj_CDF68_Tick(const f3mem_t *m, uint32_t obj)
+/* ROM 0x0CDEF4: snake segment tick (also the tail of 0x0CDE50's init) */
+int Obj_CDEF4_Tick(const f3mem_t *m, uint32_t obj)
 {
     if ((rd8(m, F3_A5 - 0x144Bu) & 0x10u) != 0u)
         goto kill;
@@ -182,4 +182,10 @@ off:
     wr16(m, obj + 0x06u, 4u);
     wr32(m, obj, 0xCDF84u);
     return 0;
+}
+
+/* ROM 0x0CDF68: bra.b 0x0CDEF4 */
+int Obj_CDF68_Tick(const f3mem_t *m, uint32_t obj)
+{
+    return Obj_CDEF4_Tick(m, obj);
 }

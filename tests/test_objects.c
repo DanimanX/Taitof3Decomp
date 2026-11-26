@@ -1922,6 +1922,7 @@ int main(void)
     bad += run("Obj 0x17D586", "work/ram/obj_17D586", Obj_17D586_Tick, rom);
     bad += run("Obj 0x17A122", "work/ram/obj_17A122", Obj_17A122_Tick, rom);
     bad += run("Obj 0x18415A", "work/ram/obj_18415A", Obj_18415A_Tick, rom);
+    bad += run("Obj 0x18417A", "work/ram/obj_18417A", Obj_18417A_Tick, rom);
     bad += run("Obj 0x17A52A", "work/ram/obj_17A52A", Obj_17A52A_Tick, rom);
     bad += run("Obj 0x17D4F4", "work/ram/obj_17D4F4", Obj_17D4F4_Tick, rom);
     bad += run("Obj 0x17DDD0", "work/ram/obj_17DDD0", Obj_17DDD0_Tick, rom);

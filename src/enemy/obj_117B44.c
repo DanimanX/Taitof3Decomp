@@ -23,8 +23,14 @@ int Obj_117B44_Tick(const f3mem_t *m, uint32_t obj)
     uint32_t a1 = rd32(m, obj + 0x08u);
     wr16(m, obj + 0x14u, rd16(m, a1 + 0x14u));
     wr16(m, obj + 0x18u, rd16(m, a1 + 0x18u));
+    return Obj_117B54_Tick(m, obj);     /* falls through */
+}
 
-    /* 0x117B54 */
+/* ROM 0x117B54: score popup init (also spawned directly): credit 0x466 to
+ * A5+0x886, build the 4-tile digit sprite at +0x46 from the score in +0x0C,
+ * 60-tick life, arm 0x117BDE. */
+int Obj_117B54_Tick(const f3mem_t *m, uint32_t obj)
+{
     wr16(m, obj + 0x1Cu, 0u);
     wr16(m, obj + 0x1Eu, 0u);
     wr32(m, F3_A5 + 0x886u, rd32(m, F3_A5 + 0x886u) + 0x466u);
@@ -35,7 +41,7 @@ int Obj_117B44_Tick(const f3mem_t *m, uint32_t obj)
     a2 += 4u;
 
     /* 0x117B72: digits of the score in A0+0x0C, drawn as 4 tiles */
-    a1 = 0x0005A834u;
+    uint32_t a1 = 0x0005A834u;
     uint32_t d1 = rd32(m, obj + 0x0Cu);
     uint32_t d0 = divu_w(d1, 1000u);    /* 0x117B7E */
     if (d0 == DIVU_OVF) {

@@ -22,19 +22,10 @@ static int in_bounds(const f3mem_t *m, uint32_t obj)
     return 1;
 }
 
-/* ROM 0x18415A: difficulty-branched spawn/init, then hand off to 0x17BE14 (0x17BE1C). */
-int Obj_18415A_Tick(const f3mem_t *m, uint32_t obj)
+/* ROM 0x18418A: common body; A2 = the 16-byte difficulty record
+ * {child fn, 0x184888 arg, anim record, script} */
+static int body_18418A(const f3mem_t *m, uint32_t obj, uint32_t a2)
 {
-    uint16_t d0 = (uint16_t)((rd16(m, F3_A5 + 0x87Eu) >> 4) & 0x0Fu);
-    uint32_t a2;
-    if ((int16_t)d0 >= 8) {
-        a2 = 0x00184234u;
-    } else if ((int16_t)d0 >= 4) {
-        a2 = 0x00184224u;
-    } else {
-        a2 = 0x00184214u;
-    }
-
     (void)Obj_PolarPlace(m, obj);
     if (!in_bounds(m, obj)) {
         lab_17C78E(m, obj);
@@ -65,4 +56,22 @@ int Obj_18415A_Tick(const f3mem_t *m, uint32_t obj)
     /* bra.l 0x17BE14 */
     wr32(m, obj + 0x00u, 0x0017BE1Cu);
     return 0;
+}
+
+/* ROM 0x18415A: difficulty-branched spawn/init (bfextu A5+0x87E{8:4}),
+ * then hand off to 0x17BE14 (0x17BE1C). */
+int Obj_18415A_Tick(const f3mem_t *m, uint32_t obj)
+{
+    uint16_t d0 = (uint16_t)((rd16(m, F3_A5 + 0x87Eu) >> 4) & 0x0Fu);
+    if ((int16_t)d0 >= 8)
+        return body_18418A(m, obj, 0x00184234u);         /* 0x184184 */
+    if ((int16_t)d0 >= 4)
+        return Obj_18417A_Tick(m, obj);
+    return body_18418A(m, obj, 0x00184214u);             /* 0x184170 */
+}
+
+/* ROM 0x18417A: difficulty 4..7 case, lea 0x184224(pc),a2 ; bra 0x18418A */
+int Obj_18417A_Tick(const f3mem_t *m, uint32_t obj)
+{
+    return body_18418A(m, obj, 0x00184224u);
 }

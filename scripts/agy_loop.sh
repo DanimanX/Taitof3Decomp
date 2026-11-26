@@ -75,7 +75,12 @@ while :; do
   t1=$(./build/test_fn | tail -1); nf=$(./build/test_objects | grep -ci fail)
   if [ "$t1" != "fn: PASS (0 failing calls)" ] || [ "$nf" != 0 ]; then
     say "TESTS FAIL after round $N ($t1, objects failing $nf): undoing the merge, stopping"
-    git checkout -q src/auto/fn_auto.h tests/fn_auto.inc; git clean -qf src/auto; break
+    # keep the drafts (and the worktrees) so the failure can be looked at
+    mkdir -p work/zcap/partial/failed_r$N
+    ./build/test_fn 2>&1 | python3 -c "import sys,re;[print(l.strip()) for l in sys.stdin if (m:=re.search(r'(\d+)/\s*(\d+) calls',l)) and m.group(1)!=m.group(2)]" > work/zcap/partial/failed_r$N/test_fn.txt
+    git status --short src/auto | sed -n 's/^?? //p' | xargs -r -I{} mv {} work/zcap/partial/failed_r$N/
+    git checkout -q src/auto/fn_auto.h tests/fn_auto.inc
+    KEEP_WT=1; break
   fi
   new=$(git status --short src/auto | sed -n 's/^?? src\/auto\/fn_\(.*\)\.c$/\1/p' | tr '\n' ' ')
   for a in $new; do
@@ -100,6 +105,8 @@ EOF
   cleanup
   N=$((N+1)); [ "${FIRST_DONE:-0}" = 1 ] && hi=2000; FIRST_DONE=1
 done
-for w in G1 G2 G3; do git worktree remove --force /PROCESOS/wt_$w 2>/dev/null; done; git worktree prune
+if [ "${KEEP_WT:-0}" = 0 ]; then
+  for w in G1 G2 G3; do git worktree remove --force /PROCESOS/wt_$w 2>/dev/null; done; git worktree prune
+fi
 cleanup
 say "loop finished at round $N"

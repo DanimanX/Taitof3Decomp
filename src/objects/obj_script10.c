@@ -153,26 +153,23 @@ static void scr_179074(const f3mem_t *m, uint32_t obj)
     wr32(m, obj + 0x54u, rd32(m, obj + 0x54u) + (uint32_t)vy);
 }
 
-/* ROM 0x178CCE: hold the heading and step the position along it by arg0.
- *
- *   (0x20,A0) := (0x20,A0) + arg0          ; signed byte add
- *   d0w = (0x42,A0) + 0x20 ; >>6          ; magnitude
- *   idx = ((0x20,A0) >> 8) & 0xFF         ; bfextu -- NOT the full word
- *   (0x50,A0) += d0 * 0x27E40[idx*2 + 0x80]   (sine)
- *   (0x54,A0) += d0 * 0x27E40[idx*2]          (cosine)
- * Same lookup 0x178C06 uses; only the heading setter differs. */
+/* ROM 0x178CCE: step Cartesian (+0x42, +0x5C) velocity components, integrate
+ * (+0x50, +0x54), and update +0x20 angle via Obj_Atan2 (0x006422). */
 static void sub_178CCE(const f3mem_t *m, uint32_t obj)
 {
     uint32_t a1 = rd32(m, obj + 0x44u);
-    wr8(m, obj + 0x20u, (uint8_t)(rd8(m, obj + 0x20u) + rd8(m, a1 + 6u)));
+    uint16_t vxw = (uint16_t)(rd16(m, obj + 0x42u) + rd16(m, a1 + 6u));
+    uint16_t vyw = (uint16_t)(rd16(m, obj + 0x5Cu) + rd16(m, a1 + 8u));
+    wr16(m, obj + 0x42u, vxw);
+    wr16(m, obj + 0x5Cu, vyw);
 
-    uint16_t mag = (uint16_t)((uint32_t)(int32_t)(int16_t)(uint16_t)(rd16(m, obj + 0x42u) + 0x20u) >> 6);
-    uint16_t idx = (uint16_t)(rd16(m, obj + 0x20u) >> 8);
-    uint32_t base = 0x0027E40u + (uint32_t)idx * 2u;
-    int32_t s = (int32_t)(int16_t)rd16(m, base);
-    int32_t c = (int32_t)(int16_t)rd16(m, base + 0x80u);
-    wr32(m, obj + 0x50u, rd32(m, obj + 0x50u) + (uint32_t)((int32_t)mag * c));
-    wr32(m, obj + 0x54u, rd32(m, obj + 0x54u) + (uint32_t)((int32_t)mag * s));
+    uint32_t dx = ((uint32_t)(int32_t)(int16_t)(uint16_t)(vxw + 0x20u) << 8) & 0xFFFFC000u;
+    uint32_t dy = ((uint32_t)(int32_t)(int16_t)(uint16_t)(vyw + 0x20u) << 8) & 0xFFFFC000u;
+    wr32(m, obj + 0x50u, rd32(m, obj + 0x50u) + dx);
+    wr32(m, obj + 0x54u, rd32(m, obj + 0x54u) + dy);
+
+    uint16_t ang = Obj_Atan2(m, vxw, vyw);
+    wr8(m, obj + 0x20u, (uint8_t)ang);
 }
 
 /* ROM 0x178ECC: the steer-to command of 0x178E4A with the heading-speed

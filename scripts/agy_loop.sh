@@ -49,6 +49,9 @@ while :; do
     if echo "$out" | grep -q 'taking 0'; then say "pool empty, stopping"; break; fi
   fi
   q=$(grep -ho 'Resets in [0-9hms]*' work/zcap/agy${N}_G*.log 2>/dev/null | head -1)
+  # a worktree that changed shared code needs Claude: its routines may rely on it
+  shared=$(for w in G1 G2 G3; do git -C /PROCESOS/wt_$w status --short 2>/dev/null | grep '^ M' | grep -v ' src/auto/\| tests/fn_auto.inc\| README.md\| docs/COVERAGE.md' | sed "s|^ M |$w:|"; done | tr '\n' ' ')
+  if [ -n "$shared" ]; then say "round $N changed shared files ($shared): stopping for review, worktrees kept"; KEEP_WT=1; break; fi
   m=$(scripts/agy_merge.sh 2>&1); echo "$m" >> "$LOG"
   merged=$(echo "$m" | sed -n 's/^merged \([0-9]*\).*/\1/p'); merged=${merged:-0}
   # routines agy never got to (quota, time) become eligible again

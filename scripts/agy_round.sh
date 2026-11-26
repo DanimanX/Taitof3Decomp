@@ -2,6 +2,7 @@
 # agy_round.sh N [MINSIZE] [MAXSIZE] : pick the next 30 untried captured routines
 # (largest first within the size range), reset wt_G1..G3 at HEAD, and run three
 # self-verifying agy (Gemini 4 Hydrogen) batches of 10. Logs: work/zcap/agyN_G*.log
+# Model: $AGY_MODEL (default gemini-4-hydrogen-medium; -high for hard rounds).
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
 N=$1 LO=${2:-1} HI=${3:-300}
@@ -33,7 +34,7 @@ for w in G1 G2 G3; do
 done
 for w in G1 G2 G3; do
   [ -s work/zcap/agy${N}_$w.list ] || continue
-  (cd /PROCESOS/wt_$w && agy --model gemini-4-hydrogen-high --mode auto --sandbox -p "$(cat $ROOT/work/zcap/agy_prompt_$w.txt)" > $ROOT/work/zcap/agy${N}_$w.log 2>&1) &
+  (cd /PROCESOS/wt_$w && agy --model ${AGY_MODEL:-gemini-4-hydrogen-medium} --mode auto --sandbox -p "$(cat $ROOT/work/zcap/agy_prompt_$w.txt)" > $ROOT/work/zcap/agy${N}_$w.log 2>&1) &
 done; wait
 grep -h 'quota\|RESOURCE_EXHAUSTED' work/zcap/agy${N}_G*.log | head -2
 echo "agy round $N done"

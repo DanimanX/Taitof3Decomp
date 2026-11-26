@@ -24,8 +24,12 @@
 #include "../src/player/player_task.h"    /* Player_CoinCheckA (0x0C77BE) */
 #include "../src/enemy/obj_CBF04.h"       /* Obj_CBEEA (0x0CBEEA) */
 #include "../src/video/linefx_176390.h"   /* LineFx_176390 */
+#include "../src/common/fn_leaf1.h"        /* Leaf_* (Strata draft) */
 
+#ifndef F3REGS_T_DEFINED
+#define F3REGS_T_DEFINED
 typedef struct { uint32_t d[8], a[8]; } f3regs_t;   /* a[7] = SP */
+#endif
 
 typedef int (*fn_adapter_t)(const f3mem_t *m, f3regs_t *r);
 
@@ -78,11 +82,40 @@ static int ad_13D638(const f3mem_t *m, f3regs_t *r)
     return 0;
 }
 
+static int ad_L16AB58(const f3mem_t *m, f3regs_t *r) { Leaf_16AB58(m, r); return 0; }
+static int ad_L16AB5C(const f3mem_t *m, f3regs_t *r) { Leaf_16AB5C(m, r); return 0; }
+static int ad_L16AB6A(const f3mem_t *m, f3regs_t *r) { Leaf_16AB6A(m, r); return 0; }
+static int ad_L16AB62(const f3mem_t *m, f3regs_t *r) { Leaf_16AB62(m, r); return 0; }
+static int ad_L1766B6(const f3mem_t *m, f3regs_t *r) { Leaf_1766B6(m, r); return 0; }
+static int ad_L0CEC40(const f3mem_t *m, f3regs_t *r) { Leaf_0CEC40(m, r); return 0; }
+static int ad_L1766DA(const f3mem_t *m, f3regs_t *r) { Leaf_1766DA(m, r); return 0; }
+static int ad_L1766EE(const f3mem_t *m, f3regs_t *r) { Leaf_1766EE(m, r); return 0; }
+static int ad_L13E9B0(const f3mem_t *m, f3regs_t *r) { Leaf_13E9B0(m, r); return 0; }
+static int ad_L0C660A(const f3mem_t *m, f3regs_t *r) { Leaf_0C660A(m, r); return 0; }
+static int ad_L16A2F6(const f3mem_t *m, f3regs_t *r) { Leaf_16A2F6(m, r); return 0; }
+static int ad_L13E994(const f3mem_t *m, f3regs_t *r) { Leaf_13E994(m, r); return 0; }
+static int ad_L1766BE(const f3mem_t *m, f3regs_t *r) { Leaf_1766BE(m, r); return 0; }
+static int ad_L13CAAE(const f3mem_t *m, f3regs_t *r) { Leaf_13CAAE(m, r); return 0; }
+
 static const fn_entry_t fns[] = {
     { "Fn 0x005666 Text_DrawString",   "work/ram/fn_005666", ad_005666, { { CR_D0, 0xFFFFFFFFu } } },
     { "Fn 0x0C77BE Player_CoinCheckA", "work/ram/fn_0C77BE", ad_0C77BE, { { CR_D0, 0x000000FFu } } },
     { "Fn 0x0CBEEA Obj_CBEEA",         "work/ram/fn_0CBEEA", ad_0CBEEA, { { 0, 0u } } },
     { "Fn 0x13D638 Hiscore_Insert",    "work/ram/fn_13D638", ad_13D638, { { CR_D0 + 1, 0x0000FFFFu }, { CR_A0 + 1, 0xFFFFFFFFu }, { 0, 0u }, { 0, 0u } } },
+    { "Fn 0x16AB58 Leaf_16AB58", "work/ram/fn_16AB58", ad_L16AB58, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x16AB5C Leaf_16AB5C", "work/ram/fn_16AB5C", ad_L16AB5C, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x16AB6A Leaf_16AB6A", "work/ram/fn_16AB6A", ad_L16AB6A, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x16AB62 Leaf_16AB62", "work/ram/fn_16AB62", ad_L16AB62, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x1766B6 Leaf_1766B6", "work/ram/fn_1766B6", ad_L1766B6, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x0CEC40 Leaf_0CEC40", "work/ram/fn_0CEC40", ad_L0CEC40, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x1766DA Leaf_1766DA", "work/ram/fn_1766DA", ad_L1766DA, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x1766EE Leaf_1766EE", "work/ram/fn_1766EE", ad_L1766EE, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x13E9B0 Leaf_13E9B0", "work/ram/fn_13E9B0", ad_L13E9B0, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x0C660A Leaf_0C660A", "work/ram/fn_0C660A", ad_L0C660A, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x16A2F6 Leaf_16A2F6", "work/ram/fn_16A2F6", ad_L16A2F6, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x13E994 Leaf_13E994", "work/ram/fn_13E994", ad_L13E994, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x1766BE Leaf_1766BE", "work/ram/fn_1766BE", ad_L1766BE, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
+    { "Fn 0x13CAAE Leaf_13CAAE", "work/ram/fn_13CAAE", ad_L13CAAE, { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } } },
     { "Fn 0x176390 LineFx_176390",     "work/ram/fn_176390", ad_176390, { { 0, 0u } } },
 };
 

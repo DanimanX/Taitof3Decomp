@@ -200,5 +200,10 @@ int Fn_10E9E2(const f3mem_t *m, f3regs_t *r); /* ROM 0x10E9E2 */
 int Fn_110328(const f3mem_t *m, f3regs_t *r); /* ROM 0x110328 */
 int Fn_110756(const f3mem_t *m, f3regs_t *r); /* ROM 0x110756 */
 int Fn_18767C(const f3mem_t *m, f3regs_t *r); /* ROM 0x18767C */
+int Fn_13311A(const f3mem_t *m, f3regs_t *r); /* ROM 0x13311A */
+int Fn_12E442(const f3mem_t *m, f3regs_t *r); /* ROM 0x12E442 */
+int Fn_122F88(const f3mem_t *m, f3regs_t *r); /* ROM 0x122F88 */
+int Fn_122702(const f3mem_t *m, f3regs_t *r); /* ROM 0x122702 */
+int Fn_1929E6(const f3mem_t *m, f3regs_t *r); /* ROM 0x1929E6 */
 /* END generated */
 #endif

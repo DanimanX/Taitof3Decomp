@@ -32,8 +32,15 @@ static inline int cap_load(capture_t *c, const char *pfx)
     char p[512];
     long l;
     memset(c, 0, sizeof *c);
+    /* capture_fn.sh writes <prefix>.bin; older sets were kept as
+     * <prefix>_pairs.bin. Accept either. */
     snprintf(p, sizeof p, "%s_pairs.bin", pfx);
-    if (!(c->wram = cap_slurp(p, &l))) return -1;
+    c->wram = cap_slurp(p, &l);
+    if (!c->wram) {
+        snprintf(p, sizeof p, "%s.bin", pfx);
+        c->wram = cap_slurp(p, &l);
+    }
+    if (!c->wram) return -1;
     c->pairs = (int)(l / (2 * F3_WRAM_SIZE));
     snprintf(p, sizeof p, "%s_dpram.bin", pfx);
     if ((c->dpram = cap_slurp(p, &l)) && l / (2 * F3_DPRAM_SIZE) < c->pairs) c->pairs = (int)(l / (2 * F3_DPRAM_SIZE));

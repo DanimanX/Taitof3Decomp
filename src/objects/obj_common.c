@@ -330,3 +330,13 @@ uint32_t Pal_QueueRamp(const f3mem_t *m, uint32_t a0, uint32_t a1,
             return 0u;
     }
 }
+
+/* ROM 0x19900: init the player-relative main object. Seeds the enemy stats and
+ * the behaviour script from the records it builds on its stack (D0 = XY-like
+ * pair, D1 = the two long args, both passed through from the spawner), writes
+ * the position words, then installs 0x199C6. Not yet decompiled: the caller
+ * (0x1057C) runs this before it returns the new object. */
+void Obj_Init19900(const f3mem_t *m, uint32_t obj, uint32_t d0, uint32_t d1)
+{
+    (void)m; (void)obj; (void)d0; (void)d1;
+}

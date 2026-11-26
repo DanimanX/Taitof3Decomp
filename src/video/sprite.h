@@ -12,6 +12,8 @@
 void Obj_DrawSprite(const f3mem_t *m, uint32_t obj);  /* ROM 0x001282 */
 void Obj_DrawSpriteSub(const f3mem_t *m, uint32_t obj, uint16_t d0, uint16_t d1, uint16_t d2); /* ROM 0x001410 */
 void Sprite_ClearAll(const f3mem_t *m);               /* ROM 0x00117E */
+void Sprite_InitHeaders(const f3mem_t *m, uint16_t d0); /* ROM 0x001100 (src/video/sprite_init.c) */
+void Sprite_InitBuffers(const f3mem_t *m);              /* ROM 0x001070 (src/video/sprite_init.c) */
 void Video_SetSpriteScroll(const f3mem_t *m);         /* ROM 0x001232 */
 void Video_UploadScroll(const f3mem_t *m);            /* ROM 0x001C90 */
 void Gfx_DrawCompressedTilemap(const f3mem_t *m, uint32_t src, uint32_t dst, uint32_t flags); /* ROM 0x0053B2 */

@@ -24,4 +24,8 @@ void Video_ClearRect(const f3mem_t *m, uint32_t a0, uint32_t a1);               
  * (A5-0x6650 + n*6) or 0 when no slot could be claimed. */
 uint32_t Pal_QueueRamp(const f3mem_t *m, uint32_t a0, uint32_t a1, uint32_t d0, uint32_t d1, uint32_t d2);
 
+/* ROM 0x19900: init the main object a spawner built (D0 = XY pair, D1 = the
+ * two spawner longs); installs 0x199C6. Not decompiled yet -- see obj_common.c. */
+void Obj_Init19900(const f3mem_t *m, uint32_t obj, uint32_t d0, uint32_t d1);
+
 #endif

@@ -6,9 +6,12 @@
  * already empty, only 2 bytes change). The Group11 task is verified in
  * tests/test_objpool.c (100 loop passes from zones 04/14/27, 10 of them paused
  * by F3_POKE8=406BB5=02; tick fn/obj order logged at 0x010568) and its setup
- * 0x010516 on 20 injected calls (test_fn "Task 0x010516 Group11 init"). */
+ * 0x010516 on 20 injected calls (test_fn "Task 0x010516 Group11 init").
+ * TaskSlot15_Frame: see test_fn "Task 0x0038B2 Slot15 daemon loop". */
 #include "tasks.h"
 #include "../collision/collision.h"
+#include "../video/palette.h"
+#include "../auto/fn_auto.h"
 
 /* ROM 0x0C63E8 Task_Collision
  *   0C63E8  sf (0x1d1c,A5)
@@ -56,4 +59,43 @@ int TaskGroup11_Frame(const f3mem_t *m, obj_tick_cb cb, void *ctx)
         return 1;
     Obj_RunGroup11(m, cb, ctx);
     return 0;
+}
+
+/* jsr <fn> from a task body: push the return PC and run the register-level
+ * translation (it sees SP -> return address, as at the ROM entry, and leaves
+ * SP as after its rts, i.e. popped). */
+static int task_jsr(const f3mem_t *m, f3regs_t *r, uint32_t ret,
+                    int (*fn)(const f3mem_t *, f3regs_t *))
+{
+    r->a[7] -= 4u;
+    wr32(m, r->a[7], ret);
+    return fn(m, r);
+}
+
+/* ROM 0x0038AC Task_Slot15Daemon: bsr 0x003912 (jsr 0x001774 Pal_ClearRamps),
+ * then the loop at 0x0038B0. */
+void TaskSlot15_Init(const f3mem_t *m)
+{
+    Pal_ClearRamps(m);
+}
+
+/*   0038B0  trap #5
+ *   0038B2  btst.b #1,(-0x144b,A5) ; bne 0x00390A   paused: only 0x391A
+ *   0038BC  jsr 0x0016AA ; jsr 0x0C676E ; jsr 0x00144A
+ *   0038CE  ten move.l (-0x5DA8..-0x5D84,A5) -> (-0x5D80..-0x5D5C,A5)
+ *   00390A  jsr 0x00391A ; nop ; bra 0x0038B0
+ * Register level (r carries from pass to pass). Returns 0x0038B0 (the TRAP
+ * #5 reached), or 0 when a callee took an untranslated path. */
+uint32_t TaskSlot15_Frame(const f3mem_t *m, f3regs_t *r)
+{
+    uint32_t a5 = r->a[5];
+    if (!(rd8(m, a5 - 0x144Bu) & 0x02u)) {
+        if (task_jsr(m, r, 0x000038C2u, Fn_0016AA) < 0) return 0;
+        if (task_jsr(m, r, 0x000038C8u, Fn_0C676E) < 0) return 0;
+        if (task_jsr(m, r, 0x000038CEu, Fn_00144A) < 0) return 0;
+        for (uint32_t i = 0; i < 10u; i++)
+            wr32(m, a5 - 0x5D80u + 4u * i, rd32(m, a5 - 0x5DA8u + 4u * i));
+    }
+    if (task_jsr(m, r, 0x0000390Eu, Fn_00391A) < 0) return 0;
+    return 0x000038B0u;
 }

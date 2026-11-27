@@ -218,6 +218,8 @@ static const uint8_t *pair_ports(void)
 KERN_VB(00222E)
 KERN_VB(001A34)
 KERN_VB(001A54)
+static int ad_task_d15_init(const f3mem_t *m, f3regs_t *r) { (void)r; TaskSlot15_Init(m); return 0; }
+static int ad_task_d15(const f3mem_t *m, f3regs_t *r) { seg_stop = TaskSlot15_Frame(m, r); return seg_stop ? 0 : -1; }
 /* END kernel adapters */
 static int ad_task_timeline_init(const f3mem_t *m, f3regs_t *r) { return Fn_13F2C6(m, r) < 0 ? -1 : 0; }
 
@@ -306,6 +308,9 @@ static const fn_entry_t fns[] = {
     { "Kernel 0x001E48 TRAP 3",        "work/ram/fn_001E48", ad_k_001E48, SEGREGS },
     { "Kernel 0x001F30 TRAP 4",        "work/ram/fn_001F30", ad_k_001F30, SEGREGS },
     { "Kernel 0x001F78 TRAP 5",        "work/ram/fn_001F78", ad_k_001F78, SEGREGS },
+    { "Task 0x0038B2 Slot15 daemon loop", "work/ram/task_d15", ad_task_d15, SEGREGS },
+    { "Task 0x0038B2 Slot15 paused",   "work/ram/task_d15p", ad_task_d15, SEGREGS },   /* F3_POKE8=406BB5=02 */
+    { "Task 0x003912 Slot15 init",     "work/ram/task_init_d15", ad_task_d15_init, { { 0, 0u } } }, /* F3_INJECT */
     { "Task 0x010516 Group11 init",    "work/ram/task_init_g11", ad_task_g11_init, { { 0, 0u } } },
     { "Task 0x13F2C6 Timeline init",   "work/ram/task_init_tl", ad_task_timeline_init, { { 0, 0u } } },
     { "Task 0x13F2CC Timeline loop",   "work/ram/task_timeline", ad_task_timeline, { { 0, 0u } } },

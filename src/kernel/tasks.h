@@ -2,6 +2,7 @@
 #define TAITOF3_KERNEL_TASKS_H
 #include "../common/f3mem.h"
 #include "../objects/obj_pool.h"
+#include "../auto/fn_auto.h"
 
 /* Kernel task bodies that are only a setup call and a TRAP #5 frame loop.
  * As in src/player/player_task.c, a task is split into the code before its
@@ -15,4 +16,6 @@ void TaskGroup11_Init(const f3mem_t *m);     /* ROM 0x010502 Task_ObjGroup11Runn
 /* ROM 0x010508 loop body: returns 1 when the pause bit kept it to the yield. */
 int  TaskGroup11_Frame(const f3mem_t *m, obj_tick_cb cb, void *ctx);
 
+void     TaskSlot15_Init(const f3mem_t *m);               /* ROM 0x0038AC Task_Slot15Daemon (+ 0x003912) */
+uint32_t TaskSlot15_Frame(const f3mem_t *m, f3regs_t *r);   /* loop pass 0x0038B2 -> TRAP #5 0x0038B0 */
 #endif

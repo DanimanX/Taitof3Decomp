@@ -5,7 +5,8 @@
 --   F3_LINGER  N: delay the "post" dump by N further entries of F3_ENTRY, so
 --              a successor state's writes land in the same pair
 --   F3_EXIT    hex PC(s) where "post" is taken, comma-separated (e.g. C63F0),
---              or "ret": post at the return address of the entry call
+--              or "ret": post at the return address of the entry call,
+--              or "a6": post at the PC in A6 at entry (jmp (a6) returns)
 --              (entry must be the first instruction of a jsr/bsr target)
 --   F3_SPR     "1" also dumps sprite RAM 0x600000-0x60FFFF to <prefix>_spr.bin
 --   F3_GFX     "1" also dumps playfield/text/char/line RAM 0x610000-0x62FFFF to <prefix>_gfx.bin
@@ -54,7 +55,10 @@ local ROOT = "/PROCESOS/Taitof3Decomp"
 local entry = tonumber(os.getenv("F3_ENTRY"), 16)
 local exits = {}
 local exit_ret = os.getenv("F3_EXIT") == "ret"
-if not exit_ret then
+-- "a6": post at the PC held in A6 at entry (stackless routines that return
+-- with jmp (a6), e.g. the boot RAM tests around 0x0047C0)
+local exit_a6 = os.getenv("F3_EXIT") == "a6"
+if not exit_ret and not exit_a6 then
   for h in string.gmatch(os.getenv("F3_EXIT"), "[^,]+") do exits[tonumber(h, 16)] = true end
 end
 -- F3_LINGER=N: take the "post" dump N entries of the tick-list site *after*
@@ -125,6 +129,7 @@ local p = manager.machine.ioport.ports
 local out = assert(io.open(prefix .. "_pairs.bin", "wb"))
 local regs = assert(io.open(prefix .. "_regs.tsv", "w"))
 local exitpc = os.getenv("F3_EXITPC") == "1"
+local service = os.getenv("F3_SERVICE") == "1"
 regs:write("pair\twhich\tframe\tD0\tD1\tD2\tD3\tD4\tD5\tD6\tD7\tA0\tA1\tA2\tA3\tA4\tA5\tA6\tSP" .. (exitpc and "\tPC" or "") .. "\n")
 cpu.debug:bpset(entry, os.getenv("F3_COND") or "", "")
 for a in pairs(remask) do cpu.debug:bpset(a, "", "") end
@@ -238,6 +243,10 @@ emu.register_periodic(function()
     end
     if noirq then saved_sr = cpu.state["SR"].value; cpu.state["SR"].value = saved_sr | 0x0700 end
     linger_left = linger
+    if exit_a6 then
+      ret_pc = cpu.state["A6"].value & 0xFFFFFF
+      ret_bp = cpu.debug:bpset(ret_pc, "", "")
+    end
     if exit_ret then
       ret_sp = spv
       ret_pc = sp:read_u32(ret_sp) & 0xFFFFFF
@@ -250,7 +259,7 @@ emu.register_periodic(function()
   elseif have_pre and linger_left > 0 and pc == entry then
     -- one more tick went by for this object: count down, then dump
     linger_left = linger_left - 1
-  elseif have_pre and (exits[pc] or (exit_ret and pc == ret_pc and spv == ret_sp + 4)) then
+  elseif have_pre and (exits[pc] or (exit_ret and pc == ret_pc and spv == ret_sp + 4) or (exit_a6 and pc == ret_pc)) then
     if ret_bp then cpu.debug:bpclear(ret_bp); ret_bp = nil; ret_pc = nil end
     emit(pre_snap); regs:write(pre_regs); regs:write(table.concat(pending_logs))
     if portf then portf:write(string.format("%d\t%s\n", pairs_done, pre_ports)); portf:flush() end
@@ -276,7 +285,16 @@ emu.register_frame_done(function()
   -- never between a pre and a post snapshot (the tick would see a write
   -- the routine did not make); the entry breakpoint re-applies them
   if not have_pre then for _, pv in ipairs(pokes16) do sp:write_u16(pv[1], pv[2]) end end
-  if inmode == "fire" then
+  -- F3_SERVICE=1: the test-mode input schedule of pc_survey.lua (on t =
+  -- frames since the survey's 01_attract start), so captures from its TM_*
+  -- states replay the same menu walk.
+  if service then
+    local t = n + noffset
+    p[":EEPROMIN"].fields["Service Mode"]:set_value((t >= 10 and t < 20) and 1 or 0)
+    p[":IN.1"].fields["P1 Down"]:set_value((t > 40 and t % 90 < 5) and 1 or 0)
+    p[":IN.0"].fields["P1 Button 1"]:set_value((t > 40 and t % 270 >= 45 and t % 270 < 50) and 1 or 0)
+    p[":IN.1"].fields["P1 Up"]:set_value((t > 40 and t % 630 >= 300 and t % 630 < 305) and 1 or 0)
+  elseif inmode == "fire" then
     local t = n + noffset
     p[":IN.0"].fields["P1 Button 1"]:set_value((t // 3) % 2)
     local k = (t // 45) % 4

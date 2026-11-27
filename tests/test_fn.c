@@ -176,6 +176,9 @@ static int ad_11BC6E(const f3mem_t *m, f3regs_t *r)
 static int ad_task_coll(const f3mem_t *m, f3regs_t *r) { (void)r; TaskCollision_Frame(m); return 0; }
 void TaskStageTimeline_Frame(const f3mem_t *m);
 static int ad_task_timeline(const f3mem_t *m, f3regs_t *r) { (void)r; TaskStageTimeline_Frame(m); return 0; }
+/* task setup: from the task entry to its first TRAP #5 */
+static int ad_task_coll_init(const f3mem_t *m, f3regs_t *r) { (void)r; TaskCollision_Init(m); return 0; }
+static int ad_task_timeline_init(const f3mem_t *m, f3regs_t *r) { return Fn_13F2C6(m, r) < 0 ? -1 : 0; }
 
 #define ALLREGS { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } }
 #ifdef FN1
@@ -251,6 +254,8 @@ static const fn_entry_t fns[] = {
     { "Seg 0x0B956C 0B935A group",  "work/ram/seg_0B956C", ad_seg, SEGREGS },
     { "Seg 0x0B958C 0B935A group",  "work/ram/seg_0B958C", ad_seg, SEGREGS },
     { "Seg 0x0B9632 0B935A group",  "work/ram/seg_0B9632", ad_seg, SEGREGS },
+    { "Task 0x0C63E8 Collision init",  "work/ram/task_init_coll", ad_task_coll_init, { { 0, 0u } } },
+    { "Task 0x13F2C6 Timeline init",   "work/ram/task_init_tl", ad_task_timeline_init, { { 0, 0u } } },
     { "Task 0x13F2CC Timeline loop",   "work/ram/task_timeline", ad_task_timeline, { { 0, 0u } } },
 };
 #endif

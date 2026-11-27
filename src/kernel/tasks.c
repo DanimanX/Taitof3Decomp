@@ -1,7 +1,9 @@
 /* Kernel task bodies: setup + TRAP #5 frame loop (see tasks.h).
  * Translated by Claude from the ROM listing. TaskCollision_Frame is verified
  * on 20 loop passes (test "Task 0x0C63F2 Collision loop", capture from the
- * resume PC to the next TRAP #5 with F3_NOIRQ=1); the rest is UNVERIFIED. */
+ * resume PC to the next TRAP #5 with F3_NOIRQ=1) and TaskCollision_Init on 3
+ * task starts (test "Task 0x0C63E8 Collision init"; weak: the lists were
+ * already empty, only 2 bytes change). The Group11 task is UNVERIFIED. */
 #include "tasks.h"
 #include "../collision/collision.h"
 

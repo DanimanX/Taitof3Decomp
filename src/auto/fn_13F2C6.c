@@ -1,7 +1,8 @@
 /* ROM 0x13F2C6: Task_StageTimeline (kernel slot 6). TaskStageTimeline_Frame is
  * verified on 20 loop passes (0x13F2CC..0x13F2CA trap, zone 4: the scroll/spawn
- * path, test "Task 0x13F2CC Timeline loop"); the init and the end-marker path
- * are UNVERIFIED (no capture).
+ * path, test "Task 0x13F2CC Timeline loop") and the init on 3 task starts
+ * (test "Task 0x13F2C6 Timeline init"). The end-marker path of the loop is
+ * covered by the 0x13F5B8 / 0x13DAD4 segments it calls into.
  * The pre-yield init runs the stage-start wrapper 0x13F428. Each frame advances
  * the 16.16 scroll position, and whenever its integer part crosses a script
  * entry it spawns the wave objects (0x0CC11C); when the end marker (negative

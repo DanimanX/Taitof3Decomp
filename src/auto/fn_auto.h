@@ -647,5 +647,34 @@ int Fn_162ED2(const f3mem_t *m, f3regs_t *r); /* ROM 0x162ED2 */
 int Fn_1672A8(const f3mem_t *m, f3regs_t *r); /* ROM 0x1672A8 */
 int Fn_192F02(const f3mem_t *m, f3regs_t *r); /* ROM 0x192F02 */
 int Fn_1985F6(const f3mem_t *m, f3regs_t *r); /* ROM 0x1985F6 */
+int Fn_193DB4(const f3mem_t *m, f3regs_t *r); /* ROM 0x193DB4 */
+int Fn_14B2FE(const f3mem_t *m, f3regs_t *r); /* ROM 0x14B2FE */
+int Fn_145654(const f3mem_t *m, f3regs_t *r); /* ROM 0x145654 */
+int Fn_112F42(const f3mem_t *m, f3regs_t *r); /* ROM 0x112F42 */
+int Fn_1176B4(const f3mem_t *m, f3regs_t *r); /* ROM 0x1176B4 */
+int Fn_11FA14(const f3mem_t *m, f3regs_t *r); /* ROM 0x11FA14 */
+int Fn_0C8BCE(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C8BCE */
+int Fn_1659B0(const f3mem_t *m, f3regs_t *r); /* ROM 0x1659B0 */
+int Fn_12C2EA(const f3mem_t *m, f3regs_t *r); /* ROM 0x12C2EA */
+int Fn_11F132(const f3mem_t *m, f3regs_t *r); /* ROM 0x11F132 */
+int Fn_0F618A(const f3mem_t *m, f3regs_t *r); /* ROM 0x0F618A */
+int Fn_11FA4C(const f3mem_t *m, f3regs_t *r); /* ROM 0x11FA4C */
+int Fn_11F9E2(const f3mem_t *m, f3regs_t *r); /* ROM 0x11F9E2 */
+int Fn_11FA30(const f3mem_t *m, f3regs_t *r); /* ROM 0x11FA30 */
+int Fn_11F21C(const f3mem_t *m, f3regs_t *r); /* ROM 0x11F21C */
+int Fn_1849AA(const f3mem_t *m, f3regs_t *r); /* ROM 0x1849AA */
+int Fn_11F0F4(const f3mem_t *m, f3regs_t *r); /* ROM 0x11F0F4 */
+int Fn_13AD8A(const f3mem_t *m, f3regs_t *r); /* ROM 0x13AD8A */
+int Fn_121254(const f3mem_t *m, f3regs_t *r); /* ROM 0x121254 */
+int Fn_0C793E(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C793E */
+int Fn_176710(const f3mem_t *m, f3regs_t *r); /* ROM 0x176710 */
+int Fn_0EBEF0(const f3mem_t *m, f3regs_t *r); /* ROM 0x0EBEF0 */
+int Fn_196C0A(const f3mem_t *m, f3regs_t *r); /* ROM 0x196C0A */
+int Fn_18301C(const f3mem_t *m, f3regs_t *r); /* ROM 0x18301C */
+int Fn_11F23C(const f3mem_t *m, f3regs_t *r); /* ROM 0x11F23C */
+int Fn_11F266(const f3mem_t *m, f3regs_t *r); /* ROM 0x11F266 */
+int Fn_1120A8(const f3mem_t *m, f3regs_t *r); /* ROM 0x1120A8 */
+int Fn_16099A(const f3mem_t *m, f3regs_t *r); /* ROM 0x16099A */
+int Fn_118242(const f3mem_t *m, f3regs_t *r); /* ROM 0x118242 */
 /* END generated */
 #endif

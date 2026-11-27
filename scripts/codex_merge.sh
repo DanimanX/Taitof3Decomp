@@ -9,7 +9,7 @@
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
 N=${1:?round}
-for w in X1 X2 X3; do
+for w in ${LANES:-X1 X2 X3}; do
   W=/PROCESOS/wt_$w; [ -d $W ] || continue
   (cd $W && make -s build/test_fn >/dev/null 2>&1; ./build/test_fn) > work/zcap/cmerge_$w.out 2>&1
 done
@@ -18,7 +18,7 @@ import os,re,shutil,subprocess,sys
 N=sys.argv[1]
 h=open('src/auto/fn_auto.h').read(); inc=open('tests/fn_auto.inc').read(); n=[]; held=[]
 os.makedirs('work/zcap/partial',exist_ok=True)
-for w in ['X1','X2','X3']:
+for w in os.environ.get('LANES','X1 X2 X3').split():
     W=f'/PROCESOS/wt_{w}'
     if not os.path.exists(f'work/zcap/codex{N}_{w}.list'): continue
     kinds=dict(l.split() for l in open(f'work/zcap/codex{N}_{w}.list') if l.strip())
@@ -29,7 +29,7 @@ for w in ['X1','X2','X3']:
         f=f'{W}/src/auto/fn_{a}.c'
         if not os.path.exists(f): held.append((a,'not written')); continue
         src=open(f).read()
-        if 'UNVERIFIED' not in src.split('\n',3)[0]+src.split('\n',3)[1]: held.append((a,'no UNVERIFIED tag')); shutil.copy(f,'work/zcap/partial/'); continue
+        if 'UNVERIFIED' not in '\n'.join(src.split('\n')[:6]): held.append((a,'no UNVERIFIED tag')); shutil.copy(f,'work/zcap/partial/'); continue
         c=subprocess.run(['cc','-std=c11','-O2','-Wall','-Wextra','-Werror','-iquote','src/auto','-c',f,'-o','/dev/null'],capture_output=True)
         if c.returncode: held.append((a,'does not build')); shutil.copy(f,'work/zcap/partial/'); continue
         line=[x for x in wi if f'fn_{a}"' in x]

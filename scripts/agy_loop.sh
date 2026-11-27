@@ -44,7 +44,7 @@ fi
 while :; do
   if [ "${RESUME:-0}" = 1 ]; then RESUME=0; say "merging round $N"
   else
-    say "round $N (sizes 1..$hi, model ${AGY_MODEL:-gemini-4-hydrogen-medium})"
+    say "round $N (sizes 1..$hi, engine ${ENGINE:-agy}, model ${AGY_MODEL:-gemini-4-hydrogen-medium}, minpairs ${MINPAIRS:-3})"
     out=$(scripts/agy_round.sh "$N" 1 "$hi" 2>&1); echo "$out" >> "$LOG"
     if echo "$out" | grep -q 'taking 0'; then say "pool empty, stopping"; break; fi
   fi
@@ -98,7 +98,7 @@ while :; do
   git add src/auto tests/fn_auto.inc docs/COVERAGE.md README.md
   git diff --cached --quiet && { say "round $N: nothing to commit, stopping"; break; }
   git commit -q -F - <<EOF
-feat: $merged routines from agy round $N (${AGY_MODEL:-gemini-4-hydrogen-medium})
+feat: $merged routines from round $N ($([ "${ENGINE:-agy}" = cw ] && echo codewhale deepseek-flash || echo ${AGY_MODEL:-gemini-4-hydrogen-medium}), >=${MINPAIRS:-3} captured calls)
 
 $new
 All bit-exact in test_fn (D0/D1/A0/A1 and all RAM), merged by

@@ -151,6 +151,15 @@ static int ad_11BC6E(const f3mem_t *m, f3regs_t *r)
     return 0;
 }
 
+/* Kernel task loop bodies (src/kernel/tasks.c, Task*_Frame in src/auto):
+ * captured from the instruction after the task's TRAP #5 to the next TRAP #5
+ * (scripts/capture_fn.sh <resume> <yield>, F3_NOIRQ=1), so one pair is one
+ * pass of the loop. Registers are scratch across a yield: RAM only. */
+#include "../src/kernel/tasks.h"
+static int ad_task_coll(const f3mem_t *m, f3regs_t *r) { (void)r; TaskCollision_Frame(m); return 0; }
+void TaskStageTimeline_Frame(const f3mem_t *m);
+static int ad_task_timeline(const f3mem_t *m, f3regs_t *r) { (void)r; TaskStageTimeline_Frame(m); return 0; }
+
 #define ALLREGS { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } }
 #ifdef FN1
 /* One-routine build for drafting (scripts/strata_fn.py):
@@ -188,6 +197,8 @@ static const fn_entry_t fns[] = {
     { "Fn 0x0D5B70 Obj_0D5B70_Step",  "work/ram/fn_0D5B70", ad_0D5B70, { { 0, 0u } } },
     { "Fn 0x11BC6E Obj_11BC6E_Wave",   "work/ram/fn_11BC6E", ad_11BC6E, { { CR_D0, 0xFFFFFFFFu } } },
     { "Fn 0x176390 LineFx_176390",     "work/ram/fn_176390", ad_176390, { { 0, 0u } } },
+    { "Task 0x0C63F2 Collision loop",  "work/ram/task_coll", ad_task_coll, { { 0, 0u } } },
+    { "Task 0x13F2CC Timeline loop",   "work/ram/task_timeline", ad_task_timeline, { { 0, 0u } } },
 };
 #endif
 

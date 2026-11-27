@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x1176B4: UNVERIFIED (no capture): Fill the object table with 0xFF and install its next callback. */
+/* ROM 0x1176B4: verified on a capture from the Y27d re-survey states (zone 27, input down): Fill the object table with 0xFF and install its next callback. */
 
 int Fn_1176B4(const f3mem_t *m, f3regs_t *r)
 {

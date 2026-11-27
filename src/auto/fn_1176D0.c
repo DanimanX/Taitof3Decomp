@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x1176D0: UNVERIFIED (no capture): record a circular nibble history and detect a five-code sequence. */
+/* ROM 0x1176D0: verified on a capture from the Y27d re-survey states (zone 27, input down): record a circular nibble history and detect a five-code sequence. */
 
 static uint32_t with_word(uint32_t reg, uint16_t word)
 {

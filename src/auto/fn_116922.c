@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x116922: UNVERIFIED (no capture): follow the boss target, update dive motion, and arm the next state. */
+/* ROM 0x116922: verified on a capture from the Y27d re-survey states (zone 27, input down): follow the boss target, update dive motion, and arm the next state. */
 #include "../objects/obj_shared_ext.h"
 
 static uint32_t with_word(uint32_t reg, uint16_t word)

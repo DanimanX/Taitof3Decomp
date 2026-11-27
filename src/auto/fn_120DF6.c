@@ -12,8 +12,8 @@ static uint32_t setw(uint32_t reg, uint16_t w)
 
 /* ROM 0x0CCC08: unpack +0x0C byte offsets into +0x50/+0x52 and angle into +0x20,
  * copy parent (+0x08) position +0x14/+0x18 and add offsets. */
-static void sub_0CCC08(const f3mem_t *m, uint32_t obj,
-                       uint32_t *d0_out, uint32_t *d1_out, uint32_t *a1_out)
+void FnAuto_InheritSpawnPosition(const f3mem_t *m, uint32_t obj,
+                                 uint32_t *d0_out, uint32_t *d1_out, uint32_t *a1_out)
 {
     uint32_t d0 = rd32(m, obj + 0x0Cu);                          /* 0x0CCC08 */
     int32_t dx = (int32_t)(int8_t)(uint8_t)(d0 >> 24);           /* 0x0CCC0C bfexts {0:8} */
@@ -55,7 +55,7 @@ int Fn_120DF6(const f3mem_t *m, f3regs_t *r)
     wr16(m, obj + 0x50u, 0xFFF2u);                               /* 0x120E16 */
     wr16(m, obj + 0x52u, 0xFFF4u);                               /* 0x120E1C */
 
-    sub_0CCC08(m, obj, &d0, &d1, &a1);                          /* 0x120E22 */
+    FnAuto_InheritSpawnPosition(m, obj, &d0, &d1, &a1);                          /* 0x120E22 */
 
     wr32(m, obj + 0x28u, 0x27100000u);                           /* 0x120E28 */
     wr32(m, obj + 0x24u, 0x00140000u);                           /* 0x120E30 */

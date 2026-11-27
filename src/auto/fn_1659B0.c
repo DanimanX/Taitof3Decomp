@@ -5,7 +5,7 @@
 
 /* ROM 0x0105EC: push the argument and JSR return address at the call site,
  * then reproduce the callee's MOVEM around the object pool helper. */
-static void free_object(const f3mem_t *m, f3regs_t *r, uint32_t obj, uint32_t ret)
+void FnAuto_FreeObject(const f3mem_t *m, f3regs_t *r, uint32_t obj, uint32_t ret)
 {
     uint32_t sp = r->a[7];
     wr32(m, sp - 4u, obj);
@@ -58,7 +58,7 @@ int Fn_1659B0(const f3mem_t *m, f3regs_t *r)
     }
 
     uint32_t sp = r->a[7];
-    free_object(m, r, rd32(m, r->a[5] + 0x3BBAu), 0x1659C2u); /* 0x1659B8 */
+    FnAuto_FreeObject(m, r, rd32(m, r->a[5] + 0x3BBAu), 0x1659C2u); /* 0x1659B8 */
 
     wr32(m, sp - 4u, r->a[0]);   /* 0x1659C6 MOVEM saves A0. */
     wr32(m, sp - 8u, 0x62A600u); /* 0x1659CA PEA */
@@ -77,6 +77,6 @@ int Fn_1659B0(const f3mem_t *m, f3regs_t *r)
     r->a[0] = rd32(m, sp - 4u); /* 0x1659DE MOVEM restores A0. */
 
     r->a[7] = sp;
-    free_object(m, r, r->a[0], 0x1659EAu); /* 0x1659E2 */
+    FnAuto_FreeObject(m, r, r->a[0], 0x1659EAu); /* 0x1659E2 */
     return 0;
 }

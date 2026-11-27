@@ -676,5 +676,39 @@ int Fn_11F266(const f3mem_t *m, f3regs_t *r); /* ROM 0x11F266 */
 int Fn_1120A8(const f3mem_t *m, f3regs_t *r); /* ROM 0x1120A8 */
 int Fn_16099A(const f3mem_t *m, f3regs_t *r); /* ROM 0x16099A */
 int Fn_118242(const f3mem_t *m, f3regs_t *r); /* ROM 0x118242 */
+int Fn_1203FE(const f3mem_t *m, f3regs_t *r); /* ROM 0x1203FE */
+int Fn_1609EC(const f3mem_t *m, f3regs_t *r); /* ROM 0x1609EC */
+int Fn_12AB7C(const f3mem_t *m, f3regs_t *r); /* ROM 0x12AB7C */
+int Fn_132752(const f3mem_t *m, f3regs_t *r); /* ROM 0x132752 */
+int Fn_11B78C(const f3mem_t *m, f3regs_t *r); /* ROM 0x11B78C */
+int Fn_002274(const f3mem_t *m, f3regs_t *r); /* ROM 0x002274 */
+int Fn_19B65A(const f3mem_t *m, f3regs_t *r); /* ROM 0x19B65A */
+int Fn_13AB36(const f3mem_t *m, f3regs_t *r); /* ROM 0x13AB36 */
+int Fn_120174(const f3mem_t *m, f3regs_t *r); /* ROM 0x120174 */
+int Fn_11A320(const f3mem_t *m, f3regs_t *r); /* ROM 0x11A320 */
+int Fn_10C818(const f3mem_t *m, f3regs_t *r); /* ROM 0x10C818 */
+int Fn_120C44(const f3mem_t *m, f3regs_t *r); /* ROM 0x120C44 */
+int Fn_1182A8(const f3mem_t *m, f3regs_t *r); /* ROM 0x1182A8 */
+int Fn_198CEC(const f3mem_t *m, f3regs_t *r); /* ROM 0x198CEC */
+int Fn_139FE4(const f3mem_t *m, f3regs_t *r); /* ROM 0x139FE4 */
+int Fn_14B1BE(const f3mem_t *m, f3regs_t *r); /* ROM 0x14B1BE */
+int Fn_120BD6(const f3mem_t *m, f3regs_t *r); /* ROM 0x120BD6 */
+int Fn_116922(const f3mem_t *m, f3regs_t *r); /* ROM 0x116922 */
+int Fn_10C178(const f3mem_t *m, f3regs_t *r); /* ROM 0x10C178 */
+int Fn_11F18E(const f3mem_t *m, f3regs_t *r); /* ROM 0x11F18E */
+int Fn_192954(const f3mem_t *m, f3regs_t *r); /* ROM 0x192954 */
+int Fn_1176D0(const f3mem_t *m, f3regs_t *r); /* ROM 0x1176D0 */
+int Fn_198904(const f3mem_t *m, f3regs_t *r); /* ROM 0x198904 */
+int Fn_13A0EE(const f3mem_t *m, f3regs_t *r); /* ROM 0x13A0EE */
+int Fn_14C04E(const f3mem_t *m, f3regs_t *r); /* ROM 0x14C04E */
+void FnAuto_PlayHooked(const f3mem_t *m, const f3regs_t *r, uint16_t cmd,
+                       uint32_t hook_return, uint32_t play_return);
+void FnAuto_FreeObject(const f3mem_t *m, f3regs_t *r, uint32_t obj, uint32_t return_addr);
+void FnAuto_QueuePalette(const f3mem_t *m, f3regs_t *r, uint32_t src,
+                         uint16_t dst, uint16_t count, uint32_t return_addr);
+void FnAuto_Angle(const f3mem_t *m, f3regs_t *r);
+void FnAuto_InheritSpawnPosition(const f3mem_t *m, uint32_t obj,
+                                 uint32_t *d0_out, uint32_t *d1_out, uint32_t *a1_out);
+void FnAuto_MoveByAngle(const f3mem_t *m, f3regs_t *r, uint16_t angle);
 /* END generated */
 #endif

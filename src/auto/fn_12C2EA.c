@@ -60,6 +60,20 @@ static void save_sound_frames(const f3mem_t *m, const f3regs_t *r, uint32_t sp,
     }
 }
 
+/* ROM 0x13F238 and 0x0039D8: push the command and simulate both calls. */
+void FnAuto_PlayHooked(const f3mem_t *m, const f3regs_t *r, uint16_t cmd,
+                       uint32_t hook_return, uint32_t play_return)
+{
+    uint32_t sp = r->a[7];
+    wr16(m, sp - 2u, cmd);
+    wr32(m, sp - 6u, hook_return);
+    if (rd8(m, r->a[5] + 0x3306u) != 0u && cmd >= 1u && cmd <= 0x40u)
+        wr16(m, sp - 2u, (uint16_t)(cmd + 0x53u));
+    wr32(m, sp - 6u, play_return);
+    save_sound_frames(m, r, sp - 6u, rd16(m, sp - 2u));
+    Sound_PlayHooked(m, cmd);
+}
+
 int Fn_12C2EA(const f3mem_t *m, f3regs_t *r)
 {
     uint32_t obj = r->a[0];
@@ -83,14 +97,7 @@ int Fn_12C2EA(const f3mem_t *m, f3regs_t *r)
         return 0;
     }
 
-    /* 0x12C2FA pushes the sound word. Both callees preserve the registers. */
-    wr16(m, sp - 2u, 0x2Bu);
-    wr32(m, sp - 6u, 0x12C304u);
-    if (rd8(m, globals + 0x3306u) != 0u)
-        wr16(m, sp - 2u, 0x7Eu); /* 0x13F254 remaps the word in place. */
-    wr32(m, sp - 6u, 0x12C30Au);
-    save_sound_frames(m, r, sp - 6u, rd16(m, sp - 2u));
-    Sound_PlayHooked(m, 0x2Bu);
+    FnAuto_PlayHooked(m, r, 0x2Bu, 0x12C304u, 0x12C30Au);
 
     wr16(m, obj + 6u, 0x14u); /* 0x12C30E clears Z. */
     wr32(m, obj, 0x12C31Eu);   /* 0x12C316 */

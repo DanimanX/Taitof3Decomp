@@ -106,7 +106,7 @@ static void explode_tick_regs(const f3mem_t *m, f3regs_t *r)
 }
 
 /* ROM 0x0CBE12 with D0/D1/D2/A3 register tracking. */
-static void move_by_angle_regs(const f3mem_t *m, f3regs_t *r, uint16_t ang)
+void FnAuto_MoveByAngle(const f3mem_t *m, f3regs_t *r, uint16_t ang)
 {
     uint32_t obj = r->a[0];
     int16_t speed = (int16_t)rd16(m, obj + 0x42u);
@@ -156,7 +156,7 @@ int Fn_120AEC(const f3mem_t *m, f3regs_t *r)
     }
 
     /* 0x120B1C -> 0x120BBA */
-    move_by_angle_regs(m, r, rd16(m, obj + 0x20u));       /* 0x120BBA..0x120BBE */
+    FnAuto_MoveByAngle(m, r, rd16(m, obj + 0x20u));       /* 0x120BBA..0x120BBE */
     uint32_t p = rd32(m, F3_A5 + 0x0906u);                /* 0x120BC4 */
     wr32(m, p, obj);                                      /* 0x120BC8 */
     wr32(m, F3_A5 + 0x0906u, p + 4u);                     /* 0x120BCA */

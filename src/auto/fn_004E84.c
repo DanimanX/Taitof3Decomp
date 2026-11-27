@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x004E84: UNVERIFIED (weak capture): copy default settings fields and update their checksum. */
+/* ROM 0x004E84: verified on an injected capture (F3_INJECT, fni_004E84; an empty body fails it): copy default settings fields and update their checksum. */
 #include "fn_call_frames.h"
 
 static void copy_bits(const f3mem_t *m, uint32_t dst, uint32_t src, uint8_t mask)

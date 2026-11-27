@@ -1,6 +1,6 @@
 #include "fn_auto.h"
 
-/* ROM 0x004F58: UNVERIFIED (weak capture): restore EEPROM settings fields and regenerate their checksum. */
+/* ROM 0x004F58: verified on an injected capture (F3_INJECT, fni_004F58; an empty body fails it): restore EEPROM settings fields and regenerate their checksum. */
 
 static void copy_field(const f3mem_t *m, uint32_t dst, uint32_t src, uint8_t mask)
 {

@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x000F04: UNVERIFIED (weak capture): update the coin-channel hold timer. */
+/* ROM 0x000F04: verified on an injected capture (F3_INJECT, fni_000F04; an empty body fails it): update the coin-channel hold timer. */
 
 int Fn_000F04(const f3mem_t *m, f3regs_t *r)
 {

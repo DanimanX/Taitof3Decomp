@@ -1,5 +1,8 @@
 #include "fn_auto.h"
-/* ROM 0x002274: UNVERIFIED (no capture): Scan runnable tasks, update sleep timers, and restore the selected task or idle context. */
+/* ROM 0x002274: scheduler loop. Scan runnable tasks, update sleep timers, and
+ * restore the selected task or idle context, up to (not including) the RTE at
+ * 0x0022DC (task) or 0x002310 (idle). Verified 40/40 (tests/test_fn.c,
+ * work/ram/seg_002274: 36 task, 4 idle restores). */
 
 int Fn_002274(const f3mem_t *m, f3regs_t *r)
 {
@@ -54,8 +57,8 @@ int Fn_002274(const f3mem_t *m, f3regs_t *r)
         r->d[i] = rd32(m, saved_sp + 4u * i);
     for (unsigned i = 0; i < 7; ++i)
         r->a[i] = rd32(m, saved_sp + 32u + 4u * i);
-    /* 0x0022DC / 0x002310 RTE consumes the scheduler's 8-byte format-0 frame.
-     * Its SR and PC are outside f3regs_t. */
-    r->a[7] = saved_sp + 60u + 8u;
+    /* Stops at the RTE (0x0022DC / 0x002310); its SR/PC frame stays on the
+     * restored stack, so A7 points at it. */
+    r->a[7] = saved_sp + 60u;
     return 0;
 }

@@ -1,3 +1,5 @@
+/* Superseded by src/stage/seg_0B8404.c (segments, verified on captures); this
+ * whole-routine form ignores the TRAP #4/#5 yields. */
 /* ROM 0x0B8404: UNVERIFIED (no capture): attract/title task (kernel slot 1).
  * The pre-yield init (0x0B8404 bsr 0x0B842E) reloads sound bank 0, clears the
  * sprite list and every playfield layer. The 0x0B8408 frame paints the legal

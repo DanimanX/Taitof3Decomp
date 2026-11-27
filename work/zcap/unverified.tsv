@@ -3,6 +3,4 @@
 14C04E	nocapture	codex round 2
 0C63E8	nocapture	Claude (task body; loop verified, init not)
 010502	nocapture	Claude (task body, src/kernel/tasks.c)
-0B8404	nocapture	codewhale (task body)
-0B935A	nocapture	codewhale (task body)
 13F2C6	nocapture	codewhale (task body; loop verified, init and stage-end path not)

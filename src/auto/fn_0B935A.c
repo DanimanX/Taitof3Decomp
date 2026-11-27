@@ -1,3 +1,5 @@
+/* Superseded by src/stage/seg_0B935A.c (segments, verified on captures); this
+ * whole-routine form ignores the TRAP #4/#5 yields. */
 /* ROM 0x0B935A: UNVERIFIED (no capture): Task_0B935A (kernel slot 2), the
  * attract-mode stage task. The pre-yield setup (0x0B935A..0x0B93E2) spawns the
  * object-pool runner, reloads sound bank 0, starts effect B(7), clears line

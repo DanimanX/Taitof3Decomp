@@ -297,6 +297,8 @@ static const fn_entry_t fns[] = {
     { "Seg 0x0B956C 0B935A group",  "work/ram/seg_0B956C", ad_seg, SEGREGS },
     { "Seg 0x0B958C 0B935A group",  "work/ram/seg_0B958C", ad_seg, SEGREGS },
     { "Seg 0x0B9632 0B935A group",  "work/ram/seg_0B9632", ad_seg, SEGREGS },
+    { "Seg 0x19F708 19F708 group",  "work/ram/seg_19F708", ad_seg, SEGREGS },
+    { "Seg 0x19F748 19F708 group",  "work/ram/seg_19F748", ad_seg, SEGREGS },
     { "Task 0x0C63E8 Collision init",  "work/ram/task_init_coll", ad_task_coll_init, { { 0, 0u } } },
     { "Kernel 0x00222E preempt Z01",    "work/ram/fn_00222E", ad_k_00222E, SEGREGS },
     { "Kernel 0x00222E preempt Z04",    "work/ram/fn_00222E_z04", ad_k_00222E, SEGREGS },

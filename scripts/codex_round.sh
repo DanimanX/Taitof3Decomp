@@ -6,6 +6,7 @@
 #   capture   : captured routines codewhale/agy failed or never finished
 # 10 per lane, smallest first. Marks them 'codex' in strata_results.tsv so the
 # codewhale/agy rounds skip them. Prompt: work/zcap/codex_prompt.txt.
+# Model: CODEX_MODEL (default gpt-reserve, the cheap one; gpt-6.2-sol for hard rounds).
 # Logs: work/zcap/codexN_X*.log. Merge afterwards with scripts/codex_merge.sh.
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
@@ -41,6 +42,6 @@ for w in X1 X2 X3; do
 done
 for w in X1 X2 X3; do
   W=/PROCESOS/wt_$w; [ -s work/zcap/codex${N}_$w.list ] || continue
-  codex exec -s workspace-write -c model_reasoning_effort="${CODEX_EFFORT:-medium}" -C $W "$(sed "s|WTDIR|$W|" work/zcap/codex_prompt.txt)" > work/zcap/codex${N}_$w.log 2>&1 &
+  codex exec -s workspace-write -m "${CODEX_MODEL:-gpt-reserve}" -c model_reasoning_effort="${CODEX_EFFORT:-medium}" -C $W "$(sed "s|WTDIR|$W|" work/zcap/codex_prompt.txt)" > work/zcap/codex${N}_$w.log 2>&1 &
 done; wait
 echo "codex round $N done"

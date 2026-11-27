@@ -10,5 +10,9 @@ uint32_t Seg_Run(const f3mem_t *m, f3regs_t *r, uint32_t pc)
         return Seg_13DAD4(m, r, pc);
     if (pc >= 0x0013D69Au && pc < 0x0013D79Au)
         return Seg_13D69A(m, r, pc);
+    if (pc >= 0x000B8404u && pc < 0x000B935Au)
+        return Seg_0B8404(m, r, pc);
+    if (pc >= 0x000B935Au && pc < 0x000B9682u)
+        return Seg_0B935A(m, r, pc);
     return SEG_LEAVE;
 }

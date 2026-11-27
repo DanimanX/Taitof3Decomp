@@ -31,6 +31,8 @@ uint32_t Seg_Run(const f3mem_t *m, f3regs_t *r, uint32_t pc);
 uint32_t Seg_13F5B8(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* stage outro */
 uint32_t Seg_13DAD4(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* stage end */
 uint32_t Seg_13D69A(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* high-score name entry */
+uint32_t Seg_0B935A(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* ending task 0x0B935A */
+uint32_t Seg_0B8404(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* attract / title sequencer (Task_Attract) */
 
 static inline void seg_push32(const f3mem_t *m, f3regs_t *r, uint32_t v)
 {

@@ -717,5 +717,7 @@ void TaskStageTimeline_Frame(const f3mem_t *m); /* ROM 0x13F2CA loop body */
 int Fn_13F5B8(const f3mem_t *m, f3regs_t *r); /* ROM 0x13F5B8 */
 int Fn_0B935A(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B935A */
 int Task0B935A_Frame(const f3mem_t *m); /* ROM 0x0B93E6 loop body */
+int Fn_13D19E(const f3mem_t *m, f3regs_t *r); /* ROM 0x13D19E */
+int Fn_13D1E6(const f3mem_t *m, f3regs_t *r); /* ROM 0x13D1E6 */
 /* END generated */
 #endif

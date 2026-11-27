@@ -206,8 +206,12 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
     uint8_t *w = malloc(F3_WRAM_SIZE);
     uint8_t *g = c.gfx ? malloc(F3_GFX_SIZE) : NULL;
     uint8_t *s = c.spr ? malloc(F3_SPR_SIZE) : NULL;
-    int ok = 0, undec = 0, budget = 12;
+    int ok = 0, undec = 0, irq = 0, budget = 12;
     for (int i = 0; i < c.pairs; i++) {
+        /* a call whose post dump is in a later frame than its pre dump was
+         * interrupted by VBlank: the IRQ handler's writes (frame counter,
+         * task mask, ...) are in the post state, so no routine can match it */
+        if (c.fpre && c.fpre[i] != c.fpost[i]) { irq++; continue; }
         memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
         if (g) memcpy(g, cap_gfx(&c, i, 0), F3_GFX_SIZE);
         if (s) memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
@@ -232,10 +236,12 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         }
         if (d == 0) ok++;
     }
-    int obs = c.pairs - undec;
-    printf("fn: %-34s %3d/%3d calls bit-exact (%d undecompiled, gfx %s, spr %s)%s\n",
+    int obs = c.pairs - undec - irq;
+    printf("fn: %-34s %3d/%3d calls bit-exact (%d undecompiled, gfx %s, spr %s)%s",
            e->name, ok, obs, undec, g ? "yes" : "no", s ? "yes" : "no",
            obs == 0 ? " REJECT no observable call" : "");
+    if (irq) printf(" [%d interrupted by VBlank, skipped]", irq);
+    printf("\n");
     free(w); free(g); free(s); cap_free(&c);
     return (obs - ok) + (obs == 0 ? 1 : 0);
 }

@@ -1,6 +1,6 @@
 #include "fn_auto.h"
 
-/* ROM 0x11F23C: UNVERIFIED (no capture): advance the shared position and start the next timed state when the countdown expires. */
+/* ROM 0x11F23C: verified on a capture from the Y04 re-survey states: advance the shared position and start the next timed state when the countdown expires. */
 #include "../player/player_move.h"
 
 /* ROM 0x11B262: step the shared position, including the 0x0CBE12 call frame. */

@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x11F18E: UNVERIFIED (no capture): swing the camera, accelerate the angle, and trigger the next state. */
+/* ROM 0x11F18E: verified on a capture from the Y04 re-survey states: swing the camera, accelerate the angle, and trigger the next state. */
 
 int Fn_11F18E(const f3mem_t *m, f3regs_t *r)
 {

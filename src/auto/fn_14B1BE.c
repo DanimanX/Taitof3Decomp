@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x14B1BE: UNVERIFIED (no capture): Wait for the countdown, reset layer scroll, draw the background, and queue a palette fade. */
+/* ROM 0x14B1BE: verified on a capture from the Y04 re-survey states: Wait for the countdown, reset layer scroll, draw the background, and queue a palette fade. */
 #include "batch_obj_regs.h"
 #include "../objects/obj_common.h"
 #include "../objects/obj_shared_ext.h"
@@ -81,7 +81,9 @@ int Fn_14B1BE(const f3mem_t *m, f3regs_t *r)
     r->a[0] = r->a[5] + 0x422Cu;
     wr32(m, sp - 4u, 0xFFF80000u);
     wr32(m, sp - 8u, 0u);
-    r->d[1] = 0xFFF80000u;
+    /* 0x14B1F6/0x14B1F8: the last push (0) pops into D1, -0x80000 into D0. */
+    r->d[1] = 0u;
+    r->d[0] = 0xFFF80000u;
     wr32(m, sp - 4u, 0x14B200u);
     Obj_16AB26(m, r->a[0], r->d[0], r->d[1]);
     r->a[0] += 4u;

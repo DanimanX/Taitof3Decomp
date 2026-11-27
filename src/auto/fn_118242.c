@@ -1,6 +1,6 @@
 #include "fn_auto.h"
 
-/* ROM 0x118242: UNVERIFIED (no capture): initialize the sprite and jitter its packed coordinates. */
+/* ROM 0x118242: verified on a capture from the Y04 re-survey states: initialize the sprite and jitter its packed coordinates. */
 
 /* ROM 0x11825E / 0x11826E: call the RNG and add its signed jitter word. */
 static void jitter_coordinate(const f3mem_t *m, f3regs_t *r,

@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x11FA14: UNVERIFIED (no capture): Count down before setting a stage flag and starting a new timer. */
+/* ROM 0x11FA14: verified on a capture from the Y04 re-survey states: Count down before setting a stage flag and starting a new timer. */
 
 int Fn_11FA14(const f3mem_t *m, f3regs_t *r)
 {

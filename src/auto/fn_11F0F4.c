@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x11F0F4: UNVERIFIED (no capture): jitter the shared X position when enabled and advance the timed state. */
+/* ROM 0x11F0F4: verified on a capture from the Y04 re-survey states: jitter the shared X position when enabled and advance the timed state. */
 
 int Fn_11F0F4(const f3mem_t *m, f3regs_t *r)
 {

@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x11FA30: UNVERIFIED (no capture): count down before clearing a flag and starting the 30-frame 0x11FA4C state. */
+/* ROM 0x11FA30: verified on a capture from the Y04 re-survey states: count down before clearing a flag and starting the 30-frame 0x11FA4C state. */
 
 int Fn_11FA30(const f3mem_t *m, f3regs_t *r)
 {

@@ -1,6 +1,6 @@
 #include "fn_auto.h"
 
-/* ROM 0x11F266: UNVERIFIED (no capture): jitter the shared X position and transition when the timer expires. */
+/* ROM 0x11F266: verified on a capture from the Y04 re-survey states: jitter the shared X position and transition when the timer expires. */
 
 /* ROM 0x11EEE0: set the exit flags and choose the next horizontal motion. */
 static void finish_wait(const f3mem_t *m, uint32_t obj, uint32_t a5)

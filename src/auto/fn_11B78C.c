@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x11B78C: UNVERIFIED (no capture): Initialize a child at its parent's position and seed its delay and heading. */
+/* ROM 0x11B78C: verified on a capture from the Y04 re-survey states: Initialize a child at its parent's position and seed its delay and heading. */
 #include "fn_call_frames.h"
 #include "../objects/obj_common.h"
 

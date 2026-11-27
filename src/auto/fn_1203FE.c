@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x1203FE: UNVERIFIED (no capture): Spawn an effect, move and draw the part, then re-arm or free it. */
+/* ROM 0x1203FE: verified on a capture from the Y04 re-survey states: Spawn an effect, move and draw the part, then re-arm or free it. */
 #include "fn_sprite_regs.h"
 #include "../player/player_move.h"
 #include "../objects/obj_shared_ext.h"

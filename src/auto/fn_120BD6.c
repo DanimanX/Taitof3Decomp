@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x120BD6: UNVERIFIED (no capture): initialize a projectile from its parent and set its velocity. */
+/* ROM 0x120BD6: verified on a capture from the Y04 re-survey states: initialize a projectile from its parent and set its velocity. */
 
 static uint32_t with_word(uint32_t reg, uint16_t word)
 {

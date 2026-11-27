@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x14B2FE: UNVERIFIED (no capture): Return the current object to the pool. */
+/* ROM 0x14B2FE: verified on a capture from the Y04 re-survey states: Return the current object to the pool. */
 #include "../objects/obj_pool.h"
 
 int Fn_14B2FE(const f3mem_t *m, f3regs_t *r)

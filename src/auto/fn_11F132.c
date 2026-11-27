@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x11F132: UNVERIFIED (no capture): Jitter the stage coordinate while counting down, then initialize the object's movement. */
+/* ROM 0x11F132: verified on a capture from the Y04 re-survey states: Jitter the stage coordinate while counting down, then initialize the object's movement. */
 
 int Fn_11F132(const f3mem_t *m, f3regs_t *r)
 {

@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x11F9E2: UNVERIFIED (no capture): count down, then clear the active flag, set the completion flag and install 0x11F7BE. */
+/* ROM 0x11F9E2: verified on a capture from the Y04 re-survey states: count down, then clear the active flag, set the completion flag and install 0x11F7BE. */
 
 int Fn_11F9E2(const f3mem_t *m, f3regs_t *r)
 {

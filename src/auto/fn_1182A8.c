@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x1182A8: UNVERIFIED (no capture): Decay the horizontal zoom, clamp the sprite to the viewport, and draw or free it. */
+/* ROM 0x1182A8: verified on a capture from the Y04 re-survey states: Decay the horizontal zoom, clamp the sprite to the viewport, and draw or free it. */
 #include "batch_obj_regs.h"
 
 static uint16_t clamp_word(uint16_t value, uint16_t low, uint16_t high)

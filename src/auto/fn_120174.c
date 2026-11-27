@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x120174: UNVERIFIED (no capture): Spawn a trail particle, move and draw the object, and free it outside the playfield. */
+/* ROM 0x120174: verified on a capture from the Y04 re-survey states: Spawn a trail particle, move and draw the object, and free it outside the playfield. */
 #include "batch_obj_regs.h"
 #include "../objects/obj_shared_ext.h"
 #include "../player/player_move.h"

@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x120C44: UNVERIFIED (no capture): Integrate the falling hazard, draw it, and switch to its exit animation or explosion. */
+/* ROM 0x120C44: verified on a capture from the Y04 re-survey states: Integrate the falling hazard, draw it, and switch to its exit animation or explosion. */
 #include "batch_obj_regs.h"
 #include "../objects/obj_shared.h"
 

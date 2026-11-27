@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x11F21C: UNVERIFIED (no capture): advance the shared coordinates by angle, then change state when the timer expires. */
+/* ROM 0x11F21C: verified on a capture from the Y04 re-survey states: advance the shared coordinates by angle, then change state when the timer expires. */
 #include "../player/player_move.h"
 
 /* 0x11B262: stage the shared coordinates in the object for 0x0CBE12. */

@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x11FA4C: UNVERIFIED (no capture): count down, then set the completion flag and install 0x11F7BE. */
+/* ROM 0x11FA4C: verified on a capture from the Y04 re-survey states: count down, then set the completion flag and install 0x11F7BE. */
 
 int Fn_11FA4C(const f3mem_t *m, f3regs_t *r)
 {

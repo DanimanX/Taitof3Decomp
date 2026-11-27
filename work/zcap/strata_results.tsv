@@ -1,0 +1,986 @@
+1379CC	146	accepted	20/20 undec=0 try=0 222s
+13AE20	146	fail	TIMEOUT: the translation loops forever on the captured input try=1 572s
+193DB4	2	weak	empty draft passes the capture
+113300	4	fail	TIMEOUT: the translation loops forever on the captured input try=1 609s
+15F952	8	accepted	20/20 undec=0 try=0 29s
+15F766	8	accepted	20/20 undec=0 try=0 24s
+17B19E	8	accepted	20/20 undec=0 try=0 25s
+1633C4	8	accepted	20/20 undec=0 try=0 30s
+1333C2	10	accepted	20/20 undec=0 try=0 125s
+138382	14	accepted	20/20 undec=0 try=0 50s
+13C9F8	14	accepted	6/6 undec=0 try=0 53s
+13A796	14	accepted	20/20 undec=0 try=0 49s
+13B8A6	14	accepted	3/3 undec=0 try=0 75s
+193F22	14	accepted	9/9 undec=0 try=0 50s
+11CDD8	16	accepted	20/20 undec=0 try=0 128s
+11F8CA	16	accepted	20/20 undec=0 try=1 120s
+19A1A0	16	accepted	4/4 undec=0 try=0 80s
+181556	18	accepted	20/20 undec=0 try=0 52s
+18E196	20	accepted	20/20 undec=0 try=0 89s
+137A38	20	accepted	20/20 undec=0 try=0 71s
+19A1B0	20	accepted	20/20 undec=0 try=1 170s
+133046	20	accepted	20/20 undec=0 try=0 67s
+11CCAA	22	accepted	20/20 undec=0 try=0 60s
+12477E	22	accepted	20/20 undec=0 try=0 69s
+137A92	24	accepted	20/20 undec=0 try=0 70s
+196C0A	24	weak	empty draft passes the capture
+18E7CE	26	accepted	20/20 undec=0 try=0 85s
+137C8A	26	accepted	20/20 undec=0 try=0 77s
+137B9C	26	accepted	20/20 undec=0 try=1 368s
+11F868	28	accepted	20/20 undec=0 try=1 229s
+11F8AE	28	accepted	20/20 undec=0 try=0 82s
+137D5A	28	accepted	20/20 undec=0 try=0 128s
+137D3E	28	accepted	20/20 undec=0 try=0 127s
+13794C	28	accepted	20/20 undec=0 try=0 126s
+11BA46	30	accepted	20/20 undec=0 try=0 65s
+137542	30	accepted	20/20 undec=0 try=0 54s
+18301C	30	weak	empty draft passes the capture
+1330D0	30	accepted	20/20 undec=0 try=1 284s
+121B60	32	accepted	20/20 undec=0 try=0 98s
+1332BA	32	accepted	20/20 undec=0 try=0 105s
+196BE8	34	accepted	20/20 undec=0 try=0 74s
+132F06	34	accepted	20/20 undec=0 try=0 143s
+10C800	24	fail	COMPILE ERROR: try=2 476s
+101FF8	24	fail	0/20 undec=0 try=1 122s
+10C160	24	fail	0/4 undec=0 try=2 420s
+10E5C8	24	fail	COMPILE ERROR: try=2 449s
+11F84C	28	fail	19/20 undec=0 try=2 362s
+137B80	28	accepted	20/20 undec=0 try=0 121s
+17A85C	28	accepted	20/20 undec=0 try=0 76s
+11F9AA	30	fail	18/20 undec=0 try=2 444s
+1292A8	30	accepted	20/20 undec=0 try=2 679s
+13334E	34	accepted	20/20 undec=0 try=0 119s
+133240	34	accepted	20/20 undec=0 try=0 125s
+1226E6	36	accepted	20/20 undec=0 try=0 80s
+121AEE	36	accepted	20/20 undec=0 try=1 221s
+137BF2	36	accepted	20/20 undec=0 try=0 135s
+16716E	36	fail	0/20 undec=0 try=2 392s
+16374A	36	accepted	20/20 undec=0 try=2 404s
+121C60	38	accepted	20/20 undec=0 try=0 92s
+133370	38	accepted	20/20 undec=0 try=2 509s
+1378F6	40	accepted	20/20 undec=0 try=0 200s
+102278	40	fail	0/5 undec=0 try=2 494s
+122E50	300	agy	assigned to agy hydrogen
+122208	300	agy	assigned to agy hydrogen
+11320A	300	agy	assigned to agy hydrogen
+123D98	298	agy	assigned to agy hydrogen
+110C9C	294	agy	assigned to agy hydrogen
+12314C	292	agy	assigned to agy hydrogen
+110EC6	292	agy	assigned to agy hydrogen
+104790	290	agy	assigned to agy hydrogen
+10D18A	288	agy	assigned to agy hydrogen
+10BE6C	276	agy	assigned to agy hydrogen
+10C548	274	agy	assigned to agy hydrogen
+1656E2	268	agy	assigned to agy hydrogen
+10F41A	266	agy	assigned to agy hydrogen
+1384B0	258	agy	assigned to agy hydrogen
+12B7D4	258	agy	assigned to agy hydrogen
+12001C	256	agy	assigned to agy hydrogen
+11D88A	254	agy	assigned to agy hydrogen
+13B2B0	246	agy	assigned to agy hydrogen
+181EA0	246	agy	assigned to agy hydrogen
+13B3A6	242	agy	assigned to agy hydrogen
+133326	40	accepted	20/20 undec=0 try=0 147s
+133218	40	accepted	20/20 undec=0 try=0 126s
+11F884	42	accepted	20/20 undec=0 try=1 211s
+132F9C	42	accepted	20/20 undec=0 try=1 249s
+138470	44	accepted	3/3 undec=0 try=0 110s
+1849AA	44	weak	empty draft passes the capture
+13A6A2	240	agy	assigned to agy hydrogen (round 2)
+12AA8E	238	agy	assigned to agy hydrogen (round 2)
+196C86	230	agy	assigned to agy hydrogen (round 2)
+11BB3C	222	agy	assigned to agy hydrogen (round 2)
+13C2D4	222	agy	assigned to agy hydrogen (round 2)
+198904	222	agy	assigned to agy hydrogen (round 2)
+139FE4	220	agy	assigned to agy hydrogen (round 2)
+121158	216	agy	assigned to agy hydrogen (round 2)
+19B65A	210	agy	assigned to agy hydrogen (round 2)
+12B4EC	206	agy	assigned to agy hydrogen (round 2)
+13BA06	200	agy	assigned to agy hydrogen (round 2)
+105B54	192	agy	assigned to agy hydrogen (round 2)
+1800C8	190	agy	assigned to agy hydrogen (round 2)
+11EE42	188	agy	assigned to agy hydrogen (round 2)
+105898	188	agy	assigned to agy hydrogen (round 2)
+198CEC	182	agy	assigned to agy hydrogen (round 2)
+130F58	182	agy	assigned to agy hydrogen (round 2)
+10C242	178	agy	assigned to agy hydrogen (round 2)
+182026	178	agy	assigned to agy hydrogen (round 2)
+1387F0	176	agy	assigned to agy hydrogen (round 2)
+1671A0	44	accepted	20/20 undec=0 try=2 459s
+16714A	44	accepted	20/20 undec=0 try=0 135s
+1021C8	44	fail	0/20 undec=0 try=2 532s
+13314C	44	accepted	20/20 undec=0 try=0 177s
+19B65A	0	weak	agy draft passes but capture shows no RAM effect; needs a better capture
+198CEC	0	weak	agy draft passes but capture shows no RAM effect; needs a better capture
+198904	0	weak	agy draft passes but capture shows no RAM effect; needs a better capture
+139FE4	0	weak	agy draft passes but capture shows no RAM effect; needs a better capture
+182D24	176	agy	assigned to agy hydrogen (round 3)
+12031A	174	agy	assigned to agy hydrogen (round 3)
+11D980	172	agy	assigned to agy hydrogen (round 3)
+1608EE	172	agy	assigned to agy hydrogen (round 3)
+10ECF6	170	agy	assigned to agy hydrogen (round 3)
+19A1E6	170	agy	assigned to agy hydrogen (round 3)
+17BEC8	170	agy	assigned to agy hydrogen (round 3)
+12EFFE	170	agy	assigned to agy hydrogen (round 3)
+14F1A6	164	agy	assigned to agy hydrogen (round 3)
+19D7D2	164	agy	assigned to agy hydrogen (round 3)
+18E05C	162	agy	assigned to agy hydrogen (round 3)
+124800	162	agy	assigned to agy hydrogen (round 3)
+194860	158	agy	assigned to agy hydrogen (round 3)
+10F2EE	156	agy	assigned to agy hydrogen (round 3)
+192954	154	agy	assigned to agy hydrogen (round 3)
+11DBBA	150	agy	assigned to agy hydrogen (round 3)
+11FB0A	150	agy	assigned to agy hydrogen (round 3)
+13801E	150	agy	assigned to agy hydrogen (round 3)
+13C3AA	148	agy	assigned to agy hydrogen (round 3)
+19F0CE	148	agy	assigned to agy hydrogen (round 3)
+10D672	398	agy	assigned to agy hydrogen (round 3)
+195BAA	414	agy	assigned to agy hydrogen (round 3)
+1982DE	430	agy	assigned to agy hydrogen (round 3)
+19D1EE	442	agy	assigned to agy hydrogen (round 3)
+120E72	448	agy	assigned to agy hydrogen (round 3)
+1657EE	450	agy	assigned to agy hydrogen (round 3)
+1031A2	456	agy	assigned to agy hydrogen (round 3)
+1897D8	472	agy	assigned to agy hydrogen (round 3)
+103714	474	agy	assigned to agy hydrogen (round 3)
+19D876	490	agy	assigned to agy hydrogen (round 3)
+13328E	44	fail	COMPILE ERROR: try=2 425s
+133396	44	accepted	20/20 undec=0 try=0 129s
+133262	44	accepted	20/20 undec=0 try=0 104s
+1330EE	44	accepted	20/20 undec=0 try=1 334s
+11F91E	46	accepted	20/20 undec=0 try=0 110s
+137968	46	accepted	20/20 undec=0 try=0 111s
+12478C	46	accepted	20/20 undec=0 try=0 168s
+102198	48	fail	0/20 undec=0 try=2 417s
+132EDE	48	fail	0/20 undec=0 try=2 334s
+192954	0	weak	agy draft passes but capture shows no RAM effect
+110DCC	250	agy	assigned to agy hydrogen (round 4)
+10F90A	214	agy	assigned to agy hydrogen (round 4)
+1812FE	200	agy	assigned to agy hydrogen (round 4)
+12F0A8	148	agy	assigned to agy hydrogen (round 4)
+13AE20	146	agy	assigned to agy hydrogen (round 4)
+19AE0E	146	agy	assigned to agy hydrogen (round 4)
+183C32	144	agy	assigned to agy hydrogen (round 4)
+10F38A	144	agy	assigned to agy hydrogen (round 4)
+11CD0E	142	agy	assigned to agy hydrogen (round 4)
+112376	142	agy	assigned to agy hydrogen (round 4)
+13486A	142	agy	assigned to agy hydrogen (round 4)
+19EFB8	142	agy	assigned to agy hydrogen (round 4)
+163528	142	agy	assigned to agy hydrogen (round 4)
+13B0E0	140	agy	assigned to agy hydrogen (round 4)
+13C652	140	agy	assigned to agy hydrogen (round 4)
+13B822	140	agy	assigned to agy hydrogen (round 4)
+15F76E	138	agy	assigned to agy hydrogen (round 4)
+163498	138	agy	assigned to agy hydrogen (round 4)
+1225B4	136	agy	assigned to agy hydrogen (round 4)
+11BA5C	136	agy	assigned to agy hydrogen (round 4)
+13B8B4	338	agy	assigned to agy hydrogen (round 4)
+13811A	492	agy	assigned to agy hydrogen (round 4)
+164692	520	agy	assigned to agy hydrogen (round 4)
+13AB36	534	agy	assigned to agy hydrogen (round 4)
+10F9E0	538	agy	assigned to agy hydrogen (round 4)
+199BE6	538	agy	assigned to agy hydrogen (round 4)
+1980AE	556	agy	assigned to agy hydrogen (round 4)
+122384	560	agy	assigned to agy hydrogen (round 4)
+192CC8	578	agy	assigned to agy hydrogen (round 4)
+11FBEC	582	agy	assigned to agy hydrogen (round 4)
+10E698	48	fail	0/20 undec=0 try=2 442s
+13CB3A	28	fail	0/4 undec=0 try=1 140s
+10E76A	48	fail	0/20 undec=0 try=2 449s
+13AB36	0	weak	agy draft passes but capture shows no RAM effect
+123F2C	134	agy	assigned to agy hydrogen (round 5)
+1674CC	134	agy	assigned to agy hydrogen (round 5)
+12D5C4	134	agy	assigned to agy hydrogen (round 5)
+198FBE	132	agy	assigned to agy hydrogen (round 5)
+16743A	132	agy	assigned to agy hydrogen (round 5)
+163026	132	agy	assigned to agy hydrogen (round 5)
+10C818	130	agy	assigned to agy hydrogen (round 5)
+137F9C	130	agy	assigned to agy hydrogen (round 5)
+10C178	130	agy	assigned to agy hydrogen (round 5)
+10E5E0	130	agy	assigned to agy hydrogen (round 5)
+132752	130	agy	assigned to agy hydrogen (round 5)
+10F706	128	agy	assigned to agy hydrogen (round 5)
+12AB7C	128	agy	assigned to agy hydrogen (round 5)
+1630D2	128	agy	assigned to agy hydrogen (round 5)
+120DF6	124	agy	assigned to agy hydrogen (round 5)
+1840A6	124	agy	assigned to agy hydrogen (round 5)
+1375FC	124	agy	assigned to agy hydrogen (round 5)
+12937E	124	agy	assigned to agy hydrogen (round 5)
+193974	120	agy	assigned to agy hydrogen (round 5)
+12EF86	120	agy	assigned to agy hydrogen (round 5)
+110756	608	agy	assigned to agy hydrogen (round 5)
+110328	696	agy	assigned to agy hydrogen (round 5)
+18767C	700	agy	assigned to agy hydrogen (round 5)
+10E9E2	714	agy	assigned to agy hydrogen (round 5)
+103D0A	760	agy	assigned to agy hydrogen (round 5)
+12296E	812	agy	assigned to agy hydrogen (round 5)
+19C304	836	agy	assigned to agy hydrogen (round 5)
+12A666	944	agy	assigned to agy hydrogen (round 5)
+1957AE	1028	agy	assigned to agy hydrogen (round 5)
+193F30	1168	agy	assigned to agy hydrogen (round 5)
+12D594	48	fail	0/20 undec=0 try=2 570s
+193D82	50	accepted	9/9 undec=0 try=0 94s
+12AB7C	0	weak	agy draft passes but capture shows no RAM effect
+10C818	0	weak	agy draft passes but capture shows no RAM effect
+10C178	0	weak	agy draft passes but capture shows no RAM effect
+132752	0	weak	agy draft passes but capture shows no RAM effect
+1375FC	0	fail	agy round 5 stopped at 0/20 (quota)
+19ADE4	50	fail	no output try=1 151s
+1375FC	124	agy	assigned to agy hydrogen (round 6)
+1375FC	124	agy	assigned to agy hydrogen (round 6)
+11A320	118	agy	assigned to agy hydrogen (round 6)
+130EE2	118	agy	assigned to agy hydrogen (round 6)
+11FEDE	116	agy	assigned to agy hydrogen (round 6)
+1609EC	116	agy	assigned to agy hydrogen (round 6)
+12AA1A	116	agy	assigned to agy hydrogen (round 6)
+10DAB2	116	agy	assigned to agy hydrogen (round 6)
+19D6FA	116	agy	assigned to agy hydrogen (round 6)
+19D686	116	agy	assigned to agy hydrogen (round 6)
+112136	114	agy	assigned to agy hydrogen (round 6)
+181D66	114	agy	assigned to agy hydrogen (round 6)
+196C40	114	agy	assigned to agy hydrogen (round 6)
+1022A0	112	agy	assigned to agy hydrogen (round 6)
+180F74	112	agy	assigned to agy hydrogen (round 6)
+1376B8	110	agy	assigned to agy hydrogen (round 6)
+11EF66	108	agy	assigned to agy hydrogen (round 6)
+121D40	108	agy	assigned to agy hydrogen (round 6)
+10204A	108	agy	assigned to agy hydrogen (round 6)
+1973BE	108	agy	assigned to agy hydrogen (round 6)
+1020B6	50	fail	0/20 undec=0 try=2 482s
+13311A	50	accepted	20/20 undec=0 try=0 156s
+10E8B4	50	fail	COMPILE ERROR (project flags): try=2 459s
+12E442	50	accepted	20/20 undec=0 try=0 126s
+122F88	52	accepted	5/5 undec=0 try=0 72s
+122702	52	accepted	20/20 undec=0 try=0 93s
+1929E6	52	accepted	20/20 undec=0 try=0 121s
+102358	52	fail	0/20 undec=0 try=1 187s
+12048C	54	fail	0/20 undec=0 try=1 203s
+137996	54	accepted	20/20 undec=0 try=0 183s
+11A320	0	weak	agy draft passes but capture shows no RAM effect
+1609EC	0	weak	agy draft passes but capture shows no RAM effect
+12A666	944	fail	partial: phase table 0x12ADBC has 15 entries (8 = handler 0x12B108, 9-14 = rts 0x12B178); C handles 0-7 only
+17EC8C	106	agy	assigned to agy hydrogen (round 7)
+1767C8	106	agy	assigned to agy hydrogen (round 7)
+13C5E8	106	agy	assigned to agy hydrogen (round 7)
+12B5BA	106	agy	assigned to agy hydrogen (round 7)
+181C34	106	agy	assigned to agy hydrogen (round 7)
+11D20C	104	agy	assigned to agy hydrogen (round 7)
+176130	104	agy	assigned to agy hydrogen (round 7)
+120D30	104	agy	assigned to agy hydrogen (round 7)
+120CC8	104	agy	assigned to agy hydrogen (round 7)
+11EEFE	104	agy	assigned to agy hydrogen (round 7)
+17FA66	104	agy	assigned to agy hydrogen (round 7)
+17FE9A	104	agy	assigned to agy hydrogen (round 7)
+11BAD6	102	agy	assigned to agy hydrogen (round 7)
+17FA00	102	agy	assigned to agy hydrogen (round 7)
+1380B4	102	agy	assigned to agy hydrogen (round 7)
+17A1DE	100	agy	assigned to agy hydrogen (round 7)
+1764F2	98	agy	assigned to agy hydrogen (round 7)
+176490	98	agy	assigned to agy hydrogen (round 7)
+120AEC	96	agy	assigned to agy hydrogen (round 7)
+120114	96	agy	assigned to agy hydrogen (round 7)
+18E750	96	agy	assigned to agy hydrogen (round 7)
+176236	96	agy	assigned to agy hydrogen (round 7)
+192ABC	96	agy	assigned to agy hydrogen (round 7)
+11F94C	94	agy	assigned to agy hydrogen (round 7)
+17671E	94	agy	assigned to agy hydrogen (round 7)
+18E656	92	agy	assigned to agy hydrogen (round 7)
+13C9AA	92	agy	assigned to agy hydrogen (round 7)
+12B386	92	agy	assigned to agy hydrogen (round 7)
+1984C0	92	agy	assigned to agy hydrogen (round 7)
+12A666	944	agy	assigned to agy hydrogen (round 7)
+1292BE	54	fail	COMPILE ERROR (project flags): try=2 1008s
+196A84	92	agy	assigned to agy hydrogen (round 8)
+19F0B2	92	agy	assigned to agy hydrogen (round 8)
+1633CC	92	agy	assigned to agy hydrogen (round 8)
+13DE08	90	agy	assigned to agy hydrogen (round 8)
+121254	90	agy	assigned to agy hydrogen (round 8)
+17FE40	90	agy	assigned to agy hydrogen (round 8)
+13789C	90	agy	assigned to agy hydrogen (round 8)
+10E818	90	agy	assigned to agy hydrogen (round 8)
+11FA6E	88	agy	assigned to agy hydrogen (round 8)
+19AF06	88	agy	assigned to agy hydrogen (round 8)
+11CCB8	86	agy	assigned to agy hydrogen (round 8)
+103BAA	86	agy	assigned to agy hydrogen (round 8)
+1917EC	86	agy	assigned to agy hydrogen (round 8)
+11F0A0	84	agy	assigned to agy hydrogen (round 8)
+137794	84	agy	assigned to agy hydrogen (round 8)
+10F786	84	agy	assigned to agy hydrogen (round 8)
+10DA5E	84	agy	assigned to agy hydrogen (round 8)
+13B25E	82	agy	assigned to agy hydrogen (round 8)
+137CA4	82	agy	assigned to agy hydrogen (round 8)
+16099A	82	agy	assigned to agy hydrogen (round 8)
+1918BA	82	agy	assigned to agy hydrogen (round 8)
+176B68	82	agy	assigned to agy hydrogen (round 8)
+1127C0	82	agy	assigned to agy hydrogen (round 8)
+1331C6	82	agy	assigned to agy hydrogen (round 8)
+123550	80	agy	assigned to agy hydrogen (round 8)
+122334	80	agy	assigned to agy hydrogen (round 8)
+13BD74	80	agy	assigned to agy hydrogen (round 8)
+101E68	80	agy	assigned to agy hydrogen (round 8)
+180F24	80	agy	assigned to agy hydrogen (round 8)
+18339C	80	agy	assigned to agy hydrogen (round 8)
+13309A	54	accepted	20/20 undec=0 try=1 232s
+10E662	54	fail	0/20 undec=0 try=1 225s
+10E734	54	fail	0/20 undec=0 try=1 158s
+121254	0	weak	agy draft passes but capture shows no RAM effect
+16099A	0	weak	agy draft passes but capture shows no RAM effect
+11F81C	56	fail	19/20 undec=0 try=2 376s
+19F046	80	agy	assigned to agy hydrogen (round 9)
+19D988	80	agy	assigned to agy hydrogen (round 9)
+19F1A2	80	agy	assigned to agy hydrogen (round 9)
+11F052	78	agy	assigned to agy hydrogen (round 9)
+121B12	78	agy	assigned to agy hydrogen (round 9)
+138334	78	agy	assigned to agy hydrogen (round 9)
+13781A	78	agy	assigned to agy hydrogen (round 9)
+197370	78	agy	assigned to agy hydrogen (round 9)
+133178	78	agy	assigned to agy hydrogen (round 9)
+179F26	78	agy	assigned to agy hydrogen (round 9)
+11CD8C	76	agy	assigned to agy hydrogen (round 9)
+13ADD4	76	agy	assigned to agy hydrogen (round 9)
+194814	76	agy	assigned to agy hydrogen (round 9)
+1833EC	76	agy	assigned to agy hydrogen (round 9)
+1332DA	76	agy	assigned to agy hydrogen (round 9)
+11EE00	74	agy	assigned to agy hydrogen (round 9)
+13B214	74	agy	assigned to agy hydrogen (round 9)
+13AEB2	74	agy	assigned to agy hydrogen (round 9)
+13AD8A	74	agy	assigned to agy hydrogen (round 9)
+12C2EA	74	agy	assigned to agy hydrogen (round 9)
+192B1C	74	agy	assigned to agy hydrogen (round 9)
+183268	74	agy	assigned to agy hydrogen (round 9)
+183308	74	agy	assigned to agy hydrogen (round 9)
+133720	74	agy	assigned to agy hydrogen (round 9)
+10E494	74	agy	assigned to agy hydrogen (round 9)
+137CF6	72	agy	assigned to agy hydrogen (round 9)
+1120A8	72	agy	assigned to agy hydrogen (round 9)
+102310	72	agy	assigned to agy hydrogen (round 9)
+16344A	72	agy	assigned to agy hydrogen (round 9)
+120B74	70	agy	assigned to agy hydrogen (round 9)
+184122	56	accepted	20/20 undec=0 try=1 194s
+191882	56	fail	COMPILE ERROR (project flags): try=2 478s
+132F28	56	accepted	20/20 undec=0 try=0 138s
+13AD8A	0	weak	agy: weak
+12C2EA	0	weak	agy: weak
+1120A8	0	weak	agy: weak
+11257E	70	agy	assigned to agy hydrogen (round 10)
+137A4C	70	agy	assigned to agy hydrogen (round 10)
+137C16	70	agy	assigned to agy hydrogen (round 10)
+1247BA	70	agy	assigned to agy hydrogen (round 10)
+129338	70	agy	assigned to agy hydrogen (round 10)
+1129BC	70	agy	assigned to agy hydrogen (round 10)
+19D640	70	agy	assigned to agy hydrogen (round 10)
+1035A2	68	agy	assigned to agy hydrogen (round 10)
+1292F4	68	agy	assigned to agy hydrogen (round 10)
+11D55C	66	agy	assigned to agy hydrogen (round 10)
+103428	66	agy	assigned to agy hydrogen (round 10)
+193EE0	66	agy	assigned to agy hydrogen (round 10)
+191840	66	agy	assigned to agy hydrogen (round 10)
+1673EA	66	agy	assigned to agy hydrogen (round 10)
+10E872	66	agy	assigned to agy hydrogen (round 10)
+13D1E6	64	agy	assigned to agy hydrogen (round 10)
+11F900	64	agy	assigned to agy hydrogen (round 10)
+11F012	64	agy	assigned to agy hydrogen (round 10)
+11EFD2	64	agy	assigned to agy hydrogen (round 10)
+18ED80	64	agy	assigned to agy hydrogen (round 10)
+137678	64	agy	assigned to agy hydrogen (round 10)
+1034DA	64	agy	assigned to agy hydrogen (round 10)
+1659B0	64	agy	assigned to agy hydrogen (round 10)
+192A3C	64	agy	assigned to agy hydrogen (round 10)
+192A7C	64	agy	assigned to agy hydrogen (round 10)
+17B1A6	64	agy	assigned to agy hydrogen (round 10)
+13305A	64	agy	assigned to agy hydrogen (round 10)
+1203C0	62	agy	assigned to agy hydrogen (round 10)
+1387B2	62	agy	assigned to agy hydrogen (round 10)
+11221E	62	agy	assigned to agy hydrogen (round 10)
+11F7BE	58	accepted	20/20 undec=0 try=2 372s
+112ADA	58	accepted	20/20 undec=0 try=0 113s
+1659B0	0	weak	agy: weak
+102010	58	accepted	5/5 undec=0 try=1 179s
+16A310	60	agy	assigned to agy hydrogen (round 11)
+121C86	60	agy	assigned to agy hydrogen (round 11)
+137758	60	agy	assigned to agy hydrogen (round 11)
+137BB6	60	agy	assigned to agy hydrogen (round 11)
+137558	60	agy	assigned to agy hydrogen (round 11)
+132F60	60	agy	assigned to agy hydrogen (round 11)
+132FC6	60	agy	assigned to agy hydrogen (round 11)
+179D92	58	agy	assigned to agy hydrogen (round 11)
+15F95A	58	agy	assigned to agy hydrogen (round 11)
+12F13C	58	agy	assigned to agy hydrogen (round 11)
+11F81C	56	agy	assigned to agy hydrogen (round 11)
+121C28	56	agy	assigned to agy hydrogen (round 11)
+18E718	56	agy	assigned to agy hydrogen (round 11)
+191882	56	agy	assigned to agy hydrogen (round 11)
+13467E	56	agy	assigned to agy hydrogen (round 11)
+1635E8	56	agy	assigned to agy hydrogen (round 11)
+1636FA	56	agy	assigned to agy hydrogen (round 11)
+16369C	56	agy	assigned to agy hydrogen (round 11)
+163646	56	agy	assigned to agy hydrogen (round 11)
+12048C	54	agy	assigned to agy hydrogen (round 11)
+121AC0	54	agy	assigned to agy hydrogen (round 11)
+1375C6	54	agy	assigned to agy hydrogen (round 11)
+1292BE	54	agy	assigned to agy hydrogen (round 11)
+10E662	54	agy	assigned to agy hydrogen (round 11)
+10E734	54	agy	assigned to agy hydrogen (round 11)
+137868	52	agy	assigned to agy hydrogen (round 11)
+102358	52	agy	assigned to agy hydrogen (round 11)
+1377E8	50	agy	assigned to agy hydrogen (round 11)
+137594	50	agy	assigned to agy hydrogen (round 11)
+137726	50	agy	assigned to agy hydrogen (round 11)
+137558	60	accepted	20/20 undec=0 try=0 117s
+132F60	60	accepted	20/20 undec=0 try=0 186s
+132FC6	60	fail	COMPILE ERROR (project flags): try=2 331s
+19ADE4	50	agy	assigned to agy hydrogen (round 12)
+1020B6	50	agy	assigned to agy hydrogen (round 12)
+10E8B4	50	agy	assigned to agy hydrogen (round 12)
+120B44	48	agy	assigned to agy hydrogen (round 12)
+121B80	48	agy	assigned to agy hydrogen (round 12)
+121BB0	48	agy	assigned to agy hydrogen (round 12)
+1385B2	48	agy	assigned to agy hydrogen (round 12)
+1373FC	48	agy	assigned to agy hydrogen (round 12)
+102198	48	agy	assigned to agy hydrogen (round 12)
+132EDE	48	agy	assigned to agy hydrogen (round 12)
+10E698	48	agy	assigned to agy hydrogen (round 12)
+10E76A	48	agy	assigned to agy hydrogen (round 12)
+12D594	48	agy	assigned to agy hydrogen (round 12)
+137C5C	46	agy	assigned to agy hydrogen (round 12)
+137D76	46	agy	assigned to agy hydrogen (round 12)
+13791E	46	agy	assigned to agy hydrogen (round 12)
+137B52	46	agy	assigned to agy hydrogen (round 12)
+1021C8	44	agy	assigned to agy hydrogen (round 12)
+13328E	44	agy	assigned to agy hydrogen (round 12)
+162FBA	44	agy	assigned to agy hydrogen (round 12)
+122FCE	42	agy	assigned to agy hydrogen (round 12)
+1201E0	42	agy	assigned to agy hydrogen (round 12)
+1659F0	42	agy	assigned to agy hydrogen (round 12)
+1327D4	42	agy	assigned to agy hydrogen (round 12)
+102278	40	agy	assigned to agy hydrogen (round 12)
+112848	40	agy	assigned to agy hydrogen (round 12)
+1636D4	38	agy	assigned to agy hydrogen (round 12)
+163620	38	agy	assigned to agy hydrogen (round 12)
+121C04	36	agy	assigned to agy hydrogen (round 12)
+121D1C	36	agy	assigned to agy hydrogen (round 12)
+13D1E6	64	fail	0/20 undec=0 try=1 198s
+11F900	64	accepted	10/10 undec=0 try=0 191s
+11F012	64	accepted	20/20 undec=0 try=0 103s
+13D1E6	64	agy	assigned to agy hydrogen (round 13)
+121BE0	36	agy	assigned to agy hydrogen (round 13)
+16716E	36	agy	assigned to agy hydrogen (round 13)
+162FE6	36	agy	assigned to agy hydrogen (round 13)
+137DA4	34	agy	assigned to agy hydrogen (round 13)
+192A1A	34	agy	assigned to agy hydrogen (round 13)
+11F9AA	30	agy	assigned to agy hydrogen (round 13)
+121CFE	30	agy	assigned to agy hydrogen (round 13)
+121CE0	30	agy	assigned to agy hydrogen (round 13)
+121CC2	30	agy	assigned to agy hydrogen (round 13)
+18E7B0	30	agy	assigned to agy hydrogen (round 13)
+16367E	30	agy	assigned to agy hydrogen (round 13)
+13CB3A	28	agy	assigned to agy hydrogen (round 13)
+11F84C	28	agy	assigned to agy hydrogen (round 13)
+19F096	28	agy	assigned to agy hydrogen (round 13)
+199042	26	agy	assigned to agy hydrogen (round 13)
+10C800	24	agy	assigned to agy hydrogen (round 13)
+101FF8	24	agy	assigned to agy hydrogen (round 13)
+10C160	24	agy	assigned to agy hydrogen (round 13)
+10E5C8	24	agy	assigned to agy hydrogen (round 13)
+18C946	22	agy	assigned to agy hydrogen (round 13)
+192C8C	22	agy	assigned to agy hydrogen (round 13)
+18F030	22	agy	assigned to agy hydrogen (round 13)
+192CAA	22	agy	assigned to agy hydrogen (round 13)
+18E708	16	agy	assigned to agy hydrogen (round 13)
+13BABE	16	agy	assigned to agy hydrogen (round 13)
+163732	10	agy	assigned to agy hydrogen (round 13)
+113300	4	agy	assigned to agy hydrogen (round 13)
+13BBE0	4	agy	assigned to agy hydrogen (round 13)
+13A748	4	agy	assigned to agy hydrogen (round 13)
+11EFD2	64	accepted	20/20 undec=0 try=0 141s
+1034DA	64	fail	18/20 undec=0 try=1 144s
+0C793E	8	weak	empty draft passes the capture
+0F618A	12	weak	empty draft passes the capture
+0F4586	292	agy	assigned to codewhale (round 14)
+0DE96C	280	agy	assigned to codewhale (round 14)
+0F1B30	274	agy	assigned to codewhale (round 14)
+0D9A24	256	agy	assigned to codewhale (round 14)
+0F1D5C	254	agy	assigned to codewhale (round 14)
+0F8836	246	agy	assigned to codewhale (round 14)
+0F82E0	246	agy	assigned to codewhale (round 14)
+0F9AD4	246	agy	assigned to codewhale (round 14)
+0F95FE	246	agy	assigned to codewhale (round 14)
+0D96B2	240	agy	assigned to codewhale (round 14)
+0E4F0A	240	agy	assigned to codewhale (round 14)
+0DF640	236	agy	assigned to codewhale (round 14)
+0CC5CA	212	agy	assigned to codewhale (round 14)
+0D8922	208	agy	assigned to codewhale (round 14)
+0E4D8E	198	agy	assigned to codewhale (round 14)
+0CCAD0	190	agy	assigned to codewhale (round 14)
+0DB896	186	agy	assigned to codewhale (round 14)
+0D8AF2	170	agy	assigned to codewhale (round 14)
+0E18F0	156	agy	assigned to codewhale (round 14)
+0E1098	156	agy	assigned to codewhale (round 14)
+0D9622	144	agy	assigned to codewhale (round 14)
+0F1E84	140	agy	assigned to codewhale (round 14)
+0C1998	132	agy	assigned to codewhale (round 14)
+0C23EE	128	agy	assigned to codewhale (round 14)
+0E12AA	126	agy	assigned to codewhale (round 14)
+0F8C3E	124	agy	assigned to codewhale (round 14)
+0D89F2	14	accepted	8/8 undec=0 try=0 60s
+0D8BAC	14	accepted	20/20 undec=0 try=1 117s
+0D7C66	14	accepted	7/7 undec=0 try=0 86s
+0C12AA	16	fail	TIMEOUT: the translation loops forever on the captured input try=2 595s
+0F4846	18	fail	0/12 undec=0 try=2 403s
+0EBEF0	20	weak	empty draft passes the capture
+0F9108	24	fail	0/5 undec=0 try=1 94s
+0C0DF4	24	fail	TIMEOUT: the translation loops forever on the captured input try=2 610s
+0C0D78	24	fail	TIMEOUT: the translation loops forever on the captured input try=1 224s
+0C12F6	26	fail	COMPILE ERROR (project flags): try=2 719s
+0F8F52	28	fail	0/5 undec=0 try=2 380s
+0FAFE6	28	fail	no code block 715s
+0F8C1E	32	fail	0/3 undec=0 try=1 121s
+0F4586	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0D9A24	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0F82E0	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0D96B2	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0CC5CA	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0CCAD0	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0E18F0	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0F1E84	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0E12AA	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0DE96C	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0F9AD4	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0E4F0A	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0D8922	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0DB896	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0E1098	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0C1998	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0F8C3E	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0F1B30	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0F8836	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0F95FE	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0DF640	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0E4D8E	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0D8AF2	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0D9622	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0C23EE	0	fail	codewhale round 14: no pass; it reported the capture as self-contradictory
+0CCE0E	34	fail	0/20 undec=0 try=2 429s
+0F8692	34	fail	0/7 undec=0 try=2 361s
+0E1072	38	fail	COMPILE ERROR (project flags): try=2 458s
+0E18CA	38	fail	0/3 undec=0 try=1 147s
+0DF61A	38	fail	0/3 undec=0 try=2 441s
+0C1D30	38	fail	TIMEOUT: the translation loops forever on the captured input try=2 520s
+0CC2DE	40	fail	0/20 undec=0 try=2 481s
+0F1B04	44	fail	COMPILE ERROR (project flags): try=2 465s
+0E1170	48	fail	17/20 undec=0 try=2 428s
+0DF766	48	fail	16/20 undec=0 try=2 435s
+0CEF62	54	fail	no code block 681s
+0F1F10	56	fail	0/16 undec=0 try=1 183s
+0F5718	56	fail	COMPILE ERROR: try=1 245s
+0C1D94	56	fail	TIMEOUT: the translation loops forever on the captured input try=2 670s
+0F4586	292	agy	assigned to agy hydrogen (round 15)
+0DE96C	280	agy	assigned to agy hydrogen (round 15)
+0F1B30	274	agy	assigned to agy hydrogen (round 15)
+0D9A24	256	agy	assigned to agy hydrogen (round 15)
+0F8836	246	agy	assigned to agy hydrogen (round 15)
+0F82E0	246	agy	assigned to agy hydrogen (round 15)
+0F9AD4	246	agy	assigned to agy hydrogen (round 15)
+0F95FE	246	agy	assigned to agy hydrogen (round 15)
+0D96B2	240	agy	assigned to agy hydrogen (round 15)
+0E4F0A	240	agy	assigned to agy hydrogen (round 15)
+0DF640	236	agy	assigned to agy hydrogen (round 15)
+0CC5CA	212	agy	assigned to agy hydrogen (round 15)
+0D8922	208	agy	assigned to agy hydrogen (round 15)
+0E4D8E	198	agy	assigned to agy hydrogen (round 15)
+0CCAD0	190	agy	assigned to agy hydrogen (round 15)
+0DB896	186	agy	assigned to agy hydrogen (round 15)
+0D8AF2	170	agy	assigned to agy hydrogen (round 15)
+0E18F0	156	agy	assigned to agy hydrogen (round 15)
+0E1098	156	agy	assigned to agy hydrogen (round 15)
+0D9622	144	agy	assigned to agy hydrogen (round 15)
+0F1E84	140	agy	assigned to agy hydrogen (round 15)
+0C1998	132	agy	assigned to agy hydrogen (round 15)
+0C23EE	128	agy	assigned to agy hydrogen (round 15)
+0E12AA	126	agy	assigned to agy hydrogen (round 15)
+0F8C3E	124	agy	assigned to agy hydrogen (round 15)
+0F86B4	118	agy	assigned to agy hydrogen (round 15)
+0FA1C4	114	agy	assigned to agy hydrogen (round 15)
+0E19F2	108	agy	assigned to agy hydrogen (round 15)
+0CC69E	106	agy	assigned to agy hydrogen (round 15)
+0E198C	102	agy	assigned to agy hydrogen (round 15)
+0F4A6C	58	fail	0/5 undec=0 try=1 180s
+0F18E8	58	fail	0/20 undec=0 try=1 203s
+0F54F8	58	fail	0/6 undec=0 try=2 449s
+0DF72C	58	fail	0/20 undec=0 try=1 169s
+0FA5FC	810	agy	assigned to agy hydrogen (round 16)
+0F5750	698	agy	assigned to agy hydrogen (round 16)
+0F3BB4	546	agy	assigned to agy hydrogen (round 16)
+0F1F48	442	agy	assigned to agy hydrogen (round 16)
+0F61C8	440	agy	assigned to agy hydrogen (round 16)
+0EBF44	436	agy	assigned to agy hydrogen (round 16)
+0F8D54	414	agy	assigned to agy hydrogen (round 16)
+0F922C	412	agy	assigned to agy hydrogen (round 16)
+0F3984	362	agy	assigned to agy hydrogen (round 16)
+0FADDE	342	agy	assigned to agy hydrogen (round 16)
+0FA236	340	agy	assigned to agy hydrogen (round 16)
+0F9FCC	326	agy	assigned to agy hydrogen (round 16)
+0D87F2	304	agy	assigned to agy hydrogen (round 16)
+0F1922	98	agy	assigned to agy hydrogen (round 16)
+0F4AA6	98	agy	assigned to agy hydrogen (round 16)
+0F5532	98	agy	assigned to agy hydrogen (round 16)
+0CC570	90	agy	assigned to agy hydrogen (round 16)
+0F9120	90	agy	assigned to agy hydrogen (round 16)
+0C065C	82	agy	assigned to agy hydrogen (round 16)
+0F917A	80	agy	assigned to agy hydrogen (round 16)
+0FB1DE	80	agy	assigned to agy hydrogen (round 16)
+0CEFF8	78	agy	assigned to agy hydrogen (round 16)
+0CF138	78	agy	assigned to agy hydrogen (round 16)
+0CF098	78	agy	assigned to agy hydrogen (round 16)
+0FB160	78	agy	assigned to agy hydrogen (round 16)
+0DF592	76	agy	assigned to agy hydrogen (round 16)
+0F4C8C	72	agy	assigned to agy hydrogen (round 16)
+0FB002	72	agy	assigned to agy hydrogen (round 16)
+0F4858	70	agy	assigned to agy hydrogen (round 16)
+0FB22E	70	agy	assigned to agy hydrogen (round 16)
+0EBF44	0	fail	jt_scan: jump-table handler not cited, held for review
+0F8D54	0	fail	jt_scan: jump-table handler not cited, held for review
+0F922C	0	fail	jt_scan: jump-table handler not cited, held for review
+0CCA8E	66	agy	assigned to agy hydrogen (round 17)
+0FB11E	66	agy	assigned to agy hydrogen (round 17)
+0F91CA	64	agy	assigned to agy hydrogen (round 17)
+0F8F6E	62	agy	assigned to agy hydrogen (round 17)
+0E1134	60	agy	assigned to agy hydrogen (round 17)
+0C18AE	60	agy	assigned to agy hydrogen (round 17)
+0F4A6C	58	agy	assigned to agy hydrogen (round 17)
+0F18E8	58	agy	assigned to agy hydrogen (round 17)
+0F54F8	58	agy	assigned to agy hydrogen (round 17)
+0DF72C	58	agy	assigned to agy hydrogen (round 17)
+0C1B0A	58	agy	assigned to agy hydrogen (round 17)
+0F1F10	56	agy	assigned to agy hydrogen (round 17)
+0F5718	56	agy	assigned to agy hydrogen (round 17)
+0C1D94	56	agy	assigned to agy hydrogen (round 17)
+0CEF62	54	agy	assigned to agy hydrogen (round 17)
+0E1170	48	agy	assigned to agy hydrogen (round 17)
+0DF766	48	agy	assigned to agy hydrogen (round 17)
+0F1B04	44	agy	assigned to agy hydrogen (round 17)
+0CC2DE	40	agy	assigned to agy hydrogen (round 17)
+0E1072	38	agy	assigned to agy hydrogen (round 17)
+0E18CA	38	agy	assigned to agy hydrogen (round 17)
+0DF61A	38	agy	assigned to agy hydrogen (round 17)
+0C1D30	38	agy	assigned to agy hydrogen (round 17)
+0CCE0E	34	agy	assigned to agy hydrogen (round 17)
+0F8692	34	agy	assigned to agy hydrogen (round 17)
+0F8C1E	32	agy	assigned to agy hydrogen (round 17)
+0F8F52	28	agy	assigned to agy hydrogen (round 17)
+0FAFE6	28	agy	assigned to agy hydrogen (round 17)
+0C12F6	26	agy	assigned to agy hydrogen (round 17)
+0DC340	24	agy	assigned to agy hydrogen (round 17)
+0EBF44	436	agy	assigned to agy hydrogen (round 18)
+0F8D54	414	agy	assigned to agy hydrogen (round 18)
+0F922C	412	agy	assigned to agy hydrogen (round 18)
+0F9108	24	agy	assigned to agy hydrogen (round 18)
+0C0DF4	24	agy	assigned to agy hydrogen (round 18)
+0C0D78	24	agy	assigned to agy hydrogen (round 18)
+0F4846	18	agy	assigned to agy hydrogen (round 18)
+0C12AA	16	agy	assigned to agy hydrogen (round 18)
+19E65A	4	agy	assigned to agy hydrogen (round 18)
+165A1A	2	agy	assigned to agy hydrogen (round 18)
+0C0DF4	0	fail	agy: fail
+0C12AA	0	fail	agy: fail
+0EBF44	0	fail	jt_scan: jump-table handler not cited, held for review
+0F8D54	0	fail	jt_scan: jump-table handler not cited, held for review
+0F4846	0	fail	agy round 18: merged then lost when the loop undid a failing round
+0F9108	0	fail	agy round 18: merged then lost when the loop undid a failing round
+165A1A	0	fail	agy round 18: merged then lost when the loop undid a failing round
+0C0D78	0	fail	agy round 18: merged then lost when the loop undid a failing round
+0F922C	0	fail	agy round 18: merged then lost when the loop undid a failing round
+19E65A	0	fail	agy round 18: merged then lost when the loop undid a failing round
+0EBF44	436	agy	assigned to agy hydrogen (round 19)
+0F8D54	414	agy	assigned to agy hydrogen (round 19)
+0F922C	412	agy	assigned to agy hydrogen (round 19)
+0F9108	24	agy	assigned to agy hydrogen (round 19)
+0C0DF4	24	agy	assigned to agy hydrogen (round 19)
+0C0D78	24	agy	assigned to agy hydrogen (round 19)
+0F4846	18	agy	assigned to agy hydrogen (round 19)
+0C12AA	16	agy	assigned to agy hydrogen (round 19)
+19E65A	4	agy	assigned to agy hydrogen (round 19)
+165A1A	2	agy	assigned to agy hydrogen (round 19)
+0F8D54	0	fail	jt_scan: jump-table handler not cited, held for review
+0F8D54	414	agy	assigned to agy hydrogen (round 20)
+0F922C	412	agy	assigned to agy hydrogen (round 20)
+10EDA0	408	agy	assigned to agy hydrogen (round 20)
+1346B6	398	agy	assigned to agy hydrogen (round 20)
+1100C6	394	agy	assigned to agy hydrogen (round 20)
+13C43E	370	agy	assigned to agy hydrogen (round 20)
+193096	366	agy	assigned to agy hydrogen (round 20)
+105356	352	agy	assigned to agy hydrogen (round 20)
+13C852	342	agy	assigned to agy hydrogen (round 20)
+13A0EE	338	agy	assigned to agy hydrogen (round 20)
+12AC6C	332	agy	assigned to agy hydrogen (round 20)
+19C648	332	agy	assigned to agy hydrogen (round 20)
+18CAB4	330	agy	assigned to agy hydrogen (round 20)
+13A0EE	0	weak	agy: weak
+0F922C	412	agy	assigned to agy hydrogen (round 21)
+0F922C	0	fail	jt_scan: jump-table handler not cited, held for review (round 21)
+110660	8	agy	assigned to codewhale (round 22)
+112914	10	agy	assigned to codewhale (round 22)
+11291E	10	agy	assigned to codewhale (round 22)
+112928	10	agy	assigned to codewhale (round 22)
+112932	10	agy	assigned to codewhale (round 22)
+118D2E	12	agy	assigned to codewhale (round 22)
+1673DE	12	agy	assigned to codewhale (round 22)
+0D8CEE	14	agy	assigned to codewhale (round 22)
+0D8C7E	14	agy	assigned to codewhale (round 22)
+15BB78	14	agy	assigned to codewhale (round 22)
+1121A0	14	agy	assigned to codewhale (round 22)
+11235A	14	agy	assigned to codewhale (round 22)
+1674BE	14	agy	assigned to codewhale (round 22)
+1673D0	14	agy	assigned to codewhale (round 22)
+16742C	14	agy	assigned to codewhale (round 22)
+13F428	14	agy	assigned to codewhale (round 22)
+176710	14	agy	assigned to codewhale (round 22)
+19EFAA	14	agy	assigned to codewhale (round 22)
+16373C	14	agy	assigned to codewhale (round 22)
+16300A	14	agy	assigned to codewhale (round 22)
+145654	18	agy	assigned to codewhale (round 22)
+13AB24	18	agy	assigned to codewhale (round 22)
+12B7C2	18	agy	assigned to codewhale (round 22)
+1988F2	18	agy	assigned to codewhale (round 22)
+0C061E	18	agy	assigned to codewhale (round 22)
+18CAF0	20	agy	assigned to codewhale (round 22)
+1930E4	20	agy	assigned to codewhale (round 22)
+19182C	20	agy	assigned to codewhale (round 22)
+19B646	20	agy	assigned to codewhale (round 22)
+195BF8	20	agy	assigned to codewhale (round 22)
+176710	0	weak	agy: weak
+145654	0	weak	agy: weak
+19742A	20	agy	assigned to codewhale (round 23)
+19832C	20	agy	assigned to codewhale (round 23)
+19C696	20	agy	assigned to codewhale (round 23)
+19D1DA	20	agy	assigned to codewhale (round 23)
+198CD2	26	agy	assigned to codewhale (round 23)
+1131EA	32	agy	assigned to codewhale (round 23)
+19A1C4	34	agy	assigned to codewhale (round 23)
+005A3A	36	agy	assigned to codewhale (round 23)
+13272E	36	agy	assigned to codewhale (round 23)
+12D570	36	agy	assigned to codewhale (round 23)
+1673AA	38	agy	assigned to codewhale (round 23)
+134844	38	agy	assigned to codewhale (round 23)
+19F29C	42	agy	assigned to codewhale (round 23)
+13B0B4	44	agy	assigned to codewhale (round 23)
+0C8BCE	44	agy	assigned to codewhale (round 23)
+0C0630	44	agy	assigned to codewhale (round 23)
+139FB6	46	agy	assigned to codewhale (round 23)
+13A0C0	46	agy	assigned to codewhale (round 23)
+11293C	48	agy	assigned to codewhale (round 23)
+19D610	48	agy	assigned to codewhale (round 23)
+1630A2	48	agy	assigned to codewhale (round 23)
+13F206	50	agy	assigned to codewhale (round 23)
+12B204	50	agy	assigned to codewhale (round 23)
+0C6738	54	agy	assigned to codewhale (round 23)
+12D542	54	agy	assigned to codewhale (round 23)
+0C8E1A	56	agy	assigned to codewhale (round 23)
+1635AE	58	agy	assigned to codewhale (round 23)
+13E8A2	62	agy	assigned to codewhale (round 23)
+13AD4C	62	agy	assigned to codewhale (round 23)
+164654	62	agy	assigned to codewhale (round 23)
+0C8BCE	0	weak	agy: weak
+110C5E	62	agy	assigned to codewhale (round 24)
+151640	66	agy	assigned to codewhale (round 24)
+14C464	66	agy	assigned to codewhale (round 24)
+12B4AA	66	agy	assigned to codewhale (round 24)
+1221C4	68	agy	assigned to codewhale (round 24)
+13D156	72	agy	assigned to codewhale (round 24)
+13D19E	72	agy	assigned to codewhale (round 24)
+19853C	72	agy	assigned to codewhale (round 24)
+1937F2	74	agy	assigned to codewhale (round 24)
+162E86	76	agy	assigned to codewhale (round 24)
+0E4EBC	78	agy	assigned to codewhale (round 24)
+199B98	78	agy	assigned to codewhale (round 24)
+12AC1C	80	agy	assigned to codewhale (round 24)
+198F6E	80	agy	assigned to codewhale (round 24)
+158758	82	agy	assigned to codewhale (round 24)
+1121AE	88	agy	assigned to codewhale (round 24)
+13F25C	90	agy	assigned to codewhale (round 24)
+197310	96	agy	assigned to codewhale (round 24)
+11225C	102	agy	assigned to codewhale (round 24)
+12A606	104	agy	assigned to codewhale (round 24)
+13CACE	108	agy	assigned to codewhale (round 24)
+198584	114	agy	assigned to codewhale (round 24)
+112EC0	130	agy	assigned to codewhale (round 24)
+1987E0	132	agy	assigned to codewhale (round 24)
+198864	142	agy	assigned to codewhale (round 24)
+15BAD8	160	agy	assigned to codewhale (round 24)
+165636	172	agy	assigned to codewhale (round 24)
+14A562	178	agy	assigned to codewhale (round 24)
+148C26	178	agy	assigned to codewhale (round 24)
+15EF96	200	agy	assigned to codewhale (round 24)
+13D19E	0	fail	agy: fail
+13D156	0	fail	agy: fail
+13D156	72	agy	assigned to codewhale (round 25)
+13D19E	72	agy	assigned to codewhale (round 25)
+160814	218	agy	assigned to codewhale (round 25)
+1671C4	228	agy	assigned to codewhale (round 25)
+167A04	230	agy	assigned to codewhale (round 25)
+162ED2	232	agy	assigned to codewhale (round 25)
+110668	238	agy	assigned to codewhale (round 25)
+13D69A	256	agy	assigned to codewhale (round 25)
+1672A8	258	agy	assigned to codewhale (round 25)
+15F172	262	agy	assigned to codewhale (round 25)
+15F456	262	agy	assigned to codewhale (round 25)
+192F02	404	agy	assigned to codewhale (round 25)
+0F922C	412	agy	assigned to codewhale (round 25)
+15894E	442	agy	assigned to codewhale (round 25)
+1985F6	490	agy	assigned to codewhale (round 25)
+158F9A	538	agy	assigned to codewhale (round 25)
+13DAD4	820	agy	assigned to codewhale (round 25)
+14AD62	930	agy	assigned to codewhale (round 25)
+14A9C0	930	agy	assigned to codewhale (round 25)
+15E0DA	930	agy	assigned to codewhale (round 25)
+14FD34	1058	agy	assigned to codewhale (round 25)
+13D156	0	fail	agy: fail
+14A9C0	0	fail	agy: fail
+13D19E	0	fail	agy: fail
+13D69A	0	fail	agy: fail
+13DAD4	0	fail	agy round 25: not attempted
+13D156	72	agy	assigned to codewhale (round 26)
+13D19E	72	agy	assigned to codewhale (round 26)
+13D69A	256	agy	assigned to codewhale (round 26)
+13DAD4	820	agy	assigned to codewhale (round 26)
+14A9C0	930	agy	assigned to codewhale (round 26)
+193DB4	2	codex	assigned to codex, weak (round 1)
+0C793E	8	codex	assigned to codex, weak (round 1)
+0F618A	12	codex	assigned to codex, weak (round 1)
+14B2FE	14	codex	assigned to codex, nocapture (round 1)
+176710	14	codex	assigned to codex, weak (round 1)
+11FA4C	16	codex	assigned to codex, nocapture (round 1)
+145654	18	codex	assigned to codex, weak (round 1)
+0EBEF0	20	codex	assigned to codex, weak (round 1)
+11F9E2	22	codex	assigned to codex, nocapture (round 1)
+112F42	24	codex	assigned to codex, nocapture (round 1)
+196C0A	24	codex	assigned to codex, weak (round 1)
+11FA30	28	codex	assigned to codex, nocapture (round 1)
+1176B4	28	codex	assigned to codex, nocapture (round 1)
+18301C	30	codex	assigned to codex, weak (round 1)
+11F21C	32	codex	assigned to codex, nocapture (round 1)
+11FA14	36	codex	assigned to codex, nocapture (round 1)
+11F23C	42	codex	assigned to codex, nocapture (round 1)
+1849AA	44	codex	assigned to codex, weak (round 1)
+0C8BCE	44	codex	assigned to codex, weak (round 1)
+11F266	48	codex	assigned to codex, nocapture (round 1)
+11F0F4	62	codex	assigned to codex, nocapture (round 1)
+1659B0	64	codex	assigned to codex, weak (round 1)
+1120A8	72	codex	assigned to codex, weak (round 1)
+13AD8A	74	codex	assigned to codex, weak (round 1)
+12C2EA	74	codex	assigned to codex, weak (round 1)
+16099A	82	codex	assigned to codex, weak (round 1)
+121254	90	codex	assigned to codex, weak (round 1)
+11F132	92	codex	assigned to codex, nocapture (round 1)
+118242	102	codex	assigned to codex, nocapture (round 1)
+0038AC	102	codex	assigned to codex, nocapture (round 1)
+0038AC	0	fail	codex round 1: not written
+0038AC	0	skip	TRAP #5 scheduler daemon (no rts), not translatable as a routine
+1203FE	104	codex	assigned to codex, nocapture (round 2)
+120174	108	codex	assigned to codex, nocapture (round 2)
+120BD6	110	codex	assigned to codex, nocapture (round 2)
+1609EC	116	codex	assigned to codex, weak (round 2)
+11A320	118	codex	assigned to codex, weak (round 2)
+116922	120	codex	assigned to codex, nocapture (round 2)
+12AB7C	128	codex	assigned to codex, weak (round 2)
+10C818	130	codex	assigned to codex, weak (round 2)
+10C178	130	codex	assigned to codex, weak (round 2)
+132752	130	codex	assigned to codex, weak (round 2)
+120C44	132	codex	assigned to codex, nocapture (round 2)
+11F18E	142	codex	assigned to codex, nocapture (round 2)
+11B78C	146	codex	assigned to codex, nocapture (round 2)
+1182A8	148	codex	assigned to codex, nocapture (round 2)
+192954	154	codex	assigned to codex, weak (round 2)
+002274	158	codex	assigned to codex, nocapture (round 2)
+198CEC	182	codex	assigned to codex, weak (round 2)
+1176D0	184	codex	assigned to codex, nocapture (round 2)
+19B65A	210	codex	assigned to codex, weak (round 2)
+139FE4	220	codex	assigned to codex, weak (round 2)
+198904	222	codex	assigned to codex, weak (round 2)
+13F5B8	232	codex	assigned to codex, nocapture (round 2)
+14B1BE	328	codex	assigned to codex, nocapture (round 2)
+13A0EE	338	codex	assigned to codex, weak (round 2)
+13AB36	534	codex	assigned to codex, weak (round 2)
+0B935A	808	codex	assigned to codex, nocapture (round 2)
+14C04E	1046	codex	assigned to codex, nocapture (round 2)
+13D156	0	fail	agy: fail
+13D19E	0	fail	agy: fail
+14A9C0	0	fail	agy: fail
+13D69A	0	fail	agy: fail
+13DAD4	0	fail	agy round 26: not attempted
+13F5B8	0	fail	codex round 2: not written
+0B935A	0	fail	codex round 2: not written
+13D1E6	64	codex	assigned to codex, capture (round 3)
+13D156	72	codex	assigned to codex, capture (round 3)
+13D19E	72	codex	assigned to codex, capture (round 3)
+13F5B8	232	codex	assigned to codex, nocapture (round 3)
+13D69A	256	codex	assigned to codex, capture (round 3)
+0B935A	808	codex	assigned to codex, nocapture (round 3)
+13DAD4	820	codex	assigned to codex, capture (round 3)
+14A9C0	930	codex	assigned to codex, capture (round 3)
+13D1E6	0	fail	codex round 3: capture not passed
+13F5B8	0	fail	codex round 3: not written
+13DAD4	0	fail	codex round 3: not written
+13D156	0	fail	codex round 3: capture not passed
+13D69A	0	fail	codex round 3: not written
+14A9C0	0	fail	codex round 3: not written
+13D19E	0	fail	codex round 3: capture not passed
+0B935A	0	fail	codex round 3: not written
+0B8404	0	cw	assigned to codewhale (task/leftover, 2026-11-27)
+13F2C6	0	cw	assigned to codewhale (task/leftover, 2026-11-27)
+13F5B8	0	cw	assigned to codewhale (task/leftover, 2026-11-27)
+0B935A	0	cw	assigned to codewhale (task/leftover, 2026-11-27)
+010502	20	codex	assigned to codex, nocapture (round 4)
+0C63E8	34	codex	assigned to codex, nocapture (round 4)
+13D1E6	64	codex	assigned to codex, capture (round 4)
+13D156	72	codex	assigned to codex, capture (round 4)
+13D19E	72	codex	assigned to codex, capture (round 4)
+13D69A	256	codex	assigned to codex, capture (round 4)
+13DAD4	820	codex	assigned to codex, capture (round 4)
+14A9C0	930	codex	assigned to codex, capture (round 4)
+010502	0	done	translated in src/kernel/tasks.c
+0C63E8	0	done	translated in src/kernel/tasks.c
+13D156	0	fail	codex round 4: not written
+13DAD4	0	fail	codex round 4: not written
+13D19E	0	fail	codex round 4: capture not passed
+14A9C0	0	fail	codex round 4: capture not passed
+13D1E6	0	fail	codex round 4: capture not passed
+13D69A	0	fail	codex round 4: not written
+13D156	0	fail	codex round 4: not written
+13DAD4	0	fail	codex round 4: not written
+14A9C0	0	fail	codex round 4: capture not passed
+13D69A	0	fail	codex round 4: not written
+0D4FF6	0	codex	assigned to codex, capture (round 5)
+0D5880	0	codex	assigned to codex, capture (round 5)
+0D588C	0	codex	assigned to codex, capture (round 5)
+0D58BE	0	codex	assigned to codex, capture (round 5)
+0D5DE6	0	codex	assigned to codex, capture (round 5)
+0D5E02	0	codex	assigned to codex, capture (round 5)
+0D5E1E	0	codex	assigned to codex, capture (round 5)
+0D5E3A	0	codex	assigned to codex, capture (round 5)
+0CD3B2	0	codex	assigned to codex, capture (round 5)
+000DFA	0	codex	assigned to codex, capture (round 5)
+001A72	0	codex	assigned to codex, capture (round 5)
+00161E	0	codex	assigned to codex, capture (round 5)
+001608	0	codex	assigned to codex, capture (round 5)
+001262	0	codex	assigned to codex, capture (round 5)
+000A22	0	codex	assigned to codex, capture (round 5)
+000C8A	0	codex	assigned to codex, capture (round 5)
+000F04	0	codex	assigned to codex, capture (round 5)
+0009E0	0	codex	assigned to codex, capture (round 5)
+000FA8	0	codex	assigned to codex, capture (round 5)
+000C30	0	codex	assigned to codex, capture (round 5)
+000AC6	0	codex	assigned to codex, capture (round 5)
+000CB4	0	codex	assigned to codex, capture (round 5)
+01033C	0	codex	assigned to codex, capture (round 5)
+1454FC	0	codex	assigned to codex, capture (round 5)
+005576	0	codex	assigned to codex, capture (round 5)
+0C676E	0	codex	assigned to codex, capture (round 5)
+14740C	0	codex	assigned to codex, capture (round 5)
+148B4C	0	codex	assigned to codex, capture (round 5)
+118E0C	0	codex	assigned to codex, capture (round 5)
+118E20	0	codex	assigned to codex, capture (round 5)
+118E34	0	codex	assigned to codex, capture (round 5)
+118E48	0	codex	assigned to codex, capture (round 5)
+118E5C	0	codex	assigned to codex, capture (round 5)
+118E72	0	codex	assigned to codex, capture (round 5)

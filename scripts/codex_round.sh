@@ -11,7 +11,8 @@
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
 N=${1:?round}; PER=${PER:-10}
-python3 - "$N" "$PER" <<'PY'
+# LISTS_READY=1: work/zcap/codexN_X{1,2,3}.list were written by hand; skip selection
+[ -n "${LISTS_READY:-}" ] || python3 - "$N" "$PER" <<'PY'
 import os,sys
 N,per=sys.argv[1],int(sys.argv[2])
 res={}

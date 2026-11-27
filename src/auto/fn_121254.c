@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x121254: UNVERIFIED (weak capture): animate and draw relative to the shared coordinates, or free when the parent signals. */
+/* ROM 0x121254: verified: the capture discriminates (an empty body fails it): animate and draw relative to the shared coordinates, or free when the parent signals. */
 #include "../objects/obj_common.h"
 #include "../objects/obj_pool.h"
 #include "../video/sprite.h"

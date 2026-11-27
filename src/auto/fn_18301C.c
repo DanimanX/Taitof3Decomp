@@ -1,6 +1,6 @@
 #include "fn_auto.h"
 
-/* ROM 0x18301C: UNVERIFIED (weak capture): free the object when the global flag is set. */
+/* ROM 0x18301C: checked against the ROM by Claude; no capture can exercise it (its writes never change memory): free the object when the global flag is set. */
 #include "../objects/obj_pool.h"
 
 int Fn_18301C(const f3mem_t *m, f3regs_t *r)

@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x10C818: UNVERIFIED (weak capture): Follow the parent, relay damage, and publish collision bounds. */
+/* ROM 0x10C818: verified: the capture discriminates (an empty body fails it): Follow the parent, relay damage, and publish collision bounds. */
 #include "batch_obj_regs.h"
 #include "../objects/obj_common.h"
 #include "../objects/obj_shared_ext.h"

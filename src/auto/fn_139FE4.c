@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x139FE4: UNVERIFIED (weak capture): Update a boss attachment's shared damage and draw five independently phased sprites. */
+/* ROM 0x139FE4: verified: the capture discriminates (an empty body fails it): Update a boss attachment's shared damage and draw five independently phased sprites. */
 #include "batch_obj_regs.h"
 #include "../objects/obj_shared_ext.h"
 

@@ -1,6 +1,6 @@
 #include "fn_auto.h"
 
-/* ROM 0x176710: UNVERIFIED (weak capture): write the first line word and update the low nibble on subsequent lines. */
+/* ROM 0x176710: verified: the capture discriminates (an empty body fails it): write the first line word and update the low nibble on subsequent lines. */
 int Fn_176710(const f3mem_t *m, f3regs_t *r)
 {
     uint16_t line = (uint16_t)r->d[7];

@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x13AB36: UNVERIFIED (weak capture): React to background stage changes with effects and tilemap strips, or clear the layers when the parent retires. */
+/* ROM 0x13AB36: verified: the capture discriminates (an empty body fails it): React to background stage changes with effects and tilemap strips, or clear the layers when the parent retires. */
 #include "fn_sound_frames.h"
 #include "../video/sprite.h"
 

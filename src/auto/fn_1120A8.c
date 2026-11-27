@@ -1,6 +1,6 @@
 #include "fn_auto.h"
 
-/* ROM 0x1120A8: UNVERIFIED (weak capture): free, re-arm or draw the sprite according to its position relative to the stage scroll. */
+/* ROM 0x1120A8: verified: the capture discriminates (an empty body fails it): free, re-arm or draw the sprite according to its position relative to the stage scroll. */
 #include "../objects/obj_pool.h"
 #include "../video/sprite.h"
 

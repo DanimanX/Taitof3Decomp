@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x198904: UNVERIFIED (weak capture): relay part damage, step its movement script, and update boss-relative position. */
+/* ROM 0x198904: verified: the capture discriminates (an empty body fails it): relay part damage, step its movement script, and update boss-relative position. */
 #include "../objects/obj_script10.h"
 
 static uint32_t with_word(uint32_t reg, uint16_t word)

@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x13A0EE: UNVERIFIED (weak capture): animate the warning effect, then draw its beam and register collision. */
+/* ROM 0x13A0EE: verified: the capture discriminates (an empty body fails it): animate the warning effect, then draw its beam and register collision. */
 #include "../objects/obj_common.h"
 #include "../video/sprite.h"
 

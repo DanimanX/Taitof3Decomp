@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x145654: UNVERIFIED (weak capture): Dispatch the stage's playfield reset. */
+/* ROM 0x145654: verified: the capture discriminates (an empty body fails it): Dispatch the stage's playfield reset. */
 #include "../video/sprite.h"
 
 /* ROM 0x0058DA / 0x005918: save D0-D1/A0-A1 before clearing the playfield. */

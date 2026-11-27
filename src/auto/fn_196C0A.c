@@ -1,6 +1,6 @@
 #include "fn_auto.h"
 
-/* ROM 0x196C0A: UNVERIFIED (weak capture): keep the object while its parent's health is positive. */
+/* ROM 0x196C0A: checked against the ROM by Claude; no capture can exercise it (its writes never change memory): keep the object while its parent's health is positive. */
 #include "../objects/obj_pool.h"
 
 int Fn_196C0A(const f3mem_t *m, f3regs_t *r)

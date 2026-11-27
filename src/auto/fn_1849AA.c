@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x1849AA: UNVERIFIED (weak capture): apply the ROM percentage table to the signed input word in D0. */
+/* ROM 0x1849AA: verified: the capture discriminates (an empty body fails it): apply the ROM percentage table to the signed input word in D0. */
 
 int Fn_1849AA(const f3mem_t *m, f3regs_t *r)
 {

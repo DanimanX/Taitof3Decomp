@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x132752: UNVERIFIED (weak capture): Position and draw the ribbon during the scroll window, then launch its follow-up objects. */
+/* ROM 0x132752: verified: the capture discriminates (an empty body fails it): Position and draw the ribbon during the scroll window, then launch its follow-up objects. */
 #include "fn_sprite_regs.h"
 
 /* 0x1328B8: draw a vertically flipped, rescaled reflection. */

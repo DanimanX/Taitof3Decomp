@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x1609EC: UNVERIFIED (weak capture): Spawn a ground effect and play its sound when the scroll and object checks allow it. */
+/* ROM 0x1609EC: verified: the capture discriminates (an empty body fails it): Spawn a ground effect and play its sound when the scroll and object checks allow it. */
 #include "fn_sound_frames.h"
 
 int Fn_1609EC(const f3mem_t *m, f3regs_t *r)

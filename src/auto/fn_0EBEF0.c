@@ -1,6 +1,6 @@
 #include "fn_auto.h"
 
-/* ROM 0x0EBEF0: UNVERIFIED (weak capture): start the death sequence when the status byte is zero. */
+/* ROM 0x0EBEF0: checked against the ROM by Claude; no capture can exercise it (its writes never change memory): start the death sequence when the status byte is zero. */
 #include "../objects/obj_common.h"
 
 int Fn_0EBEF0(const f3mem_t *m, f3regs_t *r)

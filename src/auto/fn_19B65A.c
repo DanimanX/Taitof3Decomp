@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x19B65A: UNVERIFIED (weak capture): Wait for a boss trigger, then move and intermittently draw a part along its approach script. */
+/* ROM 0x19B65A: verified: the capture discriminates (an empty body fails it): Wait for a boss trigger, then move and intermittently draw a part along its approach script. */
 #include "fn_sprite_regs.h"
 #include "../objects/obj_anim.h"
 #include "../objects/obj_script10.h"

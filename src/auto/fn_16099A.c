@@ -1,6 +1,6 @@
 #include "fn_auto.h"
 
-/* ROM 0x16099A: UNVERIFIED (weak capture): calculate the perspective boundary from the scroll word. */
+/* ROM 0x16099A: verified: the capture discriminates (an empty body fails it): calculate the perspective boundary from the scroll word. */
 int Fn_16099A(const f3mem_t *m, f3regs_t *r)
 {
     uint16_t y = (0x7Fu - rd16(m, r->a[5] + 0x4218u)) & 0xFFu;

@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x11A320: UNVERIFIED (weak capture): Pull a pattern from the parent queue and initialize its sprite list. */
+/* ROM 0x11A320: verified: the capture discriminates (an empty body fails it): Pull a pattern from the parent queue and initialize its sprite list. */
 #include "batch_obj_regs.h"
 
 /* ROM 0x11A444..0x11A64C: the records start with a divisor followed by

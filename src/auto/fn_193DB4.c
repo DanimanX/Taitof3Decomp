@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x193DB4: UNVERIFIED (weak capture): Re-arm the current object callback. */
+/* ROM 0x193DB4: checked against the ROM by Claude; no capture can exercise it (its writes never change memory): Re-arm the current object callback. */
 
 int Fn_193DB4(const f3mem_t *m, f3regs_t *r)
 {

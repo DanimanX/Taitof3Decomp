@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x10C178: UNVERIFIED (weak capture): follow the parent, transfer the hit state, and register collision bounds. */
+/* ROM 0x10C178: verified: the capture discriminates (an empty body fails it): follow the parent, transfer the hit state, and register collision bounds. */
 #include "../enemy/obj_E8B72.h"
 #include "../objects/obj_common.h"
 

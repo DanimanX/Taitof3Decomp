@@ -11,6 +11,9 @@ for f in $(git -C "$W" status --short | awk '/^\?\? src\/auto\/fn_[0-9A-F]+\.c/{
   neg=$(grep -c 'return -1' "$W/$f"); raw=$(grep -c 'Sound_PlayCmd(' "$W/$f")
   printf '#include "fn_auto.h"\nint Fn_%s(const f3mem_t *m, f3regs_t *r){(void)m;(void)r;return 0;}\n' "$a" > "work/zcap/drafts/null_$a.c"
   cc -std=c11 -O1 -iquote src/auto -DFN1=Fn_$a -DFN1_ADDR="\"$a\"" -o "build/null_$a" tests/test_fn.c "work/zcap/drafts/null_$a.c" build/libf3.a 2>/dev/null
-  nul=$(./build/null_$a | grep -c ' @')
+  # weak = an empty body passes the whole capture (registers included); the
+  # value is the number of calls the empty body fails (0 = weak). Counting only
+  # RAM-diff lines wrongly called register-only routines weak.
+  nul=$(./build/null_$a | grep -oE '[0-9]+/ *[0-9]+ calls' | tail -1 | awk -F'[/ ]+' '{print $2-$1}'); nul=${nul:-0}
   echo "$a $mode ret-1=$neg rawPlayCmd=$raw null_ramdiffs=$nul"
 done

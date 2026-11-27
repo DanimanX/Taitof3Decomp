@@ -3,11 +3,14 @@
  *   scripts/capture_fn.sh 1057C 105EA 300 work/ram/objspawn   (Obj_Spawn)
  *   scripts/capture_fn.sh 105EC 1060C 300 work/ram/objfree    (Obj_Free)
  *   F3_LOG=104EE scripts/capture_fn.sh 104B8 10500 60 work/ram/objrun
- *     (Obj_RunGroups: every object tick call A0=obj, A1=fn is logged) */
+ *     (Obj_RunGroups: every object tick call A0=obj, A1=fn is logged)
+ *   F3_LOG=10568 SEG_OUT=work/ram/task_g11 scripts/seg_capture.sh 010508 010506 04 4000 30
+ *     (Task_ObjGroup11Runner loop pass, 0x010508 to the next TRAP #5) */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../src/objects/obj_pool.h"
+#include "../src/kernel/tasks.h"
 
 enum { R_D0 = 0, R_A0 = 8, R_A1 = 9, R_SP = 15, NREG = 16 };
 typedef struct { uint32_t pre[NREG], post[NREG]; uint32_t *log; int nlog; } regs_t;
@@ -102,13 +105,15 @@ static int test(const char *pfx, int kind, int *npairs, int *extra)
             d += ram_diff(work, post, sp, i, "free", &shown);
         } else {
             cmp_ctx c = { r[i].log, r[i].nlog, 0, 0 };
-            Obj_RunGroups(&m, cmp_cb, &c);
+            uint32_t snap = OBJ_SNAP_MASKS, len = 44;
+            if (kind == 3) { TaskGroup11_Frame(&m, cmp_cb, &c); snap = 0x41005Cu; len = 4; }
+            else Obj_RunGroups(&m, cmp_cb, &c);
             if (c.pos != c.n) c.bad++;
             *extra += c.n;
             if (c.bad && shown++ < 8) printf("  run pair %d: %d calls in C vs %d in MAME, %d mismatches\n", i, c.pos, c.n, c.bad);
             d += c.bad;
             /* the loop itself only writes the snapshot masks */
-            if (memcmp(work + (OBJ_SNAP_MASKS - F3_WRAM_BASE), post + (OBJ_SNAP_MASKS - F3_WRAM_BASE), 44)) {
+            if (memcmp(work + (snap - F3_WRAM_BASE), post + (snap - F3_WRAM_BASE), len)) {
                 d++;
                 if (shown++ < 8) printf("  run pair %d: snapshot masks differ\n", i);
             }
@@ -128,15 +133,19 @@ int main(void)
         { "work/ram/objspawn_full", "Obj_Spawn", 0 }, /* F3_POKE32: groups 0..10 full */
         { "work/ram/objfree", "Obj_Free", 1 },
         { "work/ram/objrun", "Obj_RunGroups", 2 },
+        { "work/ram/task_g11", "Group11 task", 3 },
+        { "work/ram/task_g11p", "Group11 paused", 3 },   /* F3_POKE8=406BB5=02 */
+        { "work/ram/task_g11z14", "Group11 Z14", 3 },
+        { "work/ram/task_g11z27", "Group11 Z27", 3 },
     };
     int rc = 0, any = 0;
-    for (int k = 0; k < 4; k++) {
+    for (int k = 0; k < (int)(sizeof t / sizeof t[0]); k++) {
         int n = 0, extra = 0, bad = test(t[k].pfx, t[k].kind, &n, &extra);
         if (bad < 0) { printf("objpool: %-14s SKIP (no %s capture)\n", t[k].name, t[k].pfx); continue; }
         any = 1;
         printf("objpool: %-14s %3d/%3d calls bit-exact", t[k].name, n - bad, n);
         if (t[k].kind == 0) printf(" (%d pool-full)", extra);
-        if (t[k].kind == 2) printf(" (%d object ticks, same fn/obj order)", extra);
+        if (t[k].kind >= 2) printf(" (%d object ticks, same fn/obj order)", extra);
         printf("\n");
         if (bad || n == 0) rc = 1;
     }

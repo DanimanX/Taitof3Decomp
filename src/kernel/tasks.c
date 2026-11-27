@@ -3,7 +3,10 @@
  * on 20 loop passes (test "Task 0x0C63F2 Collision loop", capture from the
  * resume PC to the next TRAP #5 with F3_NOIRQ=1) and TaskCollision_Init on 3
  * task starts (test "Task 0x0C63E8 Collision init"; weak: the lists were
- * already empty, only 2 bytes change). The Group11 task is UNVERIFIED. */
+ * already empty, only 2 bytes change). The Group11 task is verified in
+ * tests/test_objpool.c (100 loop passes from zones 04/14/27, 10 of them paused
+ * by F3_POKE8=406BB5=02; tick fn/obj order logged at 0x010568) and its setup
+ * 0x010516 on 20 injected calls (test_fn "Task 0x010516 Group11 init"). */
 #include "tasks.h"
 #include "../collision/collision.h"
 

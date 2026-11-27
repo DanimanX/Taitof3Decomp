@@ -64,7 +64,7 @@ static void reset_masks(const f3mem_t *m, uint16_t g, uint16_t n, int both)
     uint16_t end = (uint16_t)((g + n) * 32u);
     for (uint16_t bit = (uint16_t)(g * 32u); bit < end; bit++) {
         mask_set1(m, bit, 1);
-        if (both) mask_set1(m, OBJ_SNAP_MASKS - OBJ_FREE_MASKS + bit, 1);
+        if (both) mask_set1(m, (uint16_t)((OBJ_SNAP_MASKS - OBJ_FREE_MASKS) * 8u + bit), 1); /* byte gap in bits */
     }
 }
 

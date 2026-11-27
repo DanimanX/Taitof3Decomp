@@ -19,7 +19,10 @@ for ln in open(f"{ROOT}/work/functions.tsv"):
         funcs[int(p[0], 16)] = (int(p[1]), p[2])
 dec = set()
 for f in glob.glob(f"{ROOT}/src/**/*.[ch]", recursive=True):
-    dec |= {int(x, 16) for x in re.findall(r"ROM 0x([0-9A-Fa-f]{4,6})", open(f).read())}
+    # "ROM 0xA" and comma lists "ROM 0xA, 0xB, 0xC" (one comment naming
+    # several routines translated together)
+    for lst in re.findall(r"ROM (0x[0-9A-Fa-f]{4,6}(?:,\s*0x[0-9A-Fa-f]{4,6})*)", open(f).read()):
+        dec |= {int(x, 16) for x in re.findall(r"0x([0-9A-Fa-f]{4,6})", lst)}
 # stubs (integrated so workers can fill them) are not decompiled. Only the
 # stub's own entry point is dropped: subtracting every "ROM 0x..." the stub
 # file mentions also removed helpers that other, decompiled routines reuse.

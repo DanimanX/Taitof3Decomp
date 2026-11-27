@@ -178,6 +178,8 @@ void TaskStageTimeline_Frame(const f3mem_t *m);
 static int ad_task_timeline(const f3mem_t *m, f3regs_t *r) { (void)r; TaskStageTimeline_Frame(m); return 0; }
 /* task setup: from the task entry to its first TRAP #5 */
 static int ad_task_coll_init(const f3mem_t *m, f3regs_t *r) { (void)r; TaskCollision_Init(m); return 0; }
+/* 0x010516 (Group11 setup), injected with F3_INJECT=010516 from Y14_002500 */
+static int ad_task_g11_init(const f3mem_t *m, f3regs_t *r) { (void)r; TaskGroup11_Init(m); return 0; }
 /* ROM 0x002274 scheduler: stop PC is the RTE of the path taken (idle path
  * selects slot A5-0x194C, task paths A5-0x1948+4*id) */
 static int ad_sched(const f3mem_t *m, f3regs_t *r)
@@ -264,6 +266,7 @@ static const fn_entry_t fns[] = {
     { "Seg 0x0B9632 0B935A group",  "work/ram/seg_0B9632", ad_seg, SEGREGS },
     { "Task 0x0C63E8 Collision init",  "work/ram/task_init_coll", ad_task_coll_init, { { 0, 0u } } },
     { "Kernel 0x002274 scheduler",     "work/ram/seg_002274", ad_sched, SEGREGS },
+    { "Task 0x010516 Group11 init",    "work/ram/task_init_g11", ad_task_g11_init, { { 0, 0u } } },
     { "Task 0x13F2C6 Timeline init",   "work/ram/task_init_tl", ad_task_timeline_init, { { 0, 0u } } },
     { "Task 0x13F2CC Timeline loop",   "work/ram/task_timeline", ad_task_timeline, { { 0, 0u } } },
 };

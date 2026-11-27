@@ -28,3 +28,9 @@ Rules:
 - Do not commit.
 
 Final report: one line per routine: PASS (N/N) / UNVERIFIED-DONE / SKIPPED (reason), then any shared file you touched.
+
+Kernel tasks: if a routine is a task body (it loops through TRAP #5 and never reaches rts), translate it like src/kernel/tasks.c (read it): Fn_<ADDR> runs the code before the first TRAP #5 and returns 0 there, and an exported function Task<Name>_Frame(const f3mem_t *m, ...) with its prototype in src/auto/fn_auto.h runs one pass of the loop after the yield. Mark it UNVERIFIED (no capture) as usual.
+
+More setup facts:
+- work/ram is a SYMLINK to the main repo's captures: use ls -L / test -e, not find (find does not follow it). The captures are there.
+- Some routines are already translated inline inside another file (grep -rn "<ADDR without leading zeros>" src/, e.g. 0x118E0C..0x118E72 in src/enemy/obj_118D7C.c call_fade_wrapper, 0x0CD3B2 in src/enemy/obj_CCF72.c). Reuse that logic (copy the helper as a static in your file if it is static there) and still write the standalone Fn_<ADDR> with its own test entry.

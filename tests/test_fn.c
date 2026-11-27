@@ -180,14 +180,17 @@ static int ad_task_timeline(const f3mem_t *m, f3regs_t *r) { (void)r; TaskStageT
 static int ad_task_coll_init(const f3mem_t *m, f3regs_t *r) { (void)r; TaskCollision_Init(m); return 0; }
 /* 0x010516 (Group11 setup), injected with F3_INJECT=010516 from Y14_002500 */
 static int ad_task_g11_init(const f3mem_t *m, f3regs_t *r) { (void)r; TaskGroup11_Init(m); return 0; }
-/* ROM 0x002274 scheduler: stop PC is the RTE of the path taken (idle path
- * selects slot A5-0x194C, task paths A5-0x1948+4*id) */
-static int ad_sched(const f3mem_t *m, f3regs_t *r)
-{
-    if (Fn_002274(m, r) < 0) return -1;
-    seg_stop = rd32(m, r->a[5] - 0x1900u) == r->a[5] - 0x194Cu ? 0x2310u : 0x22DCu;
-    return 0;
-}
+#include "../src/kernel/kernel.h"
+/* kernel calls (src/kernel/kernel.h): stop PC = the RTE reached */
+#define KERN_AD(A) static int ad_k_##A(const f3mem_t *m, f3regs_t *r) { seg_stop = Kern_##A(m, r); return 0; }
+static uint32_t Kern_002274(const f3mem_t *m, f3regs_t *r) { return Kern_Schedule(m, r); }
+KERN_AD(002274)
+KERN_AD(001E76)
+KERN_AD(001E0E)
+KERN_AD(001E48)
+KERN_AD(001F30)
+KERN_AD(001F78)
+/* END kernel adapters */
 static int ad_task_timeline_init(const f3mem_t *m, f3regs_t *r) { return Fn_13F2C6(m, r) < 0 ? -1 : 0; }
 
 #define ALLREGS { { CR_D0, 0xFFFFFFFFu }, { CR_D0 + 1, 0xFFFFFFFFu }, { CR_A0, 0xFFFFFFFFu }, { CR_A0 + 1, 0xFFFFFFFFu } }
@@ -265,7 +268,12 @@ static const fn_entry_t fns[] = {
     { "Seg 0x0B958C 0B935A group",  "work/ram/seg_0B958C", ad_seg, SEGREGS },
     { "Seg 0x0B9632 0B935A group",  "work/ram/seg_0B9632", ad_seg, SEGREGS },
     { "Task 0x0C63E8 Collision init",  "work/ram/task_init_coll", ad_task_coll_init, { { 0, 0u } } },
-    { "Kernel 0x002274 scheduler",     "work/ram/seg_002274", ad_sched, SEGREGS },
+    { "Kernel 0x002274 scheduler",     "work/ram/seg_002274", ad_k_002274, SEGREGS },
+    { "Kernel 0x001E76 TRAP 1",        "work/ram/fn_001E76", ad_k_001E76, SEGREGS },
+    { "Kernel 0x001E0E TRAP 2",        "work/ram/fn_001E0E", ad_k_001E0E, SEGREGS },
+    { "Kernel 0x001E48 TRAP 3",        "work/ram/fn_001E48", ad_k_001E48, SEGREGS },
+    { "Kernel 0x001F30 TRAP 4",        "work/ram/fn_001F30", ad_k_001F30, SEGREGS },
+    { "Kernel 0x001F78 TRAP 5",        "work/ram/fn_001F78", ad_k_001F78, SEGREGS },
     { "Task 0x010516 Group11 init",    "work/ram/task_init_g11", ad_task_g11_init, { { 0, 0u } } },
     { "Task 0x13F2C6 Timeline init",   "work/ram/task_init_tl", ad_task_timeline_init, { { 0, 0u } } },
     { "Task 0x13F2CC Timeline loop",   "work/ram/task_timeline", ad_task_timeline, { { 0, 0u } } },

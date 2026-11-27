@@ -36,7 +36,7 @@ review() { # commit
 
 commits() {
   if [ $# -gt 0 ]; then printf '%s\n' "$@"; return; fi
-  git log --format='%H %s' -40 | grep ' feat: [0-9]* routines from .*round.*codewhale' | cut -d' ' -f1 | tac
+  git log --format='%H %s' -40 | grep -E ' (feat: [0-9]* routines from .*round.*codewhale|codex round [0-9]+)' | cut -d' ' -f1 | tac
 }
 
 while :; do

@@ -34,6 +34,27 @@ for ln in open(f"{ROOT}/docs/PROGRESS.md"):
     if "VERIFIED" in ln and ln.startswith("|"):
         cell = ln.split("|")[1]
         ver |= {int(x, 16) for x in re.findall(r"0x([0-9A-Fa-f]{4,6})", cell)}
+# Routines with their own differential test against a MAME capture on disk
+# (test_fn: tests/fn_auto.inc + tests/test_fn.c; test_objects: run(...)), the
+# suites being required to pass before every commit. Excluded: files tagged
+# UNVERIFIED (weak or no capture) and rows of work/zcap/unverified.tsv.
+def has_cap(pfx):
+    return any(os.path.exists(f"{ROOT}/{pfx}_{s}") for s in ("pairs.bin", "regs.tsv"))
+unver = set()
+for ln in open(f"{ROOT}/work/zcap/unverified.tsv"):
+    if ln.strip():
+        unver.add(int(ln.split()[0], 16))
+for f in glob.glob(f"{ROOT}/src/**/*.c", recursive=True):
+    head = "\n".join(open(f).read().split("\n")[:6])
+    m = re.search(r"ROM 0x([0-9A-Fa-f]{4,6}): UNVERIFIED", head)
+    if m:
+        unver.add(int(m.group(1), 16))
+tested = set()
+for t in ("tests/fn_auto.inc", "tests/test_fn.c", "tests/test_objects.c"):
+    for name, pfx in re.findall(r'"([^"]*0x[0-9A-Fa-f]{4,6}[^"]*)",\s*"(work/ram/[^"]+)"', open(f"{ROOT}/{t}").read()):
+        if has_cap(pfx):
+            tested |= {int(x, 16) for x in re.findall(r"0x([0-9A-Fa-f]{4,6})", name)}
+ver |= tested - unver
 dec_f = {a for a in funcs if a in dec}
 ver_f = {a for a in dec_f if a in ver}
 fsum = lambda s: sum(funcs[a][0] for a in s)

@@ -190,6 +190,34 @@ KERN_AD(001E0E)
 KERN_AD(001E48)
 KERN_AD(001F30)
 KERN_AD(001F78)
+/* VBlank path: per-pair input ports from <cap>_ports.tsv (F3_PORTS=1); the
+ * frame tick's dead stack frame below *tick_sp is skipped (skip_lo/hi). */
+static const char *cur_cap; static int cur_pair; static uint32_t skip_lo, skip_hi;
+static const uint8_t *pair_ports(void)
+{
+    static char path[256]; static uint8_t tab[512][32]; static int n = -1;
+    char want[256]; snprintf(want, sizeof want, "%s_ports.tsv", cur_cap);
+    if (n < 0 || strcmp(path, want)) {
+        snprintf(path, sizeof path, "%s", want); n = 0;
+        FILE *f = fopen(path, "r"); char ln[128];
+        while (f && fgets(ln, sizeof ln, f) && n < 512) {
+            int k; char hx[65];
+            if (sscanf(ln, "%d\t%64s", &k, hx) == 2 && k == n) {
+                for (int b = 0; b < 32; b++) { unsigned v; sscanf(hx + 2 * b, "%2x", &v); tab[n][b] = (uint8_t)v; }
+                n++;
+            }
+        }
+        if (f) fclose(f);
+    }
+    return cur_pair < n ? tab[cur_pair] : NULL;
+}
+#define KERN_VB(A) static int ad_k_##A(const f3mem_t *m, f3regs_t *r) { \
+    const uint8_t *p = pair_ports(); uint32_t tsp = 0; \
+    seg_stop = Kern_##A(m, r, p, &tsp); if (!seg_stop) return -1; \
+    skip_lo = tsp - 0x400u; skip_hi = tsp; return 0; }
+KERN_VB(00222E)
+KERN_VB(001A34)
+KERN_VB(001A54)
 /* END kernel adapters */
 static int ad_task_timeline_init(const f3mem_t *m, f3regs_t *r) { return Fn_13F2C6(m, r) < 0 ? -1 : 0; }
 
@@ -268,6 +296,10 @@ static const fn_entry_t fns[] = {
     { "Seg 0x0B958C 0B935A group",  "work/ram/seg_0B958C", ad_seg, SEGREGS },
     { "Seg 0x0B9632 0B935A group",  "work/ram/seg_0B9632", ad_seg, SEGREGS },
     { "Task 0x0C63E8 Collision init",  "work/ram/task_init_coll", ad_task_coll_init, { { 0, 0u } } },
+    { "Kernel 0x00222E preempt Z01",    "work/ram/fn_00222E", ad_k_00222E, SEGREGS },
+    { "Kernel 0x00222E preempt Z04",    "work/ram/fn_00222E_z04", ad_k_00222E, SEGREGS },
+    { "Kernel 0x001A34 IRQ2 VBlank",    "work/ram/fn_001A34", ad_k_001A34, SEGREGS },
+    { "Kernel 0x001A54 IRQ3",           "work/ram/fn_001A54", ad_k_001A54, SEGREGS },
     { "Kernel 0x002274 scheduler",     "work/ram/seg_002274", ad_k_002274, SEGREGS },
     { "Kernel 0x001E76 TRAP 1",        "work/ram/fn_001E76", ad_k_001E76, SEGREGS },
     { "Kernel 0x001E0E TRAP 2",        "work/ram/fn_001E0E", ad_k_001E0E, SEGREGS },
@@ -300,7 +332,9 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         /* a call whose post dump is in a later frame than its pre dump was
          * interrupted by VBlank: the IRQ handler's writes (frame counter,
          * task mask, ...) are in the post state, so no routine can match it */
-        if (c.fpre && c.fpre[i] != c.fpost[i]) { irq++; continue; }
+        /* the VBlank path itself advances the frame counter by one */
+        int vb = e->fn == ad_k_00222E || e->fn == ad_k_001A34 || e->fn == ad_k_001A54;
+        if (c.fpre && c.fpost[i] != c.fpre[i] + (vb && c.fpost[i] != c.fpre[i] ? 1u : 0u)) { irq++; continue; }
         memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
         if (g) memcpy(g, cap_gfx(&c, i, 0), F3_GFX_SIZE);
         if (s) memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
@@ -308,7 +342,10 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         f3regs_t r;
         for (int k = 0; k < 8; k++) { r.d[k] = c.pre[i][CR_D0 + k]; r.a[k] = c.pre[i][CR_A0 + k]; }
         seg_stop = 0; seg_entry = c.pcpre ? c.pcpre[i] : 0;
+        cur_cap = e->cap; cur_pair = i; skip_lo = skip_hi = 0;
         if (e->fn(&m, &r) < 0) { undec++; continue; }
+        if (skip_hi > skip_lo && skip_lo >= F3_WRAM_BASE && skip_hi <= F3_WRAM_BASE + F3_WRAM_SIZE)
+            memcpy(w + (skip_lo - F3_WRAM_BASE), cap_wram(&c, i, 1) + (skip_lo - F3_WRAM_BASE), skip_hi - skip_lo);
         uint32_t sp = c.pre[i][CR_SP];
         int d = cap_diff(e->name, i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x100u, sp, &budget);
         if (g) d += cap_diff(e->name, i, F3_GFX_BASE, g, cap_gfx(&c, i, 1), F3_GFX_SIZE, 0, 0, &budget);

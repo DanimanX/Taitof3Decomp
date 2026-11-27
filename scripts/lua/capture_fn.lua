@@ -135,6 +135,12 @@ for pc, _ in pairs(logs) do cpu.debug:bpset(pc, "", "") end
 local dp = want_dpram and assert(io.open(prefix .. "_dpram.bin", "wb")) or nil
 local spf = os.getenv("F3_SPR") == "1" and assert(io.open(prefix .. "_spr.bin", "wb")) or nil
 local gff = os.getenv("F3_GFX") == "1" and assert(io.open(prefix .. "_gfx.bin", "wb")) or nil
+-- F3_PORTS=1: <prefix>_ports.tsv gets, per pair, the 32 input-port bytes at
+-- 0x4A0000..0x4A001F sampled at entry (IO_PollInputs 0x001A78 reads them;
+-- they are MMIO, not part of the RAM dumps). Interrupts must be masked
+-- (F3_NOIRQ) so the frame cannot change between entry and the poll.
+local portf = os.getenv("F3_PORTS") == "1" and assert(io.open(prefix .. "_ports.tsv", "w")) or nil
+local pre_ports = ""
 -- snapshot() returns the dumps as strings; pairs are written only when the
 -- post is reached, so an abandoned pre (routine left without returning)
 -- never desynchronises the output files.
@@ -225,6 +231,11 @@ emu.register_periodic(function()
     if not pokefn and not pokeat then poke_a0() end
     if sweep > 0 then sp:write_u16(spv + 4, sweep_base + pairs_done % sweep) end
     pre_snap = snapshot(); pre_regs = regline_str(pairs_done, "pre"); pending_logs = {}; have_pre = true
+    if portf then
+      local t = {}
+      for k = 0, 31 do t[#t + 1] = string.format("%02X", sp:read_u8(0x4A0000 + k)) end
+      pre_ports = table.concat(t)
+    end
     if noirq then saved_sr = cpu.state["SR"].value; cpu.state["SR"].value = saved_sr | 0x0700 end
     linger_left = linger
     if exit_ret then
@@ -242,6 +253,7 @@ emu.register_periodic(function()
   elseif have_pre and (exits[pc] or (exit_ret and pc == ret_pc and spv == ret_sp + 4)) then
     if ret_bp then cpu.debug:bpclear(ret_bp); ret_bp = nil; ret_pc = nil end
     emit(pre_snap); regs:write(pre_regs); regs:write(table.concat(pending_logs))
+    if portf then portf:write(string.format("%d\t%s\n", pairs_done, pre_ports)); portf:flush() end
     emit(snapshot()); regs:write(regline_str(pairs_done, "post")); have_pre = false
     if noirq and saved_sr then
       local cur = cpu.state["SR"].value

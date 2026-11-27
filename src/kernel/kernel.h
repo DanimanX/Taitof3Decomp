@@ -29,4 +29,10 @@ uint32_t Kern_002156(const f3mem_t *m, f3regs_t *r); /* ROM 0x002156 TRAP #10 ta
 uint32_t Kern_0021BE(const f3mem_t *m, f3regs_t *r); /* ROM 0x0021BE TRAP #11 task hand over */
 uint32_t Kern_00220E(const f3mem_t *m, f3regs_t *r); /* ROM 0x00220E TRAP #12 task word or */
 
+/* VBlank path: ports = 0x4A0000..1F image for IO_PollInputs; *tick_sp = the
+ * SP the frame tick ran on (its frame below it is dead). 0 = untranslated. */
+uint32_t Kern_00222E(const f3mem_t *m, f3regs_t *r, const uint8_t *ports, uint32_t *tick_sp); /* ROM 0x00222E */
+uint32_t Kern_001A34(const f3mem_t *m, f3regs_t *r, const uint8_t *ports, uint32_t *tick_sp); /* ROM 0x001A34 */
+uint32_t Kern_001A54(const f3mem_t *m, f3regs_t *r, const uint8_t *ports, uint32_t *tick_sp); /* ROM 0x001A54 */
+
 #endif

@@ -25,12 +25,12 @@ void IO_EdgeDetectExact(const f3mem_t *m); /* ROM 0x001B8E, on 0x40221C */
  * prev_shifted=0 shifts prev := cur first; 1 uses the prev already in RAM. */
 void IO_EdgeDetectExactFrom(const f3mem_t *m, int prev_shifted);
 
-/* Channel packing of 0x001A78 from an 8-byte image of 0x4A0000..0x4A0007.
- * [0]=sys/coin/dip low, [1]=sys/coin/dip high, [2]=P1/P2 aux,
- * [3]={P2[7:4],P1[7:4]}, [7]={P4[3:0],P3[3:0]}; see docs/KERNEL.md. */
-void IO_PollPack(const uint8_t ports[8], uint8_t ch[6]);
+/* Channel packing of 0x001A78 from the 0x20-byte image of 0x4A0000..0x4A001F
+ * (bytes 0x00-0x03, 0x07, 0x12 and 0x17 are read). */
+#define IO_PORT_BYTES 0x20
+void IO_PollPack(const uint8_t ports[IO_PORT_BYTES], uint8_t ch[6]);
 
-/* ROM 0x001A78 IO_PollInputs. ports == NULL samples 0x4A0000 (all zero in a
+/* ROM 0x001A78 IO_PollInputs. ports = the 0x20-byte image of 0x4A0000; NULL = all zero (all zero in a
  * RAM-only capture: the port image is not part of it). Always shifts
  * cur->prev, writes 0 to 0x4A0000 and the two shadows to /4A0004, /4A0014,
  * stores the packed bytes into io_ch[i].cur, then IO_EdgeDetect (001B8E).

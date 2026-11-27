@@ -7,12 +7,15 @@
  *   move.b A5-0x5DCC,0x4A0004                 ; shadows -> MMIO
  *   move.b A5-0x5DCB,0x4A0014
  *   prev[i] = cur[i] for i = 5..0             ; six move.b -0x5DE4,-0x5DE2 ...
- *   cur[0] = ports[3].hi<<4 | ports[7].lo | ports[2].bit4<<3
- *   cur[1] = ports[3].hi<<4 | ports[7].hi   | ports[2].bit5<<3
- *   cur[2] = ports[2].hi<<4 | ports[7].lo   | ports[2].bit6<<2
- *   cur[3] = ports[2].hi<<4 | ports[7].hi   | ports[2].bit7
- *   cur[4] = ports[1].hi<<4 | ports[2].lo
- *   cur[5] = ports[0].lo    | ports[1].bit1<<3
+ *   cur[i] at 0x40221C + 4*i, p = port bytes at 0x4A0000 + n (see IO_PollPack):
+ *   cur[2] = p[3]<<4 & 0x70 | p[7] & 0x0F | (p[2] & 0x10)<<3      (P1)
+ *   cur[3] = p[3] & 0x70    | p[7] >> 4   | (p[2] & 0x20)<<2      (P2)
+ *   cur[4] = p[0x12]<<4 & 0x70 | p[0x17] & 0x0F | (p[2] & 0x40)<<1 (P3)
+ *   cur[5] = p[0x12] & 0x70 | p[0x17] >> 4 | p[2] & 0x80          (P4)
+ *   cur[1] = p[1] & 0xF0    | p[2] & 0x0F
+ *   cur[0] = p[0] & 0x0F    | (p[1] & 0x02)<<3
+ *   (fixed 2026-11-27 against the VBlank capture: the old table permuted
+ *   the channels and read P3/P4 from p[2]/p[7]; all-zero ports hid it)
  *   jsr 0x001B8E
  *   move.b D0b is a byte store, so D0 keeps the 0x..FE of the last pack.
  *
@@ -55,20 +58,22 @@ void IO_EdgeDetect(void)
     }
 }
 
-void IO_PollPack(const uint8_t ports[8], uint8_t ch[6])
+/* 0x001AB4..0x001B84: ch[i] is the byte at IO_BASE + 4*i (0x40221C + 4*i);
+ * p = the 0x20-byte port image at 0x4A0000. ROM write order: ch2, ch3, ch4,
+ * ch5, ch1, ch0 (no channel reads another, so the order is not visible). */
+void IO_PollPack(const uint8_t p[IO_PORT_BYTES], uint8_t ch[6])
 {
-    const uint8_t p0 = ports[0], p1 = ports[1], p2 = ports[2], p3 = ports[3], p7 = ports[7];
-    ch[0] = (uint8_t)((p3 << 4) & 0x70u) | (uint8_t)(p7 & 0x0Fu) | (uint8_t)((p2 & 0x10u) << 3);
-    ch[1] = (uint8_t)(p3 & 0x70u) | (uint8_t)(p7 >> 4) | (uint8_t)((p2 & 0x20u) << 2);
-    ch[2] = (uint8_t)((p2 << 4) & 0x70u) | (uint8_t)(p7 & 0x0Fu) | (uint8_t)((p2 & 0x40u) << 1);
-    ch[3] = (uint8_t)(p2 & 0x70u) | (uint8_t)(p7 >> 4) | (uint8_t)(p2 & 0x80u);
-    ch[4] = (uint8_t)(p1 & 0xF0u) | (uint8_t)(p2 & 0x0Fu);
-    ch[5] = (uint8_t)(p0 & 0x0Fu) | (uint8_t)((p1 & 0x02u) << 3);
+    ch[2] = (uint8_t)(((p[0x03] << 4) & 0x70u) | (p[0x07] & 0x0Fu) | ((p[0x02] & 0x10u) << 3));
+    ch[3] = (uint8_t)((p[0x03] & 0x70u) | (p[0x07] >> 4) | ((p[0x02] & 0x20u) << 2));
+    ch[4] = (uint8_t)(((p[0x12] << 4) & 0x70u) | (p[0x17] & 0x0Fu) | ((p[0x02] & 0x40u) << 1));
+    ch[5] = (uint8_t)((p[0x12] & 0x70u) | (p[0x17] >> 4) | (p[0x02] & 0x80u));
+    ch[1] = (uint8_t)((p[0x01] & 0xF0u) | (p[0x02] & 0x0Fu));
+    ch[0] = (uint8_t)((p[0x00] & 0x0Fu) | ((p[0x01] & 0x02u) << 3));
 }
 
 void IO_PollInputs(const f3mem_t *m, const uint8_t *ports)
 {
-    static const uint8_t zero[8];
+    static const uint8_t zero[IO_PORT_BYTES];
     if (!ports) ports = zero;
 
     /* 0x001A80/0x001A88 push the two hardware shadows to the 0x4A0004 /

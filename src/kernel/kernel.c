@@ -1,19 +1,27 @@
 /* Kernel: task scheduler and the TRAP system calls (see kernel.h). */
 #include "kernel.h"
+#include "../video/sprite.h"
+#include "../io/input.h"
+#include "../kernel/soundque.h"
 
 /* ROM 0x002274: scheduler loop. Scan runnable tasks, update sleep timers, and
  * restore the selected task or idle context, up to (not including) the RTE at
  * 0x0022DC (task) or 0x002310 (idle). Verified 40/40 (tests/test_fn.c,
  * work/ram/seg_002274: 36 task, 4 idle restores). */
-uint32_t Kern_Schedule(const f3mem_t *m, f3regs_t *r)
+/* start < 0: enter at 0x002274 (next id). start >= 0: enter at 0x002284 with
+ * D0.w = start (Kernel_Preempt resumes the scan there). */
+static uint32_t schedule(const f3mem_t *m, f3regs_t *r, int start)
 {
     uint32_t globals = r->a[5];
     uint32_t status;
     uint32_t saved_sp;
     uint32_t rte_pc = 0x000022DCu;
     for (;;) {
-        uint16_t id = rd16(m, globals - 0x1906u) + 1u;
-        if (id == 0x20u) { /* 0x002280 -> 0x0022DE */
+        uint16_t id;
+        if (start >= 0) {
+            id = (uint16_t)start;
+            start = -1;
+        } else if ((id = (uint16_t)(rd16(m, globals - 0x1906u) + 1u)) == 0x20u) { /* 0x002280 -> 0x0022DE */
             if (!rd8(m, globals - 0x1452u) && rd8(m, globals - 0x1907u)) {
                 wr8(m, globals - 0x1908u, 0xFFu);
                 uint32_t idle_slot = globals - 0x194Cu;
@@ -65,6 +73,8 @@ uint32_t Kern_Schedule(const f3mem_t *m, f3regs_t *r)
     r->a[7] = saved_sp + 60u;
     return rte_pc;
 }
+
+uint32_t Kern_Schedule(const f3mem_t *m, f3regs_t *r) { return schedule(m, r, -1); }
 
 /* The TRAP handlers below run from their entry to the RTE that ends them (or
  * to the bra into Kern_Schedule) with r = the registers at the trap: A7 points
@@ -441,4 +451,85 @@ uint32_t Kern_00220E(const f3mem_t *m, f3regs_t *r)
     uint32_t wslot = globals - 0x1878u + (int16_t)index;
     wr16(m, wslot, (uint16_t)(rd16(m, wslot) | (uint16_t)rd32(m, r->a[7] + 8u)));
     return 0x0000222Cu;                       /* 0x2228 pops d2-d3/a4 */
+}
+
+/* ROM 0x001A0E Kernel_FrameTick, register level: movem.l d0-d7/a0-a6 around
+ * the chain, so the caller's registers come back unchanged; the callees run
+ * on the saved copy. ports = the 0x20 bytes IO_PollInputs reads at 0x4A0000.
+ * Returns -1 (after the writes of the callees before it) when 0x000DFA or
+ * 0x00161E takes a path they do not translate. */
+static int frame_tick(const f3mem_t *m, const f3regs_t *r, const uint8_t *ports)
+{
+    f3regs_t t = *r;
+    Video_UploadScroll(m);                    /* jsr 0x001C90 */
+    IO_PollInputs(m, ports);                  /* jsr 0x001A78 */
+    if (Fn_000DFA(m, &t) < 0) return -1;      /* jsr 0x000DFA */
+    if (Fn_00161E(m, &t) < 0) return -1;      /* jsr 0x00161E */
+    (void)Sound_PushCmd(m);                   /* jsr 0x000BF6 */
+    uint16_t n = rd16(m, F3_A5 - 0x5D54u);
+    wr16(m, F3_A5 - 0x5D54u, (uint16_t)(n + 1u));
+    return 0;
+}
+
+/* ROM 0x00222E Kernel_Preempt (VBlank): save the interrupted context like a
+ * yield, run the frame tick, then resume the task scan. -$1908 set (the idle
+ * context was running): clear it, tick on the current stack, rescan from
+ * id 0. Otherwise clear the current task's wait bits (status & 0x3FFF), tick
+ * on the kernel stack A5-0x1B4C and rescan from the current id. The tick's
+ * stack frame (return address, movem image, callee frames) lies below the
+ * stack it ran on and is dead afterwards; *tick_sp receives that SP so a
+ * test can skip it. Returns the RTE PC, or 0 when the tick hit an
+ * untranslated path. */
+uint32_t Kern_00222E(const f3mem_t *m, f3regs_t *r, const uint8_t *ports, uint32_t *tick_sp)
+{
+    uint32_t g = r->a[5];
+    if (!ports) return 0;                     /* no port image: cannot tick */
+    uint32_t ctx = push_context(m, r);        /* 0x2232..0x223A */
+    r->a[6] = rd32(m, g - 0x1900u);
+    r->a[7] = ctx;
+    uint8_t idle = rd8(m, g - 0x1908u);
+    wr8(m, g - 0x1907u, idle);                /* 0x223C */
+    int start;
+    if (!idle) {
+        uint32_t slot = rd32(m, g - 0x18FCu);   /* 0x2244 */
+        uint16_t w = (uint16_t)(rd16(m, slot) & 0x3FFFu);
+        wr16(m, slot, w);
+        r->a[4] = slot;
+        r->a[7] = g - 0x1B4Cu;                  /* 0x2250 kernel stack */
+        *tick_sp = r->a[7];
+        if (frame_tick(m, r, ports) < 0) return 0;
+        r->a[4] = g - 0x1906u;
+        start = rd16(m, g - 0x1906u);           /* 0x225E */
+    } else {
+        wr8(m, g - 0x1908u, 0);                 /* 0x2262 */
+        *tick_sp = r->a[7];
+        if (frame_tick(m, r, ports) < 0) return 0;
+        r->a[4] = g - 0x1906u;
+        start = 0;                              /* 0x2270 */
+    }
+    r->d[0] = (r->d[0] & 0xFFFF0000u) | (uint16_t)start;
+    return schedule(m, r, start);             /* bra 0x002284 */
+}
+
+/* ROM 0x001A34 IRQ2 (VBlank): set -$5D4E, clear -$5D4D, then wait up to
+ * 0x401 polls for IRQ3 to set -$5D4D (D0 is saved and restored around the
+ * wait, so it leaves no trace) and jmp 0x00222E. Interrupts are masked in
+ * the capture, so IRQ3 cannot land inside the wait here. */
+uint32_t Kern_001A34(const f3mem_t *m, f3regs_t *r, const uint8_t *ports, uint32_t *tick_sp)
+{
+    wr8(m, r->a[5] - 0x5D4Eu, 0xFFu);
+    wr8(m, r->a[5] - 0x5D4Du, 0x00u);
+    wr32(m, r->a[7] - 4u, r->d[0]);           /* 0x1A3C movem.l d0,-(a7) */
+    return Kern_00222E(m, r, ports, tick_sp);
+}
+
+/* ROM 0x001A54 IRQ3: if IRQ2 is waiting (-$5D4E set) release it (set -$5D4D,
+ * clear -$5D4E) and RTE at 0x001A64; otherwise jmp 0x00222E. */
+uint32_t Kern_001A54(const f3mem_t *m, f3regs_t *r, const uint8_t *ports, uint32_t *tick_sp)
+{
+    if (!rd8(m, r->a[5] - 0x5D4Eu))
+        return Kern_00222E(m, r, ports, tick_sp);
+    wr8(m, r->a[5] - 0x5D4Du, 0xFFu);
+    wr8(m, r->a[5] - 0x5D4Eu, 0x00u);
+    return 0x00001A64u;
 }

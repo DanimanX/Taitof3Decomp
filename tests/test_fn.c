@@ -45,10 +45,27 @@ typedef struct {
     const char *name;
     const char *cap;
     fn_adapter_t fn;
-    reg_check_t out[4];   /* mask 0 ends the list */
+    reg_check_t out[17];  /* mask 0 ends the list */
 } fn_entry_t;
 
 /* ---- adapters ---------------------------------------------------------- */
+
+/* Segment adapters (task code translated in segments, src/kernel/seg.h) put
+ * the PC of the TRAP their segment stopped at here; CR_PC checks compare it
+ * with the capture's exit PC (F3_EXITPC column). */
+static uint32_t seg_stop, seg_entry;
+#include "../src/kernel/seg.h"
+/* one adapter for every segment capture: resume at the capture's entry PC */
+static int ad_seg(const f3mem_t *m, f3regs_t *r)
+{
+    seg_stop = Seg_Run(m, r, seg_entry);
+    return seg_stop == SEG_LEAVE ? -1 : 0;
+}
+/* every register a segment carries to the next one, plus where it stopped */
+#define SEGREGS { { CR_D0, ~0u }, { CR_D0 + 1, ~0u }, { CR_D0 + 2, ~0u }, { CR_D0 + 3, ~0u }, \
+    { CR_D0 + 4, ~0u }, { CR_D0 + 5, ~0u }, { CR_D0 + 6, ~0u }, { CR_D0 + 7, ~0u }, \
+    { CR_A0, ~0u }, { CR_A0 + 1, ~0u }, { CR_A0 + 2, ~0u }, { CR_A0 + 3, ~0u }, \
+    { CR_A0 + 4, ~0u }, { CR_A0 + 5, ~0u }, { CR_A0 + 6, ~0u }, { CR_SP, ~0u }, { CR_PC, ~0u } }
 
 /* ROM 0x005666: (8,A6)=src.l (0xC,A6)=dst.l (0x10,A6)=col.w; D0 = end dst */
 static int ad_005666(const f3mem_t *m, f3regs_t *r)
@@ -198,6 +215,9 @@ static const fn_entry_t fns[] = {
     { "Fn 0x11BC6E Obj_11BC6E_Wave",   "work/ram/fn_11BC6E", ad_11BC6E, { { CR_D0, 0xFFFFFFFFu } } },
     { "Fn 0x176390 LineFx_176390",     "work/ram/fn_176390", ad_176390, { { 0, 0u } } },
     { "Task 0x0C63F2 Collision loop",  "work/ram/task_coll", ad_task_coll, { { 0, 0u } } },
+    { "Seg 0x13F5B8 13F5B8 group",  "work/ram/seg_13F5B8", ad_seg, SEGREGS },
+    { "Seg 0x13F600 13F5B8 group",  "work/ram/seg_13F600", ad_seg, SEGREGS },
+    { "Seg 0x13F65C 13F5B8 group",  "work/ram/seg_13F65C", ad_seg, SEGREGS },
     { "Task 0x13F2CC Timeline loop",   "work/ram/task_timeline", ad_task_timeline, { { 0, 0u } } },
 };
 #endif
@@ -229,19 +249,20 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         f3mem_t m = { w, rom, NULL, s, g };
         f3regs_t r;
         for (int k = 0; k < 8; k++) { r.d[k] = c.pre[i][CR_D0 + k]; r.a[k] = c.pre[i][CR_A0 + k]; }
+        seg_stop = 0; seg_entry = c.pcpre ? c.pcpre[i] : 0;
         if (e->fn(&m, &r) < 0) { undec++; continue; }
         uint32_t sp = c.pre[i][CR_SP];
         int d = cap_diff(e->name, i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x100u, sp, &budget);
         if (g) d += cap_diff(e->name, i, F3_GFX_BASE, g, cap_gfx(&c, i, 1), F3_GFX_SIZE, 0, 0, &budget);
         if (s) d += cap_diff(e->name, i, F3_SPR_BASE, s, cap_spr(&c, i, 1), F3_SPR_SIZE, 0, 0, &budget);
-        for (int k = 0; k < 4 && e->out[k].mask; k++) {
+        for (int k = 0; k < 17 && e->out[k].mask; k++) {
             int x = e->out[k].reg;
-            uint32_t got = (x < 8 ? r.d[x] : r.a[x - 8]) & e->out[k].mask;
-            uint32_t want = c.post[i][x] & e->out[k].mask;
+            uint32_t got = (x == CR_PC ? seg_stop : x < 8 ? r.d[x] : r.a[x - 8]) & e->out[k].mask;
+            uint32_t want = (x == CR_PC ? c.pcpost[i] : c.post[i][x]) & e->out[k].mask;
             if (got != want) {
                 if (budget-- > 0)
-                    printf("  %s pair %d %c%d got=%08X want=%08X\n", e->name, i,
-                           x < 8 ? 'D' : 'A', x & 7, got, want);
+                    printf("  %s pair %d %s%d got=%08X want=%08X\n", e->name, i,
+                           x == CR_PC ? "PC" : x < 8 ? "D" : "A", x == CR_PC ? 0 : x & 7, got, want);
                 d++;
             }
         }

@@ -7,13 +7,14 @@
 #include <string.h>
 #include "../src/common/f3mem.h"
 
-enum { CR_D0 = 0, CR_A0 = 8, CR_A1 = 9, CR_SP = 15, CR_N = 16 };
+enum { CR_D0 = 0, CR_A0 = 8, CR_A1 = 9, CR_SP = 15, CR_N = 16, CR_PC = 16 };
 
 typedef struct {
     int pairs;
     uint8_t *wram, *dpram, *spr, *gfx;   /* pre,post interleaved per pair */
     uint32_t (*pre)[CR_N], (*post)[CR_N];
     unsigned *fpre, *fpost;              /* frame of each dump (regs.tsv col 3) */
+    uint32_t *pcpre, *pcpost;            /* entry / exit PC (optional 17th column, F3_EXITPC) */
 } capture_t;
 
 static inline uint8_t *cap_slurp(const char *path, long *len)
@@ -53,6 +54,8 @@ static inline int cap_load(capture_t *c, const char *pfx)
     c->post = calloc((size_t)c->pairs + 1, sizeof *c->post);
     c->fpre = calloc((size_t)c->pairs + 1, sizeof *c->fpre);
     c->fpost = calloc((size_t)c->pairs + 1, sizeof *c->fpost);
+    c->pcpost = calloc((size_t)c->pairs + 1, sizeof *c->pcpost);
+    c->pcpre = calloc((size_t)c->pairs + 1, sizeof *c->pcpre);
     snprintf(p, sizeof p, "%s_regs.tsv", pfx);
     FILE *f = fopen(p, "r");
     char line[512];
@@ -66,6 +69,7 @@ static inline int cap_load(capture_t *c, const char *pfx)
             char *s = line;
             for (int t = 0; t < 3; t++) s = strchr(s, '\t') + 1;
             for (int k = 0; k < CR_N; k++) dst[k] = (uint32_t)strtoul(s, &s, 16);
+            *(dst == c->post[i] ? &c->pcpost[i] : &c->pcpre[i]) = (uint32_t)strtoul(s, &s, 16);
         }
     if (f) fclose(f);
     return 0;
@@ -80,7 +84,7 @@ static inline const uint8_t *cap_gfx(const capture_t *c, int i, int post)
 { return c->gfx ? c->gfx + ((size_t)i * 2 + (size_t)post) * F3_GFX_SIZE : NULL; }
 
 static inline void cap_free(capture_t *c)
-{ free(c->wram); free(c->dpram); free(c->spr); free(c->gfx); free(c->pre); free(c->post); free(c->fpre); free(c->fpost); }
+{ free(c->wram); free(c->dpram); free(c->spr); free(c->gfx); free(c->pre); free(c->post); free(c->fpre); free(c->fpost); free(c->pcpost); free(c->pcpre); }
 
 /* byte diff of a region, printing up to *budget mismatches; skip [lo,hi) */
 /* Engine-side capture artifact: P1's PS_INVULN high byte (0x41B1E1) flips

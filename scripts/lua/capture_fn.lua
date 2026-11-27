@@ -24,6 +24,9 @@
 --              before the pre dump (force rare branches)
 --   F3_POKE8   "addr=val,..." (hex) byte writes applied at each entry before
 --              the pre dump (a flag byte without touching its neighbour)
+--   F3_EXITPC  "1" appends the PC (entry for pre, the exit reached for post)
+--              as a 17th regs.tsv column: segment captures of task code,
+--              where the exit list holds every TRAP #4/#5 the code can reach
 --   F3_NOIRQ   "1" raises the 68k interrupt mask to 7 from the entry to the
 --              exit of each captured call and restores it after the post
 --              dump: a long routine is otherwise always cut by VBlank, whose
@@ -107,7 +110,8 @@ end
 local p = manager.machine.ioport.ports
 local out = assert(io.open(prefix .. "_pairs.bin", "wb"))
 local regs = assert(io.open(prefix .. "_regs.tsv", "w"))
-regs:write("pair\twhich\tframe\tD0\tD1\tD2\tD3\tD4\tD5\tD6\tD7\tA0\tA1\tA2\tA3\tA4\tA5\tA6\tSP\n")
+local exitpc = os.getenv("F3_EXITPC") == "1"
+regs:write("pair\twhich\tframe\tD0\tD1\tD2\tD3\tD4\tD5\tD6\tD7\tA0\tA1\tA2\tA3\tA4\tA5\tA6\tSP" .. (exitpc and "\tPC" or "") .. "\n")
 cpu.debug:bpset(entry, os.getenv("F3_COND") or "", "")
 for a in pairs(remask) do cpu.debug:bpset(a, "", "") end
 for pc, _ in pairs(exits) do cpu.debug:bpset(pc, "", "") end
@@ -150,6 +154,7 @@ local function regline_str(i, which)
   for k = 0, 7 do r[#r + 1] = string.format("%08X", cpu.state["D" .. k].value) end
   for k = 0, 6 do r[#r + 1] = string.format("%08X", cpu.state["A" .. k].value) end
   r[#r + 1] = string.format("%08X", cpu.state["SP"].value)
+  if exitpc and which ~= "log" then r[#r + 1] = string.format("%08X", cpu.state["PC"].value) end
   return string.format("%d\t%s\t%04X\t%s\n", i, which, sp:read_u16(0x4022AC), table.concat(r, "\t"))
 end
 local pairs_done, have_pre, n = 0, false, 0

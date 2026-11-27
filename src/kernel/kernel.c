@@ -435,9 +435,12 @@ uint32_t Kern_0021BE(const f3mem_t *m, f3regs_t *r)
     uint32_t slot = rd32(m, r->a[7] + 8u) & 0x1Fu;        /* 0x21C6-0x21CE */
     uint32_t status_slot = globals - 0x18F8u + 4u * slot;
     uint32_t status = rd32(m, status_slot);   /* 0x21D4 */
-    /* 0x21E4 move.b d2,d1: only d1's low byte takes the id. */
+    /* 0x21D8 clr.w/swap/andi.w #$2000 keep status bit 29 in d1's low word,
+     * 0x21E4 move.b d2,d1 puts the id in its low byte, 0x21E6 swap moves both
+     * to the high word: status = (old & 0x20000000) | id.b << 16. (Bit 29
+     * was written to bit 13 before; found by the Strata review.) */
     wr32(m, status_slot,                      /* 0x21E8 */
-         ((uint32_t)(id & 0xFFu) << 16) | (status & 0x20000000u ? 0x2000u : 0u));
+         ((uint32_t)(id & 0xFFu) << 16) | (status & 0x20000000u));
     wr32(m, globals - 0x18B8u + 4u * slot, rd32(m, r->a[7] + 12u));  /* 0x21EC */
     return 0x000021F6u;                       /* 0x21F2 pops d0-d2/a4 */
 }

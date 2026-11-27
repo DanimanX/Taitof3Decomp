@@ -63,12 +63,16 @@ while :; do
   if [ -n "$flagged" ]; then
     python3 scripts/unmerge.py work/zcap/partial $flagged >> "$LOG"
     for a in $flagged; do printf '%s\t0\tfail\tjt_scan: jump-table handler not cited, held for review\n' "$a" >> work/zcap/strata_results.tsv; done
-    merged=$((merged - $(echo $flagged | wc -w)))
   fi
+  # count only routines that are really new in main (the merge output can
+  # re-list ones already committed, which once made the loop spin 150 rounds)
+  merged=$(git status --short src/auto | grep -c '^?? src/auto/fn_')
   if [ "$merged" -le 0 ]; then
     if [ -n "$q" ] && [ $retried -eq 0 ]; then
       h=$(echo "$q" | grep -oE '[0-9]+h' | tr -d h); mi=$(echo "$q" | grep -oE '[0-9]+m' | tr -d m)
-      s=$(( ${h:-0}*3600 + ${mi:-0}*60 + 180 )); say "agy quota hit ($q), waiting ${s}s then retrying round $N"
+      s=$(( ${h:-0}*3600 + ${mi:-0}*60 + 180 ))
+      if [ $s -gt 7200 ]; then say "agy quota hit ($q): too long to wait, stopping"; break; fi
+      say "agy quota hit ($q), waiting ${s}s then retrying round $N"
       sleep $s; retried=1; continue
     fi
     say "round $N merged nothing, stopping"; break
@@ -92,6 +96,7 @@ while :; do
   cov=$(make -s coverage | tail -1)
   held=$(echo "$m" | sed -n 's/^held //p')
   git add src/auto tests/fn_auto.inc docs/COVERAGE.md README.md
+  git diff --cached --quiet && { say "round $N: nothing to commit, stopping"; break; }
   git commit -q -F - <<EOF
 feat: $merged routines from agy round $N (${AGY_MODEL:-gemini-4-hydrogen-medium})
 

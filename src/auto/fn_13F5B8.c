@@ -1,3 +1,5 @@
+/* Superseded by src/stage/seg_13F5B8.c + seg_13DAD4.c (segments, verified on
+ * captures); this whole-routine form ignores the TRAP #5 yields. */
 /* ROM 0x13F5B8: UNVERIFIED (no capture): stage-end sequence. Clears object
  * groups 3..4, sets the A5-0x144C flags, starts the level jingle (0x15D0 with
  * a stage-dependent id), fills the sprite/line tables, spawns the stage's

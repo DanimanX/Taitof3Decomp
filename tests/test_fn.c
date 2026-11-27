@@ -218,6 +218,16 @@ static const fn_entry_t fns[] = {
     { "Seg 0x13F5B8 13F5B8 group",  "work/ram/seg_13F5B8", ad_seg, SEGREGS },
     { "Seg 0x13F600 13F5B8 group",  "work/ram/seg_13F600", ad_seg, SEGREGS },
     { "Seg 0x13F65C 13F5B8 group",  "work/ram/seg_13F65C", ad_seg, SEGREGS },
+    { "Seg 0x13DAD4 13DAD4 group",  "work/ram/seg_13DAD4", ad_seg, SEGREGS },
+    { "Seg 0x13DBBA 13DAD4 group",  "work/ram/seg_13DBBA", ad_seg, SEGREGS },
+    { "Seg 0x13DBFC 13DAD4 group",  "work/ram/seg_13DBFC", ad_seg, SEGREGS },
+    { "Seg 0x13DC3A 13DAD4 group",  "work/ram/seg_13DC3A", ad_seg, SEGREGS },
+    { "Seg 0x13DC9C 13DAD4 group",  "work/ram/seg_13DC9C", ad_seg, SEGREGS },
+    { "Seg 0x13DCFE 13DAD4 group",  "work/ram/seg_13DCFE", ad_seg, SEGREGS },
+    { "Seg 0x13DD58 13DAD4 group",  "work/ram/seg_13DD58", ad_seg, SEGREGS },
+    { "Seg 0x13DDA6 13DAD4 group",  "work/ram/seg_13DDA6", ad_seg, SEGREGS },
+    { "Seg 0x13DDB2 13DAD4 group",  "work/ram/seg_13DDB2", ad_seg, SEGREGS },
+    { "Seg 0x13DDF0 13DAD4 group",  "work/ram/seg_13DDF0", ad_seg, SEGREGS },
     { "Task 0x13F2CC Timeline loop",   "work/ram/task_timeline", ad_task_timeline, { { 0, 0u } } },
 };
 #endif

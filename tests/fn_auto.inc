@@ -726,3 +726,7 @@
     { "Fn 0x118E48 auto", "work/ram/fn_118E48", Fn_118E48, ALLREGS },
     { "Fn 0x118E5C auto", "work/ram/fn_118E5C", Fn_118E5C, ALLREGS },
     { "Fn 0x118E72 auto", "work/ram/fn_118E72", Fn_118E72, ALLREGS },
+    { "Fn 0x0016AA auto", "work/ram/fn_0016AA", Fn_0016AA, ALLREGS },
+    { "Fn 0x001738 auto", "work/ram/fn_001738", Fn_001738, ALLREGS },
+    { "Fn 0x00144A auto", "work/ram/fn_00144A", Fn_00144A, ALLREGS },
+    { "Fn 0x00391A auto", "work/ram/fn_00391A", Fn_00391A, ALLREGS },

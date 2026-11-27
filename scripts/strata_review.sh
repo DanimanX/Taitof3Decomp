@@ -25,7 +25,11 @@ review() { # commit
     [ -f "$f" ] || continue
     local bnd=work/disasm/bundle_$(echo "$a" | sed 's/^0*//').s
     [ -f "$bnd" ] || { printf '%s\t%s\tERROR\tno bundle\n' "$a" "${c:0:7}" >> "$OUT"; continue; }
-    if ! strata-local ask -f "$f" -f "$bnd" "$Q" > "$DIR/$a.txt" 2>&1; then
+    # --think + 12K tokens: without reasoning Qwen3.6 loses register values
+    # across add.w/asl.w/swap and flagged almost every routine (2026-11-27:
+    # TRAP #9 0x20C8, 4 false defects without --think, correct OK with it);
+    # 4096 tokens also cut long answers. ~4x slower, fine for the watcher.
+    if ! STRATA_MAX_TOKENS=${STRATA_REVIEW_TOKENS:-12000} strata-local ask --think -f "$f" -f "$bnd" "$Q" > "$DIR/$a.txt" 2>&1; then
       printf '%s\t%s\tERROR\tstrata ask failed\n' "$a" "${c:0:7}" >> "$OUT"; continue
     fi
     v=$(grep -om1 'VERDICT: *\(OK\|SUSPECT\)' "$DIR/$a.txt" | sed 's/VERDICT: *//'); v=${v:-ERROR}

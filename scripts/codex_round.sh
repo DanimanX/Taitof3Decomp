@@ -3,6 +3,7 @@
 # cannot verify, in their own worktrees wt_X1..X3 so it runs beside agy_loop.sh:
 #   weak      : captured, but a do-nothing body passes the capture
 #   nocapture : no captured call at all (bundle exists)
+#   capture   : captured routines codewhale/agy failed or never finished
 # 10 per lane, smallest first. Marks them 'codex' in strata_results.tsv so the
 # codewhale/agy rounds skip them. Prompt: work/zcap/codex_prompt.txt.
 # Logs: work/zcap/codexN_X*.log. Merge afterwards with scripts/codex_merge.sh.
@@ -21,6 +22,7 @@ def kind(a):
     if os.path.exists(f'src/auto/fn_{a}.c') or not os.path.exists(f'work/disasm/bundle_{a.lstrip("0")}.s'): return None
     if res.get(a)=='weak': return 'weak'
     if pairs.get(a,0)==0 and res.get(a) in (None,'fail'): return 'nocapture'
+    if pairs.get(a,0)>=1 and res.get(a) in ('fail','agy'): return 'capture'  # left by codewhale/agy
     return None
 pool=sorted([(a,s,k) for a,s in rows if (k:=kind(a))],key=lambda x:x[1])
 sel=pool[:3*per]; print('pool',len(pool),'taking',len(sel))

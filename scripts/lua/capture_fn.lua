@@ -105,6 +105,12 @@ local pokeat = os.getenv("F3_POKEAT") and tonumber(os.getenv("F3_POKEAT"), 16)
 local inject = os.getenv("F3_INJECT") and tonumber(os.getenv("F3_INJECT"), 16)
 local inject_at = tonumber(os.getenv("F3_INJECT_AT") or "0104B8", 16)
 local last_inject = -1
+-- F3_INJECT_A0=1: each injected call gets A0 = the next live object slot
+-- (0x410060 + k*0x6C, k = 0..N-1 with a nonzero long at +0), cycling, so
+-- object ticks run on real object records. F3_INJECT_SLOTS (default 0x100).
+local inject_a0 = os.getenv("F3_INJECT_A0") == "1"
+local inject_slots = tonumber(os.getenv("F3_INJECT_SLOTS") or "100", 16)
+local inject_k = 0
 local sweep = tonumber(os.getenv("F3_SWEEP") or "0")
 local sweep_base = tonumber(os.getenv("F3_SWEEP_BASE") or "0")
 local want = tonumber(os.getenv("F3_SAMPLES") or "300")
@@ -205,6 +211,13 @@ emu.register_periodic(function()
       last_inject = fr
       spv = spv - 4; sp:write_u32(spv, inject_at); cpu.state["SP"].value = spv
       cpu.state["PC"].value = inject; pc = inject
+      if inject_a0 then
+        for _ = 1, inject_slots do
+          inject_k = (inject_k + 1) % inject_slots
+          local o = 0x410060 + inject_k * 0x6C
+          if sp:read_u32(o) ~= 0 then cpu.state["A0"].value = o; break end
+        end
+      end
     end
   end
   if pokeat and pc == pokeat and pc ~= entry then

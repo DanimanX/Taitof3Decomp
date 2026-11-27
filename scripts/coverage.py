@@ -59,6 +59,12 @@ for t in ("tests/fn_auto.inc", "tests/test_fn.c", "tests/test_objects.c"):
         if has_cap(pfx):
             tested |= {int(x, 16) for x in re.findall(r"0x([0-9A-Fa-f]{4,6})", name)}
 ver |= tested - unver
+# Routines whose C ran inside those passing suites (static helpers of tested
+# routines, shared code): work/gcov_exec.tsv from scripts/gcov_build.sh.
+gx = f"{ROOT}/work/gcov_exec.tsv"
+if os.path.exists(gx):
+    ran = {int(ln.split()[0], 16) for ln in open(gx) if ln.strip() and not ln.startswith("#")}
+    ver |= (ran & dec) - unver
 dec_f = {a for a in funcs if a in dec}
 ver_f = {a for a in dec_f if a in ver}
 fsum = lambda s: sum(funcs[a][0] for a in s)

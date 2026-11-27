@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x1659B0: UNVERIFIED (weak capture): Retire two objects and restore background graphics after the scroll passes 0x1C0. */
+/* ROM 0x1659B0: verified on a poke-forced capture (scripts/zcap_poke_weak.sh): Retire two objects and restore background graphics after the scroll passes 0x1C0. */
 #include "../objects/obj_pool.h"
 #include "../video/sprite.h"
 

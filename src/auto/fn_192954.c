@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x192954: UNVERIFIED (weak capture): wait for the stage position, then upload a palette and spawn three objects. */
+/* ROM 0x192954: verified on a poke-forced capture (scripts/zcap_poke_weak.sh): wait for the stage position, then upload a palette and spawn three objects. */
 #include "../objects/obj_pool.h"
 #include "../video/palette.h"
 

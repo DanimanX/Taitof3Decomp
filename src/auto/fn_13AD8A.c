@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x13AD8A: UNVERIFIED (weak capture): wait for stage phase two, initialize the next state, or free the object. */
+/* ROM 0x13AD8A: verified on a poke-forced capture (scripts/zcap_poke_weak.sh): wait for stage phase two, initialize the next state, or free the object. */
 #include "../objects/obj_pool.h"
 
 int Fn_13AD8A(const f3mem_t *m, f3regs_t *r)

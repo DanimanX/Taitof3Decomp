@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x0C8BCE: UNVERIFIED (weak capture): Clear five entries in each of two adjacent tilemap rows. */
+/* ROM 0x0C8BCE: verified on a poke-forced capture (scripts/zcap_poke_weak.sh): Clear five entries in each of two adjacent tilemap rows. */
 
 int Fn_0C8BCE(const f3mem_t *m, f3regs_t *r)
 {

@@ -22,6 +22,8 @@
 --              written to <prefix>_regs.tsv as which="log" (no RAM dump)
 --   F3_POKE32  "addr=val,addr=val" (hex) 32-bit writes applied at each entry
 --              before the pre dump (force rare branches)
+--   F3_POKE8   "addr=val,..." (hex) byte writes applied at each entry before
+--              the pre dump (a flag byte without touching its neighbour)
 --   F3_COND    MAME debugger condition on the entry breakpoint, e.g.
 --              "a1==102fe6" (capture one object routine at the tick call site)
 --   F3_POKEA0B "off=val,..." (hex) byte writes at A0+off at each entry
@@ -55,6 +57,8 @@ local logs = {}
 for h in string.gmatch(os.getenv("F3_LOG") or "", "[^,]+") do logs[tonumber(h, 16)] = true end
 local pokes = {}
 for a, v in string.gmatch(os.getenv("F3_POKE32") or "", "(%x+)=(%x+)") do pokes[#pokes + 1] = {tonumber(a, 16), tonumber(v, 16)} end
+local pokes8 = {}
+for a, v in string.gmatch(os.getenv("F3_POKE8") or "", "(%x+)=(%x+)") do pokes8[#pokes8 + 1] = {tonumber(a, 16), tonumber(v, 16)} end
 local pokesa0 = {}
 for o, v in string.gmatch(os.getenv("F3_POKEA0B") or "", "(%x+)=(%x+)") do pokesa0[#pokesa0 + 1] = {tonumber(o, 16), tonumber(v, 16)} end
 local pokesa0w = {}
@@ -167,6 +171,7 @@ emu.register_periodic(function()
   if pc == entry and not have_pre then
     for _, pv in ipairs(pokes) do sp:write_u32(pv[1], pv[2]) end
     for _, pv in ipairs(pokes16) do sp:write_u16(pv[1], pv[2]) end
+    for _, pv in ipairs(pokes8) do sp:write_u8(pv[1], pv[2]) end
     if not pokefn then poke_a0() end
     if sweep > 0 then sp:write_u16(spv + 4, sweep_base + pairs_done % sweep) end
     pre_snap = snapshot(); pre_regs = regline_str(pairs_done, "pre"); pending_logs = {}; have_pre = true

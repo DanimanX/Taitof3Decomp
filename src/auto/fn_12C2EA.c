@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x12C2EA: UNVERIFIED (weak capture): Wait for the sound trigger or retire the object when disabled. */
+/* ROM 0x12C2EA: verified on a poke-forced capture (scripts/zcap_poke_weak.sh): Wait for the sound trigger or retire the object when disabled. */
 #include "../enemy/obj_E8B72.h"
 #include "../objects/obj_pool.h"
 

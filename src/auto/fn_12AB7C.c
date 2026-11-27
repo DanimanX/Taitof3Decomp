@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x12AB7C: UNVERIFIED (weak capture): Consume a linked object and reverse its motion when its state allows. */
+/* ROM 0x12AB7C: verified on a poke-forced capture (scripts/zcap_poke_weak.sh): Consume a linked object and reverse its motion when its state allows. */
 #include "fn_sound_frames.h"
 
 int Fn_12AB7C(const f3mem_t *m, f3regs_t *r)

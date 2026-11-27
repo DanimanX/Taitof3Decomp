@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x198CEC: UNVERIFIED (weak capture): Run a scripted flight burst and draw a randomized directional trail along it. */
+/* ROM 0x198CEC: verified on a poke-forced capture (scripts/zcap_poke_weak.sh): Run a scripted flight burst and draw a randomized directional trail along it. */
 #include "batch_obj_regs.h"
 #include "../objects/obj_anim.h"
 #include "../objects/obj_shared.h"

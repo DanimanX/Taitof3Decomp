@@ -34,3 +34,4 @@ Kernel tasks: if a routine is a task body (it loops through TRAP #5 and never re
 More setup facts:
 - work/ram is a SYMLINK to the main repo's captures: use ls -L / test -e, not find (find does not follow it). The captures are there.
 - Some routines are already translated inline inside another file (grep -rn "<ADDR without leading zeros>" src/, e.g. 0x118E0C..0x118E72 in src/enemy/obj_118D7C.c call_fade_wrapper, 0x0CD3B2 in src/enemy/obj_CCF72.c). Reuse that logic (copy the helper as a static in your file if it is static there) and still write the standalone Fn_<ADDR> with its own test entry.
+- Test-mode/boot routines: 0x0047C0 is stackless and returns with jmp (a6): its capture's post is at the PC A6 held at entry (SP unchanged); treat that jmp like the rts. Captures with only 1-3 pairs are thin: re-read every uncovered branch against the bytes.

@@ -988,3 +988,38 @@
 001738	0	codex	assigned to codex, capture (round 6)
 00144A	0	codex	assigned to codex, capture (round 6)
 00391A	0	codex	assigned to codex, capture (round 6)
+0047C0	0	codex	assigned to codex, capture (round 7, test mode)
+004C12	0	codex	assigned to codex, capture (round 7, test mode)
+004E46	0	codex	assigned to codex, capture (round 7, test mode)
+005030	0	codex	assigned to codex, capture (round 7, test mode)
+19FFF0	0	codex	assigned to codex, capture (round 7, test mode)
+1A1BA6	0	codex	assigned to codex, capture (round 7, test mode)
+00466E	0	codex	assigned to codex, capture (round 7, test mode)
+004BD2	0	codex	assigned to codex, capture (round 7, test mode)
+004C78	0	codex	assigned to codex, capture (round 7, test mode)
+004E84	0	codex	assigned to codex, capture (round 7, test mode)
+005080	0	codex	assigned to codex, capture (round 7, test mode)
+1A006C	0	codex	assigned to codex, capture (round 7, test mode)
+0046C0	0	codex	assigned to codex, capture (round 7, test mode)
+004D06	0	codex	assigned to codex, capture (round 7, test mode)
+004DEE	0	codex	assigned to codex, capture (round 7, test mode)
+004F58	0	codex	assigned to codex, capture (round 7, test mode)
+005C62	0	codex	assigned to codex, capture (round 7, test mode)
+0047C0	0	fail	codex round 7: not written
+00466E	0	fail	codex round 7: not written
+005080	0	fail	codex round 7: not written
+0046C0	0	fail	codex round 7: not written
+004D06	0	fail	codex round 7: not written
+004DEE	0	fail	codex round 7: not written
+0047C0	0	fail	codex round 7: not written
+00466E	0	fail	codex round 7: not written
+005080	0	fail	codex round 7: not written
+0046C0	0	fail	codex round 7: not written
+004D06	0	fail	codex round 7: not written
+004DEE	0	fail	codex round 7: not written
+0047C0	0	skip	codex round 7: needs serial EEPROM input (not in captures)
+00466E	0	skip	codex round 7: needs serial EEPROM input (not in captures)
+005080	0	skip	codex round 7: needs serial EEPROM input (not in captures)
+0046C0	0	skip	codex round 7: needs serial EEPROM input (not in captures)
+004D06	0	skip	codex round 7: needs serial EEPROM input (not in captures)
+004DEE	0	skip	codex round 7: needs serial EEPROM input (not in captures)

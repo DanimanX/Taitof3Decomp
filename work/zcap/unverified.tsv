@@ -14,3 +14,5 @@
 002156	nocapture	codewhale (TRAP never called in any capture)
 0021BE	nocapture	codewhale (TRAP never called in any capture)
 00220E	nocapture	codewhale (TRAP never called in any capture)
+004E84	weak	codex round 7
+004F58	weak	codex round 7

@@ -334,6 +334,7 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
     uint8_t *w = malloc(F3_WRAM_SIZE);
     uint8_t *g = c.gfx ? malloc(F3_GFX_SIZE) : NULL;
     uint8_t *s = c.spr ? malloc(F3_SPR_SIZE) : NULL;
+    uint8_t *dp = c.dpram ? malloc(F3_DPRAM_SIZE) : NULL;
     int ok = 0, undec = 0, irq = 0, budget = 12;
     for (int i = 0; i < c.pairs; i++) {
         /* a call whose post dump is in a later frame than its pre dump was
@@ -345,7 +346,8 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
         if (g) memcpy(g, cap_gfx(&c, i, 0), F3_GFX_SIZE);
         if (s) memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
-        f3mem_t m = { w, rom, NULL, s, g };
+        if (dp) memcpy(dp, cap_dpram(&c, i, 0), F3_DPRAM_SIZE);
+        f3mem_t m = { w, rom, dp, s, g };
         f3regs_t r;
         for (int k = 0; k < 8; k++) { r.d[k] = c.pre[i][CR_D0 + k]; r.a[k] = c.pre[i][CR_A0 + k]; }
         seg_stop = 0; seg_entry = c.pcpre ? c.pcpre[i] : 0;
@@ -357,6 +359,8 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         int d = cap_diff(e->name, i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x100u, sp, &budget);
         if (g) d += cap_diff(e->name, i, F3_GFX_BASE, g, cap_gfx(&c, i, 1), F3_GFX_SIZE, 0, 0, &budget);
         if (s) d += cap_diff(e->name, i, F3_SPR_BASE, s, cap_spr(&c, i, 1), F3_SPR_SIZE, 0, 0, &budget);
+        /* sound DPRAM 0xC00000-0xC007FF, for captures taken with F3_DPRAM=1 */
+        if (dp) d += cap_diff(e->name, i, F3_DPRAM_BASE, dp, cap_dpram(&c, i, 1), F3_DPRAM_SIZE, 0, 0, &budget);
         for (int k = 0; k < 17 && e->out[k].mask; k++) {
             int x = e->out[k].reg;
             uint32_t got = (x == CR_PC ? seg_stop : x < 8 ? r.d[x] : r.a[x - 8]) & e->out[k].mask;
@@ -376,7 +380,7 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
            obs == 0 ? " REJECT no observable call" : "");
     if (irq) printf(" [%d interrupted by VBlank, skipped]", irq);
     printf("\n");
-    free(w); free(g); free(s); cap_free(&c);
+    free(w); free(g); free(s); free(dp); cap_free(&c);
     return (obs - ok) + (obs == 0 ? 1 : 0);
 }
 

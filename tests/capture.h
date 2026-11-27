@@ -80,6 +80,9 @@ static inline const uint8_t *cap_wram(const capture_t *c, int i, int post)
 static inline const uint8_t *cap_spr(const capture_t *c, int i, int post)
 { return c->spr ? c->spr + ((size_t)i * 2 + (size_t)post) * F3_SPR_SIZE : NULL; }
 
+static inline const uint8_t *cap_dpram(const capture_t *c, int i, int post)
+{ return c->dpram ? c->dpram + ((size_t)i * 2 + (size_t)post) * F3_DPRAM_SIZE : NULL; }
+
 static inline const uint8_t *cap_gfx(const capture_t *c, int i, int post)
 { return c->gfx ? c->gfx + ((size_t)i * 2 + (size_t)post) * F3_GFX_SIZE : NULL; }
 

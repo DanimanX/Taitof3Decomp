@@ -25,8 +25,10 @@ CFLAGS = ["-std=c11", "-O1", "-Wall", "-Wextra", "-Werror", "-Wno-unused-functio
 def b(a): return a.lstrip("0") or "0"
 
 def bundle(a):
-    p = f"work/disasm/bundle_{b(a)}.s"
-    return open(p).read() if os.path.exists(p) else None
+    # export_bundle.sh names files with or without leading zeros
+    for p in (f"work/disasm/bundle_{b(a)}.s", f"work/disasm/bundle_{a.upper().zfill(6)}.s"):
+        if os.path.exists(p): return open(p).read()
+    return None
 
 HDRS = None
 def helper_protos(text):

@@ -17,6 +17,10 @@ for ln in open(f"{ROOT}/work/functions.tsv"):
         total = int(p[1])
     else:
         funcs[int(p[0], 16)] = (int(p[1]), p[2])
+# entries of functions.tsv that are data, not code (work/not_code.tsv)
+for ln in open(f"{ROOT}/work/not_code.tsv"):
+    if ln.strip() and not ln.startswith("#"):
+        funcs.pop(int(ln.split()[0], 16), None)
 dec = set()
 for f in glob.glob(f"{ROOT}/src/**/*.[ch]", recursive=True):
     # "ROM 0xA" and comma lists "ROM 0xA, 0xB, 0xC" (one comment naming

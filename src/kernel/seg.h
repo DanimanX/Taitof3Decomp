@@ -30,6 +30,7 @@ uint32_t Seg_Run(const f3mem_t *m, f3regs_t *r, uint32_t pc);
 /* one group per routine whose code yields; each returns as Seg_Run */
 uint32_t Seg_13F5B8(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* stage outro */
 uint32_t Seg_13DAD4(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* stage end */
+uint32_t Seg_13D69A(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* high-score name entry */
 
 static inline void seg_push32(const f3mem_t *m, f3regs_t *r, uint32_t v)
 {

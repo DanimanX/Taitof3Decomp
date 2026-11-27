@@ -8,5 +8,7 @@ uint32_t Seg_Run(const f3mem_t *m, f3regs_t *r, uint32_t pc)
         return Seg_13F5B8(m, r, pc);
     if (pc >= 0x0013DAD4u && pc < 0x0013DE08u)
         return Seg_13DAD4(m, r, pc);
+    if (pc >= 0x0013D69Au && pc < 0x0013D79Au)
+        return Seg_13D69A(m, r, pc);
     return SEG_LEAVE;
 }

@@ -710,5 +710,12 @@ void FnAuto_Angle(const f3mem_t *m, f3regs_t *r);
 void FnAuto_InheritSpawnPosition(const f3mem_t *m, uint32_t obj,
                                  uint32_t *d0_out, uint32_t *d1_out, uint32_t *a1_out);
 void FnAuto_MoveByAngle(const f3mem_t *m, f3regs_t *r, uint16_t angle);
+int Fn_0B8404(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B8404 */
+void TaskAttract_Frame(const f3mem_t *m); /* ROM 0x0B8408 loop body */
+int Fn_13F2C6(const f3mem_t *m, f3regs_t *r); /* ROM 0x13F2C6 */
+void TaskStageTimeline_Frame(const f3mem_t *m); /* ROM 0x13F2CA loop body */
+int Fn_13F5B8(const f3mem_t *m, f3regs_t *r); /* ROM 0x13F5B8 */
+int Fn_0B935A(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B935A */
+int Task0B935A_Frame(const f3mem_t *m); /* ROM 0x0B93E6 loop body */
 /* END generated */
 #endif

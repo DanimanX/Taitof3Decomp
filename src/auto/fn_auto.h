@@ -720,5 +720,6 @@ int Task0B935A_Frame(const f3mem_t *m); /* ROM 0x0B93E6 loop body */
 int Fn_13D19E(const f3mem_t *m, f3regs_t *r); /* ROM 0x13D19E */
 int Fn_13D1E6(const f3mem_t *m, f3regs_t *r); /* ROM 0x13D1E6 */
 int Fn_13D156(const f3mem_t *m, f3regs_t *r); /* ROM 0x13D156 */
+int Fn_14A9C0(const f3mem_t *m, f3regs_t *r); /* ROM 0x14A9C0 */
 /* END generated */
 #endif

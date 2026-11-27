@@ -24,6 +24,14 @@
 --              before the pre dump (force rare branches)
 --   F3_POKE8   "addr=val,..." (hex) byte writes applied at each entry before
 --              the pre dump (a flag byte without touching its neighbour)
+--   F3_NOIRQ   "1" raises the 68k interrupt mask to 7 from the entry to the
+--              exit of each captured call and restores it after the post
+--              dump: a long routine is otherwise always cut by VBlank, whose
+--              handler writes land in the post state (test_fn skips those)
+--   F3_REMASK  hex PC(s) of 4-byte "andi #$F0FF,SR" (e.g. 16A4, the end of
+--              0x1660's critical section): with F3_NOIRQ, inside a captured
+--              call that instruction is skipped so the mask stays raised (the
+--              IRQ would be taken before the next instruction otherwise)
 --   F3_COND    MAME debugger condition on the entry breakpoint, e.g.
 --              "a1==102fe6" (capture one object routine at the tick call site)
 --   F3_POKEA0B "off=val,..." (hex) byte writes at A0+off at each entry
@@ -57,6 +65,10 @@ local logs = {}
 for h in string.gmatch(os.getenv("F3_LOG") or "", "[^,]+") do logs[tonumber(h, 16)] = true end
 local pokes = {}
 for a, v in string.gmatch(os.getenv("F3_POKE32") or "", "(%x+)=(%x+)") do pokes[#pokes + 1] = {tonumber(a, 16), tonumber(v, 16)} end
+local noirq = os.getenv("F3_NOIRQ") == "1"
+local saved_sr = nil
+local remask = {}
+for h in string.gmatch(os.getenv("F3_REMASK") or "", "[^,]+") do remask[tonumber(h, 16)] = true end
 local pokes8 = {}
 for a, v in string.gmatch(os.getenv("F3_POKE8") or "", "(%x+)=(%x+)") do pokes8[#pokes8 + 1] = {tonumber(a, 16), tonumber(v, 16)} end
 local pokesa0 = {}
@@ -97,6 +109,7 @@ local out = assert(io.open(prefix .. "_pairs.bin", "wb"))
 local regs = assert(io.open(prefix .. "_regs.tsv", "w"))
 regs:write("pair\twhich\tframe\tD0\tD1\tD2\tD3\tD4\tD5\tD6\tD7\tA0\tA1\tA2\tA3\tA4\tA5\tA6\tSP\n")
 cpu.debug:bpset(entry, os.getenv("F3_COND") or "", "")
+for a in pairs(remask) do cpu.debug:bpset(a, "", "") end
 for pc, _ in pairs(exits) do cpu.debug:bpset(pc, "", "") end
 for pc, _ in pairs(logs) do cpu.debug:bpset(pc, "", "") end
 local dp = want_dpram and assert(io.open(prefix .. "_dpram.bin", "wb")) or nil
@@ -162,11 +175,16 @@ emu.register_periodic(function()
       dbg.execution_state = "run"; return
     end
   end
+  if noirq and have_pre and remask[pc] then
+    cpu.state["PC"].value = pc + 4
+    dbg.execution_state = "run"; return
+  end
   if pc == entry and have_pre and exit_ret and spv ~= ret_sp then
     -- previous call never returned (e.g. a script opcode popped the return
     -- address): drop it and start over with this call
     if ret_bp then cpu.debug:bpclear(ret_bp); ret_bp = nil; ret_pc = nil end
     have_pre = false; abandoned = abandoned + 1
+    if noirq and saved_sr then cpu.state["SR"].value = (cpu.state["SR"].value & ~0x0700) | (saved_sr & 0x0700); saved_sr = nil end
   end
   if pc == entry and not have_pre then
     for _, pv in ipairs(pokes) do sp:write_u32(pv[1], pv[2]) end
@@ -175,6 +193,7 @@ emu.register_periodic(function()
     if not pokefn then poke_a0() end
     if sweep > 0 then sp:write_u16(spv + 4, sweep_base + pairs_done % sweep) end
     pre_snap = snapshot(); pre_regs = regline_str(pairs_done, "pre"); pending_logs = {}; have_pre = true
+    if noirq then saved_sr = cpu.state["SR"].value; cpu.state["SR"].value = saved_sr | 0x0700 end
     linger_left = linger
     if exit_ret then
       ret_sp = spv
@@ -192,6 +211,10 @@ emu.register_periodic(function()
     if ret_bp then cpu.debug:bpclear(ret_bp); ret_bp = nil; ret_pc = nil end
     emit(pre_snap); regs:write(pre_regs); regs:write(table.concat(pending_logs))
     emit(snapshot()); regs:write(regline_str(pairs_done, "post")); have_pre = false
+    if noirq and saved_sr then
+      local cur = cpu.state["SR"].value
+      cpu.state["SR"].value = (cur & ~0x0700) | (saved_sr & 0x0700); saved_sr = nil
+    end
     out:flush(); regs:flush(); if dp then dp:flush() end; if spf then spf:flush() end; if gff then gff:flush() end
     pairs_done = pairs_done + 1
     if pairs_done >= want then finish("DONE"); return end

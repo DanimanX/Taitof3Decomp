@@ -12,6 +12,9 @@ local p = manager.machine.ioport.ports
 local frames = tonumber(os.getenv("F3_FRAMES") or "20000")
 local outp = os.getenv("F3_OUT") or "work/pc_survey.tsv"
 local service = os.getenv("F3_SERVICE") == "1"
+-- menu-walk periods (frames), F3_SVC="down,button,up" (default 90,270,630)
+local svc_dn, svc_bt, svc_up = (os.getenv("F3_SVC") or "90,270,630"):match("(%d+),(%d+),(%d+)")
+svc_dn, svc_bt, svc_up = tonumber(svc_dn), tonumber(svc_bt), tonumber(svc_up)
 local saveevery = tonumber(os.getenv("F3_SAVEEVERY") or "0")
 local savepfx = os.getenv("F3_SAVEPFX") or "PS"
 local want, first, n, scr0 = {}, {}, 0, nil
@@ -39,9 +42,9 @@ emu.register_frame_done(function()
   n = fnum - scr0
   if service then
     p[":EEPROMIN"].fields["Service Mode"]:set_value((n >= 10 and n < 20) and 1 or 0)
-    p[":IN.1"].fields["P1 Down"]:set_value((n > 40 and n % 90 < 5) and 1 or 0)
-    p[":IN.0"].fields["P1 Button 1"]:set_value((n > 40 and n % 270 >= 45 and n % 270 < 50) and 1 or 0)
-    p[":IN.1"].fields["P1 Up"]:set_value((n > 40 and n % 630 >= 300 and n % 630 < 305) and 1 or 0)
+    p[":IN.1"].fields["P1 Down"]:set_value((n > 40 and n % svc_dn < 5) and 1 or 0)
+    p[":IN.0"].fields["P1 Button 1"]:set_value((n > 40 and n % svc_bt >= 45 and n % svc_bt < 50) and 1 or 0)
+    p[":IN.1"].fields["P1 Up"]:set_value((n > 40 and n % svc_up >= 300 and n % svc_up < 305) and 1 or 0)
   end
   if saveevery > 0 and n % saveevery == 0 then
     manager.machine:save(string.format("%s_%06d", savepfx, n)); dump()

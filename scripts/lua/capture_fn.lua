@@ -130,6 +130,9 @@ local out = assert(io.open(prefix .. "_pairs.bin", "wb"))
 local regs = assert(io.open(prefix .. "_regs.tsv", "w"))
 local exitpc = os.getenv("F3_EXITPC") == "1"
 local service = os.getenv("F3_SERVICE") == "1"
+-- menu-walk periods (frames), F3_SVC="down,button,up" (default 90,270,630)
+local svc_dn, svc_bt, svc_up = (os.getenv("F3_SVC") or "90,270,630"):match("(%d+),(%d+),(%d+)")
+svc_dn, svc_bt, svc_up = tonumber(svc_dn), tonumber(svc_bt), tonumber(svc_up)
 regs:write("pair\twhich\tframe\tD0\tD1\tD2\tD3\tD4\tD5\tD6\tD7\tA0\tA1\tA2\tA3\tA4\tA5\tA6\tSP" .. (exitpc and "\tPC" or "") .. "\n")
 cpu.debug:bpset(entry, os.getenv("F3_COND") or "", "")
 for a in pairs(remask) do cpu.debug:bpset(a, "", "") end
@@ -291,9 +294,9 @@ emu.register_frame_done(function()
   if service then
     local t = n + noffset
     p[":EEPROMIN"].fields["Service Mode"]:set_value((t >= 10 and t < 20) and 1 or 0)
-    p[":IN.1"].fields["P1 Down"]:set_value((t > 40 and t % 90 < 5) and 1 or 0)
-    p[":IN.0"].fields["P1 Button 1"]:set_value((t > 40 and t % 270 >= 45 and t % 270 < 50) and 1 or 0)
-    p[":IN.1"].fields["P1 Up"]:set_value((t > 40 and t % 630 >= 300 and t % 630 < 305) and 1 or 0)
+    p[":IN.1"].fields["P1 Down"]:set_value((t > 40 and t % svc_dn < 5) and 1 or 0)
+    p[":IN.0"].fields["P1 Button 1"]:set_value((t > 40 and t % svc_bt >= 45 and t % svc_bt < 50) and 1 or 0)
+    p[":IN.1"].fields["P1 Up"]:set_value((t > 40 and t % svc_up >= 300 and t % svc_up < 305) and 1 or 0)
   elseif inmode == "fire" then
     local t = n + noffset
     p[":IN.0"].fields["P1 Button 1"]:set_value((t // 3) % 2)

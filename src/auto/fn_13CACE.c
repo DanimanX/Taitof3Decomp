@@ -83,7 +83,7 @@ static void cace_banner_13D11E(const f3mem_t *m, f3regs_t *r)
 {
     int16_t idx = (int16_t)rd16(m, F3_A5 + 0x32DCu);            /* 0x13D124 */
     r->a[0] = rd32(m, 0x0013D558u + (uint32_t)(int32_t)idx * 4u); /* 0x13D11E..0x13D128 */
-    r->d[0] = (r->d[0] & 0xFFFFFF00u) | rd8(m, 0x00010C05u);     /* 0x13D12C..0x13D12E */
+    r->d[0] = rd8(m, 0x00010C05u);                               /* 0x13D12C moveq #0,D0 / move.b */
     cace_text_tiles_5A86(m, r);                                  /* 0x13D134 */
     Gfx_DrawTilemapBlock(m, 0x00010C00u, 0x0061C024u, 0u);       /* 0x13D13A..0x13D14A */
 }

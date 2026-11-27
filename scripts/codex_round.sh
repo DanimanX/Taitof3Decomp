@@ -39,6 +39,6 @@ for w in X1 X2 X3; do
 done
 for w in X1 X2 X3; do
   W=/PROCESOS/wt_$w; [ -s work/zcap/codex${N}_$w.list ] || continue
-  codex exec -s workspace-write --approve-for-me -C $W "$(sed "s|WTDIR|$W|" work/zcap/codex_prompt.txt)" > work/zcap/codex${N}_$w.log 2>&1 &
+  codex exec -s workspace-write -C $W "$(sed "s|WTDIR|$W|" work/zcap/codex_prompt.txt)" > work/zcap/codex${N}_$w.log 2>&1 &
 done; wait
 echo "codex round $N done"

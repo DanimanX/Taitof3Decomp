@@ -27,3 +27,30 @@
 1120A8	weak	codex round 1
 16099A	weak	codex round 1
 118242	nocapture	codex round 1
+1203FE	nocapture	codex round 2
+1609EC	weak	codex round 2
+12AB7C	weak	codex round 2
+132752	weak	codex round 2
+11B78C	nocapture	codex round 2
+002274	nocapture	codex round 2
+19B65A	weak	codex round 2
+13AB36	weak	codex round 2
+120174	nocapture	codex round 2
+11A320	weak	codex round 2
+10C818	weak	codex round 2
+120C44	nocapture	codex round 2
+1182A8	nocapture	codex round 2
+198CEC	weak	codex round 2
+139FE4	weak	codex round 2
+14B1BE	nocapture	codex round 2
+120BD6	nocapture	codex round 2
+116922	nocapture	codex round 2
+10C178	weak	codex round 2
+11F18E	nocapture	codex round 2
+192954	weak	codex round 2
+1176D0	nocapture	codex round 2
+198904	weak	codex round 2
+13A0EE	weak	codex round 2
+14C04E	nocapture	codex round 2
+0C63E8	nocapture	Claude (task body, src/kernel/tasks.c)
+010502	nocapture	Claude (task body, src/kernel/tasks.c)

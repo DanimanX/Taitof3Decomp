@@ -87,6 +87,20 @@ local loga0 = os.getenv("F3_LOGA0") and tonumber(os.getenv("F3_LOGA0"), 16)
 -- shows the object field the code is about to touch
 local logw = os.getenv("F3_LOGW") and tonumber(os.getenv("F3_LOGW"), 16)
 local pokefn = os.getenv("F3_POKEFN") and tonumber(os.getenv("F3_POKEFN"), 16)
+-- F3_POKEAT=<hex pc>: apply the A0-relative pokes (F3_POKEA0B/W/P) whenever
+-- that PC is reached (e.g. a parent state's tick, to force the state change
+-- into the captured routine) instead of at the captured routine's entry
+local pokeat = os.getenv("F3_POKEAT") and tonumber(os.getenv("F3_POKEAT"), 16)
+-- F3_INJECT=<hex pc>: synthetic calls of the captured routine (F3_ENTRY must be
+-- the same PC, exit "ret"). When F3_INJECT_AT (default 0104B8, Obj_RunGroups'
+-- entry, reached every frame) is reached, its address is pushed as a return
+-- PC and execution jumps to the routine, at most once per frame: the pair is
+-- the routine's entry to its rts, then the game resumes at F3_INJECT_AT. For
+-- routines reached only in states a run cannot get to; their inputs are then
+-- whatever RAM and registers the game has at that point.
+local inject = os.getenv("F3_INJECT") and tonumber(os.getenv("F3_INJECT"), 16)
+local inject_at = tonumber(os.getenv("F3_INJECT_AT") or "0104B8", 16)
+local last_inject = -1
 local sweep = tonumber(os.getenv("F3_SWEEP") or "0")
 local sweep_base = tonumber(os.getenv("F3_SWEEP_BASE") or "0")
 local want = tonumber(os.getenv("F3_SAMPLES") or "300")
@@ -114,6 +128,8 @@ local exitpc = os.getenv("F3_EXITPC") == "1"
 regs:write("pair\twhich\tframe\tD0\tD1\tD2\tD3\tD4\tD5\tD6\tD7\tA0\tA1\tA2\tA3\tA4\tA5\tA6\tSP" .. (exitpc and "\tPC" or "") .. "\n")
 cpu.debug:bpset(entry, os.getenv("F3_COND") or "", "")
 for a in pairs(remask) do cpu.debug:bpset(a, "", "") end
+if pokeat then cpu.debug:bpset(pokeat, "", "") end
+if inject then cpu.debug:bpset(inject_at, "", "") end
 for pc, _ in pairs(exits) do cpu.debug:bpset(pc, "", "") end
 for pc, _ in pairs(logs) do cpu.debug:bpset(pc, "", "") end
 local dp = want_dpram and assert(io.open(prefix .. "_dpram.bin", "wb")) or nil
@@ -169,6 +185,17 @@ emu.register_periodic(function()
   if dbg.execution_state ~= "stop" then return end
   local pc = cpu.state["PC"].value
   local spv = cpu.state["SP"].value
+  if inject and pc == inject_at and not have_pre then
+    local fr = sp:read_u16(0x4022AC)
+    if fr ~= last_inject then
+      last_inject = fr
+      spv = spv - 4; sp:write_u32(spv, inject_at); cpu.state["SP"].value = spv
+      cpu.state["PC"].value = inject; pc = inject
+    end
+  end
+  if pokeat and pc == pokeat and pc ~= entry then
+    poke_a0(); dbg.execution_state = "run"; return
+  end
   if pokefn and pc == entry and not have_pre and cpu.state["A1"].value == pokefn then
     -- F3_POKEFN has two uses. Without F3_COND naming this routine it marks a
     -- parent we only want to poke, so return without capturing. With F3_COND
@@ -195,7 +222,7 @@ emu.register_periodic(function()
     for _, pv in ipairs(pokes) do sp:write_u32(pv[1], pv[2]) end
     for _, pv in ipairs(pokes16) do sp:write_u16(pv[1], pv[2]) end
     for _, pv in ipairs(pokes8) do sp:write_u8(pv[1], pv[2]) end
-    if not pokefn then poke_a0() end
+    if not pokefn and not pokeat then poke_a0() end
     if sweep > 0 then sp:write_u16(spv + 4, sweep_base + pairs_done % sweep) end
     pre_snap = snapshot(); pre_regs = regline_str(pairs_done, "pre"); pending_logs = {}; have_pre = true
     if noirq then saved_sr = cpu.state["SR"].value; cpu.state["SR"].value = saved_sr | 0x0700 end

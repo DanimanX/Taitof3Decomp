@@ -690,3 +690,5 @@
     { "Fn 0x13D1E6 auto", "work/ram/fn_13D1E6", Fn_13D1E6, ALLREGS },
     { "Fn 0x13D156 auto", "work/ram/fn_13D156", Fn_13D156, ALLREGS },
     { "Fn 0x14A9C0 auto", "work/ram/fn_14A9C0", Fn_14A9C0, ALLREGS },
+    { "Fn 0x112F42 auto", "work/ram/fn_112F42", Fn_112F42, ALLREGS },
+    { "Fn 0x14C04E auto", "work/ram/fn_14C04E", Fn_14C04E, ALLREGS },

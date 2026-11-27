@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x112F42: UNVERIFIED (no capture): Wait for a linked object's flag or clear its field on timeout. */
+/* ROM 0x112F42: verified on 60 calls from Y14 states with F3_POKEAT=112EC0 F3_POKEA0W=14=FF00 (the parent state 0x112EC0 is forced offscreen; count and timeout paths, not the parent-flag path): Wait for a linked object's flag or clear its field on timeout. */
 
 int Fn_112F42(const f3mem_t *m, f3regs_t *r)
 {

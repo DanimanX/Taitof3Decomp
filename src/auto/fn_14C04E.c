@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x14C04E: UNVERIFIED (no capture): blend and queue 18 palettes across the gradient. */
+/* ROM 0x14C04E: verified on 40 injected calls (capture_fn F3_INJECT, states Y27/Y04/Y14): only reached in stage phase 49 (script 0x14C63A at scroll 0x200000), which no run gets to: blend and queue 18 palettes across the gradient. */
 #include "../video/palette.h"
 
 static uint32_t with_word(uint32_t reg, uint16_t word)

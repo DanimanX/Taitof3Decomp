@@ -24,5 +24,9 @@ Push: temp GIT_ASKPASS script printing ~/.token.bak, deleted after. Commits end 
 3. Large captured routines (> 400 B) -> codewhale / codex lanes in worktrees (wt_EA1, wt_EA2):
    give them the FN1 build command from scripts/strata_game.py build_run, one routine per file,
    accepted only bit-exact + strong (empty function fails).
+   Running (14:30): codewhale cw1/cw2/cw3 (PIDs 143982-4) on the 15 captured routines > 400 B,
+   drafts in elvactr/work/drafts/ea_<A>.c, logs drafts/cw{1,2,3}.log. Accept the BIT-EXACT ones with
+   `scripts/check_ea.py accept <A> elvactr/work/drafts/ea_<A>.c` (refuses weak captures), then make test-elvactr.
+   Second capture pass running -> elvactr/work/capture_log2.tsv (651 rows).
 4. Strata loop idle -> relaunch with --retries 2 on its "fail" rows once.
 5. Weak rows -> recapture with other states before giving up.

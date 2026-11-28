@@ -1,4 +1,4 @@
-/* ROM 0x0B7332: UNVERIFIED (capture spans frames): draw a framed text window
+/* ROM 0x0B7332: (recipe capture fnk_, recipes16.tsv): draw a framed text window
  * in text RAM (all arguments on the stack, every register restored).
  * work/ram/fn_0B7332 has every post snapshot several frames after its pre
  * (0x6DD -> 0x6E6, ...), so the harness skips all 30 pairs. Checked by hand

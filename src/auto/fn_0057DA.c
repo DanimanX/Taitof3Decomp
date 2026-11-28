@@ -1,4 +1,4 @@
-/* ROM 0x0057DA: UNVERIFIED (no usable capture - every pair is
+/* ROM 0x0057DA: (recipe capture fnk_, recipes16.tsv): (no usable capture - every pair is
  * VBlank-interrupted and the test harness rejects them, and the injected calls
  * left garbage stack arguments): format an unsigned 8-digit decimal with
  * optional left padding. Stack args (A6 frame, A6 = entry SP-4): value.l at

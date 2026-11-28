@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x005576: UNVERIFIED (weak capture): blit a word tilemap, clearing source attributes before applying the mode. */
+/* ROM 0x005576: (recipe capture fnk_, recipes16.tsv): blit a word tilemap, clearing source attributes before applying the mode. */
 #include "fn_call_frames.h"
 
 int Fn_005576(const f3mem_t *m, f3regs_t *r)

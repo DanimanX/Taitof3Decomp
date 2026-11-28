@@ -46,9 +46,9 @@ The framework implements a closed-loop verification pipeline connecting **static
 
 | | functions | code bytes | % of code in functions |
 |---|---:|---:|---:|
-| Decompiled to C | 2383 / 2612 | 296,722 / 325,792 | **91.1%** |
-| …of which verified bit-exact vs MAME | 2301 | 278,072 | 85.4% |
-| **Remaining** | 229 | 29,070 | **8.9%** |
+| Decompiled to C | 2386 / 2612 | 296,840 / 325,792 | **91.1%** |
+| …of which verified bit-exact vs MAME | 2304 | 278,190 | 85.4% |
+| **Remaining** | 226 | 28,952 | **8.9%** |
 
 Per-bank map: [`docs/COVERAGE.md`](docs/COVERAGE.md). Code bytes = instruction bytes of the 2612 Ghidra functions in maincpu (325,792 of 403,578 disassembled bytes; the rest is code Ghidra has not assigned to a function yet). A function counts as decompiled when its entry address is annotated `ROM 0x…` in `src/`. Regenerate with `make coverage`.
 <!-- coverage:end -->

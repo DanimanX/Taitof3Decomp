@@ -1209,3 +1209,10 @@
 0CEF00	0	accepted	30/30 undec=0 try=2 720s
 11A312	0	accepted	30/30 undec=0 try=0 118s
 11E252	0	accepted	30/30 undec=0 try=1 217s
+130EA6	0	accepted	30/30 undec=0 try=0 95s
+1784CA	0	fail	29/30 undec=0 try=3 985s
+1784D8	0	accepted	30/30 undec=0 try=2 568s
+1784E6	0	fail	0/30 undec=0 try=2 453s
+1784F4	0	accepted	30/30 undec=0 try=0 167s
+11A956	0	accepted	30/30 undec=0 try=0 160s
+11CF80	0	fail	24/30 undec=0 try=3 964s

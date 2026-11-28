@@ -111,6 +111,28 @@ local last_inject = -1
 local inject_a0 = os.getenv("F3_INJECT_A0") == "1"
 local inject_slots = tonumber(os.getenv("F3_INJECT_SLOTS") or "100", 16)
 local inject_k = 0
+-- F3_INJECT_REGS="D1=3,A0=05F9E0" (hex) sets registers on each injected call
+-- (after F3_INJECT_A0); F3_INJECT_STACK="v1,v2" (hex longs) pushes C-style
+-- arguments, v1 ending at 4(SP) after the call. A value may be "a|b|c": the
+-- n-th injected call uses item n mod count, so one run covers several cases.
+local function inject_vals(s)
+  local t = {}
+  for k, v in string.gmatch(s or "", "([%w]+)=([%x|]+)") do
+    local alt = {}
+    for x in string.gmatch(v, "%x+") do alt[#alt + 1] = tonumber(x, 16) end
+    t[#t + 1] = { k:upper(), alt }
+  end
+  return t
+end
+local inject_regs = inject_vals(os.getenv("F3_INJECT_REGS"))
+local inject_stack = {}
+for v in string.gmatch(os.getenv("F3_INJECT_STACK") or "", "[%x|]+") do
+  local alt = {}
+  for x in string.gmatch(v, "%x+") do alt[#alt + 1] = tonumber(x, 16) end
+  inject_stack[#inject_stack + 1] = alt
+end
+local inject_n = 0
+local inject_orig_sp = nil
 local sweep = tonumber(os.getenv("F3_SWEEP") or "0")
 local sweep_base = tonumber(os.getenv("F3_SWEEP_BASE") or "0")
 local want = tonumber(os.getenv("F3_SAMPLES") or "300")
@@ -219,10 +241,21 @@ emu.register_periodic(function()
   if dbg.execution_state ~= "stop" then return end
   local pc = cpu.state["PC"].value
   local spv = cpu.state["SP"].value
+  if inject_orig_sp and pc == inject_at and spv == inject_orig_sp - 4 * #inject_stack then
+    spv = inject_orig_sp; cpu.state["SP"].value = spv; inject_orig_sp = nil
+  end
   if inject and pc == inject_at and not have_pre then
     local fr = sp:read_u16(0x4022AC)
     if fr ~= last_inject then
       last_inject = fr
+      -- C-style arguments: pushed last-to-first so v1 sits at 4(SP) in the
+      -- callee; the return to inject_at leaves them on the stack, so the
+      -- original SP is restored there (the inject_orig_sp check above)
+      if #inject_stack > 0 then inject_orig_sp = spv end
+      for i = #inject_stack, 1, -1 do
+        local alt = inject_stack[i]
+        spv = spv - 4; sp:write_u32(spv, alt[inject_n % #alt + 1])
+      end
       spv = spv - 4; sp:write_u32(spv, inject_at); cpu.state["SP"].value = spv
       cpu.state["PC"].value = inject; pc = inject
       if inject_a0 then
@@ -232,6 +265,11 @@ emu.register_periodic(function()
           if sp:read_u32(o) ~= 0 then cpu.state["A0"].value = o; break end
         end
       end
+      for _, kv in ipairs(inject_regs) do
+        local alt = kv[2]
+        cpu.state[kv[1]].value = alt[inject_n % #alt + 1]
+      end
+      inject_n = inject_n + 1
     end
   end
   if pokeat and pc == pokeat and pc ~= entry then

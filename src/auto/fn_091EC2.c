@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x091EC2: UNVERIFIED (weak capture): draw one ON/OFF option label.
+/* ROM 0x091EC2: draw one ON/OFF option label (capture fnk_: F3_INJECT_REGS D0/D1, both arms).
  * D1.W selects the text
  * (non-zero -> "ON " at 0x091F02 with colour 8, zero -> "OFF" at 0x091F06
  * with colour 3); D0 is the text-RAM cursor it is drawn at. D0 is saved and

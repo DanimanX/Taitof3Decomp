@@ -1216,3 +1216,46 @@
 1784F4	0	accepted	30/30 undec=0 try=0 167s
 11A956	0	accepted	30/30 undec=0 try=0 160s
 11CF80	0	fail	24/30 undec=0 try=3 964s
+0F9428	0	fail	0/30 undec=0 try=3 476s
+183EC6	0	fail	24/30 undec=0 try=3 375s
+091E2C	0	weak	empty draft passes the capture
+0C8B48	0	accepted	20/20 undec=0 try=0 52s
+143AAE	0	accepted	30/30 undec=0 try=0 80s
+0C2F06	0	fail	24/30 undec=0 try=3 396s
+0F4060	0	fail	0/30 undec=0 try=3 537s
+0ACB52	0	weak	empty draft passes the capture
+0C092E	0	accepted	30/30 undec=0 try=0 47s
+0C0942	0	fail	TIMEOUT: the translation loops forever on the captured input try=3 630s
+0E33A4	0	fail	0/7 undec=0 try=3 458s
+0E4310	0	fail	0/7 undec=0 try=3 482s
+11CF18	0	fail	COMPILE ERROR (project flags): try=3 533s
+1312D2	0	accepted	30/30 undec=0 try=1 140s
+091EA4	0	weak	empty draft passes the capture
+10E2CE	0	fail	0/30 undec=0 try=3 540s
+19F270	0	accepted	30/30 undec=0 try=0 87s
+1A0A52	0	codex	assigned to codex, injected capture (round 10)
+121E1E	0	codex	assigned to codex, injected capture (round 10)
+0E40DE	0	codex	assigned to codex, injected capture (round 10)
+162C4E	0	codex	assigned to codex, injected capture (round 10)
+131144	0	codex	assigned to codex, injected capture (round 10)
+1319FE	0	codex	assigned to codex, injected capture (round 10)
+1A095E	0	codex	assigned to codex, injected capture (round 10)
+0D8F9A	0	codex	assigned to codex, injected capture (round 10)
+17AC00	0	codex	assigned to codex, injected capture (round 10)
+0B7D74	0	codex	assigned to codex, injected capture (round 10)
+0E48FA	0	codex	assigned to codex, injected capture (round 10)
+19F504	0	codex	assigned to codex, injected capture (round 10)
+18182C	0	codex	assigned to codex, injected capture (round 10)
+130D18	0	codex	assigned to codex, injected capture (round 10)
+0B7506	0	codex	assigned to codex, injected capture (round 10)
+1A1856	0	codex	assigned to codex, injected capture (round 10)
+181960	0	codex	assigned to codex, injected capture (round 10)
+18F432	0	codex	assigned to codex, injected capture (round 10)
+0910CC	0	codex	assigned to codex, injected capture (round 10)
+0E4560	0	codex	assigned to codex, injected capture (round 10)
+0DF9D8	0	codex	assigned to codex, injected capture (round 10)
+0B80A4	0	codex	assigned to codex, injected capture (round 10)
+143AC4	0	codex	assigned to codex, injected capture (round 10)
+183DF8	0	codex	assigned to codex, injected capture (round 10)
+18F3C4	0	codex	assigned to codex, injected capture (round 10)
+0B7D52	0	accepted	30/30 undec=0 try=0 69s

@@ -903,5 +903,8 @@ int Fn_0E3462(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E3462 */
 int Fn_0E43A4(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E43A4 */
 int Fn_0057DA(const f3mem_t *m, f3regs_t *r); /* ROM 0x0057DA */
 int Fn_0E2D1E(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E2D1E */
+int Fn_1312D2(const f3mem_t *m, f3regs_t *r); /* ROM 0x1312D2 */
+int Fn_19F270(const f3mem_t *m, f3regs_t *r); /* ROM 0x19F270 */
+int Fn_0B7D52(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7D52 */
 /* END generated */
 #endif

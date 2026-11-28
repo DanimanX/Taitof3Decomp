@@ -191,12 +191,14 @@ _G.__f3_capture_fn = true
 local out = assert(io.open(prefix .. "_pairs.bin", "wb"))
 local regs = assert(io.open(prefix .. "_regs.tsv", "w"))
 local exitpc = inject_exc or os.getenv("F3_EXITPC") == "1"
+-- F3_SRCOL=1: write the SR column (18th) for any capture, not only F3_INJECT_EXC
+local srcol = inject_exc or os.getenv("F3_SRCOL") == "1"
 local service = os.getenv("F3_SERVICE") == "1"
 -- menu-walk periods (frames), F3_SVC="down,button,up" (default 90,270,630)
 local svc_dn, svc_bt, svc_up = (os.getenv("F3_SVC") or "90,270,630"):match("(%d+),(%d+),(%d+)")
 svc_dn, svc_bt, svc_up = tonumber(svc_dn), tonumber(svc_bt), tonumber(svc_up)
 regs:write("pair\twhich\tframe\tD0\tD1\tD2\tD3\tD4\tD5\tD6\tD7\tA0\tA1\tA2\tA3\tA4\tA5\tA6\tSP"
-  .. (exitpc and "\tPC" or "") .. (inject_exc and "\tSR" or "") .. "\n")
+  .. (exitpc and "\tPC" or "") .. (srcol and "\tSR" or "") .. "\n")
 cpu.debug:bpset(entry, os.getenv("F3_COND") or "", "")
 for a in pairs(remask) do cpu.debug:bpset(a, "", "") end
 if pokeat then cpu.debug:bpset(pokeat, "", "") end
@@ -306,7 +308,7 @@ local function regline_str(i, which)
   for k = 0, 6 do r[#r + 1] = string.format("%08X", cpu.state["A" .. k].value) end
   r[#r + 1] = string.format("%08X", cpu.state["SP"].value)
   if exitpc and which ~= "log" then r[#r + 1] = string.format("%08X", cpu.state["PC"].value) end
-  if inject_exc and which ~= "log" then r[#r + 1] = string.format("%04X", cpu.state["SR"].value) end
+  if srcol and which ~= "log" then r[#r + 1] = string.format("%04X", cpu.state["SR"].value) end
   return string.format("%d\t%s\t%04X\t%s\n", i, which, sp:read_u16(0x4022AC), table.concat(r, "\t"))
 end
 local pairs_done, have_pre, n = 0, false, 0

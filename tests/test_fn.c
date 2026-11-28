@@ -62,6 +62,14 @@ static int ad_seg(const f3mem_t *m, f3regs_t *r)
 #define SEGREG_CHECKS CPU_REGS, { CR_PC, ~0u }
 #define SEGREGS { SEGREG_CHECKS }
 #define EXCREGS { SEGREG_CHECKS, { CR_SR, 0xFFFFu } }
+/* Every general register and SP, without the PC column: for ABORT captures
+ * (F3_EXIT=<pc> F3_INJECT_ABORT=1), whose regs.tsv has no 17th column because
+ * capture_fn.lua only writes it with F3_EXITPC. */
+#define REG16_CHECKS { CR_D0, ~0u }, { CR_D0 + 1, ~0u }, { CR_D0 + 2, ~0u }, { CR_D0 + 3, ~0u }, \
+    { CR_D0 + 4, ~0u }, { CR_D0 + 5, ~0u }, { CR_D0 + 6, ~0u }, { CR_D0 + 7, ~0u }, \
+    { CR_A0, ~0u }, { CR_A0 + 1, ~0u }, { CR_A0 + 2, ~0u }, { CR_A0 + 3, ~0u }, \
+    { CR_A0 + 4, ~0u }, { CR_A0 + 5, ~0u }, { CR_A0 + 6, ~0u }, { CR_SP, ~0u }
+#define REG16 { REG16_CHECKS }
 
 /* ROM 0x005666: (8,A6)=src.l (0xC,A6)=dst.l (0x10,A6)=col.w; D0 = end dst */
 static int ad_005666(const f3mem_t *m, f3regs_t *r)
@@ -316,6 +324,16 @@ static const fn_entry_t fns[] = {
     { "Seg 0x1A189E 1A1856 group",  "work/ram/seg_1A189E", ad_seg, SEGREGS },
     { "Seg 0x1A1944 1A1944 group",  "work/ram/seg_1A1944", ad_seg, SEGREGS },
     { "Seg 0x1A198C 1A1944 group",  "work/ram/seg_1A198C", ad_seg, SEGREGS },
+    /* ABORT captures (F3_EXIT=<pc> F3_INJECT_ABORT=1): the routine is entered
+     * by injection and stopped at a PC it never returns from, so the pair is
+     * entry -> that PC (no PC column, hence REG16 rather than SEGREGS). */
+    { "Fn 0x1A043C yield",  "work/ram/fnt_1A043C", Fn_1A043C, REG16 },
+    { "Fn 0x1A095E yield",  "work/ram/fnt_1A095E", Fn_1A095E, REG16 },
+    { "Fn 0x001F62 yield",  "work/ram/fnt_001F62", Fn_001F62, REG16 },
+    { "Fn 0x01010A halt",   "work/ram/fnt_01010A", Fn_01010A, REG16 },
+    { "Fn 0x01014E reset",  "work/ram/fnt_01014E", Fn_01014E, REG16 },
+    { "Fn 0x000402 ramtest", "work/ram/fnt_000402", Fn_000402_Early, REG16 },
+    { "Fn 0x010000 init",   "work/ram/fnt_010000", Fn_010000_Init, REG16 },
     { "Task 0x0C63E8 Collision init",  "work/ram/task_init_coll", ad_task_coll_init, { { 0, 0u } } },
     { "Kernel 0x00222E preempt Z01",    "work/ram/fn_00222E", ad_k_00222E, SEGREGS },
     { "Kernel 0x00222E preempt Z04",    "work/ram/fn_00222E_z04", ad_k_00222E, SEGREGS },
@@ -431,7 +449,7 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         }
         for (int k = 0; k < 8; k++) { r.d[k] = c.pre[i][CR_D0 + k]; r.a[k] = c.pre[i][CR_A0 + k]; }
         r.pc = c.pcpre[i];
-        if (exception) r.sr = c.srpre[i];
+        if (c.srpre) r.sr = c.srpre[i];          /* F3_INJECT_EXC or F3_SRCOL */
         cur_cap = e->cap; cur_pair = i; skip_lo = skip_hi = 0;
         /* Port image of this pair, when the capture recorded one (F3_PORTS=1):
          * a copy, so a routine that writes 0x4A0000 cannot corrupt the table

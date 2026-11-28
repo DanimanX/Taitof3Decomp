@@ -138,6 +138,39 @@ void Video_UploadScroll(const f3mem_t *m)
         Video_SetSpriteScroll(m);
 }
 
+/* ROM 0x001C90 at register level, for calls whose continuation is compared
+ * (0x01010A): the scroll arithmetic itself only feeds the write-only video
+ * registers 0x660000-0x66001E, which are not modelled, but the routine leaves
+ * D0, D1, D2 and A0 behind. At 0x001D88: A0 = 0x600020 (from the 0x001232
+ * tail), D1 = 0x0A and D2 = 0x09 (the two moveq), and D0 keeps the high half
+ * of the 0x001D34/0x001D38 `asr.l #9` of the long at A5-0x5D64 with its low
+ * word replaced twice (0x001D6A, 0x001D76: the word at A5-0x5D60 / A5-0x5D5C
+ * plus the 9th/10th word of the 0x402242 table), then once more by
+ * 0x00124C (the word at A5-0xCA8) in Video_SetSpriteScroll.
+ *
+ * The eight longs at A5-0x5D80..-0x5D64 are negated at 0x001CAA (only when
+ * the word at A5-0x5D58 is set) and negated back at 0x001D4A, so they end as
+ * they started; only the negated value feeds the arithmetic, which is what is
+ * modelled here (no RAM write). */
+void Video_UploadScroll_Regs(const f3mem_t *m, f3regs_t *r)
+{
+    uint32_t a5 = r->a[5];
+    uint32_t v = rd32(m, a5 - 0x5D64u);              /* 0x001D34 move.l */
+    if (rd16(m, a5 - 0x5D58u) != 0u)                 /* 0x001CAA neg.l x8 */
+        v = 0u - v;                                  /* ... undone 0x001D4A */
+    uint32_t d0 = (uint32_t)((int32_t)v >> 9);       /* 0x001D38 asr.l #9 */
+    d0 = (d0 & 0xFFFF0000u)
+       | (uint16_t)(rd16(m, a5 - 0x5D60u) + rd16(m, 0x00402252u)); /* 0x001D6A */
+    d0 = (d0 & 0xFFFF0000u)
+       | (uint16_t)(rd16(m, a5 - 0x5D5Cu) + rd16(m, 0x00402254u)); /* 0x001D76 */
+    if (m->spr)                                     /* 0x001D82 jsr 0x001232 */
+        Video_SetSpriteScroll(m);
+    r->d[0] = (d0 & 0xFFFF0000u) | rd16(m, a5 - 0x0CA8u); /* 0x00124C */
+    r->d[1] = 0x0000000Au;                           /* 0x001C9E moveq #0xa */
+    r->d[2] = 0x00000009u;                           /* 0x001CA0 moveq #9 */
+    r->a[0] = 0x00600020u;                           /* 0x001232 lea */
+}
+
 /* ROM 0x005BE8 */
 static uint32_t fill_lineram_run(const f3mem_t *m, uint32_t a1, uint16_t val)
 {

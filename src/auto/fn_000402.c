@@ -1,4 +1,4 @@
-/* ROM 0x000402: UNVERIFIED (no capture): F3 RAM test of the eleven boot
+/* ROM 0x000402: (abort capture fnt_, recipes17cw2.tsv): F3 RAM test of the eleven boot
  * blocks, ending in a jump to the caller's continuation (A4).
  *
  * Each block loads A0 = base, A1 = message, D0 = byte count and A6 = the
@@ -310,7 +310,12 @@ static int test_block(const f3mem_t *m, f3regs_t *r, int width)
             r->d[1] = 0xFFFFFFFFu;                       /* 0x000588 moveq #-1 */
 
         do {
-            wr8(m, 0x004A0000u, 0u);            /* 0x000528/0x00055A/0x00058A */
+            /* 0x000528/0x00055A/0x00058A write.b #0 to the F3 control port
+             * 0x4A0000, the watchdog strobe: write-only MMIO, not modelled (as
+             * everywhere else in src/), and it changes no compared byte. It is
+             * skipped rather than issued because f3mem logs every access
+             * outside RAM/ROM: the byte block below runs 0x8000 of these per
+             * call, one log line each. */
             if (width == WIDTH_BYTE) {
                 uint8_t d1 = (uint8_t)r->d[1];
                 wr8(m, a0, d1);                 /* 0x000530 move.b D1,(A0) */
@@ -375,34 +380,42 @@ static int run_block(const f3mem_t *m, f3regs_t *r, uint32_t base,
  * ROM is spinning in that block's diagnostic). Shared with Fn_010000, which
  * enters this code through jmp 0x000402 and only reaches 0x01008A when it
  * returns 0. */
-int RamTest_000402(const f3mem_t *m, f3regs_t *r)
-{
-    /* base, message (A1), byte count (D0), continuation (A6), width. A6 is
-     * the next block, 0x000520 (jmp (A4)) after the last one. */
-    static const struct {
-        uint32_t base, message, count, cont;
-        int width;
-    } blocks[] = {
-        { 0x00620000u, 0x00000875u, 0x00001000u, 0x0000041Cu, WIDTH_WORD },
-        { 0x00622000u, 0x00000888u, 0x0000E000u, 0x00000436u, WIDTH_WORD },
-        { 0x00600000u, 0x00000819u, 0x00010000u, 0x00000450u, WIDTH_WORD },
-        { 0x00400000u, 0x0000080Au, 0x00020000u, 0x0000046Au, WIDTH_BYTE },
-        { 0x00610000u, 0x0000082Au, 0x00001000u, 0x00000484u, WIDTH_WORD },
-        { 0x00611000u, 0x00000839u, 0x00001000u, 0x0000049Eu, WIDTH_WORD },
-        { 0x00612000u, 0x00000848u, 0x00001000u, 0x000004B8u, WIDTH_WORD },
-        { 0x00613000u, 0x00000857u, 0x00001000u, 0x000004D2u, WIDTH_WORD },
-        { 0x0061C000u, 0x00000866u, 0x00002000u, 0x000004ECu, WIDTH_WORD },
-        { 0x00621000u, 0x0000089Cu, 0x00001000u, 0x00000506u, WIDTH_WORD },
-        { 0x00630000u, 0x000008ADu, 0x00010000u, 0x00000520u, WIDTH_WORD },
-    };
+/* base, message (A1), byte count (D0), continuation (A6), width. A6 is the
+ * next block, 0x000520 (jmp (A4)) after the last one. */
+static const struct {
+    uint32_t base, message, count, cont;
+    int width;
+} ram_blocks[] = {
+    { 0x00620000u, 0x00000875u, 0x00001000u, 0x0000041Cu, WIDTH_WORD },
+    { 0x00622000u, 0x00000888u, 0x0000E000u, 0x00000436u, WIDTH_WORD },
+    { 0x00600000u, 0x00000819u, 0x00010000u, 0x00000450u, WIDTH_WORD },
+    { 0x00400000u, 0x0000080Au, 0x00020000u, 0x0000046Au, WIDTH_BYTE },
+    { 0x00610000u, 0x0000082Au, 0x00001000u, 0x00000484u, WIDTH_WORD },
+    { 0x00611000u, 0x00000839u, 0x00001000u, 0x0000049Eu, WIDTH_WORD },
+    { 0x00612000u, 0x00000848u, 0x00001000u, 0x000004B8u, WIDTH_WORD },
+    { 0x00613000u, 0x00000857u, 0x00001000u, 0x000004D2u, WIDTH_WORD },
+    { 0x0061C000u, 0x00000866u, 0x00002000u, 0x000004ECu, WIDTH_WORD },
+    { 0x00621000u, 0x0000089Cu, 0x00001000u, 0x00000506u, WIDTH_WORD },
+    { 0x00630000u, 0x000008ADu, 0x00010000u, 0x00000520u, WIDTH_WORD },
+};
 
-    for (unsigned i = 0; i < sizeof blocks / sizeof blocks[0]; ++i) {
-        r->a[6] = blocks[i].cont;
-        if (run_block(m, r, blocks[i].base, blocks[i].message,
-                      blocks[i].count, blocks[i].width) != 0)
+/* Runs blocks [first, last); returns 1 as soon as one fails (the ROM then
+ * spins in that block's diagnostic via ram_error_report). */
+static int run_blocks(const f3mem_t *m, f3regs_t *r, unsigned first,
+                      unsigned last)
+{
+    for (unsigned i = first; i < last; ++i) {
+        r->a[6] = ram_blocks[i].cont;
+        if (run_block(m, r, ram_blocks[i].base, ram_blocks[i].message,
+                      ram_blocks[i].count, ram_blocks[i].width) != 0)
             return 1;
     }
     return 0;
+}
+
+int RamTest_000402(const f3mem_t *m, f3regs_t *r)
+{
+    return run_blocks(m, r, 0, sizeof ram_blocks / sizeof ram_blocks[0]);
 }
 
 int Fn_000402(const f3mem_t *m, f3regs_t *r)
@@ -411,4 +424,38 @@ int Fn_000402(const f3mem_t *m, f3regs_t *r)
     /* 0x000520 jmp (A4): the ROM continues at the caller's A4 (0x01008A
      * inside the reset code). Modelled as the return. */
     return 0;
+}
+
+/* ROM 0x000402 stopped at 0x000450, the capture stop point (a capture cannot
+ * run the whole test: see below).
+ *
+ * Why 0x000450: the third block (0x00400000, byte width) is the one that wipes
+ * work RAM 0x400000-0x41FFFF -- the region the harness compares, and the stack
+ * the injected call has to return to -- so the capture stops at that block's
+ * prologue: PC = 0x000450, i.e. right after block 2 (0x600000 sprite RAM) set
+ * A6 = 0x000450 and the word loop reached `jmp (A6)`. That leaves work RAM as
+ * the pre dump had it, so the ABORT capture can take more than one pair, and
+ * it compares the two line-RAM blocks (0x620000-0x620FFF, 0x622000-0x62FFFF)
+ * and the whole sprite-RAM block (0x600000-0x60FFFF) against the capture.
+ *
+ * What it cannot cover and why: blocks 3..10 write the state the capture needs
+ * (work RAM, 0x610000-0x61FFFF, 0x621000) away, and the last block (0x630000,
+ * 0x000506) tests the F3 pivot RAM, which f3mem does not map at all -- the
+ * model reads 0 back there and takes the 0x000740 PIVOT RAM ERROR spin, while
+ * MAME's f3_map maps 0x630000-0x63FFFF read/write and the real boot passes it.
+ * A second capture at F3_EXIT=000506 would cover blocks 3..10 in a single pair
+ * (the work-RAM block zeroes the stack the abort returns through).
+ *
+ * Registers at the stop are the word loop's: A0 = 0x610000 (the 0x10000 bytes
+ * of block 2 consumed at 2 bytes a pass), A1 = 0x00000819 (block 2's message),
+ * A6 = 0x000450, D0 = 0, D3 = 0xFFFF from the dbra, D2 = 0x0000 (the last
+ * value read back) and D1 = 0xAAAB -- the four passes store 0xFFFF, 0xAAAA,
+ * 0x5555 and 0x0000 and the subi.w #0x5555 at 0x000576 also runs after the
+ * last one, so each cell ends zero while D1 is left at 0 - 0x5555. The high
+ * halves of D1/D2/D3 are the caller's (move.w/subi.w keep them). */
+int Fn_000402_Early(const f3mem_t *m, f3regs_t *r)
+{
+    if (run_blocks(m, r, 0, 3) != 0)
+        return -1;   /* the diagnostic is not the captured stop */
+    return 0;        /* 0x000450 lea 0x400000,A0 */
 }

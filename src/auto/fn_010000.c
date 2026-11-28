@@ -1,4 +1,4 @@
-/* ROM 0x010000: UNVERIFIED (no capture): reset vector target -- hardware init,
+/* ROM 0x010000: (abort capture fnt_, recipes17cw2.tsv): reset vector target -- hardware init,
  * RAM test, RAM/line-RAM clear, display + sound init, then the jump into the
  * kernel cold boot at 0x001DB8.
  *
@@ -166,10 +166,13 @@ static void config_init_000D5A(const f3mem_t *m, f3regs_t *r)
     /* 0x000DF8 rts */
 }
 
-int Fn_010000(const f3mem_t *m, f3regs_t *r)
+/* 0x010000..0x01007A: supervisor mode, the global base A5, the write-only F3
+ * control ports, the timer and the ten video registers. SR and CACR are
+ * outside f3regs_t and the ports/registers are write-only, so f3mem drops
+ * those writes (it logs each access outside RAM/ROM; they change no compared
+ * byte). Shared by the whole-boot model and the capture stop below. */
+static void reset_hw_init(const f3mem_t *m, f3regs_t *r)
 {
-    /* 0x010000 ori.w #0x700,SR: supervisor mode, not modelled (no SR). */
-
     r->a[5] = F3_A5;                                /* 0x010004 lea (0x408000).l */
     wr8(m, 0x004A0000u, 0x00u);                     /* 0x01000A */
     wr8(m, 0x004A0006u, 0x00u);                     /* 0x010012 */
@@ -186,6 +189,28 @@ int Fn_010000(const f3mem_t *m, f3regs_t *r)
     };
     for (unsigned i = 0; i < sizeof video / sizeof video[0]; ++i) /* 0x010044..0x01007A */
         wr16(m, video[i], (uint16_t)r->d[0]);
+}
+
+int Fn_010000_Init(const f3mem_t *m, f3regs_t *r)
+{
+    reset_hw_init(m, r);
+    /* 0x010080 lea (0x8,PC),A4 / 0x010084 jmp 0x000402: the capture stop, set
+     * before that lea because everything behind it destroys the state a
+     * capture needs. The RAM test is 0x000402 (reached with A4 = 0x01008A as
+     * its return), it zeroes 0x400000-0x41FFFF, and the boot then clears work
+     * RAM again at 0x01008A and re-initialises every display list, so no post
+     * dump past this point can be compared: the RAM test's last block also
+     * covers the F3 pivot RAM at 0x630000, which f3mem does not map (see
+     * Fn_000402_Early). At 0x010080 the only effects are D0 = 0 and
+     * A5 = 0x408000; every other register, SP and all of the compared RAM are
+     * the caller's. */
+    return 0;                                       /* 0x010080 */
+}
+
+int Fn_010000(const f3mem_t *m, f3regs_t *r)
+{
+    /* 0x010000 ori.w #0x700,SR: supervisor mode, not modelled (no SR). */
+    reset_hw_init(m, r);
 
     r->a[4] = 0x0001008Au;                          /* 0x010080 lea (0x8,PC),A4 */
     if (RamTest_000402(m, r) != 0)

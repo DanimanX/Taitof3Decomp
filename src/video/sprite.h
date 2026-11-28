@@ -18,6 +18,7 @@ void Sprite_InitHeaders(const f3mem_t *m, uint16_t d0); /* ROM 0x001100 (src/vid
 void Sprite_InitBuffers(const f3mem_t *m);              /* ROM 0x001070 (src/video/sprite_init.c) */
 void Video_SetSpriteScroll(const f3mem_t *m);         /* ROM 0x001232 */
 void Video_UploadScroll(const f3mem_t *m);            /* ROM 0x001C90 */
+void Video_UploadScroll_Regs(const f3mem_t *m, f3regs_t *r); /* ROM 0x001C90 + its register leftovers */
 void Gfx_DrawCompressedTilemap(const f3mem_t *m, uint32_t src, uint32_t dst, uint32_t flags); /* ROM 0x0053B2 */
 void Gfx_DrawTilemapBlock(const f3mem_t *m, uint32_t src, uint32_t dst, uint16_t flags); /* ROM 0x0055C8 */
 uint32_t Gfx_DrawHex(const f3mem_t *m, uint32_t val, uint16_t digits, uint32_t dst, uint16_t attr); /* ROM 0x005690 */

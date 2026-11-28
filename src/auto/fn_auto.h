@@ -1155,5 +1155,10 @@ int Fn_002156(const f3mem_t *m, f3regs_t *r); /* ROM 0x002156 */
 int Fn_0021BE(const f3mem_t *m, f3regs_t *r); /* ROM 0x0021BE */
 int Fn_00220E(const f3mem_t *m, f3regs_t *r); /* ROM 0x00220E */
 int Fn_003CE0(const f3mem_t *m, f3regs_t *r); /* ROM 0x003CE0 */
+int Fn_1A043C(const f3mem_t *m, f3regs_t *r); /* ROM 0x1A043C pre-yield (jsr 0x001F62 at 0x1A04D4) */
+int Fn_1A095E(const f3mem_t *m, f3regs_t *r); /* ROM 0x1A095E pre-yield (jsr 0x001F62 at 0x1A09A6) */
+int Fn_01014E(const f3mem_t *m, f3regs_t *r); /* ROM 0x01014E up to the 0x010170 spin */
+int Fn_000402_Early(const f3mem_t *m, f3regs_t *r); /* ROM 0x000402 blocks 0..2 (stop 0x000450) */
+int Fn_010000_Init(const f3mem_t *m, f3regs_t *r); /* ROM 0x010000 up to the 0x010080 RAM-test jump */
 /* END generated */
 #endif

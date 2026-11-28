@@ -1,7 +1,28 @@
-/* ROM 0x010172: UNVERIFIED (no capture): kernel task 0 (Task0_Main) -- the
- * boot task that clears the machine, arms the two display/sound init routines,
- * then runs the attract/credit state machine, and switches to test mode when
- * the service switches or a bad settings block ask for it.
+/* ROM 0x010172: UNVERIFIED (no capture, and none is possible for the entry):
+ * kernel task 0 (Task0_Main) -- the boot task that clears the machine, arms
+ * the two display/sound init routines, then runs the attract/credit state
+ * machine, and switches to test mode when the service switches or a bad
+ * settings block ask for it.
+ *
+ * UNVERIFIABLE at 0x010172 (the only instruction an entry capture could show):
+ * the body starts with `trap #5` (0x010172), which pushes the 6-byte frame
+ * {PC = 0x010174, SR} and hands the CPU to the TRAP #5 body at 0x001F78, whose
+ * Kern_Schedule never returns to that push -- it saves the context and switches
+ * task. So F3_EXIT=010174 never fires inside this activation: 0x010174 is
+ * reached only when the scheduler later resumes that saved context -- a later
+ * frame, after a scheduler round trip -- so test_fn skips the pair (fpre !=
+ * fpost) and the post state is not this entry's anyway. F3_INJECT_EXC does not
+ * help either: it
+ * does not synthesise a TRAP -- it plants an 8-byte format-0 frame and starts
+ * the routine at 0x010172, so the real `trap #5` still executes on top of it
+ * and still yields (and the frame it leaves is the trap's 6-byte one, not the
+ * synthetic one; the "ret" mode never sees its RTE). The closest reachable
+ * stop is 0x002274 (F3_INJECT=010172
+ * F3_EXIT=002274 F3_INJECT_ABORT=1), but that post is the scheduler entry after
+ * Kern_001F78's context save -- it verifies the TRAP #5 body, which already has
+ * its own capture (work/ram/fn_001F78, "Kernel 0x001F78 TRAP 5"), not this
+ * task. Fn_010172 therefore only models the yield, and the first frame of the
+ * task is verified separately through Task0_Main_Frame/seg captures.
  *
  * The body starts with TRAP #5 (0x010172), so Fn_010172 only yields. One pass
  * of the loop is Task0_Main_Frame, which runs the code after the yield up to

@@ -22,6 +22,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "capture.h"
+#ifndef GAME_ROM
+#define GAME_ROM "work/maincpu.bin"
+#endif
 #include "../src/enemy/obj_1194C2.h"      /* Text_DrawString (0x005666) */
 #include "../src/player/player_task.h"    /* Player_CoinCheckA (0x0C77BE) */
 #include "../src/enemy/obj_CBF04.h"       /* Obj_CBEEA (0x0CBEEA) */
@@ -271,6 +274,14 @@ static int ad_task_timeline_init(const f3mem_t *m, f3regs_t *r) { return Fn_13F2
 int FN1(const f3mem_t *m, f3regs_t *r);
 static const fn_entry_t fns[] = {
     { "Fn 0x" FN1_ADDR " draft", "work/ram/fn_" FN1_ADDR, FN1, ALLREGS },
+};
+#elif defined(GAME_INC)
+/* Another F3 game (e.g. elvactr): its own ROM, prototypes and test table.
+ * cc -DGAME_INC='"../elvactr/tests/fn_auto.inc"' -DGAME_HDR='"../elvactr/src/ea_auto.h"'
+ *    -DGAME_ROM='"elvactr/work/maincpu.bin"' tests/test_fn.c <game sources> $(SRC) */
+#include GAME_HDR
+static const fn_entry_t fns[] = {
+#include GAME_INC
 };
 #else
 #include "../src/auto/fn_auto.h"
@@ -563,8 +574,8 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
 int main(void)
 {
     long rl = 0;
-    uint8_t *rom = slurp("work/maincpu.bin", &rl);
-    if (!rom || rl < (long)F3_ROM_SIZE) { printf("fn: SKIP (need work/maincpu.bin)\n"); free(rom); return 0; }
+    uint8_t *rom = slurp(GAME_ROM, &rl);
+    if (!rom || rl < (long)F3_ROM_SIZE) { printf("fn: SKIP (need %s)\n", GAME_ROM); free(rom); return 0; }
     const char *only = getenv("F3_ONLY");
     int bad = 0;
     for (size_t k = 0; k < sizeof fns / sizeof fns[0]; k++) {

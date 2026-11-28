@@ -117,6 +117,10 @@ local pokeat = os.getenv("F3_POKEAT") and tonumber(os.getenv("F3_POKEAT"), 16)
 -- whatever RAM and registers the game has at that point.
 local inject = os.getenv("F3_INJECT") and tonumber(os.getenv("F3_INJECT"), 16)
 local inject_at = tonumber(os.getenv("F3_INJECT_AT") or "0104B8", 16)
+-- F3_FRAMEVAR: hex address of the game's 16-bit frame counter in work RAM,
+-- written to the "frame" column (test_fn skips pairs whose pre/post differ:
+-- the call was interrupted by a frame). Default 4022AC (dariusg).
+local framevar = tonumber(os.getenv("F3_FRAMEVAR") or "4022AC", 16)
 local inject_exc = os.getenv("F3_INJECT_EXC") == "1"
 local inject_vec = tonumber(os.getenv("F3_INJECT_VEC") or "", 16)
 if inject_exc then
@@ -309,7 +313,7 @@ local function regline_str(i, which)
   r[#r + 1] = string.format("%08X", cpu.state["SP"].value)
   if exitpc and which ~= "log" then r[#r + 1] = string.format("%08X", cpu.state["PC"].value) end
   if srcol and which ~= "log" then r[#r + 1] = string.format("%04X", cpu.state["SR"].value) end
-  return string.format("%d\t%s\t%04X\t%s\n", i, which, sp:read_u16(0x4022AC), table.concat(r, "\t"))
+  return string.format("%d\t%s\t%04X\t%s\n", i, which, sp:read_u16(framevar), table.concat(r, "\t"))
 end
 local pairs_done, have_pre, n = 0, false, 0
 local scr0 = nil
@@ -342,7 +346,7 @@ emu.register_periodic(function()
     spv = inject_orig_sp; cpu.state["SP"].value = spv; inject_orig_sp = nil
   end
   if inject and pc == inject_at and not have_pre then
-    local fr = sp:read_u16(0x4022AC)
+    local fr = sp:read_u16(framevar)
     if fr ~= last_inject then
       last_inject = fr
       -- Push arguments last-to-first. Exception captures record SP just

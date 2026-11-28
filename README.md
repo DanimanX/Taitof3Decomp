@@ -53,6 +53,21 @@ The framework implements a closed-loop verification pipeline connecting **static
 Per-bank map: [`docs/COVERAGE.md`](docs/COVERAGE.md). Code bytes = instruction bytes of the 2606 Ghidra functions in maincpu (325,124 of 403,578 disassembled bytes; the rest is code Ghidra has not assigned to a function yet). A function counts as decompiled when its entry address is annotated `ROM 0x…` in `src/`. Regenerate with `make coverage`.
 <!-- coverage:end -->
 
+<!-- coverage:elvactr:start -->
+### Decompilation progress — Elevator Action Returns (`elvactr`)
+
+**0.0% decompiled · 100.0% remaining**  
+`░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
+
+| | functions | code bytes | % of code in functions |
+|---|---:|---:|---:|
+| Decompiled to C | 0 / 1600 | 0 / 172,914 | **0.0%** |
+| …of which verified bit-exact vs MAME | 0 | 0 | 0.0% |
+| **Remaining** | 1600 | 172,914 | **100.0%** |
+
+Per-bank map: [`elvactr/docs/COVERAGE.md`](elvactr/docs/COVERAGE.md). Code bytes = instruction bytes of the 1600 Ghidra functions in maincpu (172,914 of 173,776 disassembled bytes). The function list comes from Ghidra seeded with every PC MAME executed in traced play (`elvactr/work/functions.tsv`). A function counts as decompiled when its entry is annotated `ROM 0x…` in `elvactr/src/`. Regenerate with `make coverage-elvactr`.
+<!-- coverage:elvactr:end -->
+
 ---
 
 ## Architecture & Workflow

@@ -84,3 +84,7 @@ publish:
 build/test_fn: tests/test_fn.c tests/capture.h tests/fn_auto.inc src/common/f3mem.h src/auto/fn_auto.h src/auto/eeprom_block.h $(SRC)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -o $@ tests/test_fn.c $(SRC)
+
+.PHONY: coverage-elvactr
+coverage-elvactr:
+	python3 scripts/coverage_game.py elvactr "Elevator Action Returns"

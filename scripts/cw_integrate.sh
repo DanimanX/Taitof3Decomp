@@ -8,6 +8,9 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
 W=${1:-/PROCESOS/wt_CW}
 new=$(cd "$W" && git status --short src/auto | sed -n 's/^?? //p')
 for f in $new; do [ -e "$f" ] && echo "exists $f" || cp "$W/$f" "$f"; done
+# edits to existing shared src/auto headers/files (not the generated ones)
+(cd "$W" && git diff -- src/auto ':!src/auto/fn_auto.h') > build/cw_mod.patch
+[ -s build/cw_mod.patch ] && { git apply --3way build/cw_mod.patch || echo "cw_mod.patch did not apply"; }
 (cd "$W" && git diff -U0 src/auto/fn_auto.h | grep '^+[^+]' | sed 's/^+//') > build/cw_protos.txt
 (cd "$W" && git diff -U0 tests/fn_auto.inc | grep '^+[^+]' | sed 's/^+//') > build/cw_inc.txt
 while IFS= read -r l; do grep -qF "$l" tests/fn_auto.inc || echo "$l" >> tests/fn_auto.inc; done < build/cw_inc.txt

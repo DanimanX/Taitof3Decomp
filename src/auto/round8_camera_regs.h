@@ -102,4 +102,22 @@ static inline int tick_camera(const f3mem_t *m, f3regs_t *r, uint32_t entry)
     return (int16_t)timer > 1;
 }
 
+/* The plain states of the 0x129EDE..0x12A0D8 chain (0x129EDE, 0x129F0C, ...):
+ * tick the camera through 0x11B288/0x11B2CA/0x11B262, re-arm the same state
+ * while +0x06 > 0, else set bit 8 of A5+0x30EE (byte A5+0x30EF, mask 0x80),
+ * load the next timer and arm the next state. */
+static inline void camera_chain_step(const f3mem_t *m, f3regs_t *r,
+                                     uint32_t entry, uint32_t next,
+                                     uint16_t timer)
+{
+    uint32_t obj = r->a[0];
+    if (tick_camera(m, r, entry)) {
+        wr32(m, obj, entry); /* the state's re-arm thunk */
+        return;
+    }
+    wr8(m, r->a[5] + 0x30EFu, (uint8_t)(rd8(m, r->a[5] + 0x30EFu) | 0x80u));
+    wr16(m, obj + 6u, timer);
+    wr32(m, obj, next);
+}
+
 #endif

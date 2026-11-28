@@ -1,13 +1,13 @@
 # Decompilation coverage — Elevator Action Returns (maincpu)
 
-**0.0% decompiled · 100.0% remaining**  
+**0.1% decompiled · 99.9% remaining**  
 `░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
 
 | | functions | code bytes | % of code in functions |
 |---|---:|---:|---:|
-| Decompiled to C | 0 / 1600 | 0 / 172,914 | **0.0%** |
-| …of which verified bit-exact vs MAME | 0 | 0 | 0.0% |
-| **Remaining** | 1600 | 172,914 | **100.0%** |
+| Decompiled to C | 3 / 1600 | 96 / 172,914 | **0.1%** |
+| …of which verified bit-exact vs MAME | 3 | 96 | 0.1% |
+| **Remaining** | 1597 | 172,818 | **99.9%** |
 
 ## Map by 64 KiB ROM bank
 
@@ -15,7 +15,7 @@
 
 | ROM bank | functions (done/total) | code bytes | decompiled | map |
 |---|---:|---:|---:|---|
-| `0x000000` | 0/301 | 21,582 |   0.0% | `░░░░░░░░░░░░░░░░░░░░` |
+| `0x000000` | 3/301 | 21,582 |   0.4% | `░░░░░░░░░░░░░░░░░░░░` |
 | `0x010000` | 0/22 | 1,458 |   0.0% | `░░░░░░░░░░░░░░░░░░░░` |
 | `0x0A0000` | 0/166 | 14,656 |   0.0% | `░░░░░░░░░░░░░░░░░░░░` |
 | `0x0B0000` | 0/170 | 13,750 |   0.0% | `░░░░░░░░░░░░░░░░░░░░` |

@@ -88,3 +88,13 @@ build/test_fn: tests/test_fn.c tests/capture.h tests/fn_auto.inc src/common/f3me
 .PHONY: coverage-elvactr
 coverage-elvactr:
 	python3 scripts/coverage_game.py elvactr "Elevator Action Returns"
+
+# Elevator Action Returns: register-level routines in elvactr/src, tested
+# against elvactr/work/ram captures (run from the repository root).
+EA_SRC := $(wildcard elvactr/src/*.c)
+build/test_elvactr: tests/test_fn.c tests/capture.h elvactr/tests/fn_auto.inc elvactr/src/ea_auto.h $(EA_SRC) build/libf3.a
+	$(CC) $(CFLAGS) -Wno-type-limits -Wno-unused-function -iquote src/auto -DGAME_INC='"../elvactr/tests/fn_auto.inc"' -DGAME_HDR='"../elvactr/src/ea_auto.h"' \
+	  -DGAME_ROM='"elvactr/work/maincpu.bin"' -o $@ tests/test_fn.c $(EA_SRC) build/libf3.a
+.PHONY: test-elvactr
+test-elvactr: build/test_elvactr
+	timeout 1800 ./build/test_elvactr 2>&1 | grep -v '^f3mem' | head -c 20000000 | tail -1

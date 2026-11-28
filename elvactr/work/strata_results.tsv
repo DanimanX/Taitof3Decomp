@@ -1,0 +1,4 @@
+001338	22	accepted	30/30 try=0 rel=001D8A 71s
+002E8C	32	accepted	30/30 try=1 rel=003998 208s
+000AD6	42	accepted	30/30 try=1 rel=000FEC 147s
+0009F4	46	weak	empty function passes the capture

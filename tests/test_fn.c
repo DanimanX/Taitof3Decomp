@@ -271,9 +271,12 @@ static int ad_task_timeline_init(const f3mem_t *m, f3regs_t *r) { return Fn_13F2
 #ifdef FN1
 /* One-routine build for drafting (scripts/strata_fn.py):
  * cc -DFN1=Fn_ADDR -DFN1_ADDR='"ADDR"' tests/test_fn.c draft.c build/libf3.a */
+#ifndef FN1_DIR
+#define FN1_DIR "work/ram/fn_"   /* elvactr: "elvactr/work/ram/fn_" */
+#endif
 int FN1(const f3mem_t *m, f3regs_t *r);
 static const fn_entry_t fns[] = {
-    { "Fn 0x" FN1_ADDR " draft", "work/ram/fn_" FN1_ADDR, FN1, ALLREGS },
+    { "Fn 0x" FN1_ADDR " draft", FN1_DIR FN1_ADDR, FN1, ALLREGS },
 };
 #elif defined(GAME_INC)
 /* Another F3 game (e.g. elvactr): its own ROM, prototypes and test table.

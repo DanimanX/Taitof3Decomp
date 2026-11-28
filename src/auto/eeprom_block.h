@@ -27,7 +27,7 @@ static inline uint8_t ee_sample(const f3mem_t *m)
     return m->eeprom ? rd8(m, F3_EEP_IN) & 1u : 0;
 }
 
-/* 0x0047C0 saves SR, raises IPL while clocking the EEPROM, and restores SR
+/* ROM 0x0047C0: eeprom_xfer. It saves SR, raises IPL while clocking the EEPROM, and restores SR
  * before jumping back through A6. Its callers set D1 with MOVEQ, which
  * clears NZVC and preserves X. Bits 31 and 30 select receive and poll. */
 static inline uint32_t ee_xfer(const f3mem_t *m, uint32_t d0, uint16_t d1,

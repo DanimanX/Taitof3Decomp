@@ -126,6 +126,7 @@
 00466E	Fn_00466E	src/auto/fn_00466E.c	12
 0046C0	Fn_0046C0	src/auto/fn_0046C0.c	12
 004762	Fn_004762	src/auto/fn_004762.c	30
+0047C0	ee_xfer	src/auto/eeprom_block.h	828
 004BD2	Fn_004BD2	src/auto/fn_004BD2.c	122
 004C12	Fn_004C12	src/auto/fn_004C12.c	11
 004C42	Fn_004C42	src/auto/fn_004C42.c	3

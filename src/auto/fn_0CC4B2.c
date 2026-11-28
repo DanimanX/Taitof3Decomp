@@ -1,4 +1,4 @@
-/* ROM 0x0CC4B2: UNVERIFIED (no capture): enemy bullet/missile tick. When the
+/* ROM 0x0CC4B2: (injected capture fnj_, NOIRQ): enemy bullet/missile tick. When the
  * "bullet shield" byte A5+0x1D58 has bit 1 and the object X is within
  * [-0x0A, 0x11C] it is retired immediately; the same happens when its lifetime
  * +0x24 has run out or the global blast flag A5-0x144B bit 4 is set. Otherwise

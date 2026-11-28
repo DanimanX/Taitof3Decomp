@@ -1,4 +1,4 @@
-/* ROM 0x13E7EE: UNVERIFIED (weak capture): set the display-window bounds in
+/* ROM 0x13E7EE: (injected capture fnj_, NOIRQ): set the display-window bounds in
  * graphic RAM. The capture only observes the A5+0x3300 word (0x0000 -> 0x0030 in pair 0);
  * its gfx pre/post snapshots are byte-identical, so the 0xE7-word fill is not
  * checked by the test and was verified from the bytes alone.

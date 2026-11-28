@@ -1,4 +1,4 @@
-/* ROM 0x130E3A: UNVERIFIED (no capture): object tick that steps the
+/* ROM 0x130E3A: (injected capture fnj_, NOIRQ): object tick that steps the
  * {dur.w, sprdef.l} animation table 0x130ED4, appends the object to the list
  * at A5+0x906, draws the sprite (0x001282), counts +0x06 down and re-arms:
  *

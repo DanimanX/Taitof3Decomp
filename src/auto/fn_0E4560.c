@@ -1,4 +1,4 @@
-/* ROM 0x0E4560: UNVERIFIED (weak capture): scripted flying enemy tick
+/* ROM 0x0E4560: (injected capture fnj_, NOIRQ): scripted flying enemy tick
  * (A0 = object). The only captured pair spans frames 0x06DD->0x0992, so the
  * harness skips it and the translation is verified against the bytes only. While
  * +0x06 == 2 it integrates the vertical scroll into +0x3A; always integrates

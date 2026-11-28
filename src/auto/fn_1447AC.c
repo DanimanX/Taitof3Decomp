@@ -1,4 +1,4 @@
-/* ROM 0x1447AC: UNVERIFIED (no usable capture - the only pair is
+/* ROM 0x1447AC: (injected capture fnj_, NOIRQ; the original fn_ pair was
  * VBlank-interrupted and the test harness rejects it): insertion sort of the 8-byte records at 0x40C2B4, keyed on
  * their first word (ascending, signed), ending at the first record whose word
  * at +0x06 is negative. Walks A0 by 8, and for a record smaller than its

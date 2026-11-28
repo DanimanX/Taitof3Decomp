@@ -1,4 +1,4 @@
-/* ROM 0x0E2D1E: UNVERIFIED (no usable capture - the only pair is
+/* ROM 0x0E2D1E: (injected capture fnj_, NOIRQ; the original fn_ pair was
  * VBlank-interrupted and the test harness rejects it): mid-boss segment tick
  * (A0 = object).
  * Debug on-screen kill (A5+0x1D58 bit 1 with +0x14 in [-10, 0x11C]) tail-calls

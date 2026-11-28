@@ -1146,3 +1146,66 @@
 184322	0	codex	assigned to codex, injected capture (round 9)
 0E405C	0	codex	assigned to codex, injected capture (round 9)
 0C966E	0	codex	assigned to codex, injected capture (round 9)
+003E00	0	fail	0/30 undec=0 try=3 1181s
+003E5E	0	fail	no output try=2 629s
+003EBC	0	fail	0/30 undec=0 try=3 729s
+003F1E	0	fail	f3mem: access outside RAM/ROM at C00480 try=2 533s
+003F80	0	weak	empty draft passes the capture
+003FD8	0	weak	empty draft passes the capture
+004030	0	weak	empty draft passes the capture
+1A0A52	0	fail	codex round 9: not written
+0910CC	0	fail	codex round 9: not written
+0E48FA	0	fail	codex round 9: not written
+0E40DE	0	fail	codex round 9: not written
+0B80A4	0	fail	codex round 9: not written
+1781F6	0	fail	codex round 9: not written
+0B760C	0	fail	codex round 9: not written
+0B7420	0	fail	codex round 9: not written
+131088	0	fail	codex round 9: not written
+144378	0	fail	codex round 9: not written
+178654	0	fail	codex round 9: not written
+1785B2	0	fail	codex round 9: not written
+11A994	0	fail	codex round 9: not written
+183A2C	0	fail	codex round 9: not written
+000A44	0	fail	codex round 9: not written
+121E1E	0	fail	codex round 9: not written
+137DE4	0	fail	codex round 9: not written
+0E2EAC	0	fail	codex round 9: not written
+178700	0	fail	codex round 9: not written
+124C10	0	fail	codex round 9: not written
+11E11C	0	fail	codex round 9: not written
+130D18	0	fail	codex round 9: not written
+0B7506	0	fail	codex round 9: not written
+183DF8	0	fail	codex round 9: not written
+1A1856	0	fail	codex round 9: not written
+0B7A54	0	fail	codex round 9: not written
+0E2D1E	0	fail	codex round 9: not written
+0B7FF8	0	fail	codex round 9: not written
+18098C	0	fail	codex round 9: not written
+0C2DF2	0	fail	codex round 9: not written
+162D98	0	fail	codex round 9: not written
+11CE6E	0	fail	codex round 9: not written
+0B7D74	0	fail	codex round 9: not written
+0047C0	0	fail	codex round 9: not written
+0E4560	0	fail	codex round 9: not written
+19F504	0	fail	codex round 9: not written
+162C4E	0	fail	codex round 9: not written
+131144	0	fail	codex round 9: not written
+1319FE	0	fail	codex round 9: not written
+004D06	0	fail	codex round 9: not written
+1A095E	0	fail	codex round 9: not written
+1318F2	0	fail	codex round 9: not written
+12A420	0	fail	codex round 9: not written
+0B7332	0	fail	codex round 9: not written
+0057DA	0	fail	codex round 9: not written
+0C95DE	0	fail	codex round 9: not written
+184322	0	fail	codex round 9: not written
+0E405C	0	fail	codex round 9: not written
+0C966E	0	fail	codex round 9: not written
+00466E	0	fail	0/3 undec=0 try=3 934s
+11E210	0	fail	COMPILE ERROR (project flags): try=3 1157s
+0CEEF0	0	accepted	30/30 undec=0 try=0 86s
+0CEEF8	0	accepted	30/30 undec=0 try=2 564s
+0CEF00	0	accepted	30/30 undec=0 try=2 720s
+11A312	0	accepted	30/30 undec=0 try=0 118s
+11E252	0	accepted	30/30 undec=0 try=1 217s

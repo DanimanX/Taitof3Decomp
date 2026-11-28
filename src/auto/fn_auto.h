@@ -1085,5 +1085,11 @@ int Fn_137424(const f3mem_t *m, f3regs_t *r); /* ROM 0x137424 */
 int Fn_13E7EE(const f3mem_t *m, f3regs_t *r); /* ROM 0x13E7EE */
 int Fn_14F3B4(const f3mem_t *m, f3regs_t *r); /* ROM 0x14F3B4 */
 int Fn_183DBA(const f3mem_t *m, f3regs_t *r); /* ROM 0x183DBA */
+int RamTest_000402(const f3mem_t *m, f3regs_t *r); /* ROM 0x000402 blocks (1 = spinning in a RAM error) */
+int Fn_000402(const f3mem_t *m, f3regs_t *r); /* ROM 0x000402 */
+void SoundBank0_0014DA_Regs(const f3mem_t *m, f3regs_t *r); /* ROM 0x0014DA, register-accurate */
+int Fn_010000(const f3mem_t *m, f3regs_t *r); /* ROM 0x010000 */
+int Fn_010172(const f3mem_t *m, f3regs_t *r); /* ROM 0x010172 */
+uint32_t Task0_Main_Frame(const f3mem_t *m, f3regs_t *r, uint32_t pc); /* ROM 0x010174 onward */
 /* END generated */
 #endif

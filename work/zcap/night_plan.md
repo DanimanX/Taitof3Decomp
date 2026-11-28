@@ -75,3 +75,11 @@ Push: temp GIT_ASKPASS script printing ~/.token.bak, deleted after. Commits end 
 - Left after that: boot code 000402 010000 010172 (no capture; reset path: translate UNVERIFIED or capture with a
   hard reset from a state). Then the 128 decompiled-unverified routines: recapture (injection/NOIRQ/DPRAM).
 - Order-dependent test failures: look for shared state (ROM image, statics) before blaming a draft.
+
+## Update 06:30
+- 0925086: 99.7% decompiled / 91.1% verified. Strata loop r10 finished (23 accepted of 68); its queue is empty.
+- Left undecompiled: 000402 010000 010172 (boot) -> wt_CW cw_r13 (UNVERIFIED by design).
+- Verified phase: 135 decompiled-unverified = 87 with capture but no test entry (C lives under other names),
+  34 no capture, 12 weak. wt_CW2 cw2_r3: register-level Fn_ wrappers + test lines for the 87
+  (work/zcap/notest_r1.tsv). Integrate with cw_integrate.sh, run ALL suites.
+- Next: injected captures for the 34 nocap (non-task ones), recapture the 12 weak (NOIRQ/DPRAM/POKE).

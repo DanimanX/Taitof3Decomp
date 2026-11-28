@@ -21,7 +21,7 @@ static void sound_blocks_001520(const f3mem_t *m, uint32_t a0, uint32_t a1, uint
             uint16_t d1 = rd16(m, a2 + 2u);                 /* move.w (a2)+,d1 */
             a2 += 4u;
             /* move.l (a1,d0.l),(a0,d1.w) with a0 = 0x440000 */
-            wr32(m, 0x440000u + (uint16_t)d1, rd32(m, a1 + d0));
+            wr32(m, 0x440000u + (uint32_t)(int32_t)(int16_t)d1, rd32(m, a1 + d0));
             d0 = (uint16_t)(d0 + 4u);
             d1 = (uint16_t)(d1 + 4u);
         } while (d2 >= 0);                                  /* dbra d2 */

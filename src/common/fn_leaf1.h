@@ -2,14 +2,7 @@
 #define FN_LEAF1_H
 
 #include "f3mem.h"
-
-#ifndef F3REGS_T_DEFINED
-#define F3REGS_T_DEFINED
-typedef struct {
-    uint32_t d[8];
-    uint32_t a[8];
-} f3regs_t;
-#endif
+#include "f3regs.h"
 
 void Leaf_16AB58(const f3mem_t *m, f3regs_t *r);
 void Leaf_16AB5C(const f3mem_t *m, f3regs_t *r);

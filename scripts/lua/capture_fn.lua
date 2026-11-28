@@ -7,7 +7,14 @@
 --   F3_EXIT    hex PC(s) where "post" is taken, comma-separated (e.g. C63F0),
 --              or "ret": post at the return address of the entry call,
 --              or "a6": post at the PC in A6 at entry (jmp (a6) returns)
---              (entry must be the first instruction of a jsr/bsr target)
+--              ("ret" supports jsr/bsr targets and F3_INJECT_EXC)
+--   F3_INJECT_EXC "1" uses a 68020 format-0 exception frame for F3_INJECT
+--              on the active supervisor stack. "ret" waits for the RTE to
+--              return to the injection PC and restore SP past the frame.
+--              Capture rows include PC and SR.
+--   F3_INJECT_VEC hex vector number (e.g. 26 for TRAP #6, 1D for IRQ5).
+--   F3_INJECT_ABORT "1" with an explicit F3_EXIT PC resumes at the injection
+--              point with the original SP after the dump (e.g. scheduler entry).
 --   F3_SPR     "1" also dumps sprite RAM 0x600000-0x60FFFF to <prefix>_spr.bin
 --   F3_GFX     "1" also dumps playfield/text/char/line RAM 0x610000-0x62FFFF to <prefix>_gfx.bin
 --   F3_DPRAM   "1" also dumps the 2 KiB sound DPRAM (0xC00000) to <prefix>_dpram.bin
@@ -33,6 +40,8 @@
 --              exit of each captured call and restores it after the post
 --              dump: a long routine is otherwise always cut by VBlank, whose
 --              handler writes land in the post state (test_fn skips those)
+--              With F3_INJECT_EXC the frame carries the original SR, so an
+--              RTE post shows the original mask.
 --   F3_REMASK  hex PC(s) of 4-byte "andi #$F0FF,SR" (e.g. 16A4, the end of
 --              0x1660's critical section): with F3_NOIRQ, inside a captured
 --              call that instruction is skipped so the mask stays raised (the
@@ -97,7 +106,7 @@ local pokefn = os.getenv("F3_POKEFN") and tonumber(os.getenv("F3_POKEFN"), 16)
 -- into the captured routine) instead of at the captured routine's entry
 local pokeat = os.getenv("F3_POKEAT") and tonumber(os.getenv("F3_POKEAT"), 16)
 -- F3_INJECT=<hex pc>: synthetic calls of the captured routine (F3_ENTRY must be
--- the same PC, exit "ret"). When F3_INJECT_AT (default 0104B8, Obj_RunGroups'
+-- the same PC). When F3_INJECT_AT (default 0104B8, Obj_RunGroups'
 -- entry, reached every frame) is reached, its address is pushed as a return
 -- PC and execution jumps to the routine, at most once per frame: the pair is
 -- the routine's entry to its rts, then the game resumes at F3_INJECT_AT. For
@@ -105,6 +114,13 @@ local pokeat = os.getenv("F3_POKEAT") and tonumber(os.getenv("F3_POKEAT"), 16)
 -- whatever RAM and registers the game has at that point.
 local inject = os.getenv("F3_INJECT") and tonumber(os.getenv("F3_INJECT"), 16)
 local inject_at = tonumber(os.getenv("F3_INJECT_AT") or "0104B8", 16)
+local inject_exc = os.getenv("F3_INJECT_EXC") == "1"
+local inject_vec = tonumber(os.getenv("F3_INJECT_VEC") or "", 16)
+if inject_exc then
+  assert(inject and inject == entry, "F3_INJECT_EXC requires F3_INJECT = F3_ENTRY")
+  assert(inject_vec and inject_vec >= 0 and inject_vec <= 0xFF, "F3_INJECT_VEC must be a hex vector number (00-FF)")
+end
+local ret_size = inject_exc and 8 or 4
 local last_inject = -1
 -- F3_INJECT_A0=1: each injected call gets A0 = the next live object slot
 -- (0x410060 + k*0x6C, k = 0..N-1 with a nonzero long at +0), cycling, so
@@ -114,8 +130,8 @@ local inject_slots = tonumber(os.getenv("F3_INJECT_SLOTS") or "100", 16)
 local inject_k = 0
 -- F3_INJECT_REGS="D1=3,A0=05F9E0" (hex) sets registers on each injected call
 -- (after F3_INJECT_A0); F3_INJECT_STACK="v1,v2" (hex longs) pushes C-style
--- arguments, v1 ending at 4(SP) after the call. A value may be "a|b|c": the
--- n-th injected call uses item n mod count, so one run covers several cases.
+-- arguments, v1 at 4(SP) for JSR or 8(SP) for an exception. A value may be
+-- "a|b|c": the n-th injected call uses item n mod count.
 local function inject_vals(s)
   local t = {}
   for k, v in string.gmatch(s or "", "([%w]+)=([%x|]+)") do
@@ -135,6 +151,7 @@ end
 local inject_n = 0
 local inject_orig_sp = nil
 local inject_base_sp = nil
+local inject_sr = nil
 local inject_abort = os.getenv("F3_INJECT_ABORT") == "1"
 local sweep = tonumber(os.getenv("F3_SWEEP") or "0")
 local sweep_base = tonumber(os.getenv("F3_SWEEP_BASE") or "0")
@@ -150,6 +167,11 @@ local dbg = manager.machine.debugger
 assert(dbg, "capture_fn: MAME has no debugger (need -debug -debugger none)")
 local cpu = manager.machine.devices[":maincpu"]
 local sp = cpu.spaces["program"]
+local function write_stack_long(a, v)
+  -- 68k stacks are word aligned; a long can start at SP+2.
+  sp:write_u16(a, (v >> 16) & 0xFFFF)
+  sp:write_u16(a + 2, v & 0xFFFF)
+end
 local function poke_a0()
   local a0 = cpu.state["A0"].value
   for _, pv in ipairs(pokesa0) do sp:write_u8(a0 + pv[1], pv[2]) end
@@ -165,12 +187,13 @@ if _G.__f3_capture_fn then return end
 _G.__f3_capture_fn = true
 local out = assert(io.open(prefix .. "_pairs.bin", "wb"))
 local regs = assert(io.open(prefix .. "_regs.tsv", "w"))
-local exitpc = os.getenv("F3_EXITPC") == "1"
+local exitpc = inject_exc or os.getenv("F3_EXITPC") == "1"
 local service = os.getenv("F3_SERVICE") == "1"
 -- menu-walk periods (frames), F3_SVC="down,button,up" (default 90,270,630)
 local svc_dn, svc_bt, svc_up = (os.getenv("F3_SVC") or "90,270,630"):match("(%d+),(%d+),(%d+)")
 svc_dn, svc_bt, svc_up = tonumber(svc_dn), tonumber(svc_bt), tonumber(svc_up)
-regs:write("pair\twhich\tframe\tD0\tD1\tD2\tD3\tD4\tD5\tD6\tD7\tA0\tA1\tA2\tA3\tA4\tA5\tA6\tSP" .. (exitpc and "\tPC" or "") .. "\n")
+regs:write("pair\twhich\tframe\tD0\tD1\tD2\tD3\tD4\tD5\tD6\tD7\tA0\tA1\tA2\tA3\tA4\tA5\tA6\tSP"
+  .. (exitpc and "\tPC" or "") .. (inject_exc and "\tSR" or "") .. "\n")
 cpu.debug:bpset(entry, os.getenv("F3_COND") or "", "")
 for a in pairs(remask) do cpu.debug:bpset(a, "", "") end
 if pokeat then cpu.debug:bpset(pokeat, "", "") end
@@ -229,6 +252,7 @@ local function regline_str(i, which)
   for k = 0, 6 do r[#r + 1] = string.format("%08X", cpu.state["A" .. k].value) end
   r[#r + 1] = string.format("%08X", cpu.state["SP"].value)
   if exitpc and which ~= "log" then r[#r + 1] = string.format("%08X", cpu.state["PC"].value) end
+  if inject_exc and which ~= "log" then r[#r + 1] = string.format("%04X", cpu.state["SR"].value) end
   return string.format("%d\t%s\t%04X\t%s\n", i, which, sp:read_u16(0x4022AC), table.concat(r, "\t"))
 end
 local pairs_done, have_pre, n = 0, false, 0
@@ -261,6 +285,7 @@ emu.register_periodic(function()
   -- fnk_005576 did record are its natural calls (pre SP 0x404E8A, A0 = the HUD
   -- table 0x000C8B5E), none of them the injected call.
   local spv_ret = spv
+  local did_inject = false
   if inject_orig_sp and pc == inject_at and spv == inject_orig_sp - 4 * #inject_stack then
     spv = inject_orig_sp; cpu.state["SP"].value = spv; inject_orig_sp = nil
   end
@@ -268,17 +293,34 @@ emu.register_periodic(function()
     local fr = sp:read_u16(0x4022AC)
     if fr ~= last_inject then
       last_inject = fr
-      -- C-style arguments: pushed last-to-first so v1 sits at 4(SP) in the
-      -- callee; the return to inject_at leaves them on the stack, so the
-      -- original SP is restored there (the inject_orig_sp check above)
-      if #inject_stack > 0 then inject_orig_sp = spv end
+      -- Push arguments last-to-first. Exception captures record SP just
+      -- after RTE pops the frame, then discard the arguments after the dump.
+      if not inject_exc and #inject_stack > 0 then inject_orig_sp = spv end
       inject_base_sp = spv
       for i = #inject_stack, 1, -1 do
         local alt = inject_stack[i]
-        spv = spv - 4; sp:write_u32(spv, alt[inject_n % #alt + 1])
+        spv = spv - 4; write_stack_long(spv, alt[inject_n % #alt + 1])
       end
-      spv = spv - 4; sp:write_u32(spv, inject_at); cpu.state["SP"].value = spv
+      spv = spv - ret_size
+      if inject_exc then
+        inject_sr = cpu.state["SR"].value
+        assert((inject_sr & 0x3000) == 0x2000, "F3_INJECT_EXC needs the interrupt supervisor stack")
+        sp:write_u16(spv, inject_sr)
+        write_stack_long(spv + 2, inject_at)
+        sp:write_u16(spv + 6, inject_vec * 4)
+        local handler_sr = inject_sr & ~0xC000
+        if noirq then
+          handler_sr = handler_sr | 0x0700
+        elseif inject_vec >= 0x19 and inject_vec <= 0x1F then
+          handler_sr = (handler_sr & ~0x0700) | ((inject_vec - 0x18) << 8)
+        end
+        cpu.state["SR"].value = handler_sr
+      else
+        write_stack_long(spv, inject_at)
+      end
+      cpu.state["SP"].value = spv
       cpu.state["PC"].value = inject; pc = inject
+      did_inject = true
       if inject_a0 then
         for _ = 1, inject_slots do
           inject_k = (inject_k + 1) % inject_slots
@@ -292,6 +334,11 @@ emu.register_periodic(function()
       end
       inject_n = inject_n + 1
     end
+  end
+  -- IRQ vectors and traps may also be reached naturally. Only synthetic
+  -- entries have the return PC and stack we set up for this capture.
+  if inject_exc and pc == entry and not did_inject then
+    dbg.execution_state = "run"; return
   end
   if pokeat and pc == pokeat and pc ~= entry then
     poke_a0(); dbg.execution_state = "run"; return
@@ -323,14 +370,14 @@ emu.register_periodic(function()
     for _, pv in ipairs(pokes16) do sp:write_u16(pv[1], pv[2]) end
     for _, pv in ipairs(pokes8) do sp:write_u8(pv[1], pv[2]) end
     if not pokefn and not pokeat then poke_a0() end
-    if sweep > 0 then sp:write_u16(spv + 4, sweep_base + pairs_done % sweep) end
+    if sweep > 0 then sp:write_u16(spv + ret_size, sweep_base + pairs_done % sweep) end
     pre_snap = snapshot(); pre_regs = regline_str(pairs_done, "pre"); pending_logs = {}; have_pre = true
     if portf then
       local t = {}
       for k = 0, 31 do t[#t + 1] = string.format("%02X", sp:read_u8(0x4A0000 + k)) end
       pre_ports = table.concat(t)
     end
-    if noirq then saved_sr = cpu.state["SR"].value; cpu.state["SR"].value = saved_sr | 0x0700 end
+    if noirq and not inject_exc then saved_sr = cpu.state["SR"].value; cpu.state["SR"].value = saved_sr | 0x0700 end
     linger_left = linger
     if exit_a6 then
       ret_pc = cpu.state["A6"].value & 0xFFFFFF
@@ -338,8 +385,12 @@ emu.register_periodic(function()
     end
     if exit_ret then
       ret_sp = spv
-      ret_pc = sp:read_u32(ret_sp) & 0xFFFFFF
-      ret_bp = cpu.debug:bpset(ret_pc, "", "")
+      if inject_exc then
+        ret_pc = inject_at -- injection breakpoint is already installed
+      else
+        ret_pc = sp:read_u32(ret_sp) & 0xFFFFFF
+        ret_bp = cpu.debug:bpset(ret_pc, "", "")
+      end
     end
   elseif logs[pc] and have_pre and (not loga0 or cpu.state["A0"].value == loga0) then
     pending_logs[#pending_logs + 1] = string.format("%s\t%06X\t%s\n",
@@ -348,7 +399,7 @@ emu.register_periodic(function()
   elseif have_pre and linger_left > 0 and pc == entry then
     -- one more tick went by for this object: count down, then dump
     linger_left = linger_left - 1
-  elseif have_pre and (exits[pc] or (exit_ret and pc == ret_pc and spv_ret == ret_sp + 4) or (exit_a6 and pc == ret_pc)) then
+  elseif have_pre and (exits[pc] or (exit_ret and pc == ret_pc and spv_ret == ret_sp + ret_size) or (exit_a6 and pc == ret_pc)) then
     if ret_bp then cpu.debug:bpclear(ret_bp); ret_bp = nil; ret_pc = nil end
     emit(pre_snap); regs:write(pre_regs); regs:write(table.concat(pending_logs))
     if portf then portf:write(string.format("%d\t%s\n", pairs_done, pre_ports)); portf:flush() end
@@ -360,14 +411,18 @@ emu.register_periodic(function()
     out:flush(); regs:flush(); if dp then dp:flush() end; if spf then spf:flush() end; if gff then gff:flush() end
     if palf then palf:flush() end
     pairs_done = pairs_done + 1
-    if pairs_done >= want then finish("DONE"); return end
     -- F3_INJECT_ABORT=1 with an F3_EXIT PC (e.g. a task body's first TRAP #5):
     -- the injected call cannot return from there, so after the post it is
     -- abandoned: PC back to the injection point, SP as before the call.
     if inject_abort and inject_base_sp and exits[pc] then
       cpu.state["SP"].value = inject_base_sp; cpu.state["PC"].value = inject_at
+      if inject_sr then cpu.state["SR"].value = inject_sr; inject_sr = nil end
       inject_base_sp = nil; inject_orig_sp = nil
+    elseif inject_exc and exit_ret then
+      cpu.state["SP"].value = inject_base_sp
+      inject_base_sp = nil; inject_sr = nil
     end
+    if pairs_done >= want then finish("DONE"); return end
   end
   dbg.execution_state = "run"
 end)

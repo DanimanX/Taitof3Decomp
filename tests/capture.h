@@ -7,7 +7,7 @@
 #include <string.h>
 #include "../src/common/f3mem.h"
 
-enum { CR_D0 = 0, CR_A0 = 8, CR_A1 = 9, CR_SP = 15, CR_N = 16, CR_PC = 16 };
+enum { CR_D0 = 0, CR_A0 = 8, CR_A1 = 9, CR_SP = 15, CR_N = 16, CR_PC = 16, CR_SR = 17 };
 
 typedef struct {
     int pairs;
@@ -15,6 +15,7 @@ typedef struct {
     uint32_t (*pre)[CR_N], (*post)[CR_N];
     unsigned *fpre, *fpost;              /* frame of each dump (regs.tsv col 3) */
     uint32_t *pcpre, *pcpost;            /* entry / exit PC (optional 17th column, F3_EXITPC) */
+    uint16_t *srpre, *srpost;            /* SR (optional 18th column, F3_INJECT_EXC) */
 } capture_t;
 
 static inline uint8_t *cap_slurp(const char *path, long *len)
@@ -61,7 +62,11 @@ static inline int cap_load(capture_t *c, const char *pfx)
     snprintf(p, sizeof p, "%s_regs.tsv", pfx);
     FILE *f = fopen(p, "r");
     char line[512];
-    if (f && fgets(line, sizeof line, f))
+    if (f && fgets(line, sizeof line, f)) {
+        if (strstr(line, "\tPC\tSR")) {
+            c->srpre = calloc((size_t)c->pairs + 1, sizeof *c->srpre);
+            c->srpost = calloc((size_t)c->pairs + 1, sizeof *c->srpost);
+        }
         while (fgets(line, sizeof line, f)) {
             int i; char which[8]; unsigned fr;
             if (sscanf(line, "%d\t%7s\t%x", &i, which, &fr) != 3 || i >= c->pairs) continue;
@@ -71,8 +76,12 @@ static inline int cap_load(capture_t *c, const char *pfx)
             char *s = line;
             for (int t = 0; t < 3; t++) s = strchr(s, '\t') + 1;
             for (int k = 0; k < CR_N; k++) dst[k] = (uint32_t)strtoul(s, &s, 16);
-            *(dst == c->post[i] ? &c->pcpost[i] : &c->pcpre[i]) = (uint32_t)strtoul(s, &s, 16);
+            int post = dst == c->post[i];
+            (post ? c->pcpost : c->pcpre)[i] = (uint32_t)strtoul(s, &s, 16);
+            if (c->srpre)
+                (post ? c->srpost : c->srpre)[i] = (uint16_t)strtoul(s, NULL, 16);
         }
+    }
     if (f) fclose(f);
     return 0;
 }
@@ -92,7 +101,7 @@ static inline const uint8_t *cap_pal(const capture_t *c, int i, int post)
 { return c->pal ? c->pal + ((size_t)i * 2 + (size_t)post) * F3_PAL_SIZE : NULL; }
 
 static inline void cap_free(capture_t *c)
-{ free(c->wram); free(c->dpram); free(c->spr); free(c->gfx); free(c->pal); free(c->pre); free(c->post); free(c->fpre); free(c->fpost); free(c->pcpost); free(c->pcpre); }
+{ free(c->wram); free(c->dpram); free(c->spr); free(c->gfx); free(c->pal); free(c->pre); free(c->post); free(c->fpre); free(c->fpost); free(c->pcpost); free(c->pcpre); free(c->srpre); free(c->srpost); }
 
 /* byte diff of a region, printing up to *budget mismatches; skip [lo,hi) */
 /* Engine-side capture artifact: P1's PS_INVULN high byte (0x41B1E1) flips

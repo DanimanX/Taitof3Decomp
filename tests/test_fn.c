@@ -6,6 +6,8 @@
  * for byte, skipping the stack window [SP-0x100, SP) below the entry SP
  * (locals, saved registers and the callee's frames live there). Selected
  * output registers are compared under a mask when the table entry asks.
+ * Exception captures compare PC, SR and all general registers, including
+ * SP, and check the handler's register saves in Work RAM.
  *
  * Adapter contract: int fn(const f3mem_t *m, f3regs_t *r). r holds the pre
  * registers (D0-D7, A0-A6, A7 = SP at entry, so stack arguments are at
@@ -32,11 +34,6 @@
 #include "../src/enemy/fn_0D5B70.h"       /* Obj_0D5B70_Step */
 #include "../src/enemy/fn_11BC6E.h"       /* Obj_11BC6E_SpawnWave */
 
-#ifndef F3REGS_T_DEFINED
-#define F3REGS_T_DEFINED
-typedef struct { uint32_t d[8], a[8]; } f3regs_t;   /* a[7] = SP */
-#endif
-
 typedef int (*fn_adapter_t)(const f3mem_t *m, f3regs_t *r);
 
 typedef struct { int reg; uint32_t mask; } reg_check_t;   /* reg: CR_* index */
@@ -45,27 +42,25 @@ typedef struct {
     const char *name;
     const char *cap;
     fn_adapter_t fn;
-    reg_check_t out[17];  /* mask 0 ends the list */
+    reg_check_t out[CR_SR + 1];  /* mask 0 ends the list */
 } fn_entry_t;
 
 /* ---- adapters ---------------------------------------------------------- */
 
-/* Segment adapters (task code translated in segments, src/kernel/seg.h) put
- * the PC of the TRAP their segment stopped at here; CR_PC checks compare it
- * with the capture's exit PC (F3_EXITPC column). */
-static uint32_t seg_stop, seg_entry;
 #include "../src/kernel/seg.h"
 /* one adapter for every segment capture: resume at the capture's entry PC */
 static int ad_seg(const f3mem_t *m, f3regs_t *r)
 {
-    seg_stop = Seg_Run(m, r, seg_entry);
-    return seg_stop == SEG_LEAVE ? -1 : 0;
+    r->pc = Seg_Run(m, r, r->pc);
+    return r->pc == SEG_LEAVE ? -1 : 0;
 }
-/* every register a segment carries to the next one, plus where it stopped */
-#define SEGREGS { { CR_D0, ~0u }, { CR_D0 + 1, ~0u }, { CR_D0 + 2, ~0u }, { CR_D0 + 3, ~0u }, \
+/* Every general register plus the captured exit PC. */
+#define SEGREG_CHECKS { CR_D0, ~0u }, { CR_D0 + 1, ~0u }, { CR_D0 + 2, ~0u }, { CR_D0 + 3, ~0u }, \
     { CR_D0 + 4, ~0u }, { CR_D0 + 5, ~0u }, { CR_D0 + 6, ~0u }, { CR_D0 + 7, ~0u }, \
     { CR_A0, ~0u }, { CR_A0 + 1, ~0u }, { CR_A0 + 2, ~0u }, { CR_A0 + 3, ~0u }, \
-    { CR_A0 + 4, ~0u }, { CR_A0 + 5, ~0u }, { CR_A0 + 6, ~0u }, { CR_SP, ~0u }, { CR_PC, ~0u } }
+    { CR_A0 + 4, ~0u }, { CR_A0 + 5, ~0u }, { CR_A0 + 6, ~0u }, { CR_SP, ~0u }, { CR_PC, ~0u }
+#define SEGREGS { SEGREG_CHECKS }
+#define EXCREGS { SEGREG_CHECKS, { CR_SR, 0xFFFFu } }
 
 /* ROM 0x005666: (8,A6)=src.l (0xC,A6)=dst.l (0x10,A6)=col.w; D0 = end dst */
 static int ad_005666(const f3mem_t *m, f3regs_t *r)
@@ -182,7 +177,7 @@ static int ad_task_coll_init(const f3mem_t *m, f3regs_t *r) { (void)r; TaskColli
 static int ad_task_g11_init(const f3mem_t *m, f3regs_t *r) { (void)r; TaskGroup11_Init(m); return 0; }
 #include "../src/kernel/kernel.h"
 /* kernel calls (src/kernel/kernel.h): stop PC = the RTE reached */
-#define KERN_AD(A) static int ad_k_##A(const f3mem_t *m, f3regs_t *r) { seg_stop = Kern_##A(m, r); return 0; }
+#define KERN_AD(A) static int ad_k_##A(const f3mem_t *m, f3regs_t *r) { r->pc = Kern_##A(m, r); return 0; }
 static uint32_t Kern_002274(const f3mem_t *m, f3regs_t *r) { return Kern_Schedule(m, r); }
 KERN_AD(002274)
 KERN_AD(001E76)
@@ -213,13 +208,13 @@ static const uint8_t *pair_ports(void)
 }
 #define KERN_VB(A) static int ad_k_##A(const f3mem_t *m, f3regs_t *r) { \
     const uint8_t *p = pair_ports(); uint32_t tsp = 0; \
-    seg_stop = Kern_##A(m, r, p, &tsp); if (!seg_stop) return -1; \
+    r->pc = Kern_##A(m, r, p, &tsp); if (!r->pc) return -1; \
     skip_lo = tsp - 0x400u; skip_hi = tsp; return 0; }
 KERN_VB(00222E)
 KERN_VB(001A34)
 KERN_VB(001A54)
 static int ad_task_d15_init(const f3mem_t *m, f3regs_t *r) { (void)r; TaskSlot15_Init(m); return 0; }
-static int ad_task_d15(const f3mem_t *m, f3regs_t *r) { seg_stop = TaskSlot15_Frame(m, r); return seg_stop ? 0 : -1; }
+static int ad_task_d15(const f3mem_t *m, f3regs_t *r) { r->pc = TaskSlot15_Frame(m, r); return r->pc ? 0 : -1; }
 /* END kernel adapters */
 static int ad_task_timeline_init(const f3mem_t *m, f3regs_t *r) { return Fn_13F2C6(m, r) < 0 ? -1 : 0; }
 
@@ -325,6 +320,16 @@ static const fn_entry_t fns[] = {
     { "Kernel 0x001E48 TRAP 3",        "work/ram/fn_001E48", ad_k_001E48, SEGREGS },
     { "Kernel 0x001F30 TRAP 4",        "work/ram/fn_001F30", ad_k_001F30, SEGREGS },
     { "Kernel 0x001F78 TRAP 5",        "work/ram/fn_001F78", ad_k_001F78, SEGREGS },
+    { "Kernel 0x001FE8 TRAP 6 RTE",    "work/ram/fnx_001FE8", Fn_001FE8, EXCREGS },
+    { "Kernel 0x001FE8 TRAP 6 wait",   "work/ram/fnx_001FE8_sched", Fn_001FE8, EXCREGS },
+    { "Kernel 0x001FAC TRAP 7",        "work/ram/fnx_001FAC", Fn_001FAC, EXCREGS },
+    { "Kernel 0x00205C TRAP 8",        "work/ram/fnx_00205C", Fn_00205C, EXCREGS },
+    { "Kernel 0x0020C8 TRAP 9",        "work/ram/fnx_0020C8", Fn_0020C8, EXCREGS },
+    { "Kernel 0x002156 TRAP 10",       "work/ram/fnx_002156", Fn_002156, EXCREGS },
+    { "Kernel 0x0021BE TRAP 11",       "work/ram/fnx_0021BE", Fn_0021BE, EXCREGS },
+    { "Kernel 0x00220E TRAP 12",       "work/ram/fnx_00220E", Fn_00220E, EXCREGS },
+    { "Kernel 0x001A6C IRQ5",          "work/ram/fnx_001A6C", Fn_001A6C, EXCREGS },
+    { "Kernel 0x000400 RTE",           "work/ram/fnx_000400", Fn_000400, EXCREGS },
     { "Task 0x0038B2 Slot15 daemon loop", "work/ram/task_d15", ad_task_d15, SEGREGS },
     { "Task 0x0038B2 Slot15 paused",   "work/ram/task_d15p", ad_task_d15, SEGREGS },   /* F3_POKE8=406BB5=02 */
     { "Task 0x003912 Slot15 init",     "work/ram/task_init_d15", ad_task_d15_init, { { 0, 0u } } }, /* F3_INJECT */
@@ -345,6 +350,12 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         printf("fn: %-34s SKIP (no %s)\n", e->name, e->cap);
         if (c.wram) cap_free(&c);
         return 0;
+    }
+    int exception = e->out[CR_SR].mask != 0;
+    if (exception && !c.srpre) {
+        printf("fn: %-34s FAIL (need PC/SR columns in %s_regs.tsv)\n", e->name, e->cap);
+        cap_free(&c);
+        return 1;
     }
     uint8_t *w = malloc(F3_WRAM_SIZE);
     uint8_t *g = c.gfx ? malloc(F3_GFX_SIZE) : NULL;
@@ -372,26 +383,41 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         f3mem_t m = { w, rom, dp, s, g, pal };
         f3regs_t r;
         for (int k = 0; k < 8; k++) { r.d[k] = c.pre[i][CR_D0 + k]; r.a[k] = c.pre[i][CR_A0 + k]; }
-        seg_stop = 0; seg_entry = c.pcpre ? c.pcpre[i] : 0;
+        r.pc = c.pcpre[i];
+        r.sr = exception ? c.srpre[i] : 0;
         cur_cap = e->cap; cur_pair = i; skip_lo = skip_hi = 0;
         if (e->fn(&m, &r) < 0) { undec++; continue; }
         if (skip_hi > skip_lo && skip_lo >= F3_WRAM_BASE && skip_hi <= F3_WRAM_BASE + F3_WRAM_SIZE)
             memcpy(w + (skip_lo - F3_WRAM_BASE), cap_wram(&c, i, 1) + (skip_lo - F3_WRAM_BASE), skip_hi - skip_lo);
         uint32_t sp = c.pre[i][CR_SP];
-        int d = cap_diff(e->name, i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x100u, sp, &budget);
+        int d = cap_diff(e->name, i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE,
+                         exception ? sp : sp - 0x100u, sp, &budget);
         if (g) d += cap_diff(e->name, i, F3_GFX_BASE, g, cap_gfx(&c, i, 1), F3_GFX_SIZE, 0, 0, &budget);
         if (s) d += cap_diff(e->name, i, F3_SPR_BASE, s, cap_spr(&c, i, 1), F3_SPR_SIZE, 0, 0, &budget);
         /* sound DPRAM 0xC00000-0xC007FF, for captures taken with F3_DPRAM=1 */
         if (dp) d += cap_diff(e->name, i, F3_DPRAM_BASE, dp, cap_dpram(&c, i, 1), F3_DPRAM_SIZE, 0, 0, &budget);
         if (pal) d += cap_diff(e->name, i, F3_PAL_BASE, pal, cap_pal(&c, i, 1), F3_PAL_SIZE, 0, 0, &budget);
-        for (int k = 0; k < 17 && e->out[k].mask; k++) {
+        for (int k = 0; k <= CR_SR && e->out[k].mask; k++) {
             int x = e->out[k].reg;
-            uint32_t got = (x == CR_PC ? seg_stop : x < 8 ? r.d[x] : r.a[x - 8]) & e->out[k].mask;
-            uint32_t want = (x == CR_PC ? c.pcpost[i] : c.post[i][x]) & e->out[k].mask;
+            uint32_t got, want;
+            if (x == CR_PC) {
+                got = r.pc;
+                want = c.pcpost[i];
+            } else if (x == CR_SR) {
+                got = r.sr;
+                want = c.srpost[i];
+            } else {
+                got = x < CR_A0 ? r.d[x] : r.a[x - CR_A0];
+                want = c.post[i][x];
+            }
+            got &= e->out[k].mask;
+            want &= e->out[k].mask;
             if (got != want) {
-                if (budget-- > 0)
-                    printf("  %s pair %d %s%d got=%08X want=%08X\n", e->name, i,
-                           x == CR_PC ? "PC" : x < 8 ? "D" : "A", x == CR_PC ? 0 : x & 7, got, want);
+                if (budget-- > 0) {
+                    char gpr[3] = { x < CR_A0 ? 'D' : 'A', '0' + (x & 7), '\0' };
+                    const char *name = x == CR_PC ? "PC" : x == CR_SR ? "SR" : x == CR_SP ? "SP" : gpr;
+                    printf("  %s pair %d %s got=%08X want=%08X\n", e->name, i, name, got, want);
+                }
                 d++;
             }
         }

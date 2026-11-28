@@ -79,21 +79,28 @@ uint32_t Kern_Schedule(const f3mem_t *m, f3regs_t *r) { return schedule(m, r, -1
 /* The TRAP handlers below run from their entry to the RTE that ends them (or
  * to the bra into Kern_Schedule) with r = the registers at the trap: A7 points
  * at the 68020 exception frame (SR.w, PC.l, format/vector word), so the
- * caller's arguments start at SP+8. Every memory store the ROM makes is
- * written, including the movem save areas: the ones a handler pops again land
- * below SP, the ones the scheduler restores from (TRAP #4/#5/#6/#7) and the
- * task stack TRAP #1 builds are read later. */
+ * caller's arguments start at SP+8. The movem save areas for TRAP #4-#12
+ * are written to RAM, including the contexts the scheduler restores. */
+
+/* Register masks use the order of the restoring MOVEM instruction. */
+static uint32_t push_regs(const f3mem_t *m, const f3regs_t *r, uint16_t mask)
+{
+    uint32_t sp = r->a[7];
+    for (int i = 14; i >= 0; --i) {
+        if (mask & (1u << i)) {
+            sp -= 4u;
+            wr32(m, sp, i < 8 ? r->d[i] : r->a[i - 8]);
+        }
+    }
+    return sp;
+}
 
 /* 0x1F34 / 0x1F7C / 0x1FB0 / 0x1FEC: movem.l d0-d7/a0-a6,-(a7) ;
  * movea.l -$1900(a5),a6 ; move.l a7,(a6). The scheduler restores the context
  * from that block, so it is written out. Returns the new A7 (the saved SP). */
 static uint32_t push_context(const f3mem_t *m, const f3regs_t *r)
 {
-    uint32_t ctx = r->a[7] - 60u;
-    for (unsigned i = 0; i < 8; ++i)
-        wr32(m, ctx + 4u * i, r->d[i]);
-    for (unsigned i = 0; i < 7; ++i)
-        wr32(m, ctx + 32u + 4u * i, r->a[i]);
+    uint32_t ctx = push_regs(m, r, 0x7FFFu);
     wr32(m, rd32(m, r->a[5] - 0x1900u), ctx);
     return ctx;
 }
@@ -253,7 +260,7 @@ uint32_t Kern_001F78(const f3mem_t *m, f3regs_t *r)
  * wake-with-stack-fix bit: status = ((id << 16) | ticks) | 0x40000000. Saves
  * the register set as the task context and reschedules. UNVERIFIED (no
  * capture). */
-uint32_t Kern_001FAC(const f3mem_t *m, f3regs_t *r)
+uint32_t Kern_001FAC_Body(const f3mem_t *m, f3regs_t *r)
 {
     uint32_t globals = r->a[5];
     uint32_t sp = r->a[7];
@@ -261,12 +268,18 @@ uint32_t Kern_001FAC(const f3mem_t *m, f3regs_t *r)
     uint32_t d0 = ((uint32_t)rd16(m, globals - 0x1906u) << 16) |
                   rd16(m, sp + 10u);          /* 0x1FBA / 0x1FC0 */
     d0 |= 0x40000000u;                        /* 0x1FC4 bset #$1e,d0 */
-    wr32(m, rd32(m, globals - 0x18FCu), d0);  /* 0x1FCC */
     r->d[0] = d0;
     r->a[4] = rd32(m, globals - 0x18FCu);
     r->a[6] = rd32(m, globals - 0x1900u);
     r->a[7] = ctx;
-    return Kern_Schedule(m, r);               /* 0x1FCE bra 0x002274 */
+    wr32(m, r->a[4], d0);                    /* 0x1FCC */
+    return 0x00002274u;                       /* 0x1FCE bra 0x002274 */
+}
+
+uint32_t Kern_001FAC(const f3mem_t *m, f3regs_t *r)
+{
+    Kern_001FAC_Body(m, r);
+    return Kern_Schedule(m, r);
 }
 
 /* ROM 0x001FE8 TRAP #6: wait for event (SP+8) & 0xF of the current task.
@@ -276,7 +289,7 @@ uint32_t Kern_001FAC(const f3mem_t *m, f3regs_t *r)
  * number, and D0 = the long at -$1878+0x20+16*id+4*bit (written over the saved
  * D0, so it is the RTE's D0) before the routine returns. UNVERIFIED (no
  * capture). */
-uint32_t Kern_001FE8(const f3mem_t *m, f3regs_t *r)
+uint32_t Kern_001FE8_Body(const f3mem_t *m, f3regs_t *r)
 {
     uint32_t globals = r->a[5];
     uint32_t sp = r->a[7];
@@ -300,7 +313,7 @@ uint32_t Kern_001FE8(const f3mem_t *m, f3regs_t *r)
         r->a[4] = globals - 0x1878u;
         r->a[6] = rd32(m, globals - 0x1900u);
         r->a[7] = ctx;
-        return Kern_Schedule(m, r);           /* 0x202A bra 0x002274 */
+        return 0x00002274u;                   /* 0x202A bra 0x002274 */
     }
     wr16(m, wslot, (uint16_t)(word | bit));   /* 0x202E */
     wr8(m, slot + 1u, (uint8_t)event);        /* 0x2032 move.b d3,$1(a3) */
@@ -310,6 +323,26 @@ uint32_t Kern_001FE8(const f3mem_t *m, f3regs_t *r)
     return 0x00002044u;
 }
 
+uint32_t Kern_001FE8(const f3mem_t *m, f3regs_t *r)
+{
+    uint32_t pc = Kern_001FE8_Body(m, r);
+    return pc == 0x00002274u ? Kern_Schedule(m, r) : pc;
+}
+
+void Kern_TrapReturn(const f3mem_t *m, f3regs_t *r, uint32_t exit_pc)
+{
+    if (exit_pc == 0x00002274u) {
+        /* Both scheduler branches raise IPL and end with MOVE.L D0,(An).
+         * The stored status always has bit 30 set, so Z is clear. */
+        r->pc = exit_pc;
+        r->sr = (uint16_t)((r->sr | 0x0700u) & ~0x000Fu);
+        if (r->d[0] & 0x80000000u)
+            r->sr |= 0x0008u;
+    } else {
+        Kern_RteFormat0(m, r);
+    }
+}
+
 /* ROM 0x00205C TRAP #8: wake every task in the mask (SP+8) except the caller.
  * For each set bit: status = (status & 0x20000000 when bit 30 is clear else
  * status) | (1 << id) | 0x40000000, and the -$1878 word gets 1 << id. No
@@ -317,6 +350,7 @@ uint32_t Kern_001FE8(const f3mem_t *m, f3regs_t *r)
  * capture). */
 uint32_t Kern_00205C(const f3mem_t *m, f3regs_t *r)
 {
+    push_regs(m, r, 0x1807u);                /* 0x2060 d0-d2/a3-a4 */
     uint32_t globals = r->a[5];
     uint16_t id = rd16(m, globals - 0x1906u);
     if (id > 0x0Fu)                           /* 0x206C */
@@ -349,12 +383,13 @@ uint32_t Kern_00205C(const f3mem_t *m, f3regs_t *r)
 /* ROM 0x0020C8 TRAP #9: start/stop task (SP+8) (>= 16 is ignored).
  *  (SP+8) <= 15 and the target status has bit 30 and bit id: clear bit id;
  *  when its low word then reads 0, the new status is
- *  (((status >> 16) & 0x2000) | id) << 16 and (SP+12) becomes the target's
- *  saved stack; -$1878 word gets bit id.
+ *  (((status >> 16) & 0x2000) | id) << 16 and (SP+12) goes to the target's
+ *  -$18B8 stack-fix slot; -$1878 word gets bit id.
  *  Otherwise: -$1878 word loses bit id and (SP+12) goes to
  *  -$18B8 + 16*(SP+8) + 4*id. No register changes. UNVERIFIED (no capture). */
 uint32_t Kern_0020C8(const f3mem_t *m, f3regs_t *r)
 {
+    push_regs(m, r, 0x100Fu);                /* 0x20CC d0-d3/a4 */
     uint32_t globals = r->a[5];
     uint32_t sp = r->a[7];
     uint16_t id = rd16(m, globals - 0x1906u);
@@ -393,6 +428,7 @@ uint32_t Kern_0020C8(const f3mem_t *m, f3regs_t *r)
  * register changes. UNVERIFIED (no capture). */
 uint32_t Kern_002156(const f3mem_t *m, f3regs_t *r)
 {
+    push_regs(m, r, 0x1007u);                /* 0x215A d0-d2/a4 */
     uint32_t globals = r->a[5];
     uint16_t id = rd16(m, globals - 0x1906u);
     if (id > 0x0Fu)                           /* 0x2162 */
@@ -425,11 +461,12 @@ uint32_t Kern_002156(const f3mem_t *m, f3regs_t *r)
 }
 
 /* ROM 0x0021BE TRAP #11: hand task slot (SP+8) & 0x1F to the caller: its
- * status becomes (id << 16) | (old status bit 29 ? 0x2000 : 0) and its saved
- * stack -$18B8 + 4*slot becomes (SP+12). No register changes. UNVERIFIED (no
- * capture). */
+ * status becomes (id.b << 16) | (old status & 0x20000000) and its
+ * stack-fix slot -$18B8 + 4*slot becomes (SP+12). No register changes.
+ * UNVERIFIED (no MAME capture). */
 uint32_t Kern_0021BE(const f3mem_t *m, f3regs_t *r)
 {
+    push_regs(m, r, 0x1007u);                /* 0x21C2 d0-d2/a4 */
     uint32_t globals = r->a[5];
     uint16_t id = rd16(m, globals - 0x1906u);
     uint32_t slot = rd32(m, r->a[7] + 8u) & 0x1Fu;        /* 0x21C6-0x21CE */
@@ -445,10 +482,11 @@ uint32_t Kern_0021BE(const f3mem_t *m, f3regs_t *r)
     return 0x000021F6u;                       /* 0x21F2 pops d0-d2/a4 */
 }
 
-/* ROM 0x00220E TRAP #12: -$1878 word of the current task |= (SP+8).w. No
+/* ROM 0x00220E TRAP #12: -$1878 word of the current task |= (SP+10).w. No
  * register changes. UNVERIFIED (no capture). */
 uint32_t Kern_00220E(const f3mem_t *m, f3regs_t *r)
 {
+    push_regs(m, r, 0x100Cu);                /* 0x2212 d2-d3/a4 */
     uint32_t globals = r->a[5];
     uint16_t index = (uint16_t)(2u * rd16(m, globals - 0x1906u)); /* 0x2222 */
     uint32_t wslot = globals - 0x1878u + (int16_t)index;

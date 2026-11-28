@@ -7,10 +7,7 @@
  * (0..3) and attr high byte, +0x1D colour override.b, +0x1E zoom.w. */
 #include "../common/f3mem.h"
 
-#ifndef F3REGS_T_DEFINED
-#define F3REGS_T_DEFINED
-typedef struct { uint32_t d[8], a[8]; } f3regs_t;   /* a[7] = SP */
-#endif
+#include "../common/f3regs.h"
 
 #define SPR_CURSOR (F3_A5 - 0x0CA0)
 

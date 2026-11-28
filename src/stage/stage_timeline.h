@@ -7,10 +7,7 @@
  * data+4 is negative ends the script (boss / stage-end sequence). */
 #include "../common/f3mem.h"
 
-#ifndef F3REGS_T_DEFINED
-#define F3REGS_T_DEFINED
-typedef struct { uint32_t d[8], a[8]; } f3regs_t;   /* a[7] = SP */
-#endif
+#include "../common/f3regs.h"
 
 #define TL_SCRIPT_PTR  (F3_A5 + 0x3308)  /* -> next script entry */
 #define TL_SCROLL_POS  (F3_A5 + 0x330C)  /* 16.16 */

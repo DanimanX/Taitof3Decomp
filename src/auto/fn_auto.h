@@ -5,10 +5,7 @@
 #ifndef FN_AUTO_H
 #define FN_AUTO_H
 #include "../common/f3mem.h"
-#ifndef F3REGS_T_DEFINED
-#define F3REGS_T_DEFINED
-typedef struct { uint32_t d[8], a[8]; } f3regs_t;
-#endif
+#include "../common/f3regs.h"
 /* BEGIN generated */
 int Fn_1379CC(const f3mem_t *m, f3regs_t *r); /* ROM 0x1379CC */
 int Fn_15F952(const f3mem_t *m, f3regs_t *r); /* ROM 0x15F952 */
@@ -1148,5 +1145,12 @@ int Fn_17C700(const f3mem_t *m, f3regs_t *r); /* ROM 0x17C700 bra.w 0x17C662 */
 int Fn_18BB50(const f3mem_t *m, f3regs_t *r); /* ROM 0x18BB50 Obj_18BB50 */
 int Fn_13F5B8_Yield(const f3mem_t *m, f3regs_t *r); /* ROM 0x13F5B8 pre-yield (TRAP #5 0x13F5FE) */
 int Fn_0C6A64(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C6A64 */
+int Fn_001FE8(const f3mem_t *m, f3regs_t *r); /* ROM 0x001FE8 */
+int Fn_001FAC(const f3mem_t *m, f3regs_t *r); /* ROM 0x001FAC */
+int Fn_00205C(const f3mem_t *m, f3regs_t *r); /* ROM 0x00205C */
+int Fn_0020C8(const f3mem_t *m, f3regs_t *r); /* ROM 0x0020C8 */
+int Fn_002156(const f3mem_t *m, f3regs_t *r); /* ROM 0x002156 */
+int Fn_0021BE(const f3mem_t *m, f3regs_t *r); /* ROM 0x0021BE */
+int Fn_00220E(const f3mem_t *m, f3regs_t *r); /* ROM 0x00220E */
 /* END generated */
 #endif

@@ -2,10 +2,7 @@
 #define TAITOF3_KERNEL_FN_010420_H
 #include "../common/f3mem.h"
 
-#ifndef F3REGS_T_DEFINED
-#define F3REGS_T_DEFINED
-typedef struct { uint32_t d[8], a[8]; } f3regs_t;   /* a[7] = SP */
-#endif
+#include "../common/f3regs.h"
 /* ROM 0x010420: coin-insert / start reset. Returns to the caller at 0x010478
  * when the two A5-0x5DE3 test-mode bits are set; otherwise clears three status
  * bytes, re-initialises sprites / layers / line RAM, reloads sound banks 0 and

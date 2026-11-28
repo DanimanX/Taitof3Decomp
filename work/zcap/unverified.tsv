@@ -1,12 +1,4 @@
 0D4FF6	weak	codex round 5
 005576	weak	codex round 5
-001FE8	nocapture	codewhale (TRAP never called in any capture)
-001FAC	nocapture	codewhale (TRAP never called in any capture)
-00205C	nocapture	codewhale (TRAP never called in any capture)
-0020C8	nocapture	codewhale (TRAP never called in any capture)
-002156	nocapture	codewhale (TRAP never called in any capture)
-0021BE	nocapture	codewhale (TRAP never called in any capture)
-00220E	nocapture	codewhale (TRAP never called in any capture)
-0039B8	weak	codewhale: empty body passes 30/30
 091EA4	weak	codex round 11: empty body passes 30/30
-091E2C	weak	empty body passes the capture
+000400	weak	bare rte: the strength check (ALLREGS) cannot tell it from an empty body

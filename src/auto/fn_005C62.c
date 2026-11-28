@@ -114,6 +114,9 @@ static uint16_t format_radix(formatter_t *f, uint32_t handler)
         ++length;
     } while (fixed ? length < 8u : remaining != 0u);
 
+    if (handler == 0x006004u)
+        return Formatter_Prepare_006020(r, f->flags);
+
     if ((f->flags & ALTERNATE) && (fixed || value)) {
         if (shift == 4u) {
             r->a[1] = digits + 16u;
@@ -431,6 +434,47 @@ static int format_specifier(formatter_t *f)
     }
 }
 
+/* 0x005C76: resume the format loop, then return from the enclosing call. */
+static int finish_format(formatter_t *f)
+{
+    const f3mem_t *m = f->m;
+    f3regs_t *r = f->r;
+    for (;;) {
+        uint8_t c = rd8(m, f->fmt++);
+        if (c == '%') {
+            if (!format_specifier(f)) {
+                wr8(m, f->dst, 0);
+                break;
+            }
+        } else {
+            emit(f, c);
+            if (!c) {
+                --f->dst;
+                break;
+            }
+        }
+    }
+
+    r->d[0] = f->dst - rd32(m, f->frame + 8u);
+    for (unsigned i = 2; i <= 5; ++i, f->sp += 4u)
+        r->d[i] = rd32(m, f->sp);
+    for (unsigned i = 2; i <= 4; ++i, f->sp += 4u)
+        r->a[i] = rd32(m, f->sp);
+    r->a[6] = rd32(m, f->frame);
+    r->a[7] = f->frame + 8u; /* UNLK and RTS. */
+    return 0;
+}
+
+int Formatter_RenderAndResume(const f3mem_t *m, f3regs_t *r, uint16_t length)
+{
+    formatter_t f = { .m = m, .r = r, .frame = r->a[6], .sp = r->a[7],
+                      .fmt = r->a[2], .dst = r->a[3], .args = r->a[4],
+                      .flags = (uint16_t)r->d[3], .width = (uint16_t)r->d[4],
+                      .precision = (uint16_t)r->d[5] };
+    render(&f, length);
+    return finish_format(&f);
+}
+
 int Fn_005C62(const f3mem_t *m, f3regs_t *r)
 {
     uint32_t frame = r->a[7] - 4u;
@@ -444,31 +488,5 @@ int Fn_005C62(const f3mem_t *m, f3regs_t *r)
     f.fmt = rd32(m, frame + 12u);
     f.dst = rd32(m, frame + 8u);
     f.args = rd32(m, frame + 16u);
-
-    for (;;) {
-        uint8_t c = rd8(m, f.fmt);
-        if (c == '%') {
-            ++f.fmt;
-            if (!format_specifier(&f)) {
-                wr8(m, f.dst, 0);
-                break;
-            }
-        } else {
-            ++f.fmt;
-            emit(&f, c);
-            if (!c) {
-                --f.dst;
-                break;
-            }
-        }
-    }
-
-    r->d[0] = f.dst - rd32(m, frame + 8u);
-    for (unsigned i = 2; i <= 5; ++i, f.sp += 4u)
-        r->d[i] = rd32(m, f.sp);
-    for (unsigned i = 2; i <= 4; ++i, f.sp += 4u)
-        r->a[i] = rd32(m, f.sp);
-    r->a[6] = rd32(m, frame);
-    r->a[7] = frame + 8u; /* UNLK and RTS. */
-    return 0;
+    return finish_format(&f);
 }

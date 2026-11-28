@@ -114,3 +114,7 @@ Push: temp GIT_ASKPASS script printing ~/.token.bak, deleted after. Commits end 
 - Running: wt_CW cw_r16 (005794 fix, 001A78 ports in test_fn, 003CE0 wrapper, 091EA4 & 13F436 recipes ->
   recipes17.tsv), wt_CW2 cw2_r5 (never-returning routines, abort stop points -> recipes17cw2.tsv).
 - 25 left; floor of genuinely unverifiable: bare rts/rte (000400, 0D4FF6), probably 001A66, 010172.
+
+## Update 11:40
+- 77ac3bc: 100% decompiled / 99.8% verified. Left: 006020 (codex wt_X1, codex_6020.log, recipes18.tsv) and four
+  routines an empty body cannot be told apart from: 000400 (rte), 0D4FF6 (rts), 001A66 (bare jmp), 010172 (trap #5 first).

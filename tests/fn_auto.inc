@@ -741,6 +741,7 @@
     { "Fn 0x1A006C auto", "work/ram/fn_1A006C", Fn_1A006C, ALLREGS },
     { "Fn 0x004F58 auto", "work/ram/fn_004F58", Fn_004F58, ALLREGS },
     { "Fn 0x005C62 auto", "work/ram/fn_005C62", Fn_005C62, ALLREGS },
+    { "Fn 0x005C62 pointer tail", "work/ram/fnk_005C62_p", Fn_005C62, REG16 },
     { "Fn 0x129470 auto", "work/ram/fn_129470", Fn_129470, ALLREGS },
     { "Fn 0x1296D0 auto", "work/ram/fn_1296D0", Fn_1296D0, ALLREGS },
     { "Fn 0x12C15C auto", "work/ram/fn_12C15C", Fn_12C15C, ALLREGS },

@@ -1161,4 +1161,8 @@ int Fn_01014E(const f3mem_t *m, f3regs_t *r); /* ROM 0x01014E up to the 0x010170
 int Fn_000402_Early(const f3mem_t *m, f3regs_t *r); /* ROM 0x000402 blocks 0..2 (stop 0x000450) */
 int Fn_010000_Init(const f3mem_t *m, f3regs_t *r); /* ROM 0x010000 up to the 0x010080 RAM-test jump */
 /* END generated */
+
+/* Shared entry points for the 0x005C62 formatter and its 0x006020 tail. */
+uint16_t Formatter_Prepare_006020(f3regs_t *r, uint16_t flags);
+int Formatter_RenderAndResume(const f3mem_t *m, f3regs_t *r, uint16_t length);
 #endif

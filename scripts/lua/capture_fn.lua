@@ -19,6 +19,9 @@
 --   F3_GFX     "1" also dumps playfield/text/char/line RAM 0x610000-0x62FFFF to <prefix>_gfx.bin
 --   F3_DPRAM   "1" also dumps the 2 KiB sound DPRAM (0xC00000) to <prefix>_dpram.bin
 --   F3_PAL     "1" also dumps palette RAM 0x440000-0x447FFF to <prefix>_pal.bin
+--   F3_EEPROM  "1" also dumps live EEPROM words and serial state to <prefix>_eep.bin
+--   F3_EEP_POKEW "word=value,..." (hex) seeds live EEPROM words before each pre dump
+--                when F3_EEPROM=1 (force a write or restore from a different value)
 --   F3_SAMPLES number of pre/post pairs       (default 300)
 --   F3_OUT     output prefix (default work/ram/fn) -> <prefix>_pairs.bin, <prefix>_regs.tsv
 --   F3_SWEEP   "N" overwrites the word arg at SP+4 on entry with pair_index % N
@@ -204,6 +207,55 @@ local dp = want_dpram and assert(io.open(prefix .. "_dpram.bin", "wb")) or nil
 local spf = os.getenv("F3_SPR") == "1" and assert(io.open(prefix .. "_spr.bin", "wb")) or nil
 local gff = os.getenv("F3_GFX") == "1" and assert(io.open(prefix .. "_gfx.bin", "wb")) or nil
 local palf = os.getenv("F3_PAL") == "1" and assert(io.open(prefix .. "_pal.bin", "wb")) or nil
+local eepf, eep_snapshot, eep_poke
+if os.getenv("F3_EEPROM") == "1" then
+  -- MAME 0.289 exposes live storage through save items, including the serial
+  -- controller fields. The :eeprom ROM region only holds the initial image.
+  local dev = assert(manager.machine.devices[":eeprom"], "F3_EEPROM: missing :eeprom device")
+  local items = dev.items
+  local function item(name)
+    local index = assert(items["0/" .. name], "F3_EEPROM: missing save item " .. name)
+    return emu.item(index)
+  end
+  local data = item("m_data")
+  assert(data.size == 1 and data.count == 128, "F3_EEPROM: expected a 64x16 EEPROM")
+  local words_to_poke = {}
+  for address, value in string.gmatch(os.getenv("F3_EEP_POKEW") or "", "(%x+)=(%x+)") do
+    local a, v = tonumber(address, 16), tonumber(value, 16)
+    assert(a < 64 and v < 0x10000, "F3_EEP_POKEW: expected a 6-bit address and a 16-bit word")
+    words_to_poke[#words_to_poke + 1] = { a * 2, v }
+  end
+  eep_poke = function()
+    for _, word in ipairs(words_to_poke) do
+      data:write(word[1], word[2] & 0xFF)
+      data:write(word[1] + 1, word[2] >> 8)
+    end
+  end
+  local cs, clk, di = item("m_cs_state"), item("m_clk_state"), item("m_di_state")
+  local phase, locked = item("m_state"), item("m_locked")
+  local command, address = item("m_command"), item("m_address")
+  local bits, accum, shift = item("m_bits_accum"), item("m_command_address_accum"), item("m_shift_register")
+  local seconds, attoseconds = item("m_completion_time.seconds"), item("m_completion_time.attoseconds")
+  eepf = assert(io.open(prefix .. "_eep.bin", "wb"))
+  eep_snapshot = function(pre)
+    local raw = data:read_block(0, 128)
+    local words = {}
+    for i = 1, 128, 2 do
+      local word = string.unpack("<I2", raw, i) -- MAME stores its cells little-endian
+      words[#words + 1] = string.pack(">I2", word)
+    end
+    local pins = (cs:read(0) << 4) | (clk:read(0) << 3) | (di:read(0) << 2)
+    local sr = cpu.state["SR"].value
+    if pre and noirq and not inject_exc then sr = sr | 0x0700 end
+    local now = manager.machine.time
+    local busy = math.max(0, (seconds:read(0) - now.seconds) * 1000000000
+        + (attoseconds:read(0) - now.attoseconds + 999999999) // 1000000000)
+    -- Fixed 152-byte record, pre/post per pair. See tests/capture.h.
+    return table.concat(words) .. string.pack(">I2BBBBBBI4I4I4I4", sr,
+        phase:read(0), pins, locked:read(0), command:read(0), address:read(0),
+        sp:read_u8(0x4A0001) & 1, bits:read(0), accum:read(0), shift:read(0), busy)
+  end
+end
 -- F3_PORTS=1: <prefix>_ports.tsv gets, per pair, the 32 input-port bytes at
 -- 0x4A0000..0x4A001F sampled at entry (IO_PollInputs 0x001A78 reads them;
 -- they are MMIO, not part of the RAM dumps). Interrupts must be masked
@@ -213,7 +265,7 @@ local pre_ports = ""
 -- snapshot() returns the dumps as strings; pairs are written only when the
 -- post is reached, so an abandoned pre (routine left without returning)
 -- never desynchronises the output files.
-local function snapshot()
+local function snapshot(pre)
   local t = {}
   for a = 0x400000, 0x41FFFF, 4 do t[#t + 1] = string.pack(">I4", sp:read_u32(a)) end
   local snap = { w = table.concat(t) }
@@ -237,6 +289,7 @@ local function snapshot()
     for a = 0x440000, 0x447FFF, 4 do pal[#pal + 1] = string.pack(">I4", sp:read_u32(a)) end
     snap.pal = table.concat(pal)
   end
+  if eepf then snap.e = eep_snapshot(pre) end
   return snap
 end
 local function emit(snap)
@@ -245,6 +298,7 @@ local function emit(snap)
   if spf then spf:write(snap.s) end
   if gff then gff:write(snap.g) end
   if palf then palf:write(snap.pal) end
+  if eepf then assert(eepf:write(snap.e)) end
 end
 local function regline_str(i, which)
   local r = {}
@@ -265,6 +319,7 @@ local function finish(tag)
   finished = true
   out:close(); regs:close(); if dp then dp:close() end; if spf then spf:close() end; if gff then gff:close() end
   if palf then palf:close() end
+  if eepf then assert(eepf:close()) end
   print(string.format("CAPTURE %s pairs=%d abandoned=%d frames=%d screen=%d", tag, pairs_done, abandoned, n, manager.machine.screens[":screen"]:frame_number() - (scr0 or 0))); manager.machine:exit()
 end
 -- the pairs after a reset are not from the state the capture asked for: stop
@@ -276,17 +331,12 @@ emu.register_periodic(function()
   if dbg.execution_state ~= "stop" then return end
   local pc = cpu.state["PC"].value
   local spv = cpu.state["SP"].value
-  -- SP as the call left it (arguments still pushed): the post match below needs
-  -- this value, not the restored one. Restoring first made `spv == ret_sp + 4`
-  -- false for every injected call made with F3_INJECT_STACK (ret_sp + 4 is
-  -- inject_orig_sp - 4*#inject_stack, while the restore sets spv back to
-  -- inject_orig_sp), so those calls never closed a pair: fnk_003CE0, fnk_005794,
-  -- fnk_0057DA and fnk_0B7332 all came back with 0 pairs, and the 30 pairs
-  -- fnk_005576 did record are its natural calls (pre SP 0x404E8A, A0 = the HUD
-  -- table 0x000C8B5E), none of them the injected call.
+  -- Match the post against the SP the call left, with arguments still pushed.
+  -- An active capture also records that SP before restoring the original SP.
   local spv_ret = spv
   local did_inject = false
-  if inject_orig_sp and pc == inject_at and spv == inject_orig_sp - 4 * #inject_stack then
+  local inject_return = inject_orig_sp and pc == inject_at and spv_ret == inject_orig_sp - 4 * #inject_stack
+  if inject_return and not have_pre then
     spv = inject_orig_sp; cpu.state["SP"].value = spv; inject_orig_sp = nil
   end
   if inject and pc == inject_at and not have_pre then
@@ -371,7 +421,8 @@ emu.register_periodic(function()
     for _, pv in ipairs(pokes8) do sp:write_u8(pv[1], pv[2]) end
     if not pokefn and not pokeat then poke_a0() end
     if sweep > 0 then sp:write_u16(spv + ret_size, sweep_base + pairs_done % sweep) end
-    pre_snap = snapshot(); pre_regs = regline_str(pairs_done, "pre"); pending_logs = {}; have_pre = true
+    if eep_poke then eep_poke() end
+    pre_snap = snapshot(true); pre_regs = regline_str(pairs_done, "pre"); pending_logs = {}; have_pre = true
     if portf then
       local t = {}
       for k = 0, 31 do t[#t + 1] = string.format("%02X", sp:read_u8(0x4A0000 + k)) end
@@ -404,12 +455,15 @@ emu.register_periodic(function()
     emit(pre_snap); regs:write(pre_regs); regs:write(table.concat(pending_logs))
     if portf then portf:write(string.format("%d\t%s\n", pairs_done, pre_ports)); portf:flush() end
     emit(snapshot()); regs:write(regline_str(pairs_done, "post")); have_pre = false
+    -- Keep the real post-RTS SP in the capture, then discard injected args.
+    if inject_return then cpu.state["SP"].value = inject_orig_sp; inject_orig_sp = nil end
     if noirq and saved_sr then
       local cur = cpu.state["SR"].value
       cpu.state["SR"].value = (cur & ~0x0700) | (saved_sr & 0x0700); saved_sr = nil
     end
     out:flush(); regs:flush(); if dp then dp:flush() end; if spf then spf:flush() end; if gff then gff:flush() end
     if palf then palf:flush() end
+    if eepf then assert(eepf:flush()) end
     pairs_done = pairs_done + 1
     -- F3_INJECT_ABORT=1 with an F3_EXIT PC (e.g. a task body's first TRAP #5):
     -- the injected call cannot return from there, so after the post it is

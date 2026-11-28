@@ -16,7 +16,7 @@ static int run(const char *pfx, int *total)
     for (int i = 0; i < c.pairs; i++) {
         memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
         memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
-        f3mem_t m = { w, rom, NULL, s, NULL, NULL };
+        f3mem_t m = { w, rom, NULL, s, NULL, NULL, NULL };
         uint32_t obj = c.pre[i][CR_A0], cur = rd32(&m, SPR_CURSOR);
         if (rd32(&m, rd32(&m, obj + 0x10)) == 0x00010001u) single++; else { multi++; flips[rd8(&m, obj + 0x1C) & 3]++; }
         Obj_DrawSprite(&m, obj);
@@ -54,7 +54,7 @@ int main(void)
             for (int i = 0; i < c.pairs; i++) {
                 memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
                 memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
-                f3mem_t m = { w, rom, NULL, s, NULL, NULL };
+                f3mem_t m = { w, rom, NULL, s, NULL, NULL, NULL };
                 Obj_DrawSpriteSub(&m, c.pre[i][CR_A0], (uint16_t)c.pre[i][CR_D0],
                                   (uint16_t)c.pre[i][CR_D0 + 1], (uint16_t)c.pre[i][CR_D0 + 2]);
                 uint32_t sp = c.pre[i][CR_SP];
@@ -79,7 +79,7 @@ int main(void)
             for (int i = 0; i < c.pairs; i++) {
                 memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
                 memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
-                f3mem_t m = { w, NULL, NULL, s, NULL, NULL };
+                f3mem_t m = { w, NULL, NULL, s, NULL, NULL, NULL };
                 Video_SetSpriteScroll(&m);
                 uint32_t sp = c.pre[i][CR_SP];
                 int d = cap_diff("wram", i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x40, sp, &budget)
@@ -120,7 +120,7 @@ int main(void)
             for (int i = 0; i < c.pairs; i++) {
                 memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
                 memcpy(g, c.gfx + ((size_t)i * 2) * F3_GFX_SIZE, F3_GFX_SIZE);
-                f3mem_t m = { w, rom, NULL, NULL, g, NULL };
+                f3mem_t m = { w, rom, NULL, NULL, g, NULL, NULL };
                 uint32_t sp = c.pre[i][CR_SP];
                 if (fn_tests[t].id == 0) {
                     Gfx_DrawTilemapBlock(&m, rd32(&m, sp + 4u), rd32(&m, sp + 8u), rd16(&m, sp + 12u));
@@ -169,7 +169,7 @@ int main(void)
             int ok = 0, budget = 10;
             for (int i = 0; i < c.pairs; i++) {
                 memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
-                f3mem_t m = { w, NULL, NULL, NULL, NULL, NULL };
+                f3mem_t m = { w, NULL, NULL, NULL, NULL, NULL, NULL };
                 uint32_t sp = c.pre[i][CR_SP];
                 Pal_QueueUpload(&m, rd32(&m, sp + 4u), (uint16_t)rd32(&m, sp + 8u), (uint16_t)rd32(&m, sp + 12u));
                 int d = cap_diff("wram", i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x40, sp, &budget);
@@ -193,7 +193,7 @@ int main(void)
             int ok = 0, budget = 10;
             for (int i = 0; i < c.pairs; i++) {
                 memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
-                f3mem_t m = { w, rom, NULL, NULL, NULL, NULL };
+                f3mem_t m = { w, rom, NULL, NULL, NULL, NULL, NULL };
                 Stage_Fade146006(&m);
                 uint32_t sp = c.pre[i][CR_SP];
                 int d = cap_diff("wram", i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x40, sp, &budget);
@@ -215,7 +215,7 @@ int main(void)
             int ok = 0, budget = 10;
             for (int i = 0; i < c.pairs; i++) {
                 memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
-                f3mem_t m = { w, NULL, NULL, NULL, NULL, NULL };
+                f3mem_t m = { w, NULL, NULL, NULL, NULL, NULL, NULL };
                 Video_UploadScroll(&m);
                 uint32_t sp = c.pre[i][CR_SP];
                 int d = cap_diff("wram", i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x40, sp, &budget);
@@ -237,7 +237,7 @@ int main(void)
             for (int i = 0; i < c.pairs; i++) {
                 memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
                 memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
-                f3mem_t m = { w, NULL, NULL, s, NULL, NULL };
+                f3mem_t m = { w, NULL, NULL, s, NULL, NULL, NULL };
                 Sprite_ClearAll(&m);
                 uint32_t sp = c.pre[i][CR_SP];
                 int d = cap_diff("wram", i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x40, sp, &budget)
@@ -280,7 +280,7 @@ int main(void)
             for (int i = 0; i < c.pairs; i++) {
                 memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
                 memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
-                f3mem_t m = { w, NULL, NULL, s, NULL, NULL };
+                f3mem_t m = { w, NULL, NULL, s, NULL, NULL, NULL };
                 Sprite_InitBuffers(&m);
                 uint32_t sp = c.pre[i][CR_SP];
                 if (sp < F3_WRAM_BASE || sp > F3_WRAM_BASE + F3_WRAM_SIZE - 4u)

@@ -1,17 +1,19 @@
 /* Shared loader for scripts/capture_fn.sh outputs (<prefix>_pairs.bin,
- * _regs.tsv, optional _dpram.bin / _spr.bin / _gfx.bin / _pal.bin). Header-only, for tests. */
+ * _regs.tsv, optional _dpram.bin / _spr.bin / _gfx.bin / _pal.bin / _eep.bin). Header-only, for tests. */
 #ifndef TAITOF3_TESTS_CAPTURE_H
 #define TAITOF3_TESTS_CAPTURE_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "../src/common/f3mem.h"
 
 enum { CR_D0 = 0, CR_A0 = 8, CR_A1 = 9, CR_SP = 15, CR_N = 16, CR_PC = 16, CR_SR = 17 };
+enum { CAP_EEP_BYTES = F3_EEP_WORDS * 2, CAP_EEP_RECORD = CAP_EEP_BYTES + 24 };
 
 typedef struct {
     int pairs;
-    uint8_t *wram, *dpram, *spr, *gfx, *pal;   /* pre,post interleaved per pair */
+    uint8_t *wram, *dpram, *spr, *gfx, *pal, *eep; /* pre,post interleaved per pair */
     uint32_t (*pre)[CR_N], (*post)[CR_N];
     unsigned *fpre, *fpost;              /* frame of each dump (regs.tsv col 3) */
     uint32_t *pcpre, *pcpost;            /* entry / exit PC (optional 17th column, F3_EXITPC) */
@@ -23,13 +25,18 @@ static inline uint8_t *cap_slurp(const char *path, long *len)
     FILE *f = fopen(path, "rb");
     if (!f) return NULL;
     fseek(f, 0, SEEK_END); *len = ftell(f); fseek(f, 0, SEEK_SET);
-    uint8_t *b = malloc((size_t)*len);
-    if (fread(b, 1, (size_t)*len, f) != (size_t)*len) { free(b); b = NULL; }
+    uint8_t *b = *len >= 0 ? malloc(*len ? (size_t)*len : 1) : NULL;
+    if (!b || fread(b, 1, (size_t)*len, f) != (size_t)*len) {
+        free(b);
+        fclose(f);
+        errno = EIO;
+        return NULL;
+    }
     fclose(f);
     return b;
 }
 
-/* returns 0 on success, -1 if the capture is missing */
+/* 0 on success, -1 if the capture is missing, -2 for an invalid EEPROM file. */
 static inline int cap_load(capture_t *c, const char *pfx)
 {
     char p[512];
@@ -45,6 +52,14 @@ static inline int cap_load(capture_t *c, const char *pfx)
     }
     if (!c->wram) return -1;
     c->pairs = (int)(l / (2 * F3_WRAM_SIZE));
+    snprintf(p, sizeof p, "%s_eep.bin", pfx);
+    c->eep = cap_slurp(p, &l);
+    if (c->eep ? l != (long)c->pairs * 2 * CAP_EEP_RECORD : errno != ENOENT) {
+        free(c->eep);
+        free(c->wram);
+        memset(c, 0, sizeof *c);
+        return -2;
+    }
     snprintf(p, sizeof p, "%s_dpram.bin", pfx);
     if ((c->dpram = cap_slurp(p, &l)) && l / (2 * F3_DPRAM_SIZE) < c->pairs) c->pairs = (int)(l / (2 * F3_DPRAM_SIZE));
     snprintf(p, sizeof p, "%s_spr.bin", pfx);
@@ -100,8 +115,58 @@ static inline const uint8_t *cap_gfx(const capture_t *c, int i, int post)
 static inline const uint8_t *cap_pal(const capture_t *c, int i, int post)
 { return c->pal ? c->pal + ((size_t)i * 2 + (size_t)post) * F3_PAL_SIZE : NULL; }
 
+static inline uint32_t cap_be(const uint8_t *p, unsigned n)
+{
+    uint32_t result = 0;
+    for (unsigned i = 0; i < n; ++i) result = (result << 8) | p[i];
+    return result;
+}
+
+/* Big-endian device words, SR, six serial bytes (phase, pins, lock, command,
+ * address, DO), then four u32s (bit count, command accumulator, shift and
+ * nanoseconds until ready). See scripts/lua/capture_fn.lua. */
+static inline int cap_eeprom(const capture_t *c, int i, int post,
+                             f3_eeprom_t *e, uint16_t *sr, uint8_t *dout)
+{
+    const uint8_t *p = c->eep + ((size_t)i * 2 + (size_t)post) * CAP_EEP_RECORD;
+    for (unsigned k = 0; k < F3_EEP_WORDS; ++k)
+        e->words[k] = (uint16_t)cap_be(p + 2 * k, 2);
+    p += CAP_EEP_BYTES;
+    *sr = (uint16_t)cap_be(p, 2);
+    e->phase = p[2];
+    e->pins = p[3];
+    e->write_enabled = !p[4];
+    e->command = p[5];
+    e->address = p[6];
+    *dout = p[7];
+    e->bits = cap_be(p + 8, 4);
+    e->command_bits = cap_be(p + 12, 4);
+    e->shift = cap_be(p + 16, 4);
+    e->busy_ns = cap_be(p + 20, 4);
+    return e->phase <= F3_EEP_COMPLETE && !(e->pins & ~(F3_EEP_CS | F3_EEP_CLK | F3_EEP_DI))
+        && p[4] <= 1 && e->command <= F3_EEP_ERASE_ALL && e->address < F3_EEP_WORDS
+        && *dout <= 1 && e->command_bits <= 0xFFu
+        && (e->phase != F3_EEP_COMMAND || (e->bits < 8 && e->command_bits < (1u << e->bits)))
+        && (e->phase != F3_EEP_DATA || e->bits < 16);
+}
+
 static inline void cap_free(capture_t *c)
-{ free(c->wram); free(c->dpram); free(c->spr); free(c->gfx); free(c->pal); free(c->pre); free(c->post); free(c->fpre); free(c->fpost); free(c->pcpost); free(c->pcpre); free(c->srpre); free(c->srpost); }
+{
+    free(c->wram);
+    free(c->dpram);
+    free(c->spr);
+    free(c->gfx);
+    free(c->pal);
+    free(c->eep);
+    free(c->pre);
+    free(c->post);
+    free(c->fpre);
+    free(c->fpost);
+    free(c->pcpre);
+    free(c->pcpost);
+    free(c->srpre);
+    free(c->srpost);
+}
 
 /* byte diff of a region, printing up to *budget mismatches; skip [lo,hi) */
 /* Engine-side capture artifact: P1's PS_INVULN high byte (0x41B1E1) flips

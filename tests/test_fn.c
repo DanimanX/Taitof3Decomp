@@ -1,9 +1,9 @@
 /* Generic runner for function captures (scripts/capture_fn.sh <addr> ret ...
- * -> work/ram/fn_<ADDR>_{pairs,regs,gfx,spr,dpram,pal}): one entry->return call per
- * pair. For each pair the pre Work RAM and optional screen memory, sprite,
- * sound DPRAM and palette images are loaded. The C translation runs from the
- * captured pre registers through an adapter, and the post images are compared byte
- * for byte, skipping the stack window [SP-0x100, SP) below the entry SP
+ * -> work/ram/fn_<ADDR>_{pairs,regs,gfx,spr,dpram,pal,eep}): one call per pair.
+ * Each pair loads pre Work RAM and optional screen memory, sprite RAM,
+ * sound DPRAM, palette RAM and EEPROM snapshots. The C translation runs from
+ * the captured pre registers through an adapter. The runner compares the post
+ * snapshots, skipping the stack window [SP-0x100, SP) below the entry SP
  * (locals, saved registers and the callee's frames live there). Selected
  * output registers are compared under a mask when the table entry asks.
  * Exception captures compare PC, SR and all general registers, including
@@ -54,11 +54,12 @@ static int ad_seg(const f3mem_t *m, f3regs_t *r)
     r->pc = Seg_Run(m, r, r->pc);
     return r->pc == SEG_LEAVE ? -1 : 0;
 }
-/* Every general register plus the captured exit PC. */
-#define SEGREG_CHECKS { CR_D0, ~0u }, { CR_D0 + 1, ~0u }, { CR_D0 + 2, ~0u }, { CR_D0 + 3, ~0u }, \
+/* General registers, with PC for segments and PC/SR for exceptions. */
+#define CPU_REGS { CR_D0, ~0u }, { CR_D0 + 1, ~0u }, { CR_D0 + 2, ~0u }, { CR_D0 + 3, ~0u }, \
     { CR_D0 + 4, ~0u }, { CR_D0 + 5, ~0u }, { CR_D0 + 6, ~0u }, { CR_D0 + 7, ~0u }, \
     { CR_A0, ~0u }, { CR_A0 + 1, ~0u }, { CR_A0 + 2, ~0u }, { CR_A0 + 3, ~0u }, \
-    { CR_A0 + 4, ~0u }, { CR_A0 + 5, ~0u }, { CR_A0 + 6, ~0u }, { CR_SP, ~0u }, { CR_PC, ~0u }
+    { CR_A0 + 4, ~0u }, { CR_A0 + 5, ~0u }, { CR_A0 + 6, ~0u }, { CR_SP, ~0u }
+#define SEGREG_CHECKS CPU_REGS, { CR_PC, ~0u }
 #define SEGREGS { SEGREG_CHECKS }
 #define EXCREGS { SEGREG_CHECKS, { CR_SR, 0xFFFFu } }
 
@@ -230,6 +231,12 @@ static const fn_entry_t fns[] = {
 #include "../src/auto/fn_auto.h"
 static const fn_entry_t fns[] = {
 #include "fn_auto.inc"
+    { "Fn 0x00466E EEPROM read",       "work/ram/fne2_00466E", Fn_00466E, { CPU_REGS } },
+    { "Fn 0x0046C0 EEPROM write",      "work/ram/fne2_0046C0", Fn_0046C0, { CPU_REGS } },
+    { "Fn 0x004C42 high-score restore", "work/ram/fne2_004C42", Fn_004C42, { CPU_REGS } },
+    { "Fn 0x004D06 settings reload",   "work/ram/fne2_004D06", Fn_004D06, { CPU_REGS } },
+    { "Fn 0x005080 settings defaults", "work/ram/fne2_005080", Fn_005080, { CPU_REGS } },
+    { "Fn 0x00509A high-score defaults", "work/ram/fne2_00509A", Fn_00509A, { CPU_REGS } },
     { "Fn 0x005666 Text_DrawString",   "work/ram/fn_005666", ad_005666, { { CR_D0, 0xFFFFFFFFu } } },
     { "Fn 0x0C77BE Player_CoinCheckA", "work/ram/fn_0C77BE", ad_0C77BE, { { CR_D0, 0x000000FFu } } },
     { "Fn 0x0CBEEA Obj_CBEEA",         "work/ram/fn_0CBEEA", ad_0CBEEA, { { 0, 0u } } },
@@ -343,10 +350,38 @@ static const fn_entry_t fns[] = {
 
 static uint8_t *slurp(const char *path, long *len) { return cap_slurp(path, len); }
 
+static int diff_eeprom(const char *name, int pair, const f3_eeprom_t *got,
+                       const f3_eeprom_t *want, uint8_t dout, int *budget)
+{
+    int diff = 0;
+    for (unsigned i = 0; i < F3_EEP_WORDS; ++i) {
+        if (got->words[i] == want->words[i]) continue;
+        if ((*budget)-- > 0)
+            printf("  %s pair %d EEPROM[%02X] got=%04X want=%04X\n",
+                   name, pair, i, got->words[i], want->words[i]);
+        ++diff;
+    }
+    if (got->phase != want->phase || got->pins != want->pins ||
+        got->write_enabled != want->write_enabled || f3_eeprom_do(got) != dout) {
+        if ((*budget)-- > 0)
+            printf("  %s pair %d EEPROM phase/pins/EWEN/DO got=%u/%02X/%u/%u want=%u/%02X/%u/%u\n",
+                   name, pair, got->phase, got->pins, got->write_enabled, f3_eeprom_do(got),
+                   want->phase, want->pins, want->write_enabled, dout);
+        ++diff;
+    }
+    return diff;
+}
+
 static int run(const fn_entry_t *e, const uint8_t *rom)
 {
     capture_t c;
-    if (cap_load(&c, e->cap) || c.pairs == 0) {
+    int loaded = cap_load(&c, e->cap);
+    if (loaded == -2 || (!loaded && strstr(e->cap, "/fne2_") && !c.eep)) {
+        printf("fn: %-34s FAIL (missing or invalid %s_eep.bin)\n", e->name, e->cap);
+        cap_free(&c);
+        return 1;
+    }
+    if (loaded || c.pairs == 0) {
         printf("fn: %-34s SKIP (no %s)\n", e->name, e->cap);
         if (c.wram) cap_free(&c);
         return 0;
@@ -380,11 +415,23 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         if (s) memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
         if (dp) memcpy(dp, cap_dpram(&c, i, 0), F3_DPRAM_SIZE);
         if (pal) memcpy(pal, cap_pal(&c, i, 0), F3_PAL_SIZE);
-        f3mem_t m = { w, rom, dp, s, g, pal };
-        f3regs_t r;
+        f3_eeprom_t eeprom, expected;
+        f3mem_t m = { w, rom, dp, s, g, pal, c.eep ? &eeprom : NULL };
+        f3regs_t r = { 0 };
+        uint8_t do_post = 0;
+        if (c.eep) {
+            uint16_t sr_post;
+            uint8_t do_pre;
+            if (!cap_eeprom(&c, i, 0, &eeprom, &r.sr, &do_pre) ||
+                !cap_eeprom(&c, i, 1, &expected, &sr_post, &do_post) ||
+                f3_eeprom_do(&eeprom) != do_pre) {
+                if (budget-- > 0) printf("  %s pair %d invalid EEPROM snapshot\n", e->name, i);
+                continue;
+            }
+        }
         for (int k = 0; k < 8; k++) { r.d[k] = c.pre[i][CR_D0 + k]; r.a[k] = c.pre[i][CR_A0 + k]; }
         r.pc = c.pcpre[i];
-        r.sr = exception ? c.srpre[i] : 0;
+        if (exception) r.sr = c.srpre[i];
         cur_cap = e->cap; cur_pair = i; skip_lo = skip_hi = 0;
         if (e->fn(&m, &r) < 0) { undec++; continue; }
         if (skip_hi > skip_lo && skip_lo >= F3_WRAM_BASE && skip_hi <= F3_WRAM_BASE + F3_WRAM_SIZE)
@@ -397,6 +444,7 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         /* sound DPRAM 0xC00000-0xC007FF, for captures taken with F3_DPRAM=1 */
         if (dp) d += cap_diff(e->name, i, F3_DPRAM_BASE, dp, cap_dpram(&c, i, 1), F3_DPRAM_SIZE, 0, 0, &budget);
         if (pal) d += cap_diff(e->name, i, F3_PAL_BASE, pal, cap_pal(&c, i, 1), F3_PAL_SIZE, 0, 0, &budget);
+        if (c.eep) d += diff_eeprom(e->name, i, &eeprom, &expected, do_post, &budget);
         for (int k = 0; k <= CR_SR && e->out[k].mask; k++) {
             int x = e->out[k].reg;
             uint32_t got, want;

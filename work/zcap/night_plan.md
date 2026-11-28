@@ -107,3 +107,10 @@ Push: temp GIT_ASKPASS script printing ~/.token.bak, deleted after. Commits end 
   X3 serial EEPROM model (F3_EEPROM=1, fne2_ captures)                log work/zcap/codex_eep.log
   Each leaves test lines commented with PAL-CAPTURE / EXC-CAPTURE / EEP-CAPTURE and the capture commands in its
   report. Merge: git diff in wt_X? > patch, apply, copy new files, take the captures, uncomment, all suites, commit.
+
+## Update 10:10
+- 98.7% verified (bf82c7b). Merged: palette RAM (0d79df7), TRAP/IRQ exception frames (4160605), f3regs.h is the
+  ONLY f3regs_t definition (pc, sr fields). EEPROM lane conflicted: codex rebasing it in wt_X4 (codex_eep2.log).
+- Running: wt_CW cw_r16 (005794 fix, 001A78 ports in test_fn, 003CE0 wrapper, 091EA4 & 13F436 recipes ->
+  recipes17.tsv), wt_CW2 cw2_r5 (never-returning routines, abort stop points -> recipes17cw2.tsv).
+- 25 left; floor of genuinely unverifiable: bare rts/rte (000400, 0D4FF6), probably 001A66, 010172.

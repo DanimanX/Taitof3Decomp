@@ -1273,7 +1273,7 @@ static int run_any(const char *name, const char *pfx, tick_fn fn, tick_a1_fn fn_
         memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
         memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
         if (g) memcpy(g, cap_gfx(&c, i, 0), F3_GFX_SIZE);
-        f3mem_t m = { w, (uint8_t *)rom, NULL, s, g, NULL };
+        f3mem_t m = { w, (uint8_t *)rom, NULL, s, g, NULL, NULL };
         uint32_t obj = c.pre[i][CR_A0];
         uint32_t fn0 = rd32(&m, obj);   /* tick fn before the call */
         int r = fn ? fn(&m, obj) : fn_a1(&m, obj, c.pre[i][reg]);
@@ -2604,7 +2604,7 @@ int main(void)
        tables and are covered by every object routine that calls them). */
     {
         uint8_t w[F3_WRAM_SIZE] = {0}, g2[F3_GFX_SIZE] = {0};
-        f3mem_t sm = { w, (const uint8_t *)rom, NULL, NULL, g2, NULL };
+        f3mem_t sm = { w, (const uint8_t *)rom, NULL, NULL, g2, NULL, NULL };
         int bad_s = 0;
         wr16(&sm, F3_A5 + 0x1D60u, 0x0102u);   /* x' = x + 4x + 1; return x' >> 8 */
         bad_s += Obj_Next4Way(&sm) != (uint16_t)((0x0102u + (uint16_t)(0x0102u << 2) + 1u) >> 8);
@@ -2623,7 +2623,7 @@ int main(void)
     /* 0x179A5C animation engine: index 0 walks a frame list at +0x3A. */
     {
         uint8_t w[F3_WRAM_SIZE] = {0}, g2[F3_GFX_SIZE] = {0};
-        f3mem_t am = { w, (const uint8_t *)rom, NULL, NULL, g2, NULL };
+        f3mem_t am = { w, (const uint8_t *)rom, NULL, NULL, g2, NULL, NULL };
         int bad_a = 0;
         /* index 0 with a positive duration only counts down */
         wr32(&am, 0x410100u + 0x3Au, 0x00020000u);

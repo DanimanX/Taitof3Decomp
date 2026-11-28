@@ -1,13 +1,13 @@
 # Decompilation coverage — Darius Gaiden (maincpu)
 
-**100.0% decompiled · 0.0% remaining**  
+**99.8% decompiled · 0.2% remaining**  
 `████████████████████████████████████████`
 
 | | functions | code bytes | % of code in functions |
 |---|---:|---:|---:|
-| Decompiled to C | 2606 / 2606 | 325,124 / 325,124 | **100.0%** |
-| …of which verified bit-exact vs MAME | 2581 | 320,782 | 98.7% |
-| **Remaining** | 0 | 0 | **0.0%** |
+| Decompiled to C | 2605 / 2606 | 324,636 / 325,124 | **99.8%** |
+| …of which verified bit-exact vs MAME | 2586 | 320,712 | 98.6% |
+| **Remaining** | 1 | 488 | **0.2%** |
 
 ## Map by 64 KiB ROM bank
 
@@ -15,7 +15,7 @@
 
 | ROM bank | functions (done/total) | code bytes | decompiled | map |
 |---|---:|---:|---:|---|
-| `0x000000` | 144/144 | 11,860 | 100.0% | `████████████████████` |
+| `0x000000` | 143/144 | 11,860 |  95.9% | `███████████████████░` |
 | `0x010000` | 14/14 | 1,332 | 100.0% | `████████████████████` |
 | `0x090000` | 9/9 | 1,138 | 100.0% | `████████████████████` |
 | `0x0A0000` | 3/3 | 116 | 100.0% | `████████████████████` |

@@ -1,25 +1,5 @@
-/* ROM 0x005080: UNVERIFIED (weak capture): reload the whole configuration -
- * identification bytes, settings fields, defaults, score table - then write the
- * block back to the serial EEPROM. Six calls, no arguments, no return value:
- *   0x004E46 install the identification bytes and re-checksum
- *   0x004E84 copy the default settings fields and re-checksum
- *   0x004F58 restore the remaining settings fields and re-checksum
- *   0x005030 install the default score table
- *   0x004DEE write both checksums and the block back through 0x0046C0
- *   0x004D06 read the block back and publish it into the RAM globals
- *
- * Only one captured pair exists, and it can never be bit-exact: 0x004DEE and
- * 0x004D06 clock the serial device through 0x0047C0, which saves the CPU status
- * register into 0x406C50. The capture shows 0x2710 there (supervisor, IPL 7,
- * X set), a state the harness does not model (no SR in f3regs_t); the shared
- * helper stores 0x2000. Everything else in the pair - the settings block, the
- * score table, the address scalars at 0x409D3A/3C and the registers - follows
- * from the bytes.
- *
- * Every path is translated; the EEPROM write-failure path (0x004E1C..0x004E3C:
- * clear the layers, draw the reset message, enter 0x01014E) returns -1 because
- * 0x01014E spins at 0x010170 forever. Nothing before it can fail in the
- * harness (the port write is discarded), so no side effect is lost. */
+/* ROM 0x005080: rebuild the defaults, write them to the serial EEPROM,
+ * then reload the settings into the runtime globals. */
 #include "fn_auto.h"
 #include "eeprom_block.h"
 

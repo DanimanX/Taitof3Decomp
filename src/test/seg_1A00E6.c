@@ -443,6 +443,7 @@ uint32_t Seg_1A00E6(const f3mem_t *m, f3regs_t *r, uint32_t pc)
              * write-back, which enters the 0x01014E reset loop when the device
              * does not answer - the harness has no I/O space, so this arm
              * never returns (same as seg_1A0A52.c). */
+            push_long(m, r, 0x001A0422u);
             (void)settings_refresh_4DEE(m, r);
             return SEG_LEAVE;
         }

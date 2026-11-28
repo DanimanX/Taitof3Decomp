@@ -81,6 +81,6 @@ publish:
 	 fi; \
 	 echo "publish: origin/main is up to date ($$(git rev-parse --short HEAD))"
 
-build/test_fn: tests/test_fn.c tests/capture.h tests/fn_auto.inc src/auto/fn_auto.h $(SRC)
+build/test_fn: tests/test_fn.c tests/capture.h tests/fn_auto.inc src/common/f3mem.h src/auto/fn_auto.h src/auto/eeprom_block.h $(SRC)
 	@mkdir -p build
 	$(CC) $(CFLAGS) -o $@ tests/test_fn.c $(SRC)

@@ -20,3 +20,14 @@
 003FD8	6	fail	no code block rel=- 665s
 003FDE	6	fail	0/30 undec=0 try=1 rel=- 264s
 003FE4	6	fail	no code block rel=- 376s
+0040FA	6	fail	no code block rel=- 666s
+003A72	8	weak	empty function passes the capture
+003CF8	8	fail	0/20 undec=0 try=2 rel=- 392s
+003D00	8	fail	0/20 undec=0 try=2 rel=- 401s
+004168	8	fail	COMPILE ERROR: try=2 rel=- 336s
+000C0C	10	fail	0/30 undec=0 try=2 rel=- 386s
+003C34	10	fail	COMPILE ERROR: try=2 rel=- 449s
+004110	10	fail	0/5 undec=0 try=2 rel=- 351s
+0068C0	10	weak	empty function passes the capture
+003B9A	12	fail	0/30 undec=0 try=2 rel=- 422s
+003C3E	12	fail	COMPILE ERROR: try=2 rel=- 409s

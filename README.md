@@ -56,14 +56,14 @@ Per-bank map: [`docs/COVERAGE.md`](docs/COVERAGE.md). Code bytes = instruction b
 <!-- coverage:elvactr:start -->
 ### Decompilation progress — Elevator Action Returns (`elvactr`)
 
-**1.5% decompiled · 98.5% remaining**  
-`█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
+**7.4% decompiled · 92.6% remaining**  
+`███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
 
 | | functions | code bytes | % of code in functions |
 |---|---:|---:|---:|
-| Decompiled to C | 12 / 1600 | 2,530 / 172,914 | **1.5%** |
-| …of which verified bit-exact vs MAME | 12 | 2,530 | 1.5% |
-| **Remaining** | 1588 | 170,384 | **98.5%** |
+| Decompiled to C | 33 / 1600 | 12,738 / 172,914 | **7.4%** |
+| …of which verified bit-exact vs MAME | 30 | 12,530 | 7.2% |
+| **Remaining** | 1567 | 160,176 | **92.6%** |
 
 Per-bank map: [`elvactr/docs/COVERAGE.md`](elvactr/docs/COVERAGE.md). Code bytes = instruction bytes of the 1600 Ghidra functions in maincpu (172,914 of 173,776 disassembled bytes). The function list comes from Ghidra seeded with every PC MAME executed in traced play (`elvactr/work/functions.tsv`). A function counts as decompiled when its entry is annotated `ROM 0x…` in `elvactr/src/`. Regenerate with `make coverage-elvactr`.
 <!-- coverage:elvactr:end -->

@@ -2,7 +2,7 @@
 #include "fn_call_frames.h"
 #include "../enemy/obj_1194C2.h"
 
-/* ROM 0x1781F6: UNVERIFIED (no usable capture): stage-select panel -- a
+/* ROM 0x1781F6: (capture fnt_: up to the first yield): stage-select panel -- a
  * kernel task body (TRAP #5 at 0x178216 is its yield).
  *
  * Fn_1781F6 is the setup before the first yield: frame a 10x3 box (attribute

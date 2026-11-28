@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x091EA4: UNVERIFIED (weak capture): select a direction in D1.W from active-low input bits. */
+/* ROM 0x091EA4: (recipe capture fnk_, recipes17.tsv): select a direction in D1.W from active-low input bits. */
 #include "fn_call_frames.h"
 
 int Fn_091EA4(const f3mem_t *m, f3regs_t *r)

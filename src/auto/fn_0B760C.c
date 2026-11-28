@@ -3,7 +3,7 @@
 #include "fn_helpers.h"
 #include "../enemy/obj_1194C2.h"
 
-/* ROM 0x0B760C: UNVERIFIED (no usable capture): test-mode selftest panel --
+/* ROM 0x0B760C: (capture fnt_: up to the first yield): test-mode selftest panel --
  * a kernel task body (TRAP #5 at 0x0B762E is its yield).
  *
  * Fn_0B760C is the setup before the first yield: it frames a 12x3 box with

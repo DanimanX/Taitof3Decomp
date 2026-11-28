@@ -1,4 +1,4 @@
-/* ROM 0x003D54: UNVERIFIED (weak capture): queue sound 0x486 on the channel
+/* ROM 0x003D54: verified on an injected capture with the channel-enable table A5-0x1442 forced to 1 (fne_003D54): queue sound 0x486 on the channel
  * table entry selected by the stack argument. The word at SP+4 indexes the
  * pointer table at A5-0x1448; the record {0x486, cmd byte, arg byte at SP+7} is
  * put at the scratch block A5-0x13C2 and handed to 0x003998, then the DPRAM ring

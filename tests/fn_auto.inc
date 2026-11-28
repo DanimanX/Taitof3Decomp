@@ -858,3 +858,8 @@
     { "Fn 0x003EBC auto", "work/ram/fn_003EBC", Fn_003EBC, ALLREGS },
     { "Fn 0x003F1E auto", "work/ram/fn_003F1E", Fn_003F1E, ALLREGS },
     { "Fn 0x0C7B7C auto", "work/ram/fn_0C7B7C", Fn_0C7B7C, ALLREGS },
+    { "Fn 0x003F80 enabled", "work/ram/fne_003F80", Fn_003F80, ALLREGS },
+    { "Fn 0x003FD8 enabled", "work/ram/fne_003FD8", Fn_003FD8, ALLREGS },
+    { "Fn 0x004030 enabled", "work/ram/fne_004030", Fn_004030, ALLREGS },
+    { "Fn 0x003D54 enabled", "work/ram/fne_003D54", Fn_003D54, ALLREGS },
+    { "Fn 0x003DB0 enabled", "work/ram/fne_003DB0", Fn_003DB0, ALLREGS },

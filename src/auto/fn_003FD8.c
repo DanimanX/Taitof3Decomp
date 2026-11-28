@@ -1,4 +1,4 @@
-/* ROM 0x003FD8: UNVERIFIED (weak capture): queue sound 0x68C with group id 4 on
+/* ROM 0x003FD8: verified on an injected capture with the channel-enable table A5-0x1442 forced to 1 (fne_003FD8): queue sound 0x68C with group id 4 on
  * the channel table entry selected by the stack argument (same body as 0x003F80,
  * only the constant byte differs): record {0x68C, cmd byte, arg byte at SP+7,
  * 0x04, arg byte at SP+9} into the scratch block A5-0x13C2 for 0x003998, then

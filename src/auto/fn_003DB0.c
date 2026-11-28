@@ -1,4 +1,4 @@
-/* ROM 0x003DB0: UNVERIFIED (weak capture): queue one sound command from the
+/* ROM 0x003DB0: verified on an injected capture with the channel-enable table A5-0x1442 forced to 1 (fne_003DB0): queue one sound command from the
  * id table when the channel is enabled.
  * arg.w (SP+4) indexes the pointer table whose base is the long at A5-0x1448;
  * that entry + 1 is the command byte, whose low 7 bits index the enable byte

@@ -1,4 +1,4 @@
-/* ROM 0x003F80: UNVERIFIED (weak capture): queue sound 0x68C with group id 1 on
+/* ROM 0x003F80: verified on an injected capture with the channel-enable table A5-0x1442 forced to 1 (fne_003F80): queue sound 0x68C with group id 1 on
  * the channel table entry selected by the stack argument. The word at SP+4
  * indexes the pointer table at A5-0x1448; the record {0x68C, cmd byte, arg byte
  * at SP+7, 0x01, arg byte at SP+9} is put at the scratch block A5-0x13C2 and

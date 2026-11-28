@@ -979,5 +979,18 @@ int Task1783A8_Frame(const f3mem_t *m, f3regs_t *r); /* ROM 0x1783A8 post-yield 
 int Fn_0E4560(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E4560 */
 int Fn_0E48FA(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E48FA */
 int Fn_1A0086(const f3mem_t *m, f3regs_t *r); /* ROM 0x1A0086 */
+int Fn_004D06(const f3mem_t *m, f3regs_t *r); /* ROM 0x004D06 */
+int Fn_005080(const f3mem_t *m, f3regs_t *r); /* ROM 0x005080 */
+int Fn_144894(const f3mem_t *m, f3regs_t *r); /* ROM 0x144894 */
+int Task144894_Frame(const f3mem_t *m, f3regs_t *r); /* ROM 0x144894 post-yield continuation (0x1448C2 -> jmp (A0)) */
+int Fn_006020(const f3mem_t *m, f3regs_t *r); /* ROM 0x006020 */
+int Fn_13F436(const f3mem_t *m, f3regs_t *r); /* ROM 0x13F436 */
+int Task13F436_Frame(const f3mem_t *m, f3regs_t *r); /* ROM 0x13F436 post-yield continuation (0x13F464 -> 0x13F462) */
+int Fn_0B7B52(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7B52 */
+int Task0B7B52_Frame(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7B52 post-yield continuation (0x0B7B80 -> 0x0B7B7E) */
+int Fn_0B7A54(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7A54 */
+int Fn_0B7B28(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7B28 */
+int Fn_0B7D74(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7D74 */
+int Fn_0B7D74_Tick(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7D74 post-yield continuation (0x0B7DD2) */
 /* END generated */
 #endif

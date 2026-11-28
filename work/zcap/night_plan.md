@@ -49,3 +49,11 @@ Push: temp GIT_ASKPASS script printing ~/.token.bak, deleted after. Commits end 
   taken with F3_SERVICE=1 F3_SVC=90,360,99999 from TE_000750 (noffset 750).
 - Test-mode captures: only 01_attract (noffset 0) and TE_/TM_ states replay; TG1_* states do not reproduce.
   Sound test reached with F3_SVC=90,150,99999 at frame 645 from 01_attract.
+
+## Update 03:35
+- 9d8212d: codewhale batch 8 (4 bit-exact + 0D8F9A 14/14 + 5 UNVERIFIED) and sound-test screens. 96.5% / 89.1%.
+- capture_fn.lua fix: an injected call that resets the game re-ran the autoboot script and left NULs in regs.tsv
+  (that was the 0D8F9A "infinite loop"). Now runs once + stops on reset. Scan found no other NUL-holed capture.
+- wt_CW2 next: DIFFICULTY 0x1A1282 (see Update 02:50). wt_CW next: leftovers 13F436 0B7B52 (callee sets untranslated),
+  boot 010000/000402/010172, 006020, 004D06, 005080, 144894.
+- codewhale noted test-mode segs push jsr_pc+2 as the return address where the jsr is 4/6 bytes: check against captures.

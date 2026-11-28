@@ -2,7 +2,7 @@
 #define TAITOF3_COMMON_F3MEM_H
 /* Big-endian views of the 68EC020 address space used by decompiled code that
  * is verified against MAME RAM captures: Work RAM image (0x400000, 128 KiB)
- * plus the program ROM (0x000000, 2 MiB) for constant tables. */
+ * plus the program ROM (0x000000, 2 MiB) and optional capture regions. */
 #include <stdint.h>
 
 #define F3_ROM_BASE   0x000000u
@@ -10,6 +10,8 @@
 #define F3_WRAM_BASE  0x400000u
 #define F3_WRAM_SIZE  0x020000u
 #define F3_A5         0x408000u  /* global base register */
+#define F3_PAL_BASE   0x440000u  /* palette RAM (0x440000-0x447FFF) */
+#define F3_PAL_SIZE   0x008000u
 #define F3_DPRAM_BASE 0xC00000u  /* sound DPRAM (MB8421, 8-bit) */
 #define F3_DPRAM_SIZE 0x000800u
 #define F3_SPR_BASE   0x600000u  /* sprite RAM */
@@ -23,9 +25,10 @@ typedef struct {
     uint8_t *dpram;       /* optional, F3_DPRAM_SIZE bytes */
     uint8_t *spr;         /* optional, F3_SPR_SIZE bytes (big-endian words) */
     uint8_t *gfx;         /* optional, F3_GFX_SIZE bytes (0x610000-0x62FFFF) */
+    uint8_t *pal;         /* optional, F3_PAL_SIZE bytes, big-endian */
 } f3mem_t;
 
-uint8_t  *f3_ptr(const f3mem_t *m, uint32_t addr); /* abort()s outside RAM/ROM */
+uint8_t  *f3_ptr(const f3mem_t *m, uint32_t addr); /* scratch buffer for unmapped addresses */
 uint8_t   rd8(const f3mem_t *m, uint32_t a);
 uint16_t  rd16(const f3mem_t *m, uint32_t a);
 uint32_t  rd32(const f3mem_t *m, uint32_t a);

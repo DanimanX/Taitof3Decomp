@@ -1,5 +1,5 @@
 /* Shared loader for scripts/capture_fn.sh outputs (<prefix>_pairs.bin,
- * _regs.tsv, optional _dpram.bin / _spr.bin). Header-only, for tests. */
+ * _regs.tsv, optional _dpram.bin / _spr.bin / _gfx.bin / _pal.bin). Header-only, for tests. */
 #ifndef TAITOF3_TESTS_CAPTURE_H
 #define TAITOF3_TESTS_CAPTURE_H
 #include <stdio.h>
@@ -11,7 +11,7 @@ enum { CR_D0 = 0, CR_A0 = 8, CR_A1 = 9, CR_SP = 15, CR_N = 16, CR_PC = 16 };
 
 typedef struct {
     int pairs;
-    uint8_t *wram, *dpram, *spr, *gfx;   /* pre,post interleaved per pair */
+    uint8_t *wram, *dpram, *spr, *gfx, *pal;   /* pre,post interleaved per pair */
     uint32_t (*pre)[CR_N], (*post)[CR_N];
     unsigned *fpre, *fpost;              /* frame of each dump (regs.tsv col 3) */
     uint32_t *pcpre, *pcpost;            /* entry / exit PC (optional 17th column, F3_EXITPC) */
@@ -50,6 +50,8 @@ static inline int cap_load(capture_t *c, const char *pfx)
     if ((c->spr = cap_slurp(p, &l)) && l / (2 * F3_SPR_SIZE) < c->pairs) c->pairs = (int)(l / (2 * F3_SPR_SIZE));
     snprintf(p, sizeof p, "%s_gfx.bin", pfx);
     if ((c->gfx = cap_slurp(p, &l)) && l / (2 * F3_GFX_SIZE) < c->pairs) c->pairs = (int)(l / (2 * F3_GFX_SIZE));
+    snprintf(p, sizeof p, "%s_pal.bin", pfx);
+    if ((c->pal = cap_slurp(p, &l)) && l / (2 * F3_PAL_SIZE) < c->pairs) c->pairs = (int)(l / (2 * F3_PAL_SIZE));
     c->pre = calloc((size_t)c->pairs + 1, sizeof *c->pre);
     c->post = calloc((size_t)c->pairs + 1, sizeof *c->post);
     c->fpre = calloc((size_t)c->pairs + 1, sizeof *c->fpre);
@@ -86,8 +88,11 @@ static inline const uint8_t *cap_dpram(const capture_t *c, int i, int post)
 static inline const uint8_t *cap_gfx(const capture_t *c, int i, int post)
 { return c->gfx ? c->gfx + ((size_t)i * 2 + (size_t)post) * F3_GFX_SIZE : NULL; }
 
+static inline const uint8_t *cap_pal(const capture_t *c, int i, int post)
+{ return c->pal ? c->pal + ((size_t)i * 2 + (size_t)post) * F3_PAL_SIZE : NULL; }
+
 static inline void cap_free(capture_t *c)
-{ free(c->wram); free(c->dpram); free(c->spr); free(c->gfx); free(c->pre); free(c->post); free(c->fpre); free(c->fpost); free(c->pcpost); free(c->pcpre); }
+{ free(c->wram); free(c->dpram); free(c->spr); free(c->gfx); free(c->pal); free(c->pre); free(c->post); free(c->fpre); free(c->fpost); free(c->pcpost); free(c->pcpre); }
 
 /* byte diff of a region, printing up to *budget mismatches; skip [lo,hi) */
 /* Engine-side capture artifact: P1's PS_INVULN high byte (0x41B1E1) flips

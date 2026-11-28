@@ -48,7 +48,7 @@ static int run_one(const char *pfx)
     for (int i = 0; i < pairs; i++) {
         const uint8_t *pre = cap + (size_t)i * 2 * F3_WRAM_SIZE, *post = pre + F3_WRAM_SIZE;
         memcpy(work, pre, F3_WRAM_SIZE);
-        f3mem_t m = { work, rom, NULL, NULL, NULL };
+        f3mem_t m = { work, rom, NULL, NULL, NULL, NULL };
         uint16_t before = rd16(&m, TL_LAST_POS);
         uint8_t fx_before = rd8(&m, TL_FX_STARTED);
         ends += StageTimeline_Step(&m, &spawned);
@@ -88,7 +88,7 @@ static int test_stage_scroll(void)
     for (int i = 0; i < c.pairs; i++) {
         memcpy(work, cap_wram(&c, i, 0), F3_WRAM_SIZE);
         memcpy(gfx, cap_gfx(&c, i, 0), F3_GFX_SIZE);
-        f3mem_t m = { work, rom, NULL, NULL, gfx };
+        f3mem_t m = { work, rom, NULL, NULL, gfx, NULL };
         StageScroll_Step(&m);
         uint32_t sp = c.pre[i][CR_SP];
         int d = cap_diff("wram", i, F3_WRAM_BASE, work, cap_wram(&c, i, 1), F3_WRAM_SIZE, sp - 0x100u, sp, &budget)
@@ -117,7 +117,7 @@ static int test_stage_bg(void)
     for (int i = 0; i < c.pairs; i++) {
         memcpy(work, cap_wram(&c, i, 0), F3_WRAM_SIZE);
         memcpy(gfx, cap_gfx(&c, i, 0), F3_GFX_SIZE);
-        f3mem_t m = { work, rom, NULL, NULL, gfx };
+        f3mem_t m = { work, rom, NULL, NULL, gfx, NULL };
         if (StageBg_Step(&m) < 0) {
             if (budget-- > 0) printf("  pair %d StageBg_Step returned -1\n", i);
             continue;

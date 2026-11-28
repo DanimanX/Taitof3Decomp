@@ -11,6 +11,7 @@
 --   F3_SPR     "1" also dumps sprite RAM 0x600000-0x60FFFF to <prefix>_spr.bin
 --   F3_GFX     "1" also dumps playfield/text/char/line RAM 0x610000-0x62FFFF to <prefix>_gfx.bin
 --   F3_DPRAM   "1" also dumps the 2 KiB sound DPRAM (0xC00000) to <prefix>_dpram.bin
+--   F3_PAL     "1" also dumps palette RAM 0x440000-0x447FFF to <prefix>_pal.bin
 --   F3_SAMPLES number of pre/post pairs       (default 300)
 --   F3_OUT     output prefix (default work/ram/fn) -> <prefix>_pairs.bin, <prefix>_regs.tsv
 --   F3_SWEEP   "N" overwrites the word arg at SP+4 on entry with pair_index % N
@@ -179,6 +180,7 @@ for pc, _ in pairs(logs) do cpu.debug:bpset(pc, "", "") end
 local dp = want_dpram and assert(io.open(prefix .. "_dpram.bin", "wb")) or nil
 local spf = os.getenv("F3_SPR") == "1" and assert(io.open(prefix .. "_spr.bin", "wb")) or nil
 local gff = os.getenv("F3_GFX") == "1" and assert(io.open(prefix .. "_gfx.bin", "wb")) or nil
+local palf = os.getenv("F3_PAL") == "1" and assert(io.open(prefix .. "_pal.bin", "wb")) or nil
 -- F3_PORTS=1: <prefix>_ports.tsv gets, per pair, the 32 input-port bytes at
 -- 0x4A0000..0x4A001F sampled at entry (IO_PollInputs 0x001A78 reads them;
 -- they are MMIO, not part of the RAM dumps). Interrupts must be masked
@@ -207,6 +209,11 @@ local function snapshot()
     for a = 0x610000, 0x62FFFF, 4 do t3[#t3 + 1] = string.pack(">I4", sp:read_u32(a)) end
     snap.g = table.concat(t3)
   end
+  if palf then
+    local pal = {}
+    for a = 0x440000, 0x447FFF, 4 do pal[#pal + 1] = string.pack(">I4", sp:read_u32(a)) end
+    snap.pal = table.concat(pal)
+  end
   return snap
 end
 local function emit(snap)
@@ -214,6 +221,7 @@ local function emit(snap)
   if dp then dp:write(snap.d) end
   if spf then spf:write(snap.s) end
   if gff then gff:write(snap.g) end
+  if palf then palf:write(snap.pal) end
 end
 local function regline_str(i, which)
   local r = {}
@@ -232,6 +240,7 @@ local function finish(tag)
   if finished then return end
   finished = true
   out:close(); regs:close(); if dp then dp:close() end; if spf then spf:close() end; if gff then gff:close() end
+  if palf then palf:close() end
   print(string.format("CAPTURE %s pairs=%d abandoned=%d frames=%d screen=%d", tag, pairs_done, abandoned, n, manager.machine.screens[":screen"]:frame_number() - (scr0 or 0))); manager.machine:exit()
 end
 -- the pairs after a reset are not from the state the capture asked for: stop
@@ -349,6 +358,7 @@ emu.register_periodic(function()
       cpu.state["SR"].value = (cur & ~0x0700) | (saved_sr & 0x0700); saved_sr = nil
     end
     out:flush(); regs:flush(); if dp then dp:flush() end; if spf then spf:flush() end; if gff then gff:flush() end
+    if palf then palf:flush() end
     pairs_done = pairs_done + 1
     if pairs_done >= want then finish("DONE"); return end
     -- F3_INJECT_ABORT=1 with an F3_EXIT PC (e.g. a task body's first TRAP #5):

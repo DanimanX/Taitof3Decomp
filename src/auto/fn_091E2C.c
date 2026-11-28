@@ -1,12 +1,7 @@
 #include "fn_auto.h"
-/* ROM 0x091E2C: UNVERIFIED (weak capture): pick one of six palette blocks from
- * the stage byte A5-0xC4E and copy it 32 longs per row into palette RAM at
- * 0x440000. Palette RAM is not part of f3mem_t, so the capture only proves the
- * register restore (movem), not the copy. */
-/* 0x091E2C keeps every D/A register through movem and only writes palette RAM
- * (0x440000), which f3mem_t does not model: the writes land on the scratch
- * byte f3mem hands out for unmapped space and are discarded. Verified against
- * the bytes, not against the capture.
+/* ROM 0x091E2C: (palette capture fnp_): pick one of six palette
+ * blocks from the stage byte A5-0xC4E and copy it 32 longs per row into
+ * palette RAM at 0x440000. The existing capture checks register preservation.
  *
  * 0x0014E8 (table walk) and 0x001520 (block copy) are inlined below.
  * Block table 0x16890: {src.l, rows.l} per index; the six used indexes are
@@ -15,7 +10,6 @@
  * dst_off.w} at the block pointer and copies n longs from 0x16900+src_off to
  * 0x440000+dst_off (n = 0x20 for every row of every block). */
 
-#define PAL_RAM   0x00440000u   /* palette RAM (unmodelled) */
 #define COLOR_TBL 0x00016900u   /* base of the {col*2,char}-style colour words */
 
 static void copy_block(const f3mem_t *m, uint32_t a1, uint16_t rows, uint32_t a2)
@@ -29,7 +23,7 @@ static void copy_block(const f3mem_t *m, uint32_t a1, uint16_t rows, uint32_t a2
         uint16_t d1 = rd16(m, a2);                    /* move.w (A2)+,D1w */
         a2 += 2u;
         for (;;) {                                    /* 0x00153A */
-            wr32(m, PAL_RAM + (uint32_t)(int32_t)(int16_t)d1, rd32(m, a1 + d0));
+            wr32(m, F3_PAL_BASE + (uint32_t)(int32_t)(int16_t)d1, rd32(m, a1 + d0));
             d0 += 4u;                                 /* 0x001540 addq.l #4,D0 */
             d1 = (uint16_t)(d1 + 4u);                 /* 0x001542 addq.w #4,D1w */
             if (d2-- == 0u)                           /* 0x001544 dbf D2w */

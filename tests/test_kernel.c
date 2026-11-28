@@ -120,7 +120,7 @@ static int test_io_poll(void)
         const uint8_t *pre = cap_wram(&c, i, 0), *post = cap_wram(&c, i, 1);
         memcpy(before, pre, F3_WRAM_SIZE);
         memcpy(after, before, F3_WRAM_SIZE);
-        f3mem_t m = { after, NULL, NULL, NULL, NULL };
+        f3mem_t m = { after, NULL, NULL, NULL, NULL, NULL };
         IO_PollInputs(&m, NULL);
 
         int pv = 1;
@@ -165,7 +165,7 @@ static int test_sound_push(void)
     static const uint32_t targets[] = { SQ_WRITE_IDX, SQ_WRITE_IDX + 1 };
     for (int i = 0; i < c.pairs; i++) {
         memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
-        f3mem_t m = { w, NULL, NULL, NULL, NULL };
+        f3mem_t m = { w, NULL, NULL, NULL, NULL, NULL };
         Sound_SerialReset();
         pushes += Sound_PushCmd(&m);
         outside += cap_changed_outside(&c, i, targets, 2);
@@ -214,7 +214,7 @@ static int test_devboard(void)
     for (int i = 0; i < pairs; i++) {
         memcpy(before, cap_wram(&c, i, 0), F3_WRAM_SIZE);
         memcpy(first, before, F3_WRAM_SIZE);
-        f3mem_t m = { first, NULL, NULL, NULL, NULL };
+        f3mem_t m = { first, NULL, NULL, NULL, NULL, NULL };
         wr8(&m, IO_BASE, 0x1Fu); /* io_ch[0].cur bit0 = 1: service switch released */
         took += DevBoard_ServiceTask(&m);
 
@@ -232,7 +232,7 @@ static int test_devboard(void)
         }
         /* determinism: same pre image in, same image out */
         memcpy(again, before, F3_WRAM_SIZE);
-        f3mem_t m2 = { again, NULL, NULL, NULL, NULL };
+        f3mem_t m2 = { again, NULL, NULL, NULL, NULL, NULL };
         wr8(&m2, IO_BASE, 0x1Fu);
         (void)DevBoard_ServiceTask(&m2);
         int same = memcmp(first, again, F3_WRAM_SIZE) == 0;
@@ -282,7 +282,7 @@ static int test_frametick(void)
     }
 
     uint8_t *wr = calloc(1, F3_WRAM_SIZE);
-    f3mem_t m = { wr, rom, NULL, NULL, NULL };
+    f3mem_t m = { wr, rom, NULL, NULL, NULL, NULL };
     frametick_hooks_t h = { NULL, NULL, NULL, NULL, Sound_PushCmd };
     uint16_t got = Kernel_FrameTick(&m, &h);
     uint16_t cnt = rd16(&m, F3_A5 - 0x5D54u);

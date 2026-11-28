@@ -1,8 +1,8 @@
 /* Generic runner for function captures (scripts/capture_fn.sh <addr> ret ...
- * -> work/ram/fn_<ADDR>_{pairs,regs,gfx,spr}): one entry->return call per
- * pair. For each pair the pre Work RAM / screen memory (0x610000-0x62FFFF) /
- * sprite RAM images are loaded, the C translation runs from the captured
- * pre registers through an adapter, and the post images are compared byte
+ * -> work/ram/fn_<ADDR>_{pairs,regs,gfx,spr,dpram,pal}): one entry->return call per
+ * pair. For each pair the pre Work RAM and optional screen memory, sprite,
+ * sound DPRAM and palette images are loaded. The C translation runs from the
+ * captured pre registers through an adapter, and the post images are compared byte
  * for byte, skipping the stack window [SP-0x100, SP) below the entry SP
  * (locals, saved registers and the callee's frames live there). Selected
  * output registers are compared under a mask when the table entry asks.
@@ -350,6 +350,12 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
     uint8_t *g = c.gfx ? malloc(F3_GFX_SIZE) : NULL;
     uint8_t *s = c.spr ? malloc(F3_SPR_SIZE) : NULL;
     uint8_t *dp = c.dpram ? malloc(F3_DPRAM_SIZE) : NULL;
+    uint8_t *pal = c.pal ? malloc(F3_PAL_SIZE) : NULL;
+    if (!w || (c.gfx && !g) || (c.spr && !s) || (c.dpram && !dp) || (c.pal && !pal)) {
+        fprintf(stderr, "fn: %s REJECT (cannot allocate capture buffers)\n", e->name);
+        free(w); free(g); free(s); free(dp); free(pal); cap_free(&c);
+        return 1;
+    }
     int ok = 0, undec = 0, irq = 0, budget = 12;
     for (int i = 0; i < c.pairs; i++) {
         /* a call whose post dump is in a later frame than its pre dump was
@@ -362,7 +368,8 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         if (g) memcpy(g, cap_gfx(&c, i, 0), F3_GFX_SIZE);
         if (s) memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
         if (dp) memcpy(dp, cap_dpram(&c, i, 0), F3_DPRAM_SIZE);
-        f3mem_t m = { w, rom, dp, s, g };
+        if (pal) memcpy(pal, cap_pal(&c, i, 0), F3_PAL_SIZE);
+        f3mem_t m = { w, rom, dp, s, g, pal };
         f3regs_t r;
         for (int k = 0; k < 8; k++) { r.d[k] = c.pre[i][CR_D0 + k]; r.a[k] = c.pre[i][CR_A0 + k]; }
         seg_stop = 0; seg_entry = c.pcpre ? c.pcpre[i] : 0;
@@ -376,6 +383,7 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         if (s) d += cap_diff(e->name, i, F3_SPR_BASE, s, cap_spr(&c, i, 1), F3_SPR_SIZE, 0, 0, &budget);
         /* sound DPRAM 0xC00000-0xC007FF, for captures taken with F3_DPRAM=1 */
         if (dp) d += cap_diff(e->name, i, F3_DPRAM_BASE, dp, cap_dpram(&c, i, 1), F3_DPRAM_SIZE, 0, 0, &budget);
+        if (pal) d += cap_diff(e->name, i, F3_PAL_BASE, pal, cap_pal(&c, i, 1), F3_PAL_SIZE, 0, 0, &budget);
         for (int k = 0; k < 17 && e->out[k].mask; k++) {
             int x = e->out[k].reg;
             uint32_t got = (x == CR_PC ? seg_stop : x < 8 ? r.d[x] : r.a[x - 8]) & e->out[k].mask;
@@ -390,12 +398,12 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         if (d == 0) ok++;
     }
     int obs = c.pairs - undec - irq;
-    printf("fn: %-34s %3d/%3d calls bit-exact (%d undecompiled, gfx %s, spr %s)%s",
-           e->name, ok, obs, undec, g ? "yes" : "no", s ? "yes" : "no",
+    printf("fn: %-34s %3d/%3d calls bit-exact (%d undecompiled, gfx %s, spr %s, pal %s)%s",
+           e->name, ok, obs, undec, g ? "yes" : "no", s ? "yes" : "no", pal ? "yes" : "no",
            obs == 0 ? " REJECT no observable call" : "");
     if (irq) printf(" [%d interrupted by VBlank, skipped]", irq);
     printf("\n");
-    free(w); free(g); free(s); free(dp); cap_free(&c);
+    free(w); free(g); free(s); free(dp); free(pal); cap_free(&c);
     return (obs - ok) + (obs == 0 ? 1 : 0);
 }
 

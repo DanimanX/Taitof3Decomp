@@ -6,7 +6,7 @@
 | | functions | code bytes | % of code in functions |
 |---|---:|---:|---:|
 | Decompiled to C | 2606 / 2606 | 325,124 / 325,124 | **100.0%** |
-| …of which verified bit-exact vs MAME | 2568 | 319,778 | 98.4% |
+| …of which verified bit-exact vs MAME | 2570 | 319,842 | 98.4% |
 | **Remaining** | 0 | 0 | **0.0%** |
 
 ## Map by 64 KiB ROM bank

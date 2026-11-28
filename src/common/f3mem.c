@@ -10,6 +10,8 @@ uint8_t *f3_ptr(const f3mem_t *m, uint32_t a)
         a -= 0x20000u;
     if (a >= F3_WRAM_BASE && a < F3_WRAM_BASE + F3_WRAM_SIZE)
         return &m->wram[a - F3_WRAM_BASE];
+    if (m->pal && a >= F3_PAL_BASE && a < F3_PAL_BASE + F3_PAL_SIZE)
+        return &m->pal[a - F3_PAL_BASE];
     if (m->spr && a >= F3_SPR_BASE && a < F3_SPR_BASE + F3_SPR_SIZE)
         return &m->spr[a - F3_SPR_BASE];
     if (m->gfx && a >= F3_GFX_BASE && a < F3_GFX_BASE + F3_GFX_SIZE)

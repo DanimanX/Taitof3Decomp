@@ -16,6 +16,7 @@ test: build/test_kernel build/test_player build/test_player_task build/test_coll
 
 SRC += $(wildcard src/auto/*.c)
 LIBOBJ = $(SRC:%.c=build/o/%.o)
+$(LIBOBJ): src/common/f3mem.h
 build/o/%.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@

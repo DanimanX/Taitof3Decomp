@@ -1,4 +1,4 @@
-/* ROM 0x0B7B28: UNVERIFIED (no capture): copy 0x20 longs from (A1) into the
+/* ROM 0x0B7B28: (palette capture fnp_): copy 0x20 longs from (A1) into the
  * 0x40-byte-strided cell array at 0x440500.
  *
  * The destination cursor A2 starts at 0x440500 and is advanced by 4 BEFORE each

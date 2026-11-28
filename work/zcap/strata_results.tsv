@@ -1282,3 +1282,28 @@
 0B71E0	0	weak	empty draft passes the capture
 0B7B28	0	weak	empty draft passes the capture
 0C2F20	0	fail	0/30 undec=0 try=3 465s
+0B7D74	0	codex	assigned to codex, injected capture (round 11)
+0910CC	0	codex	assigned to codex, injected capture (round 11)
+0B80A4	0	codex	assigned to codex, injected capture (round 11)
+0B7506	0	codex	assigned to codex, injected capture (round 11)
+0B71E0	0	codex	assigned to codex, injected capture (round 11)
+0B7B28	0	codex	assigned to codex, injected capture (round 11)
+0C2F20	0	codex	assigned to codex, injected capture (round 11)
+129E3E	0	codex	assigned to codex, injected capture (round 11)
+0E0008	0	codex	assigned to codex, injected capture (round 11)
+0E343C	0	codex	assigned to codex, injected capture (round 11)
+0E437E	0	codex	assigned to codex, injected capture (round 11)
+1305C2	0	codex	assigned to codex, injected capture (round 11)
+091EA4	0	codex	assigned to codex, injected capture (round 11)
+10E2CE	0	codex	assigned to codex, injected capture (round 11)
+11CF18	0	codex	assigned to codex, injected capture (round 11)
+0D8F9A	0	codex	assigned to codex, injected capture (round 11)
+0ACB52	0	codex	assigned to codex, injected capture (round 11)
+091E2C	0	codex	assigned to codex, injected capture (round 11)
+11CEEE	0	fail	24/30 undec=0 try=3 695s
+0B7D74	0	fail	codex round 11: capture not passed
+0B7506	0	fail	codex round 11: capture not passed
+0910CC	0	fail	codex round 11: capture not passed
+0B80A4	0	fail	codex round 11: capture not passed
+11CF56	0	fail	COMPILE ERROR (project flags): try=3 726s
+14D6E2	0	fail	0/30 undec=0 try=3 711s

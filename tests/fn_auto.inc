@@ -804,3 +804,8 @@
     { "Fn 0x1454FC injected", "work/ram/fni_1454FC", Fn_1454FC, ALLREGS },
     { "Fn 0x000F04 injected", "work/ram/fni_000F04", Fn_000F04, ALLREGS },
     { "Fn 0x01033C injected", "work/ram/fni_01033C", Fn_01033C, ALLREGS },
+    { "Fn 0x004088 auto", "work/ram/fn_004088", Fn_004088, ALLREGS },
+    { "Fn 0x0050DC auto", "work/ram/fn_0050DC", Fn_0050DC, ALLREGS },
+    { "Fn 0x137460 auto", "work/ram/fn_137460", Fn_137460, ALLREGS },
+    { "Fn 0x15CD38 auto", "work/ram/fn_15CD38", Fn_15CD38, ALLREGS },
+    { "Fn 0x12A290 auto", "work/ram/fn_12A290", Fn_12A290, ALLREGS },

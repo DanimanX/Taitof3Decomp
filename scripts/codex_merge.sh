@@ -11,7 +11,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
 N=${1:?round}
 for w in ${LANES:-X1 X2 X3}; do
   W=/PROCESOS/wt_$w; [ -d $W ] || continue
-  (cd $W && make -s build/test_fn >/dev/null 2>&1; ./build/test_fn) > work/zcap/cmerge_$w.out 2>&1
+  (cd $W && make -s build/test_fn >/dev/null 2>&1; timeout 1800 ./build/test_fn 2>&1 | grep -v "^f3mem" | head -c 20000000) > work/zcap/cmerge_$w.out 2>&1
 done
 python3 - "$N" <<'PY'
 import os,re,shutil,subprocess,sys

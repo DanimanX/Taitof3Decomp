@@ -1,4 +1,4 @@
-/* ROM 0x0CC50C: UNVERIFIED (no usable capture): shot/effect object tick.
+/* ROM 0x0CC50C: verified on an injected F3_NOIRQ capture (fnq_0CC50C): shot/effect object tick.
  * With A5+0x1D58 bit 1 set and X in [-10, 0x11C] the object is on screen and
  * goes straight to the 0x0CD3D6 conversion: sound entry 0x0CD444[1], the
  * record after it into +0x0C, the animation fields +0x3A/+0x3E/+0x1E/+0x1C

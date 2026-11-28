@@ -11,3 +11,7 @@
 00220E	nocapture	codewhale (TRAP never called in any capture)
 004088	weak	codex round 9: empty body passes 29/30 injected pairs
 0039B8	weak	codewhale: empty body passes 30/30
+003F80	weak	codewhale: empty body passes
+003FD8	weak	codewhale: empty body passes
+004030	weak	codewhale: empty body passes
+003D54	weak	codewhale: empty body passes

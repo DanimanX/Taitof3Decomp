@@ -913,3 +913,4 @@
     { "Fn 0x0E0008 auto", "work/ram/fn_0E0008", Fn_0E0008, ALLREGS },
     { "Fn 0x1305C2 auto", "work/ram/fn_1305C2", Fn_1305C2, ALLREGS },
     { "Fn 0x11CF18 auto", "work/ram/fn_11CF18", Fn_11CF18, ALLREGS },
+    { "Fn 0x11A966 auto", "work/ram/fn_11A966", Fn_11A966, ALLREGS },

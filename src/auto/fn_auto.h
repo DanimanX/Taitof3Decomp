@@ -966,5 +966,6 @@ int Fn_0C44DC(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C44DC */
 int Fn_1439BC(const f3mem_t *m, f3regs_t *r); /* ROM 0x1439BC */
 int Task1439BC_Frame(const f3mem_t *m, f3regs_t *r); /* ROM 0x1439BC post-yield continuation (0x143A90 -> 0x1448C0) */
 int Task_0AC8E4_Frame(const f3mem_t *m, f3regs_t *r); /* ROM 0x0AC8E4 post-yield loop (0x0AC906) */
+int Fn_11A966(const f3mem_t *m, f3regs_t *r); /* ROM 0x11A966 */
 /* END generated */
 #endif

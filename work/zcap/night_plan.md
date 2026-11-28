@@ -35,3 +35,17 @@ Push: temp GIT_ASKPASS script printing ~/.token.bak, deleted after. Commits end 
   tests/test_fn.c Seg lines by hand (cw_integrate only handles src/auto).
 - Full test_fn takes ~5 s; if it runs for minutes a draft is looping: find it with F3_ONLY per entry + timeout.
 - Still to plan: unreached screens 1A00E6, 1A043C, 1A1282, 1A095E; boot code 010000/000402/010172/01010A; 006020 (printf case).
+
+## Update 01:55
+- codex usage limit again until 05:23. Round 12 lists ready (codex12_X*.list: 0B7D74 0910CC 0B7506 0B80A4, captures
+  not passed in round 11). Add more captured leftovers to those lists before launching if any.
+- 0x0D8F9A: codex C loops forever on its capture twice (copy in scratchpad fn_0D8F9A_codex.c): give it to codewhale.
+- Do not merge codex changes to src/common/f3mem.[ch] (palette field) without updating every test initializer.
+
+## Update 02:50
+- Test-mode screens 1A1A26/19F504/1A0A52/1A1856/1A1944 committed (f458fbb). wt_CW2 now: 1A0942/1A00E6/1A043C/1A095E
+  (log work/zcap/cw_tm2.log). Integrate: git diff in wt_CW2 > patch, git apply --3way, copy src/test/seg_*.c.
+- NEXT for wt_CW2: DIFFICULTY 0x1A1282 (yield 0x1A12DC -> resume 0x1A12E2), captures seg_1A1282 (1), seg_1A12E2 (30),
+  taken with F3_SERVICE=1 F3_SVC=90,360,99999 from TE_000750 (noffset 750).
+- Test-mode captures: only 01_attract (noffset 0) and TE_/TM_ states replay; TG1_* states do not reproduce.
+  Sound test reached with F3_SVC=90,150,99999 at frame 645 from 01_attract.

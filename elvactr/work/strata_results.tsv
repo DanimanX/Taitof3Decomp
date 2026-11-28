@@ -18,3 +18,5 @@
 003AA0	6	fail	no code block rel=- 626s
 003C1E	6	fail	COMPILE ERROR: try=2 rel=- 405s
 003FD8	6	fail	no code block rel=- 665s
+003FDE	6	fail	0/30 undec=0 try=1 rel=- 264s
+003FE4	6	fail	no code block rel=- 376s

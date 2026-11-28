@@ -6,3 +6,8 @@
     { "Ea 0x003B96 auto", "elvactr/work/ram/fn_003B96", Ea_003B96, ALLREGS },
     { "Ea 0x003FF0 auto", "elvactr/work/ram/fn_003FF0", Ea_003FF0, ALLREGS },
     { "Ea 0x001044 auto", "elvactr/work/ram/fn_001044", Ea_001044, ALLREGS },
+    { "Ea 0x0A485C auto", "elvactr/work/ram/fn_0A485C", Ea_0A485C, ALLREGS },
+    { "Ea 0x0BEB9A auto", "elvactr/work/ram/fn_0BEB9A", Ea_0BEB9A, ALLREGS },
+    { "Ea 0x0BF622 auto", "elvactr/work/ram/fn_0BF622", Ea_0BF622, ALLREGS },
+    { "Ea 0x0C019E auto", "elvactr/work/ram/fn_0C019E", Ea_0C019E, ALLREGS },
+    { "Ea 0x1316B4 auto", "elvactr/work/ram/fn_1316B4", Ea_1316B4, ALLREGS },

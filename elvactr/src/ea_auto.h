@@ -17,5 +17,10 @@ int Ea_0069F4(const f3mem_t *m, f3regs_t *r); /* ROM 0x0069F4 */
 int Ea_003B96(const f3mem_t *m, f3regs_t *r); /* ROM 0x003B96 */
 int Ea_003FF0(const f3mem_t *m, f3regs_t *r); /* ROM 0x003FF0 */
 int Ea_001044(const f3mem_t *m, f3regs_t *r); /* ROM 0x001044 */
+int Ea_0A485C(const f3mem_t *m, f3regs_t *r); /* ROM 0x0A485C */
+int Ea_0BEB9A(const f3mem_t *m, f3regs_t *r); /* ROM 0x0BEB9A */
+int Ea_0BF622(const f3mem_t *m, f3regs_t *r); /* ROM 0x0BF622 */
+int Ea_0C019E(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C019E */
+int Ea_1316B4(const f3mem_t *m, f3regs_t *r); /* ROM 0x1316B4 */
 /* END generated */
 #endif

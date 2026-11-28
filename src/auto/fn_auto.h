@@ -1057,5 +1057,33 @@ int Fn_19F4A6(const f3mem_t *m, f3regs_t *r); /* ROM 0x19F4A6 */
 int Fn_131272(const f3mem_t *m, f3regs_t *r); /* ROM 0x131272 */
 int Fn_091E42(const f3mem_t *m, f3regs_t *r); /* ROM 0x091E42 */
 int Fn_180670(const f3mem_t *m, f3regs_t *r); /* ROM 0x180670 */
+int Fn_0910CC(const f3mem_t *m, f3regs_t *r); /* ROM 0x0910CC */
+int TaskObjectChecker_Frame(const f3mem_t *m, f3regs_t *r, uint32_t pc); /* ROM 0x091152 onward */
+int Fn_0B7506(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7506 */
+int TaskYesNoPrompt_Frame(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7524 */
+int Fn_0B80A4(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B80A4 */
+int TaskMinMax_Frame(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B80FE loop pass */
+int Fn_091944(const f3mem_t *m, f3regs_t *r); /* ROM 0x091944 */
+int Fn_091E2C(const f3mem_t *m, f3regs_t *r); /* ROM 0x091E2C */
+int Fn_091EC2(const f3mem_t *m, f3regs_t *r); /* ROM 0x091EC2 */
+int Fn_091F0C(const f3mem_t *m, f3regs_t *r); /* ROM 0x091F0C */
+int Fn_0C2EC6(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C2EC6 */
+int Fn_0C7B48(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C7B48 */
+int Fn_0C9752(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C9752 */
+int Fn_0E0424(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E0424 */
+int Fn_0E33C0(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E33C0 */
+int Fn_0E34FE(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E34FE */
+int Fn_0E353A(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E353A */
+int Fn_0E48B8(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E48B8 */
+int Fn_118C4A(const f3mem_t *m, f3regs_t *r); /* ROM 0x118C4A */
+int Fn_129D80(const f3mem_t *m, f3regs_t *r); /* ROM 0x129D80 */
+int Fn_129E0C(const f3mem_t *m, f3regs_t *r); /* ROM 0x129E0C */
+int Fn_129E66(const f3mem_t *m, f3regs_t *r); /* ROM 0x129E66 */
+int Fn_129EA6(const f3mem_t *m, f3regs_t *r); /* ROM 0x129EA6 */
+int Fn_12B1CC(const f3mem_t *m, f3regs_t *r); /* ROM 0x12B1CC */
+int Fn_137424(const f3mem_t *m, f3regs_t *r); /* ROM 0x137424 */
+int Fn_13E7EE(const f3mem_t *m, f3regs_t *r); /* ROM 0x13E7EE */
+int Fn_14F3B4(const f3mem_t *m, f3regs_t *r); /* ROM 0x14F3B4 */
+int Fn_183DBA(const f3mem_t *m, f3regs_t *r); /* ROM 0x183DBA */
 /* END generated */
 #endif

@@ -28,9 +28,9 @@ int Fn_1A0086(const f3mem_t *m, f3regs_t *r)
     const uint32_t slots = rd32(m, sp + 0xCu);   /* 0x1A00AC (0x18,SP) */
     const uint16_t colour = rd16(m, sp + 0x10u); /* 0x1A00B6 (0x1C,SP) */
 
-    wr32(m, sp - 4u, r->d[2]);                   /* 0x1A0086 movem.l d4/d3/d2 */
+    wr32(m, sp - 4u, r->d[4]);                   /* 0x1A0086 predecrement MOVEM */
     wr32(m, sp - 8u, r->d[3]);
-    wr32(m, sp - 12u, r->d[4]);
+    wr32(m, sp - 12u, r->d[2]);
 
     /* 0x1A0092 bpl / 0x1A0094 addq.l #7 / 0x1A0096 asr.l #3 */
     r->d[0] = value;
@@ -63,9 +63,9 @@ int Fn_1A0086(const f3mem_t *m, f3regs_t *r)
               (uint16_t)((r->d[0] + 0x10u) & 0xFFFFu);
     wr16(m, a0, (uint16_t)r->d[0]);               /* 0x1A00DE move.w D0w,(A0) */
 
-    r->d[2] = rd32(m, sp - 4u);                   /* 0x1A00E0 movem.l (SP)+,d2-d4 */
+    r->d[2] = rd32(m, sp - 12u);                  /* 0x1A00E0 movem.l (SP)+,d2-d4 */
     r->d[3] = rd32(m, sp - 8u);
-    r->d[4] = rd32(m, sp - 12u);
+    r->d[4] = rd32(m, sp - 4u);
     r->a[0] = a0;
     r->a[1] = a1;
     r->a[7] = sp + 4u;                            /* 0x1A00E4 rts */

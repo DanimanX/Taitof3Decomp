@@ -1325,3 +1325,14 @@
 129E0C	0	fail	COMPILE ERROR (project flags): try=3 936s
 0C7B48	0	fail	COMPILE ERROR (project flags): try=3 719s
 129EA6	0	fail	0/30 undec=0 try=3 775s
+12B1CC	0	fail	0/30 undec=0 try=3 535s
+0910CC	568	codex	assigned to codex (round 12)
+0B7506	250	codex	assigned to codex (round 12)
+0B80A4	310	codex	assigned to codex (round 12)
+118C4A	0	fail	TIMEOUT: the translation loops forever on the captured input try=3 885s
+14F3B4	0	fail	0/30 undec=0 try=3 531s
+0C9752	0	fail	0/30 undec=0 try=3 495s
+0910CC	0	fail	codex round 12: capture not passed
+0B7506	0	fail	codex round 12: capture not passed
+0B80A4	0	fail	codex round 12: capture not passed
+0E34FE	0	fail	COMPILE ERROR: try=3 499s

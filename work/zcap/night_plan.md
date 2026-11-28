@@ -65,3 +65,13 @@ Push: temp GIT_ASKPASS script printing ~/.token.bak, deleted after. Commits end 
 - cw_integrate.sh now applies edits to existing src/auto files too (wt_CW2 integrations still need the patch route
   for Makefile/seg.c/test_fn.c when it touches src/test).
 - After the undecompiled ones: the 129 decompiled-but-unverified routines (weak/no capture) are what moves verified %.
+
+## Update 05:05
+- 88863b9 (25 bit-exact + f3mem ignores ROM writes) and 542b2e4 (20 bit-exact). 99.0% / 90.8%. 28 undecompiled left.
+- Running: wt_CW cw_r12 (12: 091944 091E2C 091EC2 091F0C 0C2EC6 0C7B48 0C9752 0E0424 0E33C0 0E34FE 0E353A 0E48B8),
+  wt_CW2 cw2_r2 (10: 118C4A 129D80 129E0C 129E66 129EA6 12B1CC 137424 13E7EE 14F3B4 183DBA), one background job.
+  Integrate each with scripts/cw_integrate.sh <wt>, then run ALL suites (not just test_fn) before committing.
+- 05:31 codex round 12: 0910CC 0B7506 0B80A4.
+- Left after that: boot code 000402 010000 010172 (no capture; reset path: translate UNVERIFIED or capture with a
+  hard reset from a state). Then the 128 decompiled-unverified routines: recapture (injection/NOIRQ/DPRAM).
+- Order-dependent test failures: look for shared state (ROM image, statics) before blaming a draft.

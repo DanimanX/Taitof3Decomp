@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include "obj_18B9DE.h"
 #include "../audio/sound_cmd.h"
 #include "../objects/obj_anim.h"
@@ -27,22 +28,35 @@ static uint32_t sub_17B02E(const f3mem_t *m, uint32_t obj)
 }
 
 /* ROM 0x18BB50: credit the receiver, bump the global score counters and
- * spawn the 0x179DEE burst + sound 0x13 */
-static void sub_18BB50(const f3mem_t *m, uint32_t obj)
+ * spawn the 0x179DEE burst + sound 0x13. Returns the D0 the ROM leaves at its
+ * rts: the 0x01057C slot address of the burst (callers such as 0x0D5594 keep
+ * it), or 0xFFFFFFFF when the pool is full. `a1` (optional) is the caller's A1
+ * and receives the credit pointer 0x17B02E returns: 0x18BB5C `movea.l D0,A1`
+ * leaves it there and nothing after it touches A1 (fnk_18BB50 pairs 2/5/...
+ * end with A1 = 0x41E340, the object's +0x36 pointer). */
+uint32_t Obj_18BB50R(const f3mem_t *m, uint32_t obj, uint32_t *a1)
 {
     uint32_t d0 = sub_17B02E(m, obj);
-    if ((int32_t)d0 >= 0)
+    if ((int32_t)d0 >= 0) {
+        if (a1) *a1 = d0;
         wr32(m, d0 + 0x48u, rd32(m, d0 + 0x48u) + 0x7530u);
+    }
     wr32(m, A5_(0x886u), rd32(m, A5_(0x886u)) + 0x12C5Fu);
     wr8(m, A5_(0x4B26u), (uint8_t)(rd8(m, A5_(0x4B26u)) | 0x20u));
     wr16(m, A5_(0x4B20u), rd16(m, obj + 0x34u));
     wr32(m, A5_(0x4B1Cu), rd32(m, obj + 0x36u));
     wr8(m, obj + 0x23u, (uint8_t)(rd8(m, obj + 0x23u) | 0x04u));
     if (rd8(m, obj + 0x22u) != 0u)
-        Obj_Spawn(m, obj, 0x179DEEu, 0, 1, 0);
+        d0 = Obj_Spawn(m, obj, 0x179DEEu, 0, 1, 0);
     else
-        Obj_Spawn(m, obj, 0x179DEEu, 5, 2, 0);
+        d0 = Obj_Spawn(m, obj, 0x179DEEu, 5, 2, 0);
     Sound_PlayCmd(m, Sound_PreCmdHook(m, 0x13));
+    return d0;
+}
+
+uint32_t Obj_18BB50(const f3mem_t *m, uint32_t obj)
+{
+    return Obj_18BB50R(m, obj, NULL);
 }
 
 /* ROM 0x18BAAE: vtable tick of the spinning part */
@@ -56,7 +70,7 @@ static void tick_18BAAE(const f3mem_t *m, uint32_t obj)
         wr32(m, obj + 0x30u, 0x100048u);
         wr32(m, obj + 0x68u, 0u);
         sub_18BB3A(m, obj);
-        sub_18BB50(m, obj);
+        (void)Obj_18BB50(m, obj);
     }
     uint16_t d0 = rd16(m, 0x27E40u + (uint32_t)rd8(m, obj + 0x5Eu) * 2u);
     d0 = (uint16_t)((uint16_t)(d0 + 0x4000u) >> 8);
@@ -71,7 +85,7 @@ static void death_18BB12(const f3mem_t *m, uint32_t obj)
     wr16(m, obj + 0x16u, 0x20u);
     wr16(m, obj + 0x1Au, 0xFFF8u);
     sub_18BB3A(m, obj);
-    sub_18BB50(m, obj);
+    (void)Obj_18BB50(m, obj);
     wr8(m, A5_(0x4B7Cu), (uint8_t)(rd8(m, A5_(0x4B7Cu)) | 0x80u));
     wr32(m, obj, 0x17AA36u);
 }

@@ -72,24 +72,40 @@ void Obj_Animate(const f3mem_t *m, uint32_t obj, uint32_t anim_tbl)
  * entry made `tst.w (0,A1,D0w)` end the loop. A caller that needs it re-reads
  * obj+0x3A before the call, exactly as the ROM leaves D0. A non-positive
  * duration (including -1, which only `ble` treats as end-of-script) ends the
- * step without touching the object beyond the D0 table probe. */
-void Obj_AnimFrameStep(const f3mem_t *m, uint32_t obj, uint32_t anim_tbl)
+ * step without touching the object beyond the D0 table probe.
+ *
+ * D1w is not incidental: 0x0CBD34 `move.w (0x3e,A0),D1w` leaves the frame
+ * timer in the register, and the caller keeps it even when 0x0CBD40 has
+ * already cleared the field again (fnk_0C06E0 pair 6: the object's +0x3A ran
+ * from 0xC to 0x12, +0x3E was clobbered back to 0, and the ROM still returns
+ * D1 = 2). Obj_AnimFrameStepD1 reports that word; Obj_AnimFrameStep is the
+ * plain-RAM form the other callers use. */
+int Obj_AnimFrameStepD1(const f3mem_t *m, uint32_t obj, uint32_t anim_tbl, uint16_t *d1w)
 {
+    int set = 0;
     for (;;) {
         int16_t off = (int16_t)rd16(m, obj + 0x3Au);          /* 0x0CBD24 */
         uint32_t entry = anim_tbl + (uint32_t)(int32_t)off;
         int16_t dur = (int16_t)rd16(m, entry);                /* 0x0CBD28 */
-        if (dur <= 0)                                         /* 0x0CBD2C */
-            return;
+        if (dur <= 0)                                         /* 0x0CBD2C -> 0x0CBD50 */
+            return set;
         uint16_t cnt = (uint16_t)(rd16(m, obj + 0x3Eu) + 1u); /* 0x0CBD30 */
         wr16(m, obj + 0x3Eu, cnt);
+        *d1w = cnt;                                           /* 0x0CBD34 move.w */
+        set = 1;
         if ((int16_t)cnt <= dur) {                            /* 0x0CBD3C */
             wr32(m, obj + 0x10u, rd32(m, entry + 2u));        /* 0x0CBD4A */
-            return;
+            return 1;
         }
         wr16(m, obj + 0x3Eu, 0);                              /* 0x0CBD40 */
         wr16(m, obj + 0x3Au, (uint16_t)((uint16_t)off + 6u)); /* 0x0CBD44 */
     }
+}
+
+void Obj_AnimFrameStep(const f3mem_t *m, uint32_t obj, uint32_t anim_tbl)
+{
+    uint16_t d1w;
+    (void)Obj_AnimFrameStepD1(m, obj, anim_tbl, &d1w);
 }
 
 /* ROM 0x0CBD86: reset the per-frame object fields. Byte-for-byte from

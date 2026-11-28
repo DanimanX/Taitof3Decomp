@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include "obj_CBF8A.h"
 #include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
@@ -168,16 +169,20 @@ static void sub_0D55FC(const f3mem_t *m, uint32_t obj)
     wr8(m, obj + 0x1Cu, (uint8_t)(rd8(m, obj + 0x1Cu) & ~0x02u));
 }
 
-/* ROM 0x0CC1E0 */
-static uint8_t sub_0CC1E0(const f3mem_t *m, uint32_t obj)
+/* ROM 0x0CC1E0: overlap test against the A5+0x1D2C list. `a1_out` (optional)
+ * receives the list cursor A1 holds at the rts: it is A5+0x1D2C when the list
+ * count is already 0, else one long past the last entry walked. */
+static uint8_t sub_0CC1E0(const f3mem_t *m, uint32_t obj, uint32_t *a1_out)
 {
     uint32_t a1 = F3_A5 + 0x1D2Cu;
     uint16_t d0 = rd16(m, F3_A5 + 0x1D34u);
     for (;;) {
         int lt = (int16_t)d0 < 1;
         d0 = (uint16_t)(d0 - 1u);
-        if (lt)
+        if (lt) {
+            if (a1_out) *a1_out = a1;
             return 0x00u;
+        }
 
         uint32_t a2 = rd32(m, a1);
         a1 += 4u;
@@ -202,6 +207,7 @@ static uint8_t sub_0CC1E0(const f3mem_t *m, uint32_t obj)
         if ((int16_t)d1 < (int16_t)rd16(m, 0x000CC246u) || (int16_t)d1 > (int16_t)rd16(m, 0x000CC248u))
             continue;
 
+        if (a1_out) *a1_out = a1;
         return 0xFFu;
     }
 }
@@ -229,26 +235,51 @@ static uint16_t sub_0D0C9E(const f3mem_t *m)
     return rd16(m, 0x000D0D42u + (uint32_t)d0 * 2u);
 }
 
-/* ROM 0x0CC306 */
-static uint8_t sub_0CC306(const f3mem_t *m, uint16_t d1)
+/* ROM 0x0CC306: D1w += 0x0D0C9E word, asr #1, compare with an 8-bit RNG roll.
+ * `d0_out` / `d1_out` (optional) receive the full 32-bit registers at the rts:
+ * the RNG call at 0x0CC310 leaves its swapped seed in D0, `andi.w #0xFF` keeps
+ * only the byte and the trailing `sle.b` sets the low byte to 0xFF/0x00, while
+ * 0x0CC30C/0x0CC30E only rewrite D1's low word. */
+static uint8_t sub_0CC306(const f3mem_t *m, uint16_t d1, uint32_t *d0_out, uint32_t *d1_out)
 {
     uint16_t d0 = sub_0D0C9E(m);
     int16_t sum = (int16_t)(uint16_t)(d1 + d0);
     int16_t lim = ASR16(sum, 1u);
-    uint16_t rng = (uint16_t)(Rng_NextMem(m) & 0x00FFu);
-    return (lim <= (int16_t)rng) ? 0xFFu : 0x00u;
+    uint32_t rng = Rng_NextMem(m);
+    uint8_t byte = ((int16_t)(uint16_t)lim <= (int16_t)(uint16_t)(rng & 0x00FFu)) ? 0xFFu : 0x00u;
+    if (d1_out) *d1_out = (*d1_out & 0xFFFF0000u) | (uint16_t)lim;
+    if (d0_out) *d0_out = (rng & 0xFFFF0000u) | byte;
+    return byte;
+}
+
+/* ROM 0x0D5620: the spawn guard of 0x0D5594. `regs` (optional) is the caller's
+ * D0/D1/A1 and receives what the ROM leaves at the 0x0D5666 rts:
+ *   - 0x0CC1E0/0x0CC24A only set D0.b (st.b/sf.b), A1 is the 0x0CC1E0 cursor
+ *     (0x0CC24A does not touch it),
+ *   - 0x0CC306 overwrites D0 with the RNG word and writes D1,
+ *   - 0x01057C leaves the slot address in D0 when the spawn happens. */
+void Obj_CBF8A_0D5620(const f3mem_t *m, uint32_t obj, Obj_CBF8A_D5620Regs *regs)
+{
+    uint8_t r = sub_0CC1E0(m, obj, regs ? &regs->a1 : NULL);  /* 0x0D5620 */
+    if (regs) regs->d0 = (regs->d0 & 0xFFFFFF00u) | r;
+    if (r != 0u)
+        return;
+    r = sub_0CC24A(m, obj);                                   /* 0x0D562C */
+    if (regs) regs->d0 = (regs->d0 & 0xFFFFFF00u) | r;
+    if (r != 0u)
+        return;
+    r = sub_0CC306(m, 0x0010u, regs ? &regs->d0 : NULL,        /* 0x0D563C */
+                              regs ? &regs->d1 : NULL);
+    if (r != 0u)
+        return;
+    uint32_t slot = Obj_Spawn(m, obj, 0x000D901Au, 9u, 2u, 0x080D6000u); /* 0x0D565C */
+    if (regs) regs->d0 = slot;                                /* 0x01057C result */
 }
 
 /* ROM 0x0D5620 */
 static void sub_0D5620(const f3mem_t *m, uint32_t obj)
 {
-    if (sub_0CC1E0(m, obj) != 0u)
-        return;
-    if (sub_0CC24A(m, obj) != 0u)
-        return;
-    if (sub_0CC306(m, 0x0010u) != 0u)
-        return;
-    Obj_Spawn(m, obj, 0x000D901Au, 9u, 2u, 0x080D6000u);
+    Obj_CBF8A_0D5620(m, obj, NULL);
 }
 
 /* ROM 0x0D54DC */

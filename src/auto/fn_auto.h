@@ -1139,5 +1139,12 @@ int Fn_1799B2(const f3mem_t *m, f3regs_t *r); /* ROM 0x1799B2 */
 int Fn_1799E6(const f3mem_t *m, f3regs_t *r); /* ROM 0x1799E6 */
 int Fn_179A1E(const f3mem_t *m, f3regs_t *r); /* ROM 0x179A1E */
 int Fn_1065B6(const f3mem_t *m, f3regs_t *r); /* ROM 0x1065B6 */
+/* wrappers around C already in src/ (no logic duplicated here) */
+int Fn_000910(const f3mem_t *m, f3regs_t *r); /* ROM 0x000910 Sound_EnqueueExact */
+int Fn_0C8AB4(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C8AB4 HUD lives (Fn_005576/Fn_0C8B48) */
+int Fn_0D5620(const f3mem_t *m, f3regs_t *r); /* ROM 0x0D5620 Obj_CBF8A_0D5620 */
+int Fn_17C662(const f3mem_t *m, f3regs_t *r); /* ROM 0x17C662 Obj_17C700_Tick */
+int Fn_17C700(const f3mem_t *m, f3regs_t *r); /* ROM 0x17C700 bra.w 0x17C662 */
+int Fn_18BB50(const f3mem_t *m, f3regs_t *r); /* ROM 0x18BB50 Obj_18BB50 */
 /* END generated */
 #endif

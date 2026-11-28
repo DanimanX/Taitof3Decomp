@@ -23,8 +23,8 @@ int Obj_17C700_Tick(const f3mem_t *m, uint32_t obj)
 {
     /* 0x17C662..0x17C67E: bfextu {0:8} of +0x1F / +0x1E ; cmpi.w #0xF0 ; bge */
     if (rd8(m, obj + 0x1Fu) >= 0xF0u || rd8(m, obj + 0x1Eu) >= 0xF0u) {
-        Obj_Free(m, obj);
-        return 0;
+        Obj_Free(m, obj);                            /* 0x17C78E */
+        return 0;                                    /* freed, no 0x001282 draw */
     }
 
     if (Obj_Script10(m, obj) < 0)                   /* 0x17C67E */
@@ -57,5 +57,5 @@ int Obj_17C700_Tick(const f3mem_t *m, uint32_t obj)
 
     Obj_DrawSprite(m, obj);                         /* 0x17C6F2 */
     wr32(m, obj + 0x00u, 0x0017C700u);
-    return 0;
+    return 1;                                       /* the 0x001282 draw ran */
 }

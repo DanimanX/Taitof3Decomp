@@ -90,3 +90,20 @@ Push: temp GIT_ASKPASS script printing ~/.token.bak, deleted after. Commits end 
   unverified routines (work/zcap/unver15.tsv). Then: run each RECIPE with $S/inj1.sh-style command into fnk_<ADDR>
   (F3_NOIRQ=1 F3_REMASK=16A4 F3_GFX=1 F3_SPR=1 F3_INJECT=<A> ... Z10_001000), check_capture.sh <A> fnk_<A>,
   repoint strong ones' test lines, fix headers, unverified.tsv, all suites, commit.
+
+## Update 09:15
+- 68c9554 (22 recipe captures fnk_) and a95c0a9 (F3_INJECT_ABORT, 5 task bodies, fnt_). 96.6% verified.
+- Running: wt_CW2 cw2_r4 (4 C fixes on fnk_, 6 wrappers, recipes16.tsv for 6 failed recipes);
+  wt_CW cw_r15 (10 task-body Fn_ fixes against fnt_ captures, 0C6A64 wrapper). Integrate both with cw_integrate.sh
+  PLUS the non-src/auto patch route, then run every suite.
+- Then: run recipes16.tsv like recipes15 ($S/rec1.sh reads the tsv: point it at recipes16).
+- Genuinely unverifiable (recipes15.tsv UNVERIFIABLE minus task bodies): TRAP handlers ending in RTE, EEPROM,
+  palette-only, boot, bare rts/rte. Next idea for TRAP/RTE: inject with an exception frame pushed (SR + PC).
+
+## Update 09:40 (user: "usa codex para acelerar")
+- codex lanes (gpt-6.2-sol, effort high), harness work, no MAME:
+  X1 palette RAM (F3_PAL=1, f3mem palette field, fnp_ captures)      log work/zcap/codex_pal.log
+  X2 TRAP/IRQ handlers ending in RTE (F3_INJECT_EXC, fnx_ captures)  log work/zcap/codex_trap.log
+  X3 serial EEPROM model (F3_EEPROM=1, fne2_ captures)                log work/zcap/codex_eep.log
+  Each leaves test lines commented with PAL-CAPTURE / EXC-CAPTURE / EEP-CAPTURE and the capture commands in its
+  report. Merge: git diff in wt_X? > patch, apply, copy new files, take the captures, uncomment, all suites, commit.

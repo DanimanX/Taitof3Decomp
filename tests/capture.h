@@ -101,6 +101,16 @@ static inline void cap_free(capture_t *c)
  * exclusion is one byte and is reported here rather than hidden. */
 #define CAP_ARTIFACT_LO 0x41B1E1u
 #define CAP_ARTIFACT_HI 0x41B1E2u
+/* Sound DPRAM 0xC00482 (word): the 68000 sound CPU's ring READ index, i.e. the
+ * other side of the MB8421 (docs/PROGRESS.md: C00480 = write idx*2, C00482 =
+ * sound-CPU read idx). The peer CPU consumes commands while the main-CPU call
+ * is being captured, so the byte moves between the pre and post dump with no
+ * main-CPU code behind it: fnk_0039B8 pair 19 has 0x5E -> 0x6C there right
+ * after 0x0039B8 queued "ABC" into the ring (the only pair of 30 that does,
+ * although all 30 calls are byte-identical). No translation in src/ writes
+ * 0xC00482, and the main CPU's own index at 0xC00480 is still compared. */
+#define CAP_ARTIFACT_DPRAM_LO 0xC00482u
+#define CAP_ARTIFACT_DPRAM_HI 0xC00484u
 
 static inline int cap_diff(const char *tag, int pair, uint32_t base, const uint8_t *got,
                            const uint8_t *want, uint32_t n, uint32_t lo, uint32_t hi, int *budget)
@@ -110,6 +120,7 @@ static inline int cap_diff(const char *tag, int pair, uint32_t base, const uint8
         uint32_t a = base + o;
         if (a >= lo && a < hi) continue;
         if (a >= CAP_ARTIFACT_LO && a < CAP_ARTIFACT_HI) continue;
+        if (a >= CAP_ARTIFACT_DPRAM_LO && a < CAP_ARTIFACT_DPRAM_HI) continue;
         if (got[o] != want[o]) {
             if ((*budget)-- > 0) printf("  %s pair %d @%06X got=%02X want=%02X\n", tag, pair, a, got[o], want[o]);
             d++;

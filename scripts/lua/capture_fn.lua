@@ -243,6 +243,15 @@ emu.register_periodic(function()
   if dbg.execution_state ~= "stop" then return end
   local pc = cpu.state["PC"].value
   local spv = cpu.state["SP"].value
+  -- SP as the call left it (arguments still pushed): the post match below needs
+  -- this value, not the restored one. Restoring first made `spv == ret_sp + 4`
+  -- false for every injected call made with F3_INJECT_STACK (ret_sp + 4 is
+  -- inject_orig_sp - 4*#inject_stack, while the restore sets spv back to
+  -- inject_orig_sp), so those calls never closed a pair: fnk_003CE0, fnk_005794,
+  -- fnk_0057DA and fnk_0B7332 all came back with 0 pairs, and the 30 pairs
+  -- fnk_005576 did record are its natural calls (pre SP 0x404E8A, A0 = the HUD
+  -- table 0x000C8B5E), none of them the injected call.
+  local spv_ret = spv
   if inject_orig_sp and pc == inject_at and spv == inject_orig_sp - 4 * #inject_stack then
     spv = inject_orig_sp; cpu.state["SP"].value = spv; inject_orig_sp = nil
   end
@@ -330,7 +339,7 @@ emu.register_periodic(function()
   elseif have_pre and linger_left > 0 and pc == entry then
     -- one more tick went by for this object: count down, then dump
     linger_left = linger_left - 1
-  elseif have_pre and (exits[pc] or (exit_ret and pc == ret_pc and spv == ret_sp + 4) or (exit_a6 and pc == ret_pc)) then
+  elseif have_pre and (exits[pc] or (exit_ret and pc == ret_pc and spv_ret == ret_sp + 4) or (exit_a6 and pc == ret_pc)) then
     if ret_bp then cpu.debug:bpclear(ret_bp); ret_bp = nil; ret_pc = nil end
     emit(pre_snap); regs:write(pre_regs); regs:write(table.concat(pending_logs))
     if portf then portf:write(string.format("%d\t%s\n", pairs_done, pre_ports)); portf:flush() end

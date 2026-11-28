@@ -1,4 +1,4 @@
-/* ROM 0x0C44DC: UNVERIFIED (no capture): animated effect object that spirals
+/* ROM 0x0C44DC: (recipe capture fnk_): animated effect object that spirals
  * up and out with two alternating sprite parts (A0 = object).
  * Clears the flip byte +0x1C, picks 0x027E40[(+0x60 + 0x40) & 0xFF] and scales
  * it by 0x3FC; the high word of that product is the zoom step. A negative value
@@ -55,8 +55,11 @@ int Fn_0C44DC(const f3mem_t *m, f3regs_t *r)
 
     wr32(m, obj + 0x14u, rd32(m, obj + 0x14u) - 0x00003400u); /* 0x0C453C */
     if ((int32_t)rd32(m, obj + 0x14u) < (int32_t)0xFF900000u) { /* 0x0C4544..0x0C454C blt */
-        d0 = (uint32_t)rd8(m, obj + 0x0Fu);               /* 0x0C4570 clr.w D0w ; move.b (0xF,A0),D0b */
-        r->d[0] = d0;
+        /* 0x0C4570 clr.w D0w ; 0x0C4572 move.b (0xF,A0),D0b: the word clear
+         * keeps D0's high word, which the second 0x001282 left as
+         * ((x & 0xFFF) << 16) (fnk_0C44DC pairs 2/5/...: 0x0F000003). */
+        r->d[0] = (r->d[0] & 0xFFFF0000u) | (uint32_t)rd8(m, obj + 0x0Fu);
+        d0 = (uint32_t)(int32_t)(int16_t)(uint16_t)r->d[0];  /* (A1,D0w*4) index */
         r->a[1] = F3_A5 + 0x08CEu;                        /* 0x0C4576 lea (0x8CE,A5),A1 */
         wr32(m, F3_A5 + 0x08CEu + d0 * 4u, 0u);           /* 0x0C4576..0x0C457A clr.l */
         Obj_Free(m, obj);                                 /* 0x0C4580 jsr 0x0105EC */

@@ -152,28 +152,37 @@ static void sub_0D0384(const f3mem_t *m, uint32_t obj, uint32_t a1, uint16_t d0)
 
 /* ROM 0x1065B6: choose next +0x06 state and clear +0x22. Returns -1 when D0
  * is left alone, else the word 0x0D0E3A left in D0 (both branches at 0x106606
- * and 0x106622 compare that word). */
-int sub_1065B6(const f3mem_t *m, uint32_t obj)
+ * and 0x106622 compare that word).
+ *
+ * D0w is not only the 0x0D0E3A result: 0x1065C2 `move.w (0x14,A0),D0w` puts
+ * the object's x word there and both rts paths that skip 0x0D0E3A
+ * (0x1065EE and 0x1065F8) leave it (fnk_1065B6: D0 = 0x20 / 0x90 for
+ * +0x14 = 0x00200000 / 0x00900000). sub_1065B6D0 takes the caller's D0,
+ * applies that word move and returns it as the ROM leaves it; sub_1065B6 is
+ * the RAM-only form. */
+int sub_1065B6D0(const f3mem_t *m, uint32_t obj, uint32_t *d0)
 {
     wr8(m, obj + 0x22u, 0u);
     if (rd16(m, obj + 0x50u) == 0u) {
         wr8(m, obj + 0x06u, 3u);
-        return -1;
+        return -1;                                          /* 0x1065F6 rts: D0 untouched */
     }
-    int16_t x = (int16_t)rd16(m, obj + 0x14u);
+    int16_t x = (int16_t)rd16(m, obj + 0x14u);              /* 0x1065C2 move.w */
+    *d0 = (*d0 & 0xFFFF0000u) | (uint16_t)x;
     if (x < 0x003C) {
         wr8(m, obj + 0x06u, 6u);
-        return -1;
+        return -1;                                          /* 0x1065FE rts: D0 = x */
     } else if (x < 0x0078) {
         wr8(m, obj + 0x06u, 4u);
         uint16_t r = Obj_Next4Way(m);                       /* 0x106606 jsr 0x0d0e3a */
         if (r <= 0x0032u)
             wr8(m, obj + 0x06u, 6u);
+        *d0 = (uint32_t)(r & 0xFFFFu);
         return (int)(r & 0xFFFFu);
     } else if (x <= 0x00DC) {
         if (rd8(m, obj + 0x06u) == 2u)
             wr8(m, obj + 0x06u, 4u);
-        return -1;
+        return -1;                                          /* 0x1065EE rts: D0 = x */
     } else {
         wr8(m, obj + 0x06u, 3u);
         uint16_t r = Obj_Next4Way(m);                       /* 0x106622 jsr 0x0d0e3a */
@@ -182,8 +191,15 @@ int sub_1065B6(const f3mem_t *m, uint32_t obj)
             if (r >= 0x0064u)
                 wr8(m, obj + 0x06u, 4u);
         }
+        *d0 = (uint32_t)(r & 0xFFFFu);
         return (int)(r & 0xFFFFu);
     }
+}
+
+int sub_1065B6(const f3mem_t *m, uint32_t obj)
+{
+    uint32_t d0 = 0u;
+    return sub_1065B6D0(m, obj, &d0);
 }
 
 /* ROM 0x1061A4..106474: state machine on obj+0x06 (1..6). */

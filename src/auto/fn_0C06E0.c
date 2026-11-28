@@ -1,4 +1,4 @@
-/* ROM 0x0C06E0: UNVERIFIED (no capture): animated effect-object tick with a
+/* ROM 0x0C06E0: (recipe capture fnk_): animated effect-object tick with a
  * signed vertical drift (A0 = object).
  * Adds 0x4000 to +0x14 (high word of the position long) and the signed
  * 0x027E40[+0x60 & 0xFF] table word to +0x18, steps the {dur.w, sprdef.l}
@@ -38,7 +38,16 @@ int Fn_0C06E0(const f3mem_t *m, f3regs_t *r)
     }
 
     r->a[1] = rd32(m, obj + 0x5Cu);                       /* 0x0C0702 movea.l (0x5C,A0),A1 */
-    Obj_AnimFrameStep(m, obj, r->a[1]);                   /* 0x0C0706 jsr 0x0CBD24 */
+    {
+        uint16_t d1w = 0;
+        /* 0x0C0706 jsr 0x0CBD24. 0x0CBD34 leaves the frame timer it compared
+         * in D1w and the caller keeps it on every exit, including the free
+         * path where 0x0CBD40 has already cleared +0x3E again (pair 6 of
+         * work/ram/fnk_0C06E0: +0x3A ran 0xC -> 0x12, +0x3E back to 0, D1 = 2).
+         * Only the first probe (duration <= 0) leaves D1 untouched. */
+        if (Obj_AnimFrameStepD1(m, obj, r->a[1], &d1w))
+            r->d[1] = (r->d[1] & 0xFFFF0000u) | d1w;
+    }
     /* 0x0CBD24 leaves D0w = the table offset the step ended on, i.e. the word
      * it left in +0x3A. 0x0C070C tst.w (A1,D0w) ; ble 0x0C0720. */
     r->d[0] = (r->d[0] & 0xFFFF0000u) | rd16(m, obj + 0x3Au);

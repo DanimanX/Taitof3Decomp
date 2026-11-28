@@ -1,4 +1,4 @@
-/* ROM 0x0039B8: UNVERIFIED (weak capture): append a length-prefixed byte
+/* ROM 0x0039B8: (recipe capture fnk_): append a length-prefixed byte
  * string (A0) to the sound DPRAM ring. The write index is DPRAM word 0xC00480
  * (byte offset *2); every register is saved and restored, so only the DPRAM
  * changes:
@@ -10,10 +10,14 @@
  *   0039CC  D1w += D1w ; word 0xC00480 = D1w
  *   0039D2  movem.l (SP)+,{D0 D1 A0 A1 A2} ; rts
  *
- * WEAK: all 30 injected pairs have a count byte of 0 (the string at A0 is
- * empty), so no byte is copied, 0xC00480 keeps its value and an empty body
- * passes the capture as well. The routine is translated from the bytes and
- * re-read instruction by instruction.
+ * work/ram/fnk_0039B8 (30 injected pairs, F3_DPRAM=1): every pair is the same
+ * call with A0 = 0x400200 pointing at {03, 'A', 'B', 'C'}, so the routine
+ * copies 3 bytes to 0xC00000..0xC00002 from ring index 0 and advances the
+ * index word 0xC00480 from 0 to 6. The null body leaves 0xC00480 = 0 and
+ * 0xC00000..2 at their old values, so it fails all 30 pairs. Every
+ * instruction is re-read from work/maincpu.bin at 0x0039B8. The peer sound
+ * CPU's read index at 0xC00482 is the other side of the DPRAM handshake and
+ * moves on its own (see CAP_ARTIFACT_DPRAM_LO in tests/capture.h).
  */
 #include "fn_auto.h"
 

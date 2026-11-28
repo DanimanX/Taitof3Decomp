@@ -1,5 +1,6 @@
 #include "fn_auto.h"
 #include "fn_call_frames.h"
+#include "fn_helpers.h"
 #include "../enemy/obj_1194C2.h"
 
 /* ROM 0x0B760C: UNVERIFIED (no usable capture): test-mode selftest panel --
@@ -95,7 +96,7 @@ static void sub_0B7332(const f3mem_t *m, uint16_t w, uint16_t h, uint16_t attr, 
 
 /* ROM 0x0B73E2: blank the `w` x `h` box at the rect the third argument points
  * to (top-left {x.w, y.w} of the text layer 0x61C000). Registers are saved. */
-static void sub_0B73E2(const f3mem_t *m, uint16_t w, uint16_t h, uint32_t rect)
+void sub_0B73E2(const f3mem_t *m, uint16_t w, uint16_t h, uint32_t rect)
 {
     uint16_t x = rd16(m, rect);                                  /* 0x0B73F2 */
     uint16_t y = rd16(m, rect + 2u);                             /* 0x0B73F4 */

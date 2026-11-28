@@ -1,0 +1,87 @@
+000910	FUN_00000910	work/ram/fn_000910 (30 pairs)	src/kernel/soundque.h
+000E00	OBJ_000E00	work/ram/fn_000E00 (20 pairs)	src/kernel/devboard.h
+000ECA	FUN_00000eca	work/ram/fn_000ECA (30 pairs)	src/kernel/devboard.h
+001016	Coin_CoinsNeeded	work/ram/fn_001016 (30 pairs)	src/player/player_task.h,src/player/player_task.c
+001070	Sprite_InitBuffers	work/ram/fn_001070 (2 pairs)	src/video/sprite.h
+001100	OBJ_001100	work/ram/fn_001100 (1 pairs)	src/video/sprite.h
+0014DA	Pal_LoadDefault	work/ram/fn_0014DA (30 pairs)	src/kernel/fn_010420.c,src/kernel/fn_010420.h
+0014E8	FUN_000014e8	work/ram/fn_0014E8 (30 pairs)	src/kernel/fn_010420.h,src/auto/fn_0B8404.c
+001504	FUN_00001504	work/ram/fn_001504 (30 pairs)	src/kernel/fn_010420.c,src/auto/fn_0AC8E4.c
+001520	FUN_00001520	work/ram/fn_001520 (1 pairs)	src/kernel/fn_010420.c
+001A78	IO_PollInputs	work/ram/fn_001A78 (20 pairs)	src/io/input.h
+001F62	Sys_Yield	work/ram/fn_001F62 (30 pairs)	src/auto/fn_001F62.c,src/auto/fn_auto.h
+003960	Sound_ResetDpram	work/ram/fn_003960 (30 pairs)	
+003998	Sound_WriteScratch	work/ram/fn_003998 (30 pairs)	
+003B4E	Sound_CopyToRing	work/ram/fn_003B4E (30 pairs)	
+003B66	Sound_PlayCmdForced	work/ram/fn_003B66 (30 pairs)	
+003C12	Sound_StopAllPart2	work/ram/fn_003C12 (30 pairs)	
+003C24	Sound_StopAll	work/ram/fn_003C24 (30 pairs)	
+003CBA	Sound_SetVolume	work/ram/fn_003CBA (30 pairs)	
+003CE0	FUN_00003ce0	work/ram/fn_003CE0 (30 pairs)	src/enemy/obj_13EFA0.c
+00466E	FUN_0000466e	work/ram/fn_00466E (3 pairs)	src/auto/eeprom_block.h
+0046C0	FUN_000046c0	work/ram/fn_0046C0 (3 pairs)	src/auto/eeprom_block.h
+004C42	FUN_00004c42	work/ram/fn_004C42 (30 pairs)	src/auto/fn_004C42.c,src/auto/fn_auto.h
+004D06	Eeprom_UnpackSettings	work/ram/fn_004D06 (3 pairs)	src/auto/fn_auto.h,src/auto/eeprom_block.h
+005080	FUN_00005080	work/ram/fn_005080 (1 pairs)	src/auto/fn_auto.h,src/auto/fn_005080.c
+00509A	FUN_0000509a	work/ram/fn_00509A (30 pairs)	src/auto/fn_00509A.c,src/auto/fn_auto.h
+0057DA	FUN_000057da	work/ram/fn_0057DA (30 pairs)	src/auto/fn_0057DA.c,src/auto/fn_auto.h
+005AB6	FUN_00005ab6	work/ram/fn_005AB6 (5 pairs)	src/auto/fn_005AB6.c,src/auto/fn_auto.h
+01060E	FUN_0001060e	work/ram/fn_01060E (1 pairs)	src/objects/obj_pool.h
+010638	FUN_00010638	work/ram/fn_010638 (30 pairs)	src/objects/obj_pool.h
+010672	FUN_00010672	work/ram/fn_010672 (30 pairs)	src/objects/obj_pool.h
+0910CC	Task_0910CC	work/ram/fn_0910CC (13 pairs)	src/auto/fn_auto.h,src/auto/fn_0910CC.c
+0B7332	FUN_000b7332	work/ram/fn_0B7332 (30 pairs)	src/auto/fn_0B760C.c,src/auto/fn_1781F6.c
+0B73E2	FUN_000b73e2	work/ram/fn_0B73E2 (30 pairs)	src/auto/fn_0B760C.c,src/auto/fn_1781F6.c
+0B7506	FUN_000b7506	work/ram/fn_0B7506 (30 pairs)	src/auto/fn_auto.h,src/auto/fn_0B7506.c
+0B760C	FUN_000b760c	work/ram/fn_0B760C (30 pairs)	src/auto/fn_0B760C.c,src/auto/fn_auto.h
+0B7A54	FUN_000b7a54	work/ram/fn_0B7A54 (30 pairs)	src/auto/fn_auto.h,src/auto/fn_0B7A54.c
+0B7B28	FUN_000b7b28	work/ram/fn_0B7B28 (30 pairs)	src/auto/fn_auto.h,src/auto/fn_0B7B28.c
+0B7D74	FUN_000b7d74	work/ram/fn_0B7D74 (30 pairs)	src/auto/fn_auto.h,src/auto/fn_0B7D74.c
+0B7FF8	FUN_000b7ff8	work/ram/fn_0B7FF8 (30 pairs)	src/auto/fn_auto.h,src/auto/fn_0B7FF8.c
+0B80A4	FUN_000b80a4	work/ram/fn_0B80A4 (30 pairs)	src/auto/fn_auto.h,src/auto/fn_0B80A4.c
+0B8404	Task_Attract	work/ram/seg_0B8404 (1 pairs)	src/stage/seg_0B8404.c,src/auto/fn_0B8404.c
+0B935A	Task_0B935A	work/ram/seg_0B935A (1 pairs)	src/stage/seg_0B935A.c,src/auto/fn_0B935A.c
+0C08AC	OBJ_0C08AC	work/ram/fn_0C08AC (1 pairs)	src/auto/fn_0C08AC.c,src/auto/fn_auto.h
+0C1B3C	OBJ_0C1B3C	work/ram/fn_0C1B3C (1 pairs)	src/auto/fn_0C1B3C.c,src/auto/fn_auto.h
+0C640A	Coll_ResetLists	work/ram/fn_0C640A (30 pairs)	src/collision/collision.h
+0C6446	Coll_PlayerShotsVsEnemies	work/ram/fn_0C6446 (30 pairs)	src/collision/collision.h
+0C64FC	Coll_PlayersVsHazards	work/ram/fn_0C64FC (30 pairs)	src/collision/collision.h
+0C6624	Terrain_SyncScroll	work/ram/fn_0C6624 (30 pairs)	src/collision/collision.h
+0C8AB4	FUN_000c8ab4	work/ram/fn_0C8AB4 (20 pairs)	
+0C966E	OBJ_0C966E	work/ram/fn_0C966E (1 pairs)	src/auto/fn_0C966E.c,src/auto/fn_auto.h
+0CC0F8	FUN_000cc0f8	work/ram/fn_0CC0F8 (30 pairs)	src/enemy/obj_CC0F4.c,src/enemy/obj_CBF8A.c
+0CC4B2	OBJ_0CC4B2	work/ram/fn_0CC4B2 (1 pairs)	src/auto/fn_0CC4B2.c,src/auto/fn_auto.h
+0CFD66	FUN_000cfd66	work/ram/fn_0CFD66 (8 pairs)	src/enemy/obj_105EDE.c
+0D0C7A	FUN_000d0c7a	work/ram/fn_0D0C7A (30 pairs)	src/enemy/obj_CC11C.c
+0D5620	FUN_000d5620	work/ram/fn_0D5620 (30 pairs)	src/enemy/obj_CBF8A.c
+0D609A	OBJ_0D609A	work/ram/fn_0D609A (30 pairs)	src/enemy/obj_D609A.h,src/enemy/obj_D609A.c
+0E2D1E	OBJ_0E2D1E	work/ram/fn_0E2D1E (1 pairs)	src/auto/fn_0E2D1E.c,src/auto/fn_auto.h
+0E4560	OBJ_0E4560	work/ram/fn_0E4560 (1 pairs)	src/auto/fn_auto.h,src/auto/fn_0E4560.c
+0E48FA	OBJ_0E48FA	work/ram/fn_0E48FA (1 pairs)	src/auto/fn_auto.h,src/auto/fn_0E48FA.c
+1065B6	FUN_001065b6	work/ram/fn_1065B6 (30 pairs)	src/enemy/obj_105EDE.c
+130B16	OBJ_130B16	work/ram/fn_130B16 (1 pairs)	src/auto/fn_130B16.c,src/auto/fn_auto.h
+130E3A	OBJ_130E3A	work/ram/fn_130E3A (1 pairs)	src/auto/fn_130E3A.c,src/auto/fn_auto.h
+1319FE	OBJ_1319FE	work/ram/fn_1319FE (1 pairs)	src/auto/fn_auto.h,src/auto/fn_1319FE.c
+13F5B8	FUN_0013f5b8	work/ram/seg_13F5B8 (1 pairs)	src/stage/seg_13F5B8.c,src/auto/fn_13F5B8.c
+14477C	FUN_0014477c	work/ram/fn_14477C (30 pairs)	src/auto/fn_144378.c
+1447AC	FUN_001447ac	work/ram/fn_1447AC (1 pairs)	src/auto/fn_1447AC.c,src/auto/fn_auto.h
+150156	FUN_00150156	work/ram/fn_150156 (30 pairs)	src/video/palette.h,src/video/palette.c
+150578	FUN_00150578	work/ram/fn_150578 (30 pairs)	src/video/palette.h,src/video/palette.c
+15099A	FUN_0015099a	work/ram/fn_15099A (30 pairs)	src/video/palette.h,src/video/palette.c
+15458C	FUN_0015458c	work/ram/fn_15458C (30 pairs)	src/video/palette.h,src/video/palette.c
+1549AE	FUN_001549ae	work/ram/fn_1549AE (30 pairs)	src/video/palette.h,src/video/palette.c
+154DD0	FUN_00154dd0	work/ram/fn_154DD0 (30 pairs)	src/video/palette.h,src/video/palette.c
+1551F2	FUN_001551f2	work/ram/fn_1551F2 (30 pairs)	src/video/palette.h,src/video/palette.c
+163D1A	FUN_00163d1a	work/ram/fn_163D1A (30 pairs)	src/video/palette.h,src/video/palette.c
+16413C	FUN_0016413c	work/ram/fn_16413C (30 pairs)	src/video/palette.h,src/video/palette.c
+16A9BC	FUN_0016a9bc	work/ram/fn_16A9BC (1 pairs)	src/video/sprite.c,src/video/sprite.h
+1781F6	FUN_001781f6	work/ram/fn_1781F6 (30 pairs)	src/auto/fn_1781F6.c,src/auto/fn_auto.h
+179588	FUN_00179588	work/ram/fn_179588 (8 pairs)	src/enemy/obj_179588.c,src/enemy/obj_179588.h
+1798F8	FUN_001798f8	work/ram/fn_1798F8 (8 pairs)	src/objects/obj_anim.c,src/enemy/obj_17961E.c
+17991C	FUN_0017991c	work/ram/fn_17991C (8 pairs)	src/objects/obj_anim.c
+179946	FUN_00179946	work/ram/fn_179946 (8 pairs)	src/objects/obj_anim.c,src/enemy/obj_179632.c
+1799B2	FUN_001799b2	work/ram/fn_1799B2 (8 pairs)	src/objects/obj_anim.c,src/enemy/obj_179646.c
+1799E6	FUN_001799e6	work/ram/fn_1799E6 (8 pairs)	src/objects/obj_anim.c
+179A1E	FUN_00179a1e	work/ram/fn_179A1E (8 pairs)	src/objects/obj_anim.c,src/enemy/obj_17A8E0.c
+18BB50	FUN_0018bb50	work/ram/fn_18BB50 (30 pairs)	src/enemy/obj_18B9DE.c
+1A095E	FUN_001a095e	work/ram/fn_1A095E (30 pairs)	src/test/seg_1A095E.c

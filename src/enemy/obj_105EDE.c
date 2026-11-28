@@ -1,4 +1,5 @@
 #include "obj_105EDE.h"
+#include "../auto/fn_helpers.h"
 #include "../objects/obj_common.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_shared.h"
@@ -130,7 +131,7 @@ static void sub_0D0BBC(const f3mem_t *m, uint32_t obj, uint32_t a1)
 }
 
 /* ROM 0x0CFD66: apply frame record A1 + table 0x0CFD80[d0]. */
-static void sub_0CFD66(const f3mem_t *m, uint32_t obj, uint32_t a1, uint16_t d0)
+void sub_0CFD66(const f3mem_t *m, uint32_t obj, uint32_t a1, uint16_t d0)
 {
     int16_t off = (int16_t)rd16(m, 0x000CFD80u + (uint32_t)(int32_t)(int16_t)d0 * 2u);
     a1 += (uint32_t)off;
@@ -149,32 +150,39 @@ static void sub_0D0384(const f3mem_t *m, uint32_t obj, uint32_t a1, uint16_t d0)
     Obj_StartBehaviour(m, obj, ptr);
 }
 
-/* ROM 0x1065B6: choose next +0x06 state and clear +0x22. */
-static void sub_1065B6(const f3mem_t *m, uint32_t obj)
+/* ROM 0x1065B6: choose next +0x06 state and clear +0x22. Returns -1 when D0
+ * is left alone, else the word 0x0D0E3A left in D0 (both branches at 0x106606
+ * and 0x106622 compare that word). */
+int sub_1065B6(const f3mem_t *m, uint32_t obj)
 {
     wr8(m, obj + 0x22u, 0u);
     if (rd16(m, obj + 0x50u) == 0u) {
         wr8(m, obj + 0x06u, 3u);
-        return;
+        return -1;
     }
     int16_t x = (int16_t)rd16(m, obj + 0x14u);
     if (x < 0x003C) {
         wr8(m, obj + 0x06u, 6u);
+        return -1;
     } else if (x < 0x0078) {
         wr8(m, obj + 0x06u, 4u);
-        if (Obj_Next4Way(m) <= 0x0032u)
+        uint16_t r = Obj_Next4Way(m);                       /* 0x106606 jsr 0x0d0e3a */
+        if (r <= 0x0032u)
             wr8(m, obj + 0x06u, 6u);
+        return (int)(r & 0xFFFFu);
     } else if (x <= 0x00DC) {
         if (rd8(m, obj + 0x06u) == 2u)
             wr8(m, obj + 0x06u, 4u);
+        return -1;
     } else {
         wr8(m, obj + 0x06u, 3u);
-        uint16_t r = Obj_Next4Way(m);
+        uint16_t r = Obj_Next4Way(m);                       /* 0x106622 jsr 0x0d0e3a */
         if (r >= 0x0032u) {
             wr8(m, obj + 0x06u, 5u);
             if (r >= 0x0064u)
                 wr8(m, obj + 0x06u, 4u);
         }
+        return (int)(r & 0xFFFFu);
     }
 }
 
@@ -208,7 +216,7 @@ static int step_state6(const f3mem_t *m, uint32_t obj)
             return 0;
         case 2:
             if ((rd8(m, obj + 0x4Eu) & 0x0Fu) == 0x0Fu)
-                sub_1065B6(m, obj);
+                (void)sub_1065B6(m, obj);
             return 0;
         default:
             return -1;
@@ -224,7 +232,7 @@ static int step_state6(const f3mem_t *m, uint32_t obj)
             uint8_t bit = ((rd8(m, obj + 0x4Eu) & 0x80u) != 0u) ? 5u : 4u;
             if ((rd8(m, obj + 0x4Eu) & (1u << bit)) != 0u) {
                 wr8(m, obj + 0x4Eu, (uint8_t)(rd8(m, obj + 0x4Eu) ^ 0x80u));
-                sub_1065B6(m, obj);
+                (void)sub_1065B6(m, obj);
                 wr8(m, obj + 0x4Eu, (uint8_t)(rd8(m, obj + 0x4Eu) | 0x40u));
                 Sound_PlayHooked(m, 0x001Bu);
             } else if ((rd8(m, obj + 0x4Eu) & 0x0Fu) == 0x0Fu) {
@@ -247,7 +255,7 @@ static int step_state6(const f3mem_t *m, uint32_t obj)
                 uint8_t next = (uint8_t)(s22 + 1u);
                 wr8(m, obj + 0x22u, next);
                 if (next > 4u)
-                    sub_1065B6(m, obj);
+                    (void)sub_1065B6(m, obj);
             }
             return 0;
         case 3: {

@@ -14,4 +14,12 @@ void Kernel_CoinStart010420(const f3mem_t *m);
  * to the upload buffer at 0x440000. A negative block count stops the loop. */
 void Kernel_SoundBank0_0014DA(const f3mem_t *m);
 void Kernel_SoundBank1_001504(const f3mem_t *m);
+
+/* The registers the 0x001520 relay leaves: d0/d1 are the last copy's
+ * (src+4)/(dst+4) words (or the caller's own d0/d1 when the block is negative),
+ * a2 the stream cursor, a0 the upload buffer or the table, d3 the block long
+ * with dbra's 0xFFFF. */
+typedef struct { uint32_t d0, d1, a0, a1, a2, d3; } snd_relay_t;
+void Kernel_SoundRelay(const f3mem_t *m, uint32_t table, uint32_t src, uint8_t idx,
+                       snd_relay_t *rg);
 #endif

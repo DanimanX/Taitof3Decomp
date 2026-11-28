@@ -44,7 +44,7 @@ void Sprite_InitHeaders(const f3mem_t *m, uint16_t d0)
     d0 |= 0x0100u;
     spr_w16(m, 0x60000Au, d0);
     spr_w16(m, 0x60800Au, d0); /* wraps onto 0x60000A */
-    wr16(m, SPR_CURSOR + 4u, d0); /* 0x40735C */
+    wr16(m, SPR_CURSOR - 4u, d0); /* 0x40735C: 0x001110 move.w d0,-$ca4(a5) */
 
     for (int bank = 0; bank < 2; bank++) {
         uint32_t a0 = 0x603FF0u + 0x8000u * (uint32_t)bank;

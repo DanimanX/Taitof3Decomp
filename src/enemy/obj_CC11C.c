@@ -1,4 +1,5 @@
 #include "obj_CC11C.h"
+#include "../auto/fn_helpers.h"
 #include "../objects/obj_shared.h"
 #include "../objects/obj_pool.h"
 #include "../objects/obj_common.h"
@@ -103,7 +104,7 @@ static void sub_0CBE66(const f3mem_t *m, uint32_t obj, uint32_t a1)
 }
 
 /* ROM 0x0D0C7A: difficulty table 0x0D0CC2[(A5+0x87F) >> 3] */
-static uint16_t sub_0D0C7A(const f3mem_t *m)
+uint16_t sub_0D0C7A(const f3mem_t *m)
 {
     uint8_t i = (uint8_t)(rd8(m, F3_A5 + 0x87Fu) >> 3);
     return rd16(m, 0x000D0CC2u + (uint32_t)i * 2u);

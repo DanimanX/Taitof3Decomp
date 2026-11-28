@@ -18,14 +18,19 @@
 #define DEV_CREDIT   (F3_A5 - 0x7F70u) /* 0x400090 */
 #define DEV_ENABLE   (F3_A5 - 0x5DC7u) /* 0x402239 */
 
-/* ROM 0x000ECA, one coin channel: phase timer (0x000F04), then if d3 has bit
- * d2: count++, (a4)++ and on (a2)==(a4) reset it, signal the sound queue and
- * add (a2+2) credits (clamped at 9). */
-void Dev_StepChannel(const f3mem_t *m, uint32_t chan, uint32_t a2, uint32_t a4, int d2);
+/* ROM 0x000ECA, one coin channel: phase timer (0x000F04, tests bit d2 of d1),
+ * then if d3 has bit d2: count++, (a4)++ and on (a2)==(a4) reset it, signal the
+ * sound queue and add (a2+2) credits (clamped at 9). d1/d3 are the caller's
+ * masks: d1 = io_ch[1].cur, d3 = ~io_ch[1].released (0x000E18/0x000E1C).
+ * Returns 0, or -1 when the phase timer took the 0x000F3E error path. */
+int Dev_StepChannel(const f3mem_t *m, uint32_t chan, uint32_t a2, uint32_t a4, int d2,
+                    uint8_t d1, uint8_t d3);
 
-/* ROM 0x000E00  DevBoard_ServiceTask. Runs while io_ch[0].cur bit0 (0x40221C)
- * is clear - active-low service switch pressed; 0x000F54 otherwise. Returns 0
- * when the 0x000F3E CRC/error path was taken (not modelled), else 1. */
+/* ROM 0x000E00  DevBoard_ServiceTask. 0x000E00 tests bit0 of io_ch[1].cur
+ * (0x402220) and jumps to 0x000F54 when it is clear, i.e. the body runs while
+ * channel 1's bit0 is set. The 0x000E14 call to 0x000FA8 (pending coin-sound
+ * queue service) is modelled by Fn_000FA8 (src/auto/fn_000FA8.c), not here.
+ * Returns 0 when the 0x000F54 / 0x000F3E paths were taken, else 1. */
 int DevBoard_ServiceTask(const f3mem_t *m);
 
 #endif

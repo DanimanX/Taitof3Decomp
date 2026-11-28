@@ -1,5 +1,6 @@
 #include "fn_auto.h"
 #include "fn_call_frames.h"
+#include "fn_helpers.h"
 #include "../enemy/obj_1194C2.h"
 
 /* ROM 0x144378: test-mode selftest row editor tick (no arguments).
@@ -43,7 +44,7 @@ static uint32_t sub_144720(const f3mem_t *m)
 
 /* ROM 0x14477C: close the row at the cursor by shifting the rows above it
  * one 8-byte slot down. */
-static uint32_t sub_14477C(const f3mem_t *m)
+uint32_t sub_14477C(const f3mem_t *m)
 {
     uint32_t a0 = rd32(m, F3_A5 + 0x3320u);
     for (;;) {                                         /* 0x144780 */

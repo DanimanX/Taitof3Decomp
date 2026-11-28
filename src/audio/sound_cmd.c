@@ -104,21 +104,31 @@ static void snd_play_type2_3ae2(const f3mem_t *m, uint32_t a0, uint16_t *idx)
     wr8(m, slot, rd8(m, a0 + 5u));
 }
 
-static void snd_copy_3b4e(const f3mem_t *m, uint32_t a0, uint16_t *idx)
+/* ROM 0x3B4E: copy the counted byte string at A0 into `base` at ring index
+ * *idx (0x003B54 move.b (a0)+,(a1,d1.w)). A1 is the caller's destination base.
+ * Returns the number of bytes consumed from A0 (its advance at the rts). */
+uint16_t Sound_CopyToRing(const f3mem_t *m, uint32_t a0, uint32_t base, uint16_t *idx)
 {
-    /* ROM 0x3B4E */
     uint16_t d0 = rd8(m, a0++);
     uint16_t d1 = *idx;
+    uint16_t used = 1u;
 
     for (;;) {
         d0 = (uint16_t)(d0 - 1u);
         if (d0 == 0xFFFFu) {
             break;
         }
-        wr8(m, F3_DPRAM_BASE + (uint32_t)(int32_t)(int16_t)d1, rd8(m, a0++));
+        wr8(m, base + (uint32_t)(int32_t)(int16_t)d1, rd8(m, a0++));
         d1 = (uint16_t)((d1 + 1u) & 0x3FFu);
+        used++;
     }
     *idx = d1;
+    return used;
+}
+
+static void snd_copy_3b4e(const f3mem_t *m, uint32_t a0, uint16_t *idx)
+{
+    (void)Sound_CopyToRing(m, a0, F3_DPRAM_BASE, idx);
 }
 
 static void snd_forced_type01_3ba8(const f3mem_t *m, uint32_t a0, uint16_t *idx)
@@ -233,14 +243,20 @@ void Sound_ResetDpram(const f3mem_t *m)
     /* Hardware sound-reset release write to 0x00C80000 (move.w #0, (0xC80000).l) ignored. */
 }
 
-void Sound_WriteScratch(const f3mem_t *m, uint16_t *idx)
+/* ROM 0x3998: copy the counted byte string at A5-0x13C2 into `base` at the
+ * ring index *idx (0x0039A0 move.b d0,(a1,d1.w)). The ROM's destination base is
+ * the A1 register, not a fixed 0xC00000: the routine is shared by the DPRAM
+ * callers (base = F3_DPRAM_BASE) and by captures whose injected call leaves
+ * another base there. Returns the number of bytes consumed from A5-0x13C2 (the
+ * A2 advance the ROM leaves behind). */
+uint16_t Sound_WriteScratchBase(const f3mem_t *m, uint32_t base, uint16_t *idx)
 {
-    /* ROM 0x3998 */
     uint32_t a2 = F3_A5 - 0x13C2u;
     uint16_t d1 = *idx;
     uint16_t d0 = rd8(m, a2++);
+    uint16_t used = 1u;
 
-    wr8(m, F3_DPRAM_BASE + (uint32_t)(int32_t)(int16_t)d1, (uint8_t)d0);
+    wr8(m, base + (uint32_t)(int32_t)(int16_t)d1, (uint8_t)d0);
     d0 = (uint16_t)(d0 - 1u);
     for (;;) {
         d1 = (uint16_t)((d1 + 1u) & 0x3FFu);
@@ -248,9 +264,16 @@ void Sound_WriteScratch(const f3mem_t *m, uint16_t *idx)
         if (d0 == 0xFFFFu) {
             break;
         }
-        wr8(m, F3_DPRAM_BASE + (uint32_t)(int32_t)(int16_t)d1, rd8(m, a2++));
+        wr8(m, base + (uint32_t)(int32_t)(int16_t)d1, rd8(m, a2++));
+        used++;
     }
     *idx = d1;
+    return used;
+}
+
+void Sound_WriteScratch(const f3mem_t *m, uint16_t *idx)
+{
+    (void)Sound_WriteScratchBase(m, F3_DPRAM_BASE, idx);
 }
 
 void Sound_PlayCmd(const f3mem_t *m, int16_t cmd)

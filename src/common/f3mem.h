@@ -18,6 +18,8 @@
 #define F3_SPR_SIZE   0x010000u
 #define F3_GFX_BASE   0x610000u  /* playfield, text, character and line RAM */
 #define F3_GFX_SIZE   0x020000u
+#define F3_MMIO_PORTS_BASE 0x4A0000u /* input ports (JAMMA), read-only on the wire */
+#define F3_MMIO_PORTS_SIZE 0x000020u /* 0x001A78 reads 0x4A0000..0x4A0017 */
 
 #define F3_EEP_IN     0x4A0001u
 #define F3_EEP_OUT    0x4A0013u
@@ -57,6 +59,11 @@ void f3_eeprom_advance(f3_eeprom_t *e, uint32_t ns);
 uint8_t f3_eeprom_do(const f3_eeprom_t *e);
 
 uint8_t  *f3_ptr(const f3mem_t *m, uint32_t addr); /* scratch buffer for unmapped addresses */
+/* Serve the 0x20-byte 0x4A0000 port image of the capture pair being replayed
+ * (scripts/capture_fn.lua F3_PORTS=1 -> <prefix>_ports.tsv). tests/test_fn.c
+ * installs a per-pair copy before running a routine; NULL (the default, and
+ * every other test) leaves 0x4A0000 unmapped and reads return 0. */
+void      f3_set_mmio_ports(uint8_t *ports);
 uint8_t   rd8(const f3mem_t *m, uint32_t a);
 uint16_t  rd16(const f3mem_t *m, uint32_t a);
 uint32_t  rd32(const f3mem_t *m, uint32_t a);

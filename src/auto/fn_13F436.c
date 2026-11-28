@@ -1,4 +1,4 @@
-/* ROM 0x13F436: UNVERIFIED (no capture): "BOSS TEST MODE" task body.
+/* ROM 0x13F436: (recipe capture): "BOSS TEST MODE" task body.
  * Pre-yield part: set the test-mode byte A5+0x1D1C to 0xFF, drop the
  * word 0x0060 into the sound upload buffer 0x440000, clear playfield layer 3
  * (0x0058AE), rebuild the line RAM tables (0x005B0C), raise A5-0x144C bit 1 and
@@ -32,13 +32,17 @@
 #include "../objects/obj_shared_ext.h" /* Sound_PreCmdHook (0x13F238) */
 #include "../video/sprite.h"
 
-/* 0x13F436 up to the TRAP #5 at 0x13F462. */
-static void init_13F436(const f3mem_t *m)
+/* 0x13F436 up to the TRAP #5 at 0x13F462. The register leftovers of the two
+ * gfx calls are part of the pair: 0x0058AE saves/restores D0-D3/A0, and
+ * 0x005B0C leaves D0 = 0x0018xxxx, D1/D3 = 0xFFFF, A0 = 0x5C38 and
+ * A1 = 0x621000 (Gfx_InitLineRam_Regs). fnt_13F436's post image carries
+ * exactly those values, which is why this runs the register-aware variant. */
+static void init_13F436(const f3mem_t *m, f3regs_t *r)
 {
     wr8(m, F3_A5 + 0x1D1Cu, 0xFFu);                 /* 0x13F436 st.b */
     wr32(m, 0x00440000u, 0x0060u);                  /* 0x13F43A move.l #0x60 */
     Gfx_ClearPf3(m);                                /* 0x13F444 jsr 0x0058AE */
-    Gfx_InitLineRam(m);                             /* 0x13F44A jsr 0x005B0C */
+    Gfx_InitLineRam_Regs(m, r);                     /* 0x13F44A jsr 0x005B0C */
     wr8(m, F3_A5 - 0x144Cu, (uint8_t)(rd8(m, F3_A5 - 0x144Cu) | 0x02u)); /* 0x13F450 bset.b #1 */
     wr8(m, F3_A5 + 0x1D36u, (uint8_t)(rd8(m, F3_A5 + 0x1D36u) & 0xFBu)); /* 0x13F456 bclr.b #2 */
     wr8(m, F3_A5 + 0x1D36u, (uint8_t)(rd8(m, F3_A5 + 0x1D36u) & 0x7Fu)); /* 0x13F45C bclr.b #7 */
@@ -46,8 +50,7 @@ static void init_13F436(const f3mem_t *m)
 
 int Fn_13F436(const f3mem_t *m, f3regs_t *r)
 {
-    (void)r;
-    init_13F436(m);
+    init_13F436(m, r);
     return 0;                                       /* 0x13F462 trap #5 */
 }
 
@@ -148,6 +151,6 @@ int Task13F436_Frame(const f3mem_t *m, f3regs_t *r)
         Sound_PlayCmdForced(m, cmd);                /* 0x13F590 jsr 0x003B66 */
     }
 
-    init_13F436(m);                                 /* 0x13F59A bra.w 0x13F444 */
+    init_13F436(m, r);                              /* 0x13F59A bra.w 0x13F444 */
     return 1;                                       /* 0x13F462 trap #5 */
 }

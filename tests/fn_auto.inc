@@ -1108,3 +1108,7 @@
     { "Fn 0x001520 palette", "work/ram/fnp_001520", Fn_001520, ALLREGS },
     { "Fn 0x0057DA auto", "work/ram/fnk_0057DA", Fn_0057DA, ALLREGS },
     { "Fn 0x0B7332 auto", "work/ram/fnk_0B7332", Fn_0B7332, ALLREGS },
+    { "Fn 0x005794 auto", "work/ram/fnk_005794", Fn_005794, ALLREGS },
+    { "Fn 0x001A78 auto", "work/ram/fnk_001A78", Fn_001A78, ALLREGS },
+    { "Fn 0x003CE0 volume cmd", "work/ram/fnk_003CE0", Fn_003CE0, ALLREGS },
+    { "Fn 0x13F436 auto", "work/ram/fnt_13F436", Fn_13F436, ALLREGS },

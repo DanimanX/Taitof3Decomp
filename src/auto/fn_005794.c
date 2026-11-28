@@ -1,14 +1,15 @@
-/* ROM 0x005794: UNVERIFIED (weak capture): write the decimal digits of a
- * 16-bit value into a buffer backwards, then pad with a fill byte.
- *   arg1.w (SP+4)  value to print (zero-extended into D7)
- *   arg2.l (SP+6)  buffer pointer
- *   arg4.w (SP+0xA) padding byte (D1.b)
+/* ROM 0x005794: write the decimal digits of a 16-bit value into a buffer
+ * backwards, then pad with a fill byte.
+ *   arg1.w (SP+4)   value to print (zero-extended into D7)
+ *   arg2.l (SP+6)   buffer pointer
  *   arg3.w (SP+0xC) end index: buffer[index] = 0, digits are written at
  *                   index-1, index-2, ... until the quotient is 0 or the
  *                   index-1 counter runs out, then padding fills the rest.
- * The routine saves D1/D2/D7/A0, so it returns every register unchanged; the
- * capture only ever shows the digits-skipped / padding-skipped path (arg3.w =
- * 0, arg4.w odd) and its buffer pointer is outside the captured RAM. */
+ *   arg4.w (SP+0xA) padding byte (D1.b)
+ * The routine saves D1/D2/D7/A0, so it returns every register unchanged.
+ * 0x0057AA adda.w D2,A0 takes the base from arg3.w (the index), not arg4.w:
+ * the earlier draft added the padding word, so the digits landed at
+ * 0x400220 instead of 0x400200-0x400203 in work/ram/fnk_005794 (0/30). */
 #include "fn_auto.h"
 
 int Fn_005794(const f3mem_t *m, f3regs_t *r)
@@ -20,9 +21,9 @@ int Fn_005794(const f3mem_t *m, f3regs_t *r)
     uint32_t d7_saved = r->d[7], a0_saved = r->a[0];
 
     uint32_t d7 = (uint32_t)rd16(m, sp + 4u);                 /* 0x00579C..0x00579E */
-    uint32_t a0 = rd32(m, sp + 6u)
-                + (uint32_t)(int32_t)(int16_t)rd16(m, sp + 0x0Au); /* 0x0057A2..0x0057AA */
     uint16_t d2 = rd16(m, sp + 0x0Cu);                        /* 0x0057A6 (0x10,A6) */
+    uint32_t a0 = rd32(m, sp + 6u)
+                + (uint32_t)(int32_t)(int16_t)d2;             /* 0x0057A2..0x0057AA adda.w D2,A0 */
     uint32_t d1 = 10;                                         /* 0x0057AE moveq #0xa */
 
     wr8(m, a0, 0u);                                           /* 0x0057AC clr.b (A0) */

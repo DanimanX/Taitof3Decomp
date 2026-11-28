@@ -1154,5 +1154,6 @@ int Fn_0020C8(const f3mem_t *m, f3regs_t *r); /* ROM 0x0020C8 */
 int Fn_002156(const f3mem_t *m, f3regs_t *r); /* ROM 0x002156 */
 int Fn_0021BE(const f3mem_t *m, f3regs_t *r); /* ROM 0x0021BE */
 int Fn_00220E(const f3mem_t *m, f3regs_t *r); /* ROM 0x00220E */
+int Fn_003CE0(const f3mem_t *m, f3regs_t *r); /* ROM 0x003CE0 */
 /* END generated */
 #endif

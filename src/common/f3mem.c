@@ -115,6 +115,15 @@ static void eeprom_port_write(f3_eeprom_t *e, uint8_t pins)
     }
 }
 
+/* The 0x4A0000 port image of the current capture pair (see f3_set_mmio_ports).
+ * NULL leaves 0x4A0000 in the unmapped fallback below, as it always was. */
+static uint8_t *g_mmio_ports;
+
+void f3_set_mmio_ports(uint8_t *ports)
+{
+    g_mmio_ports = ports;
+}
+
 uint8_t *f3_ptr(const f3mem_t *m, uint32_t a)
 {
     a &= 0xFFFFFFu;                      /* 24-bit bus */
@@ -122,6 +131,9 @@ uint8_t *f3_ptr(const f3mem_t *m, uint32_t a)
         a -= 0x20000u;
     if (a >= F3_WRAM_BASE && a < F3_WRAM_BASE + F3_WRAM_SIZE)
         return &m->wram[a - F3_WRAM_BASE];
+    if (g_mmio_ports && a >= F3_MMIO_PORTS_BASE
+        && a < F3_MMIO_PORTS_BASE + F3_MMIO_PORTS_SIZE)
+        return &g_mmio_ports[a - F3_MMIO_PORTS_BASE];
     if (m->pal && a >= F3_PAL_BASE && a < F3_PAL_BASE + F3_PAL_SIZE)
         return &m->pal[a - F3_PAL_BASE];
     if (m->spr && a >= F3_SPR_BASE && a < F3_SPR_BASE + F3_SPR_SIZE)

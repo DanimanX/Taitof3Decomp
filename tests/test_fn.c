@@ -433,6 +433,15 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         r.pc = c.pcpre[i];
         if (exception) r.sr = c.srpre[i];
         cur_cap = e->cap; cur_pair = i; skip_lo = skip_hi = 0;
+        /* Port image of this pair, when the capture recorded one (F3_PORTS=1):
+         * a copy, so a routine that writes 0x4A0000 cannot corrupt the table
+         * the next pair (or a second entry on the same capture) reads. */
+        {
+            static uint8_t port_img[F3_MMIO_PORTS_SIZE];
+            const uint8_t *pp = pair_ports();
+            if (pp) memcpy(port_img, pp, sizeof port_img);
+            f3_set_mmio_ports(pp ? port_img : NULL);
+        }
         if (e->fn(&m, &r) < 0) { undec++; continue; }
         if (skip_hi > skip_lo && skip_lo >= F3_WRAM_BASE && skip_hi <= F3_WRAM_BASE + F3_WRAM_SIZE)
             memcpy(w + (skip_lo - F3_WRAM_BASE), cap_wram(&c, i, 1) + (skip_lo - F3_WRAM_BASE), skip_hi - skip_lo);

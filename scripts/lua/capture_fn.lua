@@ -132,6 +132,12 @@ local function poke_a0()
   for _, pv in ipairs(pokesa0p) do sp:write_u8((sp:read_u32(a0 + pv[1]) & 0xFFFFFF) + pv[2], pv[3]) end
 end
 local p = manager.machine.ioport.ports
+-- A machine reset during the capture (a broken injected call can make the
+-- game crash into the watchdog) re-runs this autoboot script. A second copy
+-- would reopen the outputs with "w" while the first still writes at its
+-- offset, leaving a hole of NUL bytes at the start of regs.tsv. So: run once.
+if _G.__f3_capture_fn then return end
+_G.__f3_capture_fn = true
 local out = assert(io.open(prefix .. "_pairs.bin", "wb"))
 local regs = assert(io.open(prefix .. "_regs.tsv", "w"))
 local exitpc = os.getenv("F3_EXITPC") == "1"
@@ -197,10 +203,18 @@ local pairs_done, have_pre, n = 0, false, 0
 local scr0 = nil
 local pre_snap, pre_regs, pending_logs, abandoned = nil, nil, {}, 0
 local maxframes = tonumber(os.getenv("F3_MAXFRAMES") or "6000")
+local finished = false
 local function finish(tag)
+  if finished then return end
+  finished = true
   out:close(); regs:close(); if dp then dp:close() end; if spf then spf:close() end; if gff then gff:close() end
-  print(string.format("CAPTURE %s pairs=%d abandoned=%d frames=%d screen=%d", tag, pairs_done, abandoned, n, manager.machine.screens[":screen"]:frame_number() - scr0)); manager.machine:exit()
+  print(string.format("CAPTURE %s pairs=%d abandoned=%d frames=%d screen=%d", tag, pairs_done, abandoned, n, manager.machine.screens[":screen"]:frame_number() - (scr0 or 0))); manager.machine:exit()
 end
+-- the pairs after a reset are not from the state the capture asked for: stop
+-- at the first reset with the pairs taken so far (an open pre is dropped)
+local reset_sub = emu.add_machine_reset_notifier and emu.add_machine_reset_notifier(function()
+  if scr0 then finish("RESET") end
+end)
 emu.register_periodic(function()
   if dbg.execution_state ~= "stop" then return end
   local pc = cpu.state["PC"].value

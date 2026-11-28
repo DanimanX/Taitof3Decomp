@@ -914,3 +914,10 @@
     { "Fn 0x1305C2 auto", "work/ram/fn_1305C2", Fn_1305C2, ALLREGS },
     { "Fn 0x11CF18 auto", "work/ram/fn_11CF18", Fn_11CF18, ALLREGS },
     { "Fn 0x11A966 auto", "work/ram/fn_11A966", Fn_11A966, ALLREGS },
+    /* 0x0D8F9A: injected capture (F3_INJECT_A0, Z10_001000, 14 pairs); the
+     * game resets after pair 14, so later pairs are not from this state. */
+    { "Fn 0x0D8F9A auto", "work/ram/fn_0D8F9A", Fn_0D8F9A, ALLREGS },
+    { "Fn 0x11CEEE auto", "work/ram/fn_11CEEE", Fn_11CEEE, ALLREGS },
+    { "Fn 0x11CF56 auto", "work/ram/fn_11CF56", Fn_11CF56, ALLREGS },
+    { "Fn 0x14D6E2 auto", "work/ram/fn_14D6E2", Fn_14D6E2, ALLREGS },
+    { "Fn 0x151D68 auto", "work/ram/fn_151D68", Fn_151D68, ALLREGS },

@@ -25,14 +25,19 @@
  * All the draws go through jsr (A4) = 0x005666 and are pushed in place; the
  * lea 0x42(SP) at 0x1A1B0E drops the three fixed lines (10 + 26 + 30 bytes),
  * and each row drops its own 10 bytes with lea 0xA(SP). Bit 4 of 0x402225
- * leaves the frame: the selected fn at 0x1A2350 + D3*36 is called, then
- * 0x005A3A (Gfx_LoadCharFont), then the frame yields again. That callee is a
- * whole test-mode screen (a segment group of its own, which yields inside),
- * so the exit path returns SEG_LEAVE before any side effect; every captured
- * frame has bit 4 set and never takes it. */
+ * leaves the frame: `move.l D3,D0 / lsl #3 / add.l D3 / lsl #2 / add.l D5,D0`
+ * makes D0 the table record 0x1A2350 + D3*36 and 0x1A1B96 `jsr ([D0])` calls
+ * the fn pointer stored there - a whole test-mode screen, i.e. a segment group
+ * of its own that yields inside. The wrapper pushes the return PC 0x1A1B9A and
+ * lets Seg_Run run the screen's group; when the screen returns, 0x1A1B9A runs
+ * 0x005A3A (the character/font upload) and 0x1A1BA0 branches back to the
+ * yield. Every captured frame has bit 4 set and never takes this path; the one
+ * table entry without a group yet (0x1A1282 DIFFICULTY) makes Seg_Run report
+ * SEG_LEAVE. */
 #include "../kernel/seg.h"
 #include "../enemy/obj_1194C2.h"   /* Text_DrawString (ROM 0x005666) */
 #include "../video/sprite.h"        /* Gfx_ClearAllLayers (ROM 0x005A12) */
+#include "../auto/fn_auto.h"        /* Fn_005A3A (ROM 0x005A3A) */
 
 #define SEG_YIELD   0x001A1A68u     /* jsr 0x001F62, the yield */
 #define MENU_TABLE  0x001A2350u     /* {fn.l, "  label"} x 7, then a null fn */
@@ -188,13 +193,23 @@ uint32_t Seg_1A1A26(const f3mem_t *m, f3regs_t *r, uint32_t pc)
         r->a[0] = r->d[6];
         r->d[0] = (r->d[0] & 0xFFFFFF00u) | (rd8(m, r->d[6]) & 0x10u);
         if (!(r->d[0] & 0xFFu)) {
-            /* 0x1A1B8C: D0 = 0x1A2350 + D3*36, jsr ([D0]) runs the selected
-             * screen (a segment group of its own, which yields inside), then
-             * 0x005A3A loads the character font. Neither is translatable
-             * inside this segment, so the path stops here. */
-            return SEG_LEAVE;
+            /* 0x1A1B8C: D0 = 0x1A2350 + D3*36 ; 0x1A1B96 jsr ([D0]) */
+            r->d[0] = r->d[3] * 8u;     /* lsl.l #3,D0 */
+            r->d[0] += r->d[3];         /* add.l D3,D0 */
+            r->d[0] <<= 2;              /* lsl.l #2,D0 */
+            r->d[0] += r->d[5];         /* add.l D5,D0 */
+            seg_push32(m, r, 0x001A1B9Au);
+            return Seg_Run(m, r, rd32(m, r->d[0] & 0x00FFFFFFu));
         }
         return SEG_YIELD;           /* 0x1A1B88 bne.w 0x1A1A68 */
+
+    case 0x1A1B9Au:
+        /* 0x1A1B9A jsr 0x005A3A: load the character/font block (register
+         * neutral), then 0x1A1BA0 bra.w 0x1A1A68 yields again. */
+        seg_push32(m, r, 0x001A1BA0u);
+        (void)Fn_005A3A(m, r);
+        r->a[7] += 4u;              /* its rts */
+        return SEG_YIELD;
     }
     return SEG_LEAVE;
 }

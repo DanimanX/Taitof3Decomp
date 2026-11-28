@@ -35,6 +35,10 @@ uint32_t Seg_0B935A(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* ending tas
 uint32_t Seg_0B8404(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* attract / title sequencer (Task_Attract) */
 uint32_t Seg_19F504(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode MONITOR TEST */
 uint32_t Seg_19F708(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode screen (yields via jsr 0x1F62) */
+uint32_t Seg_1A00E6(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode SOUND TEST (0x1A00E6) */
+uint32_t Seg_1A043C(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode SOUND TEST (0x1A043C) */
+uint32_t Seg_1A0942(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode SOUND TEST wrapper (0x1A0942) */
+uint32_t Seg_1A095E(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode HI-SCORE RESET (0x1A095E) */
 uint32_t Seg_1A0A52(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode CONFIGURATION */
 uint32_t Seg_1A1856(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode FACTORY SETTING */
 uint32_t Seg_1A1A26(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode main menu (Task_TestModeMenu) */

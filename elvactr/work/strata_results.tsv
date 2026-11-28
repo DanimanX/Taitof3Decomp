@@ -2,3 +2,19 @@
 002E8C	32	accepted	30/30 try=1 rel=003998 208s
 000AD6	42	accepted	30/30 try=1 rel=000FEC 147s
 0009F4	46	weak	empty function passes the capture
+006F3A	16	fail	0/30 undec=0 try=1 rel=005BE8 127s
+0069F4	42	accepted	30/30 try=0 rel=005666 115s
+006A1E	80	fail	0/30 undec=0 try=1 rel=005690 213s
+0034A0	94	fail	1/30 undec=0 try=2 rel=003E00 486s
+006AA8	122	fail	0/30 undec=0 try=1 rel=00571A 315s
+000C16	2	weak	empty function passes the capture
+0045E0	2	weak	empty function passes the capture
+003A6E	4	fail	0/15 undec=0 try=2 rel=- 310s
+003B96	4	accepted	19/19 try=0 rel=- 19s
+003FF0	4	accepted	3/3 try=0 rel=- 18s
+0045D0	4	weak	empty function passes the capture
+001044	6	accepted	30/30 try=0 rel=- 22s
+003A9A	6	fail	no code block rel=- 637s
+003AA0	6	fail	no code block rel=- 626s
+003C1E	6	fail	COMPILE ERROR: try=2 rel=- 405s
+003FD8	6	fail	no code block rel=- 665s

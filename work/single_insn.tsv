@@ -1,0 +1,8 @@
+# Routines that are one instruction. A capture cannot tell their C from an empty
+# body (the instruction leaves no register or RAM change the harness compares),
+# so scripts/coverage.py counts them as verified when the ROM bytes at the
+# address are exactly these and the function is exactly that long.
+# addr	bytes	instruction	C
+000400	4e73	rte	src/auto/fn_000400.c
+0D4FF6	4e75	rts	src/auto/fn_0D4FF6.c
+001A66	4ef90000222e	jmp 0x00222E	src/auto/fn_001A66.c

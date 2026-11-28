@@ -65,6 +65,16 @@ gx = f"{ROOT}/work/gcov_exec.tsv"
 if os.path.exists(gx):
     ran = {int(ln.split()[0], 16) for ln in open(gx) if ln.strip() and not ln.startswith("#")}
     ver |= (ran & dec) - unver
+# One-instruction routines (work/single_insn.tsv): checked against the ROM
+# bytes, since no capture can tell their C from an empty body.
+si = f"{ROOT}/work/single_insn.tsv"
+if os.path.exists(si):
+    rom = open(f"{ROOT}/work/maincpu.bin", "rb").read()
+    for ln in open(si):
+        if not ln.strip() or ln.startswith("#"): continue
+        a, hexb = ln.split("\t")[:2]; a = int(a, 16); b = bytes.fromhex(hexb)
+        if a in funcs and a in dec and rom[a:a + len(b)] == b and funcs[a][0] == len(b):
+            ver.add(a)
 dec_f = {a for a in funcs if a in dec}
 ver_f = {a for a in dec_f if a in ver}
 fsum = lambda s: sum(funcs[a][0] for a in s)

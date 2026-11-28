@@ -1259,3 +1259,26 @@
 183DF8	0	codex	assigned to codex, injected capture (round 10)
 18F3C4	0	codex	assigned to codex, injected capture (round 10)
 0B7D52	0	accepted	30/30 undec=0 try=0 69s
+11CF34	0	accepted	30/30 undec=0 try=2 445s
+1305C2	0	fail	COMPILE ERROR (project flags): try=3 698s
+1A0A52	0	fail	codex round 10: not written
+1319FE	0	fail	codex round 10: capture not passed
+1A095E	0	fail	codex round 10: not written
+0B7D74	0	fail	codex round 10: not written
+0E48FA	0	fail	codex round 10: not written
+19F504	0	fail	codex round 10: not written
+0B7506	0	fail	codex round 10: not written
+1A1856	0	fail	codex round 10: not written
+0910CC	0	fail	codex round 10: not written
+0E4560	0	fail	codex round 10: not written
+0B80A4	0	fail	codex round 10: capture not passed
+0C6836	0	accepted	30/30 undec=0 try=0 100s
+17ABDC	0	accepted	30/30 undec=0 try=0 65s
+18F3A0	0	accepted	30/30 undec=0 try=0 68s
+0E0008	0	fail	0/30 undec=0 try=3 473s
+0E343C	0	fail	0/30 undec=0 try=3 401s
+0E437E	0	fail	0/30 undec=0 try=3 443s
+129E3E	0	fail	12/30 undec=0 try=2 395s
+0B71E0	0	weak	empty draft passes the capture
+0B7B28	0	weak	empty draft passes the capture
+0C2F20	0	fail	0/30 undec=0 try=3 465s

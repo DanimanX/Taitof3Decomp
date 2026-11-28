@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x0910CC: UNVERIFIED (no capture): initialize and run the object-checker menu task. */
+/* ROM 0x0910CC: (capture fnt_: injected call up to its first yield, F3_INJECT_ABORT): initialize and run the object-checker menu task. */
 #include "fn_text_frames.h"
 #include "../kernel/kernel.h"
 

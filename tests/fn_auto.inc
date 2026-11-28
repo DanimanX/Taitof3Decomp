@@ -1074,3 +1074,8 @@
     { "Fn 0x130B16 auto", "work/ram/fnk_130B16", Fn_130B16, ALLREGS },
     { "Fn 0x1319FE auto", "work/ram/fnk_1319FE", Fn_1319FE, ALLREGS },
     { "Fn 0x1843AE auto", "work/ram/fnk_1843AE", Fn_1843AE, ALLREGS },
+    { "Fn 0x0910CC auto", "work/ram/fnt_0910CC", Fn_0910CC, ALLREGS },
+    { "Fn 0x0B7B52 auto", "work/ram/fnt_0B7B52", Fn_0B7B52, ALLREGS },
+    { "Fn 0x0B80A4 auto", "work/ram/fnt_0B80A4", Fn_0B80A4, ALLREGS },
+    { "Fn 0x1781F6 auto", "work/ram/fnt_1781F6", Fn_1781F6, ALLREGS },
+    { "Fn 0x0B7506 auto", "work/ram/fnt_0B7506", Fn_0B7506, ALLREGS },

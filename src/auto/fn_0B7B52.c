@@ -1,4 +1,4 @@
-/* ROM 0x0B7B52: UNVERIFIED (no capture): the sound/option editor task body.
+/* ROM 0x0B7B52: (capture fnt_: injected call up to its first yield, F3_INJECT_ABORT): the sound/option editor task body.
  *
  * Pre-yield part: frame a 0x12 x 9 box (attribute 6) at the record
  * A5-0xC18 points to (0x4073E8), draw the hex legend and its two attribute

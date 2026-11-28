@@ -133,6 +133,8 @@ for v in string.gmatch(os.getenv("F3_INJECT_STACK") or "", "[%x|]+") do
 end
 local inject_n = 0
 local inject_orig_sp = nil
+local inject_base_sp = nil
+local inject_abort = os.getenv("F3_INJECT_ABORT") == "1"
 local sweep = tonumber(os.getenv("F3_SWEEP") or "0")
 local sweep_base = tonumber(os.getenv("F3_SWEEP_BASE") or "0")
 local want = tonumber(os.getenv("F3_SAMPLES") or "300")
@@ -252,6 +254,7 @@ emu.register_periodic(function()
       -- callee; the return to inject_at leaves them on the stack, so the
       -- original SP is restored there (the inject_orig_sp check above)
       if #inject_stack > 0 then inject_orig_sp = spv end
+      inject_base_sp = spv
       for i = #inject_stack, 1, -1 do
         local alt = inject_stack[i]
         spv = spv - 4; sp:write_u32(spv, alt[inject_n % #alt + 1])
@@ -339,6 +342,13 @@ emu.register_periodic(function()
     out:flush(); regs:flush(); if dp then dp:flush() end; if spf then spf:flush() end; if gff then gff:flush() end
     pairs_done = pairs_done + 1
     if pairs_done >= want then finish("DONE"); return end
+    -- F3_INJECT_ABORT=1 with an F3_EXIT PC (e.g. a task body's first TRAP #5):
+    -- the injected call cannot return from there, so after the post it is
+    -- abandoned: PC back to the injection point, SP as before the call.
+    if inject_abort and inject_base_sp and exits[pc] then
+      cpu.state["SP"].value = inject_base_sp; cpu.state["PC"].value = inject_at
+      inject_base_sp = nil; inject_orig_sp = nil
+    end
   end
   dbg.execution_state = "run"
 end)

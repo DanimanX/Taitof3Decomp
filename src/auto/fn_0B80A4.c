@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x0B80A4: UNVERIFIED (no capture): edit the test menu's MIN-MAX setting. */
+/* ROM 0x0B80A4: (capture fnt_: injected call up to its first yield, F3_INJECT_ABORT): edit the test menu's MIN-MAX setting. */
 /* All 30 supplied entry-to-return pairs span VBlank. The setup stops at
  * 0x0B80FC and TaskMinMax_Frame resumes at 0x0B80FE with the saved frame. */
 #include "fn_call_frames.h"

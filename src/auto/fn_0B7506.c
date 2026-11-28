@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x0B7506: UNVERIFIED (no capture): draw and run the YES/NO prompt. */
+/* ROM 0x0B7506: (capture fnt_: injected call up to its first yield, F3_INJECT_ABORT): draw and run the YES/NO prompt. */
 /* All supplied entry-to-RTS pairs span VBlanks and are skipped by test_fn. */
 #include "fn_text_frames.h"
 

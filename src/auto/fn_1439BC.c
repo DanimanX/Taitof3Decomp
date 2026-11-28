@@ -1,4 +1,4 @@
-/* ROM 0x1439BC: UNVERIFIED (no capture): stage-8 boss task entry.
+/* ROM 0x1439BC: (capture fnt_: up to the first yield): stage-8 boss task entry.
  * It calls 0x143A16 and that call does NOT return: 0x143A16 ends its first
  * pass in a TRAP #5 at 0x143A8E, so the task yields inside the bsr and the
  * continuation (0x143A90 -> rts -> 0x1439C0 bra 0x1439EA) runs on the next
@@ -24,6 +24,7 @@
  * sets A5+0x1D36 bit 3, and tail-jumps to the 0x144894 task body, which clears
  * the A5-0x5D56-offset 0xE8 attribute words at 0x627200 and yields. */
 #include "fn_auto.h"
+#include "fn_call_frames.h"
 #include "../common/fn_leaf1.h"
 #include "../kernel/fn_010420.h"
 #include "../kernel/kernel.h"
@@ -40,7 +41,7 @@ static void trap01_create(const f3mem_t *m, f3regs_t *r, uint32_t id, uint32_t e
     wr32(m, sp - 8u, entry);                 /* 0x143A5E pea.l */
     wr32(m, sp - 4u, id);                    /* 0x143A58 move.l #id,-(A7) */
     r->a[7] = sp - 16u;
-    (void)Kern_001E76(m, r);                 /* 0x143A64 trap #1 */
+    (void)Kern_001E76(m, r);                 /* 0x143A64 trap #1: sets D0 = slot */
     r->a[7] = sp;                            /* 0x143A66 addq.l #8,A7 */
 }
 
@@ -86,7 +87,7 @@ static void init_143A16(const f3mem_t *m, f3regs_t *r)
     wr16(m, 0x0040CAB2u, 0xFFFFu);
     r->a[0] = 0x0040CAACu;                   /* 0x143A44 lea (0x7F8,A1),A0 */
 
-    Kernel_SoundBank0_0014DA(m);             /* 0x143A52 jsr 0x0014DA */
+    Kernel_SoundBank0_0014DA_Regs(m, r);            /* 0x143A52 jsr 0x0014DA */
 
     trap01_create(m, r, 0x00000004u, 0x00010488u); /* 0x143A58..0x143A66 */
     trap01_create(m, r, 0x0000000Eu, 0x00010502u); /* 0x143A68..0x143A76 */
@@ -125,7 +126,12 @@ static void ending_144894(const f3mem_t *m, f3regs_t *r)
 
 int Fn_1439BC(const f3mem_t *m, f3regs_t *r)
 {
-    init_143A16(m, r);                       /* 0x1439BC bsr.w 0x143A16 (yields inside) */
+    /* 0x1439BC bsr.w 0x143A16: the BSR's return address stays on the stack,
+     * because 0x143A16 does not return -- it yields at the TRAP #5 0x143A8E,
+     * so the ROM reaches the trap with SP 4 below the entry SP. The pop is the
+     * rts at 0x143AAC on the resume path (Task1439BC_Frame). */
+    push_long(m, r, 0x001439C0u);
+    init_143A16(m, r);                       /* 0x143A16 .. TRAP #5 0x143A8E */
     return 0;
 }
 
@@ -136,7 +142,8 @@ int Task1439BC_Frame(const f3mem_t *m, f3regs_t *r)
     /* 0x143A90 pea.l 0 ; move.w #1,-(A7) ; move.w #0xB,-(A7) ;
      * move.l #0x143AAE,-(A7) ; jsr 0x01057C ; lea 0xC(A7),A7 */
     r->d[0] = Obj_Spawn(m, r->a[0], 0x00143AAEu, 0x000Bu, 1u, 0u);
-    /* 0x143AAC rts -> 0x1439C0 bra.w 0x1439EA */
+    r->a[7] += 4u;                           /* 0x143AAC rts pops the 0x1439BC BSR PC */
+    /* -> 0x1439C0 bra.w 0x1439EA */
 
     wr16(m, F3_A5 + 0x331Cu, 0u);            /* 0x1439EA clr.w (0x331C,A5) */
     wr32(m, F3_A5 + 0x3370u, rd32(m, F3_A5 + 0x4224u)); /* 0x1439EE */

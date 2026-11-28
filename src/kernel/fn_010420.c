@@ -62,6 +62,40 @@ void Kernel_SoundBank0_0014DA(const f3mem_t *m)
     Kernel_SoundRelay(m, 0x00016890u, 0x00016900u, 0u, &rg);
 }
 
+/* ROM 0x0014DA with the register file it leaves: bank 0 with index
+ * (D0.b) % 6 from table 0x16890 / source 0x16900, then `moveq #0,D0` and bank 1
+ * with index 0 from 0x168C0 / 0x1FB40. D0/D1 end as the bank-1 relay left them
+ * (D1 carries over from bank 0), D2 = -1 once a block loop ran, D3 = the block
+ * long with DBRA's 0xFFFF, A0 = 0x440000, A1 = 0x1FB40, A2 = the stream cursor.
+ * Needed by the callers that print or branch on those registers. */
+void Kernel_SoundBank0_0014DA_Regs(const f3mem_t *m, f3regs_t *r)
+{
+    snd_relay_t rg = { 0u, 0u, 0u, 0u, 0u, 0u };
+    uint32_t n = r->d[0] & 0xFFu;                     /* 0x0014F4 andi.l #$ff */
+    uint16_t quo = (uint16_t)(n / 6u);                /* 0x0014FA divu.w #6 */
+    uint16_t rem = (uint16_t)(n % 6u);
+    int ran = 0;
+
+    rg.d0 = ((uint32_t)quo << 16) | rem;              /* 0x0014FE swap D0 */
+    rg.d1 = r->d[1];
+    Kernel_SoundRelay(m, 0x00016890u, 0x00016900u, (uint8_t)rem, &rg);
+    if ((int32_t)rg.d3 >= 0)
+        ran = 1;
+    rg.d0 = 0u;                                       /* 0x0014E0 moveq #$0,d0 */
+    Kernel_SoundRelay(m, 0x000168C0u, 0x0001FB40u, 0u, &rg);
+    if ((int32_t)rg.d3 >= 0)
+        ran = 1;
+
+    r->d[0] = (r->d[0] & 0xFFFF0000u) | (rg.d0 & 0xFFFFu);
+    r->d[1] = (r->d[1] & 0xFFFF0000u) | (rg.d1 & 0xFFFFu);
+    if (ran)                                          /* 0x001544 dbra D2 */
+        r->d[2] = (r->d[2] & 0xFFFF0000u) | 0xFFFFu;
+    r->d[3] = rg.d3;                                  /* 0x001548 dbra D3 */
+    r->a[0] = rg.a0;                                  /* 0x00152A lea */
+    r->a[1] = rg.a1;
+    r->a[2] = rg.a2;
+}
+
 /* ROM 0x001504: sound bank 1 (D0 = 0). 0x00151A swap d0 makes the block index
  * the remainder of D0 mod 8; the table's word entries are 8 bytes apart. */
 void Kernel_SoundBank1_001504(const f3mem_t *m)

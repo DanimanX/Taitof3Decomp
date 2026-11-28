@@ -7,6 +7,11 @@
  * (0..3) and attr high byte, +0x1D colour override.b, +0x1E zoom.w. */
 #include "../common/f3mem.h"
 
+#ifndef F3REGS_T_DEFINED
+#define F3REGS_T_DEFINED
+typedef struct { uint32_t d[8], a[8]; } f3regs_t;   /* a[7] = SP */
+#endif
+
 #define SPR_CURSOR (F3_A5 - 0x0CA0)
 
 void Obj_DrawSprite(const f3mem_t *m, uint32_t obj);  /* ROM 0x001282 */
@@ -29,7 +34,9 @@ void Gfx_ClearPf2AndLineRam(const f3mem_t *m);        /* ROM 0x0059B4 */
 void Gfx_ClearAllLayers(const f3mem_t *m);            /* ROM 0x005A12 */
 void Gfx_UploadTextTiles(const f3mem_t *m, uint32_t src, uint16_t slot); /* ROM 0x005A86 */
 void Gfx_InitLineRam(const f3mem_t *m);               /* ROM 0x005B0C */
+void Gfx_InitLineRam_Regs(const f3mem_t *m, f3regs_t *r); /* ROM 0x005B0C + its leftovers */
 void Stage_DrawBanner13D11E(const f3mem_t *m);        /* ROM 0x13D11E */
+void Stage_DrawBanner13D11E_Regs(const f3mem_t *m, f3regs_t *r); /* ROM 0x13D11E + 0x005A86 leftovers */
 void Stage_NameEntry13D7A0(const f3mem_t *m, uint32_t a0, uint32_t a1, uint16_t d7); /* ROM 0x13D7A0 */
 void Stage_DrawHighScores13D94C(const f3mem_t *m);    /* ROM 0x13D94C */
 void Stage_UploadBgTilemaps(const f3mem_t *m);        /* ROM 0x16A9BC */

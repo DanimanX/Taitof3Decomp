@@ -104,6 +104,10 @@
 /* ======================================================================== */
 void Player_ShotPoolReset(const f3mem_t *m)
 {
+    /* 0x0C6DEC lea.l 0x410354,A0 ; move.w #0x3F,D0 ; L: the four stores ;
+     * 0x0C6E0A dbra D0,L. The loop never advances A0, so it writes the SAME
+     * object 0x40 times (verified: work/ram/fnt_0C6A64 keeps 0x4103D0+ clear
+     * apart from the base object at 0x410354). */
     uint32_t a0 = SHOT_POOL_BASE;
     int16_t d0w = SHOT_POOL_LAST;
     do {
@@ -111,7 +115,6 @@ void Player_ShotPoolReset(const f3mem_t *m)
         wr16(m, a0 + 0x1Eu, 0u);
         wr8(m, a0 + 0x34u, 0xFFu);   /* st: collision off */
         wr8(m, a0 + 0x35u, 0u);
-        a0 += 0x6Cu;
         d0w = (int16_t)(d0w - 1);
     } while (d0w >= 0);
 }
@@ -138,9 +141,10 @@ void Player_ArmRespawn(const f3mem_t *m, uint32_t a0)
 /* ======================================================================== */
 int Player_Respawn(const f3mem_t *m, uint32_t a0)
 {
-    /* Obj_Spawn(*(A0+0x62), fn 0x0C95DE, group 1, n 11, arg *(A0+0x62)) */
-    Obj_Spawn(m, rd32(m, a0 + PS_CHILD_PTR), TBL_SHOT_SCRIPT, 1u, 11u,
-              rd32(m, a0 + PS_CHILD_PTR));
+    /* 0x0C6D12..0x0C6D24: Obj_Spawn(A0, fn 0x0C95DE, group 0xB, n 1,
+     * arg *(A0+0x62)): the pushed pair is (arg, count 1, group 0xB, fn), so
+     * the group word reaches the handler first. */
+    Obj_Spawn(m, a0, TBL_SHOT_SCRIPT, 11u, 1u, rd32(m, a0 + PS_CHILD_PTR));
     wr8(m, a0 + PS_FLAGS, 0u);
 
     /* lea (0x253A,PC),A1 + mulu.w #4 of the id: spawn position pair */

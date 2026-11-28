@@ -199,8 +199,14 @@ static void test_helpers(const uint8_t *rom)
     CHECK(rd32(&m, P1_SHOTS + 0x10u) == 0x00028740u && rd8(&m, P1_SHOTS + 0x34u) == 0xFF &&
           rd8(&m, P1_SHOTS + 0x35u) == 0 && rd16(&m, P1_SHOTS + 0x1Eu) == 0,
           "ShotPoolReset first object");
-    CHECK(rd32(&m, P1_SHOTS + 63u * 0x6Cu + 0x10u) == 0x00028740u &&
-          rd8(&m, P1_SHOTS + 63u * 0x6Cu + 0x34u) == 0xFF, "ShotPoolReset last object");
+    /* 0x0C6E0A is `dbra D0,0x0C6DF6` with no `lea` in the body: the ROM writes
+     * the base object 0x40 times and leaves the rest of the pool alone. The
+     * capture work/ram/fnt_0C6A64 shows it (0x410354 already 0x00028740, every
+     * other object 0x4103C0 / 0x411DE8 still 0 afterwards). */
+    CHECK(rd32(&m, P1_SHOTS + 1u * 0x6Cu + 0x10u) == 0u &&
+          rd8(&m, P1_SHOTS + 1u * 0x6Cu + 0x34u) == 0u &&
+          rd32(&m, P1_SHOTS + 63u * 0x6Cu + 0x10u) == 0u,
+          "ShotPoolReset repeats the base object only (no A0 advance)");
     CHECK(rd32(&m, P1_SHOTS + 64u * 0x6Cu + 0x10u) == 0x22222222u,
           "ShotPoolReset stays inside the pool");
 

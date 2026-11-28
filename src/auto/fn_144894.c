@@ -1,4 +1,4 @@
-/* ROM 0x144894: UNVERIFIED (no capture): configuration ("OPTION") task body.
+/* ROM 0x144894: (capture fnt_: up to the first yield): configuration ("OPTION") task body.
  * Pre-yield part: clear playfield layer 3 (0x0058AE), draw the stage banner
  * (0x13D11E), reload the flash ramp table (0x13CAAE), then clear bits 14-15 of
  * the 0xE8 attribute words at 0x627200 + (A5-0x5D56) and yield at the TRAP #5
@@ -25,7 +25,7 @@
 static void body_144894(const f3mem_t *m, f3regs_t *r)
 {
     Gfx_ClearPf3(m);                         /* 0x144894 jsr 0x0058AE */
-    Stage_DrawBanner13D11E(m);               /* 0x14489A jsr 0x13D11E */
+    Stage_DrawBanner13D11E_Regs(m, r);       /* 0x14489A jsr 0x13D11E */
     Leaf_13CAAE(m, r);                       /* 0x1448A0 jsr 0x13CAAE */
 
     /* 0x1448A6 lea 0x627200,A0 ; 0x1448AC adda.w (A5-0x5D56),A0 ;

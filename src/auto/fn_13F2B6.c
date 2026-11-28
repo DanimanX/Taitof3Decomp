@@ -1,4 +1,4 @@
-/* ROM 0x13F2B6: UNVERIFIED (no capture): stage-timeline task restart entry.
+/* ROM 0x13F2B6: (capture fnt_: up to the first yield): stage-timeline task restart entry.
  * It re-runs the stage-start wrapper 0x13F428 (stage setup + terrain + banner,
  * clears A5-0x144C bit 5), installs the ROM script base 0x0040C2B4 as the
  * wave-script pointer A5+0x3308, and falls into the task's TRAP #5 yield at

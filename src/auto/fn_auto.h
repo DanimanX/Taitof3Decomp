@@ -1146,5 +1146,7 @@ int Fn_0D5620(const f3mem_t *m, f3regs_t *r); /* ROM 0x0D5620 Obj_CBF8A_0D5620 *
 int Fn_17C662(const f3mem_t *m, f3regs_t *r); /* ROM 0x17C662 Obj_17C700_Tick */
 int Fn_17C700(const f3mem_t *m, f3regs_t *r); /* ROM 0x17C700 bra.w 0x17C662 */
 int Fn_18BB50(const f3mem_t *m, f3regs_t *r); /* ROM 0x18BB50 Obj_18BB50 */
+int Fn_13F5B8_Yield(const f3mem_t *m, f3regs_t *r); /* ROM 0x13F5B8 pre-yield (TRAP #5 0x13F5FE) */
+int Fn_0C6A64(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C6A64 */
 /* END generated */
 #endif

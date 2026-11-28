@@ -17,6 +17,34 @@ static void fx_start(const f3mem_t *m, uint32_t table, uint16_t mode, uint8_t id
     }
 }
 
+/* ROM 0x0015D0 / 0x0015EC with the register file they leave, for callers that
+ * read it: A0 = the block table, D0 = the `divu.w` quotient in the high word and
+ * `swap`ed remainder (id % 6 or id % 8) in the low word, D1 = the block's
+ * duration long with `addq.w #1` when it is positive. The duration word and the
+ * pointer still land in the A5 FX variables. */
+static void fx_start_regs(const f3mem_t *m, f3regs_t *r, uint32_t table,
+                          uint16_t mode, uint8_t id, uint8_t n)
+{
+    wr16(m, FX_MODE, mode);
+    r->a[0] = table;                                   /* 0x0015D6 lea */
+    uint32_t d0 = id & 0xFFu;                          /* 0x0015DC andi.l #$ff */
+    d0 = ((d0 / n) << 16) | (d0 % n);                  /* 0x0015E2 divu.w ; 0x0015E6 swap */
+    r->d[0] = d0;
+    int32_t dur = (int32_t)rd32(m, table + 4u + 8u * (d0 & 0xFFFFu)); /* 0x001608 */
+    r->d[1] = (uint32_t)dur;
+    if (dur > 0) {                                     /* 0x00160C ble */
+        r->d[1] = (uint32_t)((uint32_t)dur & 0xFFFF0000u) | (uint16_t)((uint32_t)dur + 1u); /* 0x001610 */
+        wr16(m, FX_TIMER, (uint16_t)r->d[1]);          /* 0x001612 */
+        wr32(m, FX_PTR, rd32(m, table + 8u * (d0 & 0xFFFFu))); /* 0x001616 */
+    }
+}
+
+void Fx_StartA_Regs(const f3mem_t *m, f3regs_t *r, uint8_t id)
+{ fx_start_regs(m, r, 0x16890u, 0, id, 6); }
+
+void Fx_StartB_Regs(const f3mem_t *m, f3regs_t *r, uint8_t id)
+{ fx_start_regs(m, r, 0x168C0u, 1, id, 8); }
+
 void Fx_StartA(const f3mem_t *m, uint8_t id) { fx_start(m, 0x16890u, 0, id, 6); }
 void Fx_StartB(const f3mem_t *m, uint8_t id) { fx_start(m, 0x168C0u, 1, id, 8); }
 

@@ -474,6 +474,37 @@ void Gfx_InitLineRam(const f3mem_t *m)
     }
 }
 
+/* ROM 0x005B0C as its caller sees it: the RAM rebuild plus the registers it
+ * leaves. A0 ends on the byte after the 0x5BF8 row table (8 rows x 4 words),
+ * A1 on the byte after the 0x620000 row table (8 rows x 0x100 words), D3 and
+ * D1 on -1 after their DBF loops, D0 = the 0x624000-derived value of
+ * 0x005B50..0x005B62 whose low word the 0x005B8A/0x005BD6 `move.w <control>,D0`
+ * + `ori.w #0x8000` replaces, and D2 is rotated by 4 eight times = unchanged.
+ * D0's high word is 0x0018 for every path (0x00624000 >>8 >>4 <<8 <<2, then
+ * `andi.w #0x7fff` and eight `addi.w #0x400` that never carry out of the low
+ * word). */
+void Gfx_InitLineRam_Regs(const f3mem_t *m, f3regs_t *r)
+{
+    uint32_t d0 = 0x00624000u;                                   /* 0x005B50 */
+    d0 >>= 8;                                                    /* 0x005B56 */
+    d0 >>= 4;                                                    /* 0x005B58 */
+    d0 <<= 8;                                                    /* 0x005B5A */
+    d0 <<= 2;                                                    /* 0x005B5C */
+    d0 = (d0 & 0xFFFF0000u) | (uint16_t)((uint16_t)d0 + 0x000Fu); /* 0x005B5E */
+    d0 = (d0 & 0xFFFF0000u) | (uint16_t)((uint16_t)d0 & 0x7FFFu); /* 0x005B62 */
+    if (rd16(m, F3_A5 - 0x5D58u) == 0u)                          /* 0x005B7A tst.w */
+        d0 = (d0 & 0xFFFF0000u) | (uint16_t)(rd16(m, 0x006247FEu) | 0x8000u); /* 0x005BA2 */
+    else
+        d0 = (d0 & 0xFFFF0000u) | (uint16_t)(rd16(m, 0x00624600u) | 0x8000u); /* 0x005BD6 */
+
+    Gfx_InitLineRam(m);
+    r->d[0] = d0;
+    r->d[1] = (r->d[1] & 0xFFFF0000u) | 0xFFFFu;                 /* 0x005B6C dbf D1 */
+    r->d[3] = (r->d[3] & 0xFFFF0000u) | 0xFFFFu;                 /* 0x005B76 dbf D3 */
+    r->a[0] = 0x00005C38u;                                       /* 0x005BF8 + 8*4*2 */
+    r->a[1] = 0x00621000u;                                       /* 0x00620000 + 8*0x100*2 */
+}
+
 /* ROM 0x13D11E */
 void Stage_DrawBanner13D11E(const f3mem_t *m)
 {
@@ -481,6 +512,43 @@ void Stage_DrawBanner13D11E(const f3mem_t *m)
     uint32_t a0 = rd32(m, 0x0013D558u + (int32_t)idx * 4);
     Gfx_UploadTextTiles(m, a0, rd8(m, 0x00010C05u));
     Gfx_DrawTilemapBlock(m, 0x00010C00u, 0x0061C024u, 0u);
+}
+
+/* ROM 0x13D11E with the register leftovers its callers keep: 0x005A86 saves
+ * nothing, so A0-A3/D0-D2 hold its end state (A1 = end of the tile block,
+ * A3 = end of the last tile source, D2 = the last swapped long, D0/D1 = -1
+ * after their DBF); 0x0055C8 keeps every register. D0.b at entry is the tile
+ * slot from 0x10C05, used as `lsl.w #5,D0 ; adda.w D0,A1`. */
+void Stage_DrawBanner13D11E_Regs(const f3mem_t *m, f3regs_t *r)
+{
+    int16_t idx = (int16_t)rd16(m, F3_A5 + 0x32DCu);              /* 0x13D124 */
+    uint32_t a0 = rd32(m, 0x0013D558u + (int32_t)idx * 4);         /* 0x13D128 */
+    uint16_t d0 = rd8(m, 0x00010C05u);                             /* 0x13D12C..0x13D12E */
+    uint32_t a1 = 0x0061E000u                                      /* 0x005A86 */
+                + (uint32_t)(int32_t)(int16_t)(uint16_t)(d0 << 5); /* 0x005A8C..0x005A8E */
+    uint32_t a2 = 0x0001120Au;                                     /* 0x005A90 */
+    int16_t count = (int16_t)rd16(m, a0);                          /* 0x005A96 */
+    uint16_t d1 = 0;
+    uint32_t d2 = 0, a3 = 0;
+    a0 += 2u;
+    do {
+        d1 = (uint16_t)(rd16(m, a0) << 5);                          /* 0x005A98..0x005A9A */
+        a0 += 2u;
+        a3 = a2 + (uint32_t)(int32_t)(int16_t)d1;                   /* 0x005A9C lea (A2,D1.w),A3 */
+        for (int k = 0; k < 8; k++) {                               /* 0x005AA4 dbf #7 */
+            d2 = rd32(m, a3);
+            a3 += 4u;
+            d2 = (d2 >> 16) | (d2 << 16);                           /* 0x005AA6 swap D2 */
+            wr32(m, a1, d2);
+            a1 += 4u;
+        }
+        count--;                                                    /* 0x005AAE dbf D0 */
+    } while (count >= 0);
+    r->a[0] = a0; r->a[1] = a1; r->a[2] = a2; r->a[3] = a3;
+    r->d[0] = (r->d[0] & 0xFFFF0000u) | (uint16_t)count;            /* D0.w = -1 */
+    r->d[1] = (r->d[1] & 0xFFFF0000u) | 0xFFFFu;                    /* 0x005AAA dbf D1 */
+    r->d[2] = d2;
+    Gfx_DrawTilemapBlock(m, 0x00010C00u, 0x0061C024u, 0u);         /* 0x13D13A */
 }
 
 /* ROM 0x13D7A0 */

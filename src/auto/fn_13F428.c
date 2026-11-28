@@ -57,52 +57,10 @@ static void timeline_init_13F25C(const f3mem_t *m, f3regs_t *r)
     r->d[0] = d0; r->a[0] = a0;                                 /* 0x13F2B0 */
 }
 
-/* ROM 0x005A86: copy the character tiles of the {count.w, idx.w...} record at
- * A0 into char RAM 0x61E000 + D0.w*0x20, 8 longs (swapped) per tile, source
- * table 0x1120A. Leaves A1/A2/A3/D0/D1/D2 live (no save frame). */
-static void upload_text_tiles_5A86(const f3mem_t *m, f3regs_t *r)
-{
-    uint32_t a1 = 0x0061E000u + (uint32_t)(int32_t)(int16_t)(uint16_t)((uint16_t)r->d[0] << 5); /* 0x005A86..0x005A8E */
-    uint32_t a2 = 0x0001120Au;                                  /* 0x005A90 */
-    uint32_t a0 = r->a[0];
-    int16_t d0 = (int16_t)rd16(m, a0);                          /* 0x005A96 */
-    uint32_t a3 = 0;
-    uint32_t d2 = 0;
-    int16_t d1 = 0;
-    a0 += 2u;
-
-    do {
-        d1 = (int16_t)(uint16_t)((uint16_t)rd16(m, a0) << 5);    /* 0x005A98..0x005A9A */
-        a0 += 2u;
-        a3 = a2 + (uint32_t)(int32_t)d1;                        /* 0x005A9C */
-        d1 = 7;                                                 /* 0x005AA0 */
-        do {
-            d2 = rd32(m, a3);                                   /* 0x005AA4 */
-            a3 += 4u;
-            d2 = (d2 >> 16) | (d2 << 16);                        /* 0x005AA6 swap */
-            wr32(m, a1, d2);                                    /* 0x005AA8 */
-            a1 += 4u;
-            d1--;                                               /* 0x005AAA dbf */
-        } while (d1 != -1);
-        d0--;                                                   /* 0x005AAE dbf */
-    } while (d0 != -1);
-
-    r->a[0] = a0; r->a[1] = a1; r->a[2] = a2; r->a[3] = a3;
-    r->d[0] = (r->d[0] & 0xFFFF0000u) | (uint16_t)d0;
-    r->d[1] = (r->d[1] & 0xFFFF0000u) | (uint16_t)d1;
-    r->d[2] = d2;
-}
-
-/* ROM 0x13D11E: draw the stage banner: upload the tiles of 0x13D558[stage]
- * at slot 0x10C05 and blit tilemap 0x10C00 to 0x61C024 (0x0055C8 keeps every
- * register, so only 0x005A86's leftovers survive). */
+/* ROM 0x13D11E (banner) with the 0x005A86 register leftovers in r. */
 static void banner_13D11E(const f3mem_t *m, f3regs_t *r)
 {
-    int16_t idx = (int16_t)rd16(m, F3_A5 + 0x32DCu);            /* 0x13D124 */
-    r->a[0] = rd32(m, 0x0013D558u + (uint32_t)(int32_t)idx * 4u); /* 0x13D11E..0x13D128 */
-    r->d[0] = (r->d[0] & 0xFFFFFF00u) | rd8(m, 0x00010C05u);     /* 0x13D12C..0x13D12E */
-    upload_text_tiles_5A86(m, r);                                /* 0x13D134 */
-    Gfx_DrawTilemapBlock(m, 0x00010C00u, 0x0061C024u, 0u);       /* 0x13D13A..0x13D14A */
+    Stage_DrawBanner13D11E_Regs(m, r);                          /* 0x13CAF2 -> 0x13D11E */
 }
 
 /* ROM 0x0019F29C: write the per-stage status char 0x19F2C6[stage*2] to

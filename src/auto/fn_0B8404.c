@@ -1,6 +1,6 @@
 /* Superseded by src/stage/seg_0B8404.c (segments, verified on captures); this
  * whole-routine form ignores the TRAP #4/#5 yields. */
-/* ROM 0x0B8404: UNVERIFIED (no capture): attract/title task (kernel slot 1).
+/* ROM 0x0B8404: (capture fnt_: up to the first yield): attract/title task (kernel slot 1).
  * The pre-yield init (0x0B8404 bsr 0x0B842E) reloads sound bank 0, clears the
  * sprite list and every playfield layer. The 0x0B8408 frame paints the legal
  * notice once (bit 0 of A5+0x089A gates 0x0B8442), then runs the attract
@@ -223,9 +223,8 @@ static void attract_highscores_0B8F7C(const f3mem_t *m)
 
 int Fn_0B8404(const f3mem_t *m, f3regs_t *r)
 {
-    (void)r;
     /* 0x0B8404 bsr.w 0x0B842E */
-    Kernel_SoundBank0_0014DA(m);                       /* 0x0B842E jsr 0x14DA */
+    Kernel_SoundBank0_0014DA_Regs(m, r);                      /* 0x0B842E jsr 0x14DA */
     Gfx_ClearAllLayers(m);                             /* 0x0B8434 jsr 0x5A12 */
     Sprite_ClearAll(m);                                /* 0x0B843A jsr 0x117E */
     /* 0x0B8440 rts of the init; 0x0B8408 trap #5 is the first frame yield */

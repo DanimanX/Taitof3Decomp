@@ -1,4 +1,4 @@
-/* ROM 0x0B7D74: UNVERIFIED (no capture): the sound/option editor.
+/* ROM 0x0B7D74: (capture fnt_: up to the first yield): the sound/option editor.
  *
  * The routine frames a 8x6 box at the record A5-0xC18 points to and prints the
  * single control glyph 0x06 at (x+2, y), then yields at the TRAP #5 at
@@ -173,11 +173,16 @@ int Fn_0B7D74(const f3mem_t *m, f3regs_t *r)
     /* 0x0B7D82..0x0B7D94: w = 8, h = 6, attribute 6. */
     box_frame_0B7332(m, 8u, 6u, 6u, a0);
 
-    /* 0x0B7D98..0x0B7DCC: the glyph at 0x0B7502 ("\\x06") at (x+2, y+0), attr 0xA. */
+    /* 0x0B7D98..0x0B7DCC: the glyph at 0x0B7502 ("\\x06") at (x+2, y+0), attr 0xA.
+     * D0/D1 keep the (x+2, y) words the routine pushed at 0x0B7DA4: the pop at
+     * 0x0B7DCC restores them, and they are what the routine leaves at the
+     * TRAP #5 (the draw's own return value is lost in that pop). */
     {
         uint32_t dx = (uint32_t)(int32_t)(int16_t)(uint16_t)(rd16(m, a0) + 2u);
         uint32_t dy = (uint32_t)(int32_t)(int16_t)(uint16_t)(rd16(m, a0 + 2u) << 7);
         (void)Text_DrawString(m, 0x000B7502u, 0x0061C000u + dx + dx + dy, 0x0Au);
+        r->d[0] = (r->d[0] & 0xFFFF0000u) | (uint16_t)dx;   /* 0x0B7D98/0x0B7D9A move.w/addq.w */
+        r->d[1] = (r->d[1] & 0xFFFF0000u) | (uint16_t)(rd16(m, a0 + 2u)); /* 0x0B7D9C */
     }
 
     r->a[0] = a0;                                   /* live across the yield */

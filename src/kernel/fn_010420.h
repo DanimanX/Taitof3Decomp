@@ -1,6 +1,11 @@
 #ifndef TAITOF3_KERNEL_FN_010420_H
 #define TAITOF3_KERNEL_FN_010420_H
 #include "../common/f3mem.h"
+
+#ifndef F3REGS_T_DEFINED
+#define F3REGS_T_DEFINED
+typedef struct { uint32_t d[8], a[8]; } f3regs_t;   /* a[7] = SP */
+#endif
 /* ROM 0x010420: coin-insert / start reset. Returns to the caller at 0x010478
  * when the two A5-0x5DE3 test-mode bits are set; otherwise clears three status
  * bytes, re-initialises sprites / layers / line RAM, reloads sound banks 0 and
@@ -14,6 +19,7 @@ void Kernel_CoinStart010420(const f3mem_t *m);
  * to the upload buffer at 0x440000. A negative block count stops the loop. */
 void Kernel_SoundBank0_0014DA(const f3mem_t *m);
 void Kernel_SoundBank1_001504(const f3mem_t *m);
+void Kernel_SoundBank0_0014DA_Regs(const f3mem_t *m, f3regs_t *r); /* 0x0014DA + registers */
 
 /* The registers the 0x001520 relay leaves: d0/d1 are the last copy's
  * (src+4)/(dst+4) words (or the caller's own d0/d1 when the block is negative),

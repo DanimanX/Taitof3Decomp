@@ -1,4 +1,4 @@
-/* ROM 0x1783A8: UNVERIFIED (no capture): kernel task body (the RAM-test /
+/* ROM 0x1783A8: (capture fnt_: up to the first yield): kernel task body (the RAM-test /
  * display screen). The prefix clears A5-0x144B, rebuilds the line-scroll
  * tables (0x005B0C), reloads sound bank 0 (0x0014DA), clears the text layer
  * (0x005880) and creates six kernel tasks through TRAP #1: (2, 0x144B60),
@@ -27,7 +27,7 @@ static void trap01_create(const f3mem_t *m, f3regs_t *r, uint32_t id, uint32_t e
     wr32(m, sp - 8u, entry);                 /* 0x1783C4 pea.l */
     wr32(m, sp - 4u, id);                    /* 0x1783BE move.l #id,-(A7) */
     r->a[7] = sp - 16u;
-    (void)Kern_001E76(m, r);                 /* 0x1783CA trap #1 */
+    (void)Kern_001E76(m, r);                 /* 0x1783CA trap #1: sets D0 = slot */
     r->a[7] = sp;                            /* 0x1783CC addq.l #8,A7 */
 }
 
@@ -106,7 +106,7 @@ int Fn_1783A8(const f3mem_t *m, f3regs_t *r)
 {
     wr8(m, F3_A5 - 0x144Bu, 0x00u);                              /* 0x1783A8 */
     sub_005B0C(m);                                               /* 0x1783AC jsr 0x005B0C */
-    Kernel_SoundBank0_0014DA(m);                                 /* 0x1783B2 jsr 0x0014DA */
+    Kernel_SoundBank0_0014DA_Regs(m, r);                                /* 0x1783B2 jsr 0x0014DA */
     sub_005880(m);                                               /* 0x1783B8 jsr 0x005880 */
 
     trap01_create(m, r, 0x0002u, 0x00144B60u);                   /* 0x1783BE..0x1783CC */

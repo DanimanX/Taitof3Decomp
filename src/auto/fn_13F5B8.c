@@ -1,6 +1,6 @@
 /* Superseded by src/stage/seg_13F5B8.c + seg_13DAD4.c (segments, verified on
  * captures); this whole-routine form ignores the TRAP #5 yields. */
-/* ROM 0x13F5B8: UNVERIFIED (no capture): stage-end sequence. Clears object
+/* ROM 0x13F5B8: (capture fnt_: up to the first yield): stage-end sequence. Clears object
  * groups 3..4, sets the A5-0x144C flags, starts the level jingle (0x15D0 with
  * a stage-dependent id), fills the sprite/line tables, spawns the stage's
  * object 0x13F964[stage] in groups 3..4, waits for the stage-clear flag
@@ -225,4 +225,34 @@ int Fn_13F5B8(const f3mem_t *m, f3regs_t *r)
     r->a[0] = 0x0013F964u;                              /* ROM A0 at the 0x13DAD4 call */
     stage_end_13DAD4(m, r);                             /* 0x13F698 */
     return 0;
+}
+
+/* ROM 0x13F5B8 up to its first yield, the TRAP #5 at 0x13F5FE: reset object
+ * groups 3..4, set A5-0x144C bit 3 and clear bit 4, start the level jingle with
+ * 0x15D0 (id 2, +1 when A5+0x32DE > 3, +1 more when > 6) and load D7 with the
+ * 0x3C-frame wait counter (`move.w #0x3C,D7 ; subq.w #1,D7`). The registers at
+ * the trap are the jingle call's (A0 = 0x16890, D0 = quotient|remainder of the
+ * id, D1 = the block duration + 1) plus D7 = 0x...003B. Fn_13F5B8 above is the
+ * whole-sequence form its two callers use (it collapses the 0x13F5FE and
+ * 0x13F65A wait loops), so the capture entry gets its own pre-yield model;
+ * the sequence after the trap is covered by src/stage/seg_13F5B8.c. */
+int Fn_13F5B8_Yield(const f3mem_t *m, f3regs_t *r)
+{
+    Obj_ResetGroups(m, 3u, 2u);                         /* 0x13F5B8..0x13F5C6 */
+    wr8(m, F3_A5 - 0x144Cu, (uint8_t)(rd8(m, F3_A5 - 0x144Cu) | 0x08u)); /* 0x13F5CA */
+    wr8(m, F3_A5 - 0x144Cu, (uint8_t)(rd8(m, F3_A5 - 0x144Cu) & 0xEFu)); /* 0x13F5D0 */
+
+    {
+        uint16_t d0 = 2u;                               /* 0x13F5D6 move.w #2,D0 */
+        int16_t de = (int16_t)rd16(m, F3_A5 + 0x32DEu);
+        if (de > 3) {                                   /* 0x13F5DA ble */
+            if (de > 6)                                 /* 0x13F5E4 ble */
+                d0 = (uint16_t)(d0 + 1u);               /* 0x13F5EE */
+            d0 = (uint16_t)(d0 + 1u);                   /* 0x13F5F0 */
+        }
+        Fx_StartA_Regs(m, r, (uint8_t)d0);              /* 0x13F5F2 jsr 0x15D0 */
+    }
+
+    r->d[7] = (r->d[7] & 0xFFFF0000u) | 0x003Bu;        /* 0x13F5F8/0x13F5FC */
+    return 1;                                           /* 0x13F5FE trap #5 */
 }

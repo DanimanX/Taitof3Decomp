@@ -1,4 +1,4 @@
-/* ROM 0x0AC8E4: UNVERIFIED (no capture): task body of the bank/scroll debug
+/* ROM 0x0AC8E4: (capture fnt_: up to the first yield): task body of the bank/scroll debug
  * overlay (kernel task slot initialiser).
  * Before its first TRAP #5 it clears the sound upload word at 0x440000,
  * reinitialises line RAM (Gfx_InitLineRam, 0x005B0C) and, when the debug list
@@ -252,9 +252,8 @@ static void screen_0AC91C(const f3mem_t *m, f3regs_t *r)
 
 int Fn_0AC8E4(const f3mem_t *m, f3regs_t *r)
 {
-    (void)r;
     wr32(m, 0x00440000u, 0x00008000u);              /* 0x0AC8E4 move.l #0x8000,(0x440000).l */
-    Gfx_InitLineRam(m);                             /* 0x0AC8EE jsr 0x005B0C */
+    Gfx_InitLineRam_Regs(m, r);                     /* 0x0AC8EE jsr 0x005B0C */
     if (rd32(m, F3_A5 - 0x0C4Cu) == 0u)             /* 0x0AC8F4 tst.l / bne 0xAC904 */
         wr32(m, F3_A5 - 0x0C4Cu, 0x000ACB92u);      /* 0x0AC8FC move.l #0xacb92,(A5-0xC4C) */
     return 0;                                       /* 0x0AC904 trap #5: the task yields */

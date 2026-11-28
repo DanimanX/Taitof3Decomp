@@ -135,7 +135,7 @@ int Fn_0B760C(const f3mem_t *m, f3regs_t *r)
     push_word(m, r, 0x000Cu);                                    /* 0x0B761C */
     push_long(m, r, 0x000B7624u);
     sub_0B7332(m, 0x000Cu, 3u, (uint16_t)r->d[1], r->a[0]);      /* 0x0B7620 */
-    r->a[7] += 10u;                                              /* 0x0B7624 lea 0xa(SP) */
+    r->a[7] += 14u;                        /* 0x0B7624 lea 0xa(SP) + the rts' return PC */
     r->d[0] = rd32(m, r->a[7]);                                  /* 0x0B7628 movem (SP)+,{D0} */
     r->a[7] += 4u;
     r->d[1] = setw(r->d[1], (uint16_t)r->d[0]);                  /* 0x0B762C move.w D0w,D1w */

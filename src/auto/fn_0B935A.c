@@ -1,12 +1,15 @@
 /* Superseded by src/stage/seg_0B935A.c (segments, verified on captures); this
  * whole-routine form ignores the TRAP #4/#5 yields. */
-/* ROM 0x0B935A: UNVERIFIED (no capture): Task_0B935A (kernel slot 2), the
- * attract-mode stage task. The pre-yield setup (0x0B935A..0x0B93E2) spawns the
- * object-pool runner, reloads sound bank 0, starts effect B(7), clears line
- * RAM, sleeps 5 frames, fades two palette blocks out and plays hooked sound
- * 0x42. The loop after the yield (0x0B93E6..0x0B9680) installs the stage-2
- * background script (three ROM-scripted dispatchers), runs the "STAGE CLEAR"
- * line-RAM fade, draws the banner tilemaps and finally exits via TRAP #3.
+/* ROM 0x0B935A: Task_0B935A (kernel slot 2), the attract-mode stage task.
+ * Fn_0B935A is the entry up to the task's first yield, the TRAP #4 at 0x0B9388
+ * (verified 30/30 against work/ram/fnt_0B935A): it spawns the object-pool
+ * runner through TRAP #1, reloads sound bank 0, starts effect B(7), rebuilds
+ * line RAM and pushes the 5-tick sleep argument, so the task resumes at
+ * 0x0B938A. That resume block (two palette ramps and the stage jingle 0x42,
+ * 0x0B938A..0x0B93E4) is modelled in src/stage/seg_0B935A.c. The loop after
+ * the next yield (0x0B93E6..0x0B9680) installs the stage-2 background script
+ * (three ROM-scripted dispatchers), runs the "STAGE CLEAR" line-RAM fade,
+ * draws the banner tilemaps and finally exits via TRAP #3.
  *
  * Two ROM script tables drive the background through function pointers:
  *   A5+0x338A -> 0x0BE39C, 8 entries {frame.w, fn.l} (driver 0x145464);
@@ -23,8 +26,10 @@
  * contract stage_timeline.c's bg_run_frame_events uses). The routine is
  * therefore PARTIAL, not PASS. */
 #include "fn_auto.h"
+#include "fn_call_frames.h"
 #include "../common/fn_leaf1.h"
 #include "../kernel/fn_010420.h"
+#include "../kernel/kernel.h"
 #include "../stage/stage_timeline.h"
 #include "../video/sprite.h"
 #include "../video/palette.h"
@@ -37,21 +42,18 @@
 #include "../objects/obj_shared_ext.h"
 
 /* ---- kernel TRAP services --------------------------------------------- */
-static void sys_spawn_req(const f3mem_t *m, uint16_t slot, uint32_t entry)
+/* TRAP #1 (0x001E76) as 0x0B935A issues it: the handler reads the entry point
+ * at A7+8 and the slot at A7+12. Slot 4 is already active in the live mask, so
+ * the kernel only returns D0 = 0 and writes no task-table word -- which is what
+ * work/ram/fnt_0B935A shows (status 0x00010000 at 0x406718 stays put). */
+static void trap01_create(const f3mem_t *m, f3regs_t *r, uint32_t id, uint32_t entry)
 {
-    uint32_t id = (uint32_t)(slot & 0x0Fu);
-    uint32_t parent = (uint32_t)(rd16(m, F3_A5 - 0x1906u) & 0xFFu);
-    (void)entry;
-    wr32(m, F3_A5 - 0x1904u, rd32(m, F3_A5 - 0x1904u) | (1u << id));
-    wr32(m, F3_A5 - 0x18F8u + id * 4u, parent << 16);
-}
-
-static void sys_sleep(const f3mem_t *m, uint16_t frames)
-{
-    uint32_t cur = (uint32_t)(rd16(m, F3_A5 - 0x1906u) & 0x0Fu);
-    wr32(m, F3_A5 - 0x18F8u + cur * 4u,
-         ((uint32_t)(0xA000u | cur) << 16) | (uint32_t)frames);
-    wr32(m, F3_A5 - 0x18B8u + cur * 4u, 0u);
+    uint32_t sp = r->a[7];
+    wr32(m, sp - 8u, entry);         /* 0x0B9364 pea.l 0x10488 */
+    wr32(m, sp - 4u, id);            /* 0x0B935E move.l #4,-(A7) */
+    r->a[7] = sp - 16u;
+    (void)Kern_001E76(m, r);         /* 0x0B936A trap #1 */
+    r->a[7] = sp;                    /* 0x0B936C addq.l #8,A7 */
 }
 
 static void sys_exit(const f3mem_t *m)
@@ -739,20 +741,28 @@ static int run_handler(const f3mem_t *m, uint32_t addr)
 
 /* ---- the task ---------------------------------------------------------- */
 
+/* 0x0B935A up to the TRAP #4 at 0x0B9388, the task's first yield: the ROM
+ * resumes at 0x0B938A with the sleep argument (`move.l #5,-(A7)`) still on the
+ * stack, so SP ends 4 below the entry SP. The registers at the resume are the
+ * ones the 0x5B0C line-RAM rebuild leaves (D0/D1/D3/A0/A1), except A2, which
+ * the 0x14DA sound-bank load left on the bank-1 stream cursor: 0x15EC and
+ * 0x5B0C never write A2. The 0x0B938A..0x0B93E4 block that follows the sleep
+ * (two palette ramps and the stage jingle, no captured effect) is the case
+ * 0x000B938A segment in src/stage/seg_0B935A.c. */
 int Fn_0B935A(const f3mem_t *m, f3regs_t *r)
 {
-    (void)r;
     wr16(m, F3_A5 + 0x3384u, 0u);                       /* 0x0B935A clr.w */
-    sys_spawn_req(m, 4u, 0x00010488u);                  /* 0x0B935E..0x0B936C */
-    Kernel_SoundBank0_0014DA(m);                        /* 0x0B936E jsr 0x14DA */
+    trap01_create(m, r, 4u, 0x00010488u);               /* 0x0B935E..0x0B936C */
+    Kernel_SoundBank0_0014DA_Regs(m, r);                /* 0x0B936E jsr 0x14DA */
     Fx_StartB(m, 7u);                                   /* 0x0B9374 moveq #7; jsr 0x15EC */
-    Gfx_InitLineRam(m);                                 /* 0x0B937C jsr 0x5B0C */
-    sys_sleep(m, 5u);                                   /* 0x0B9382 trap #4 */
-    Pal_FadeOut001866(m, 0x000BA026u, 0x0880u, 0x96u, 0x20u); /* 0x0B938C */
-    Pal_FadeOut001866(m, 0x00026940u, 0x1000u, 0x96u, 0x20u); /* 0x0B93AE */
-    Sound_PlayHooked(m, 0x0042u);                       /* 0x0B93D0 */
-    /* 0x0B93E4 trap #5: first yield */
-    return 0;
+    Gfx_InitLineRam_Regs(m, r);                         /* 0x0B937C jsr 0x5B0C */
+    push_long(m, r, 5u);                                /* 0x0B9382 move.l #5,-(A7) */
+    return 0;                        /* 0x0B9388 trap #4; the capture's state at the
+                                      * resume PC 0x0B938A carries no TRAP #4
+                                      * bookkeeping (work/ram/fnt_0B935A leaves
+                                      * task status 0x406718 = 0x00010000), so the
+                                      * pair stops here like every other trap
+                                      * capture. */
 }
 
 int Task0B935A_Frame(const f3mem_t *m)

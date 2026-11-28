@@ -115,23 +115,16 @@ static void sound_relay(const f3mem_t *m, uint32_t table, uint32_t src,
         uint16_t d2 = (uint16_t)(rd16(m, a2) - 1u);           /* 0x001530/0x001532 */
         a2 += 2u;
         r->d[2] = set_word(r->d[2], d2);
-        r->d[0] = 0;                                          /* 0x001534 moveq #0 */
-        for (;;) {
-            r->d[0] = rd16(m, a2);                            /* 0x001536 move.w (A2)+ */
-            a2 += 2u;
-            r->d[1] = set_word(r->d[1], rd16(m, a2));         /* 0x001538 */
-            a2 += 2u;
-            r->a[2] = a2;
-            /* 0x00153A move.l (A1,D0.l),(A0,D1.w) */
-            wr32(m, 0x00440000u + (uint32_t)(int32_t)(int16_t)(uint16_t)r->d[1],
-                 rd32(m, r->a[1] + r->d[0]));
+        r->d[0] = rd16(m, a2);                                /* 0x001534/0x001536 */
+        r->d[1] = set_word(r->d[1], rd16(m, a2 + 2u));        /* 0x001538 */
+        a2 += 4u;
+        r->a[2] = a2;
+        do {
+            wr32(m, r->a[0] + (int16_t)r->d[1], rd32(m, r->a[1] + r->d[0]));
             r->d[0] += 4u;                                    /* 0x001540 addq.l #4 */
-            r->d[1] = set_word(r->d[1], (uint16_t)((uint16_t)r->d[1] + 4u)); /* 0x001542 */
-            d2--;                                             /* 0x001544 dbra D2 */
-            if (d2 == 0xFFFFu)
-                break;
-            r->d[2] = set_word(r->d[2], d2);
-        }
+            r->d[1] = set_word(r->d[1], (uint16_t)(r->d[1] + 4u)); /* 0x001542 */
+        } while (--d2 != 0xFFFFu);                            /* 0x001544 dbra D2 */
+        r->sr = (uint16_t)((r->sr & ~0x10u) | ((uint16_t)r->d[1] < 4u ? 0x10u : 0u));
         r->d[2] = set_word(r->d[2], d2);
         r->d[3] = set_word(r->d[3], (uint16_t)((uint16_t)r->d[3] - 1u)); /* 0x001548 dbra D3 */
     } while ((uint16_t)r->d[3] != 0xFFFFu);

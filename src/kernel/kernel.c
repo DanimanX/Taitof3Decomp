@@ -496,16 +496,30 @@ uint32_t Kern_00220E(const f3mem_t *m, f3regs_t *r)
 
 /* ROM 0x001A0E Kernel_FrameTick, register level: movem.l d0-d7/a0-a6 around
  * the chain, so the caller's registers come back unchanged; the callees run
- * on the saved copy. ports = the 0x20 bytes IO_PollInputs reads at 0x4A0000.
+ * on the saved copy and the kernel stack holds their call frames.
+ * ports = the 0x20 bytes IO_PollInputs reads at 0x4A0000.
  * Returns -1 (after the writes of the callees before it) when 0x000DFA or
  * 0x00161E takes a path they do not translate. */
-static int frame_tick(const f3mem_t *m, const f3regs_t *r, const uint8_t *ports)
+static int frame_tick(const f3mem_t *m, const f3regs_t *r, const uint8_t *ports,
+                      uint32_t ret)
 {
     f3regs_t t = *r;
-    Video_UploadScroll(m);                    /* jsr 0x001C90 */
+    t.a[7] -= 4u;
+    wr32(m, t.a[7], ret);
+    t.a[7] = push_regs(m, &t, 0x7FFFu);
+    wr32(m, t.a[7] - 4u, 0x001A16u);          /* jsr 0x001C90 */
+    wr32(m, t.a[7] - 8u, 0x001D88u);          /* jsr 0x001232 */
+    Video_UploadScroll_Regs(m, &t);
+    wr32(m, t.a[7] - 4u, 0x001A1Au);          /* jsr 0x001A78 */
     IO_PollInputs(m, ports);                  /* jsr 0x001A78 */
-    if (Fn_000DFA(m, &t) < 0) return -1;      /* jsr 0x000DFA */
-    if (Fn_00161E(m, &t) < 0) return -1;      /* jsr 0x00161E */
+    wr32(m, t.a[7] - 8u, 0x001B8Cu);          /* jsr 0x001B8E */
+    t.a[7] -= 4u;
+    wr32(m, t.a[7], 0x001A1Eu);               /* jsr 0x000DFA */
+    if (Fn_000DFA(m, &t) < 0) return -1;
+    t.a[7] -= 4u;
+    wr32(m, t.a[7], 0x001A22u);               /* jsr 0x00161E */
+    if (Fn_00161E(m, &t) < 0) return -1;
+    wr32(m, t.a[7] - 4u, 0x001A26u);          /* jsr 0x000BF6 */
     (void)Sound_PushCmd(m);                   /* jsr 0x000BF6 */
     uint16_t n = rd16(m, F3_A5 - 0x5D54u);
     wr16(m, F3_A5 - 0x5D54u, (uint16_t)(n + 1u));
@@ -535,16 +549,17 @@ uint32_t Kern_00222E(const f3mem_t *m, f3regs_t *r, const uint8_t *ports, uint32
         uint32_t slot = rd32(m, g - 0x18FCu);   /* 0x2244 */
         uint16_t w = (uint16_t)(rd16(m, slot) & 0x3FFFu);
         wr16(m, slot, w);
+        r->d[0] = (r->d[0] & 0xFFFF0000u) | w;
         r->a[4] = slot;
         r->a[7] = g - 0x1B4Cu;                  /* 0x2250 kernel stack */
         *tick_sp = r->a[7];
-        if (frame_tick(m, r, ports) < 0) return 0;
+        if (frame_tick(m, r, ports, 0x00225Au) < 0) return 0;
         r->a[4] = g - 0x1906u;
         start = rd16(m, g - 0x1906u);           /* 0x225E */
     } else {
         wr8(m, g - 0x1908u, 0);                 /* 0x2262 */
         *tick_sp = r->a[7];
-        if (frame_tick(m, r, ports) < 0) return 0;
+        if (frame_tick(m, r, ports, 0x00226Cu) < 0) return 0;
         r->a[4] = g - 0x1906u;
         start = 0;                              /* 0x2270 */
     }

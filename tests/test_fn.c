@@ -222,6 +222,43 @@ static const uint8_t *pair_ports(void)
 KERN_VB(00222E)
 KERN_VB(001A34)
 KERN_VB(001A54)
+
+/* The power-on 0x0101FA pair was preempted during 0x005A12's text clear.
+ * The saved D0/A0 locate the IRQ3 at DBRA. The port values reproduce the
+ * captured input transition (Up held, Fire released). */
+static int task0_vblank(const f3mem_t *m, f3regs_t *r)
+{
+    if (r->a[0] != 0x61DAB0u) return 0;
+    static const uint8_t ports[F3_MMIO_PORTS_SIZE] = {
+        [0x00] = 0xFF, [0x01] = 0xFF, [0x02] = 0xFF, [0x03] = 0xFF,
+        [0x07] = 0xFB, [0x12] = 0xFF, [0x17] = 0xFF,
+    };
+    uint32_t tick_sp = 0;
+    uint32_t interrupted_pc = r->pc;
+    uint32_t interrupted_sp = r->a[7];
+    r->a[7] -= 8u;
+    wr16(m, r->a[7], r->sr);
+    wr32(m, r->a[7] + 2u, interrupted_pc);
+    wr16(m, r->a[7] + 6u, 0x006Cu);            /* IRQ3 autovector */
+    if (Kern_001A54(m, r, ports, &tick_sp) != 0x0022DCu)
+        return -1;
+    r->sr = rd16(m, r->a[7]);
+    r->pc = rd32(m, r->a[7] + 2u);
+    r->a[7] += 8u;                            /* RTE */
+    return r->pc == interrupted_pc && r->a[7] == interrupted_sp ? 0 : -1;
+}
+
+static unsigned task0_frame_advance;
+static int ad_seg_task0(const f3mem_t *m, f3regs_t *r)
+{
+    if (task0_frame_advance == 0)
+        return ad_seg(m, r);
+    if (task0_frame_advance != 1 || r->pc != 0x0101FAu)
+        return -1;
+    r->pc = Seg_Task0_Main(m, r, r->pc, task0_vblank);
+    return r->pc == SEG_LEAVE ? -1 : 0;
+}
+
 static int ad_task_d15_init(const f3mem_t *m, f3regs_t *r) { (void)r; TaskSlot15_Init(m); return 0; }
 static int ad_task_d15(const f3mem_t *m, f3regs_t *r) { r->pc = TaskSlot15_Frame(m, r); return r->pc ? 0 : -1; }
 /* END kernel adapters */
@@ -271,6 +308,14 @@ static const fn_entry_t fns[] = {
     { "Fn 0x11BC6E Obj_11BC6E_Wave",   "work/ram/fn_11BC6E", ad_11BC6E, { { CR_D0, 0xFFFFFFFFu } } },
     { "Fn 0x176390 LineFx_176390",     "work/ram/fn_176390", ad_176390, { { 0, 0u } } },
     { "Task 0x0C63F2 Collision loop",  "work/ram/task_coll", ad_task_coll, { { 0, 0u } } },
+    { "Seg 0x010174 Task0_Main", "work/ram/seg0_010174", ad_seg_task0, EXCREGS },
+    { "Seg 0x0101A8 Task0_Main", "work/ram/seg0_0101A8", ad_seg_task0, EXCREGS },
+    { "Seg 0x0101FA Task0_Main", "work/ram/seg0_0101FA", ad_seg_task0, EXCREGS },
+    { "Seg 0x010270 Task0_Main", "work/ram/seg0_010270", ad_seg_task0, EXCREGS },
+    { "Seg 0x010280 Task0_Main", "work/ram/seg0_010280", ad_seg_task0, EXCREGS },
+    { "Seg 0x010284 Task0_Main", "work/ram/seg0_010284", ad_seg_task0, EXCREGS },
+    { "Seg 0x010298 Task0_Main", "work/ram/seg0_010298", ad_seg_task0, EXCREGS },
+    { "Seg 0x01029C Task0_Main", "work/ram/seg0_01029C", ad_seg_task0, EXCREGS },
     { "Seg 0x13F5B8 13F5B8 group",  "work/ram/seg_13F5B8", ad_seg, SEGREGS },
     { "Seg 0x13F600 13F5B8 group",  "work/ram/seg_13F600", ad_seg, SEGREGS },
     { "Seg 0x13F65C 13F5B8 group",  "work/ram/seg_13F65C", ad_seg, SEGREGS },
@@ -405,8 +450,14 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         return 0;
     }
     int exception = e->out[CR_SR].mask != 0;
+    int task0 = e->fn == ad_seg_task0;
     if (exception && !c.srpre) {
         printf("fn: %-34s FAIL (need PC/SR columns in %s_regs.tsv)\n", e->name, e->cap);
+        cap_free(&c);
+        return 1;
+    }
+    if (task0 && (!c.gfx || !c.spr || !c.pal)) {
+        printf("fn: %-34s FAIL (need gfx, spr and pal snapshots)\n", e->name);
         cap_free(&c);
         return 1;
     }
@@ -422,12 +473,13 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
     }
     int ok = 0, undec = 0, irq = 0, budget = 12;
     for (int i = 0; i < c.pairs; i++) {
-        /* a call whose post dump is in a later frame than its pre dump was
-         * interrupted by VBlank: the IRQ handler's writes (frame counter,
-         * task mask, ...) are in the post state, so no routine can match it */
-        /* the VBlank path itself advances the frame counter by one */
+        /* The IRQ handler's writes are in captures that cross frames.
+         * Task 0 replays its interrupt. The VBlank handlers also advance
+         * the frame counter by one when tested directly. */
         int vb = e->fn == ad_k_00222E || e->fn == ad_k_001A34 || e->fn == ad_k_001A54;
-        if (c.fpre && c.fpost[i] != c.fpre[i] + (vb && c.fpost[i] != c.fpre[i] ? 1u : 0u)) { irq++; continue; }
+        unsigned frame_advance = c.fpost[i] - c.fpre[i];
+        if (!task0 && frame_advance != 0 && !(vb && frame_advance == 1)) { irq++; continue; }
+        task0_frame_advance = frame_advance;
         memcpy(w, cap_wram(&c, i, 0), F3_WRAM_SIZE);
         if (g) memcpy(g, cap_gfx(&c, i, 0), F3_GFX_SIZE);
         if (s) memcpy(s, cap_spr(&c, i, 0), F3_SPR_SIZE);
@@ -464,8 +516,8 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         if (skip_hi > skip_lo && skip_lo >= F3_WRAM_BASE && skip_hi <= F3_WRAM_BASE + F3_WRAM_SIZE)
             memcpy(w + (skip_lo - F3_WRAM_BASE), cap_wram(&c, i, 1) + (skip_lo - F3_WRAM_BASE), skip_hi - skip_lo);
         uint32_t sp = c.pre[i][CR_SP];
-        int d = cap_diff(e->name, i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE,
-                         exception ? sp : sp - 0x100u, sp, &budget);
+        int d = cap_diff_region(e->name, i, F3_WRAM_BASE, w, cap_wram(&c, i, 1), F3_WRAM_SIZE,
+                                exception ? sp : sp - 0x100u, sp, !task0, &budget);
         if (g) d += cap_diff(e->name, i, F3_GFX_BASE, g, cap_gfx(&c, i, 1), F3_GFX_SIZE, 0, 0, &budget);
         if (s) d += cap_diff(e->name, i, F3_SPR_BASE, s, cap_spr(&c, i, 1), F3_SPR_SIZE, 0, 0, &budget);
         /* sound DPRAM 0xC00000-0xC007FF, for captures taken with F3_DPRAM=1 */
@@ -498,7 +550,7 @@ static int run(const fn_entry_t *e, const uint8_t *rom)
         }
         if (d == 0) ok++;
     }
-    int obs = c.pairs - undec - irq;
+    int obs = c.pairs - (task0 ? 0 : undec + irq);
     printf("fn: %-34s %3d/%3d calls bit-exact (%d undecompiled, gfx %s, spr %s, pal %s)%s",
            e->name, ok, obs, undec, g ? "yes" : "no", s ? "yes" : "no", pal ? "yes" : "no",
            obs == 0 ? " REJECT no observable call" : "");

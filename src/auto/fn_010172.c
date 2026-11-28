@@ -1,160 +1,165 @@
-/* ROM 0x010172: UNVERIFIED (no capture, and none is possible for the entry):
- * kernel task 0 (Task0_Main) -- the boot task that clears the machine, arms
- * the two display/sound init routines, then runs the attract/credit state
- * machine, and switches to test mode when the service switches or a bad
- * settings block ask for it.
+/* ROM 0x010172: Task0_Main, the boot task.
+ * Verified against power-on captures in work/ram/seg0_* from resume PC to
+ * the next TRAP, including SR, SP, the stack and all captured RAM regions.
  *
- * UNVERIFIABLE at 0x010172 (the only instruction an entry capture could show):
- * the body starts with `trap #5` (0x010172), which pushes the 6-byte frame
- * {PC = 0x010174, SR} and hands the CPU to the TRAP #5 body at 0x001F78, whose
- * Kern_Schedule never returns to that push -- it saves the context and switches
- * task. So F3_EXIT=010174 never fires inside this activation: 0x010174 is
- * reached only when the scheduler later resumes that saved context -- a later
- * frame, after a scheduler round trip -- so test_fn skips the pair (fpre !=
- * fpost) and the post state is not this entry's anyway. F3_INJECT_EXC does not
- * help either: it
- * does not synthesise a TRAP -- it plants an 8-byte format-0 frame and starts
- * the routine at 0x010172, so the real `trap #5` still executes on top of it
- * and still yields (and the frame it leaves is the trap's 6-byte one, not the
- * synthetic one; the "ret" mode never sees its RTE). The closest reachable
- * stop is 0x002274 (F3_INJECT=010172
- * F3_EXIT=002274 F3_INJECT_ABORT=1), but that post is the scheduler entry after
- * Kern_001F78's context save -- it verifies the TRAP #5 body, which already has
- * its own capture (work/ram/fn_001F78, "Kernel 0x001F78 TRAP 5"), not this
- * task. Fn_010172 therefore only models the yield, and the first frame of the
- * task is verified separately through Task0_Main_Frame/seg captures.
+ *   Resume   Stop     Pairs   Path
+ *   010174   0101A6     1/1   Font, settings check, wait message and sleep
+ *   0101A8   0101F8     1/1   Sound cues, service switches and second sleep
+ *   0101FA   01026E     1/1   Display and sound rebuild, with IRQ3 replay
+ *   010270   01027E     1/1   Prepare the second init task
+ *   010280   010282     1/1   Drop spawn arguments and yield
+ *   010284   010296     1/1   Set up the attract task
+ *   010298   01029A     1/1   Drop spawn arguments and yield
+ *   01029C   01029A   30/30   Attract/credit loop while waiting for start
  *
- * The body starts with TRAP #5 (0x010172), so Fn_010172 only yields. One pass
- * of the loop is Task0_Main_Frame, which runs the code after the yield up to
- * the next scheduling point:
- *
- *   010174  jsr 0x005A3A (font) ; jsr 0x0050DC (EEPROM settings check)
- *   010182  D0 != 0 -> test mode (0x010432)
- *   010186  "WAIT A MOMENT" at 0x61C79C, TRAP #4 sleep 0xB4 frames
- *   0101A8  sound 0, sound 0x94, latch two service-switch bits from A5-0x5DE4
- *           into A5-0x144A (inverted), TRAP #4 sleep 0xB4 frames
- *   0101FA  sound 0x95, CACR = 1 (cache, not modelled), volume word
- *           A5-0x5DC0 to 0xC007F8..FB, clear the text layer
- *   010236  font, clear A5-0x144C/0x144B/0x1452, stop the sound, rebuild the
- *           sprite buffers, sprites, layers, line RAM and sound bank, then
- *           TRAP #1 spawn <slot 4, 0x010488> and <slot 15, 0x0038AC>
- *   010282  TRAP #5 -> resume 0x010284
- *   010284  A5-0x1444 = A5-0x5DC5, TRAP #1 spawn <slot 1, 0x0B8404>
- *   01029A  TRAP #5 -> resume 0x01029C
- *   01029C  per-frame select (0x01033C): while the coin/credit state asks to
- *           keep waiting it yields again at 0x01029A; otherwise the
- *           0x0102EE reset runs (stop sound, sprites, layers, TRAP #2 kill
- *           0x7FFE, TRAP #1 spawn <slot 1, 0x004146>, A5-0x1444 = 0) and the
- *           task yields at 0x010320
- *   010322  per-frame select again; A5-0x144B bit 0 set -> TRAP #2 kill
- *           0xFFFE and the 0x010236 init runs again; else yield at 0x010320
- *   010432  test-mode entry: TRAP #2 kill 0xFFFE, TRAP #1 spawn
- *           <slot 1, 0x1A1A26, param = long at ROM 0>, clear A5-0x5DC7,
- *           0x5DCC and 0x1444, sprites/layers/line RAM/sound bank, stop the
- *           sound, then TRAP #5 and bra 0x010474 forever.
- *
- * TRAP #1 and TRAP #2 are modelled with the kernel handlers (Kern_001E76 /
- * Kern_001E0E, 0x001E76 / 0x001E0E), including the 68020 format-0 frame the
- * handler reads its arguments from (SR 0x2000, the task SR of 0x1EF2). TRAP #4
- * sleep is the scheduler's job (the handler 0x001F30 saves the task context and
- * sets its timer): a pass that reaches one has already pushed the 0xB4 frame
- * count, ends there and reports the wake-up PC, whose first instruction is the
- * `addq.l #4,A7` that pops the argument.
- *
- * The jsr return addresses of Fn_005A3A (0x010174, 0x010236) are not written:
- * that helper leaves SP at its entry value rather than popping like its rts;
- * the frame is below SP and nothing reads it. Every other call, trap and jmp
- * writes its frame as the ROM does.
- *
- * 0x0014DA is translated register-level in fn_000402.c
- * (SoundBank0_0014DA_Regs) because its sign-extended destination index writes
- * through the 0x438000 work-RAM mirror; the shared void helper does not. */
-#include "fn_auto.h"
-#include "fn_call_frames.h"
+ * The start/reset continuations at 0x010308, 0x010318, 0x010322 and
+ * 0x010336 and the separate test-mode branch at 0x010432 are uncaptured.
+ * Fn_010172 models the initial TRAP #5 yield. Seg_Task0_Main stops before
+ * each TRAP. Task0_Main_Frame executes synchronous TRAP #1/#2 handlers
+ * and returns the resume PC for the scheduler's next TRAP #4/#5 yield.
+ */
+#include "../kernel/seg.h"
+#include "fn_text_frames.h"
 #include "../audio/sound_cmd.h"
-#include "../enemy/obj_1194C2.h"   /* Text_DrawString 0x005666 */
-#include "../kernel/kernel.h"      /* Kern_001E76 / Kern_001E0E */
-#include "../player/player_task.h" /* Coin_CheckStartReady (0x000FEC) */
-#include "../video/sprite.h"
+#include "../kernel/kernel.h"
+#include "../player/player_task.h"
 
-/* 0x005666 with the caller's arguments and its link/move frame. */
-static void draw_string(const f3mem_t *m, f3regs_t *r, uint32_t src,
-                        uint32_t dst, uint16_t col, uint32_t ret)
+/* MOVE/TST update NZVC and preserve X. Narrow operands are sign-extended
+ * by their caller for the N test. */
+static void move_flags(f3regs_t *r, int32_t value)
 {
-    uint32_t sp = r->a[7];
-    push_word(m, r, col);                       /* 0x010186 move.w #7,-(A7) */
-    push_long(m, r, dst);                       /* 0x01018A pea.l 0x61C79C */
-    push_long(m, r, src);
+    r->sr = (uint16_t)((r->sr & ~0x0Fu) | (value < 0 ? 8u : value == 0 ? 4u : 0u));
+}
+
+static void save_call(const f3mem_t *m, f3regs_t *r, uint32_t ret, uint16_t mask)
+{
     push_long(m, r, ret);
-    push_long(m, r, r->a[6]);
-    push_long(m, r, r->a[1]);
-    push_long(m, r, r->a[0]);
-    push_long(m, r, r->d[7]);
-    r->d[0] = Text_DrawString(m, src, dst, col);
-    r->a[7] = sp;                               /* 0x01019C lea 0xA(A7),A7 */
+    push_movem(m, r, mask);
 }
 
-/* ROM 0x0013F238 + 0x0039D8: the caller pushes the command word, 0x0013F238
- * rewrites it in place (+0x53 when A5+0x3306 is set and 1 <= cmd <= 0x40), and
- * 0x0039D8 queues it into the sound DPRAM ring. */
-static void play_sound(const f3mem_t *m, int16_t cmd)
+/* 0x13F238 can rewrite the pushed argument before 0x0039D8 queues it. */
+static void play_sound(const f3mem_t *m, f3regs_t *r, int16_t cmd, uint32_t ret)
 {
-    if (rd8(m, F3_A5 + 0x3306u) != 0u && cmd >= 1 && cmd <= 0x40)
+    uint32_t sp = r->a[7];
+    push_word(m, r, (uint16_t)cmd);
+    wr32(m, r->a[7] - 4u, ret - 6u);            /* 0x13F238 return PC */
+    if (rd8(m, r->a[5] + 0x3306u) != 0u && cmd >= 1 && cmd <= 0x40) {
         cmd = (int16_t)(cmd + 0x53);
-    if (m->dpram) {
-        Sound_PlayCmd(m, cmd);
-    } else {
-        uint8_t tmp[F3_DPRAM_SIZE] = {0};
-        f3mem_t tm = *m;
-        tm.dpram = tmp;
-        Sound_PlayCmd(&tm, cmd);
+        wr16(m, r->a[7], (uint16_t)cmd);
     }
+    save_call(m, r, ret, 0x0707u);               /* 0x0039D8 saves D0-D2/A0-A2 */
+    if (rd8(m, r->a[5] - 0x1444u) == 0u && cmd >= 0 &&
+        cmd <= (int16_t)rd16(m, 0x6750u)) {
+        push_long(m, r, 0x003A16u);             /* command handler return PC */
+        r->sr &= (uint16_t)~0x10u;              /* 0x003A16 add.w D1,D1 */
+    }
+    Sound_PlayCmd(m, cmd);
+    r->a[7] = sp;
 }
 
-/* TRAP #1 with the two arguments the ROM pushes: entry PC (SP+8) and slot
- * (SP+12). The task parameter at SP+16 is whatever the caller's stack holds,
- * as in the ROM. */
-static void trap01(const f3mem_t *m, f3regs_t *r, uint32_t slot,
-                   uint32_t entry, uint32_t retpc)
+/* Execute a synchronous trap when running a whole frame. Its arguments
+ * remain on the stack until the instruction at the resume PC removes them. */
+static void run_trap(const f3mem_t *m, f3regs_t *r, uint32_t pc, unsigned vector)
 {
-    uint32_t sp = r->a[7];
-    push_long(m, r, slot);                      /* move.l #slot,-(A7) */
-    push_long(m, r, entry);                     /* pea.l entry */
-    r->a[7] -= 8u;                              /* 68020 format-0 trap frame */
-    wr16(m, r->a[7], 0x2000u);                  /* SR of the task context (0x1EF2) */
-    wr32(m, r->a[7] + 2u, retpc);
-    wr16(m, r->a[7] + 6u, 0x0084u);             /* format 0, vector 33 (trap #1) */
-    (void)Kern_001E76(m, r);                    /* 0x001E76 */
-    r->a[7] = sp;                               /* addq.l #8,A7 */
+    const uint16_t sr = r->sr;
+    push_word(m, r, (uint16_t)(0x80u + 4u * vector));
+    push_long(m, r, pc + 2u);
+    push_word(m, r, sr);
+    uint32_t frame = r->a[7];
+    push_movem(m, r, vector == 1u ? 0x03C0u : 0x0003u);
+    r->a[7] = frame;
+    if (vector == 1u)
+        (void)Kern_001E76(m, r);
+    else
+        (void)Kern_001E0E(m, r);
+    r->a[7] = frame + 8u;
 }
 
-/* TRAP #1 with the task parameter pushed too (0x01043C..0x01044C). */
-static void trap01_param(const f3mem_t *m, f3regs_t *r, uint32_t slot,
-                         uint32_t entry, uint32_t param, uint32_t retpc)
+static void stop_sound(const f3mem_t *m, f3regs_t *r, uint32_t ret)
 {
     uint32_t sp = r->a[7];
-    push_long(m, r, param);                     /* 0x01043C move.l (0).w,-(A7) */
-    push_long(m, r, slot);                      /* 0x010440 move.l #1 */
-    push_long(m, r, entry);                     /* 0x010446 pea.l */
-    r->a[7] -= 8u;                              /* 68020 format-0 trap frame */
-    wr16(m, r->a[7], 0x2000u);
-    wr32(m, r->a[7] + 2u, retpc);
-    wr16(m, r->a[7] + 6u, 0x0084u);             /* format 0, vector 33 (trap #1) */
-    (void)Kern_001E76(m, r);
-    r->a[7] = sp;                               /* 0x01044E lea 0xC(A7),A7 */
+    save_call(m, r, ret, 0x071Fu);               /* 0x003C24 saves D0-D4/A0-A2 */
+    Sound_StopAll(m);
+    r->a[7] = sp;
+    r->sr &= (uint16_t)~0x10u;                  /* 0x003CAE add.w D1,D1 */
 }
 
-/* TRAP #2: kill the tasks selected by the mask (0x001E0E). */
-static void trap02(const f3mem_t *m, f3regs_t *r, uint32_t mask, uint32_t retpc)
+static void clear_sprites(const f3mem_t *m, f3regs_t *r, uint32_t ret)
 {
     uint32_t sp = r->a[7];
-    push_long(m, r, mask);                      /* move.l #mask,-(A7) */
-    r->a[7] -= 8u;                              /* 68020 format-0 trap frame */
-    wr16(m, r->a[7], 0x2000u);
-    wr32(m, r->a[7] + 2u, retpc);
-    wr16(m, r->a[7] + 6u, 0x0088u);             /* format 0, vector 34 (trap #2) */
-    (void)Kern_001E0E(m, r);                    /* 0x001E0E */
-    r->a[7] = sp;                               /* addq.l #4,A7 */
+    save_call(m, r, ret, 0x0303u);               /* 0x00117E saves D0-D1/A0-A1 */
+    Sprite_ClearAll(m);
+    r->a[7] = sp;
+}
+
+/* 0x005880: the text clear preserves D0-D1/A0. Its loop can be
+ * interrupted after the store, with A0 already advanced to the next long. */
+static int clear_text(const f3mem_t *m, f3regs_t *r, uint32_t ret,
+                      task0_checkpoint_t checkpoint)
+{
+    const f3regs_t saved = *r;
+    save_call(m, r, ret, 0x0103u);
+    r->a[0] = 0x61C000u;
+
+    if (checkpoint) {
+        r->d[0] = set_word(r->d[0], 0x07FFu);
+        r->d[1] = 0;
+        r->pc = 0x005892u;
+        move_flags(r, 0);
+        do {
+            wr32(m, r->a[0], r->d[1]);
+            r->a[0] += 4u;
+            if (checkpoint(m, r) < 0)
+                return -1;
+            r->d[0] = set_word(r->d[0], (uint16_t)(r->d[0] - 1u));
+        } while ((uint16_t)r->d[0] != 0xFFFFu);
+    }
+    Gfx_ClearTextLayerFrom(m, r->a[0]);
+    *r = saved;
+    move_flags(r, 0);
+    return 0;
+}
+
+static int clear_layers(const f3mem_t *m, f3regs_t *r, uint32_t ret,
+                        task0_checkpoint_t checkpoint)
+{
+    uint32_t sp = r->a[7];
+    push_long(m, r, ret);                       /* 0x005A12 */
+    if (clear_text(m, r, 0x005A16u, checkpoint) < 0)
+        return -1;
+    /* The last subcall, 0x0059B4, saves a superset of the earlier frames. */
+    save_call(m, r, 0x005A26u, 0x0307u);
+    Gfx_ClearPlayfields(m);
+    r->a[7] = sp;
+    return 0;
+}
+
+static void load_font(const f3mem_t *m, f3regs_t *r, uint32_t ret)
+{
+    uint32_t sp = r->a[7];
+    save_call(m, r, ret, 0x0303u);               /* 0x005A3A saves D0-D1/A0-A1 */
+    (void)Fn_005A3A(m, r);
+    r->a[7] = sp;
+}
+
+static void load_sound_bank(const f3mem_t *m, f3regs_t *r, uint32_t ret)
+{
+    wr32(m, r->a[7] - 4u, ret);                 /* 0x0014DA */
+    wr32(m, r->a[7] - 8u, 0x0014E6u);           /* last BSR in 0x0014DA */
+    SoundBank0_0014DA_Regs(m, r);
+}
+
+static void push_trap_argument(const f3mem_t *m, f3regs_t *r, uint32_t value)
+{
+    push_long(m, r, value);
+    move_flags(r, (int32_t)value);               /* MOVE.L to stack */
+}
+
+static void push_spawn(const f3mem_t *m, f3regs_t *r, uint32_t slot,
+                       uint32_t entry)
+{
+    push_trap_argument(m, r, slot);
+    push_long(m, r, entry);                     /* PEA preserves CCR */
 }
 
 /* bsr.w 0x01033C: the routine pops its own return address; on its -1
@@ -168,51 +173,50 @@ static int call_01033C(const f3mem_t *m, f3regs_t *r, uint32_t ret)
     return rc;
 }
 
-static uint32_t pass_10174(const f3mem_t *m, f3regs_t *r);
-static uint32_t pass_101A8(const f3mem_t *m, f3regs_t *r);
-static uint32_t pass_101FA(const f3mem_t *m, f3regs_t *r);
-static uint32_t pass_10236(const f3mem_t *m, f3regs_t *r);
-static uint32_t pass_1029C(const f3mem_t *m, f3regs_t *r);
-static uint32_t pass_10322(const f3mem_t *m, f3regs_t *r);
-static uint32_t pass_10432(const f3mem_t *m, f3regs_t *r);
-
 /* 0x010432: test-mode entry (reached from 0x010182 or from 0x01033C's -1). */
 static uint32_t pass_10432(const f3mem_t *m, f3regs_t *r)
 {
-    uint32_t a5 = r->a[5];
-
-    trap02(m, r, 0x0000FFFEu, 0x01043Au);       /* 0x010432..0x01043A */
-    trap01_param(m, r, 1u, 0x001A1A26u, rd32(m, 0x00000000u), 0x01044Eu); /* 0x01043C */
-    wr8(m, a5 - 0x5DC7u, 0x00u);                /* 0x010452 */
-    wr8(m, a5 - 0x5DCCu, 0x00u);                /* 0x010456 */
-    wr8(m, a5 - 0x1444u, 0x00u);                /* 0x01045A */
-    Sprite_ClearAll(m);                         /* 0x01045E jsr 0x0000117E */
-    Gfx_ClearAllLayers(m);                      /* 0x010462 jsr 0x00005A12 */
-    Gfx_InitLineRam(m);                         /* 0x010466 jsr 0x00005B0C */
-    SoundBank0_0014DA_Regs(m, r);               /* 0x01046A jsr 0x000014DA */
-    Sound_StopAll(m);                           /* 0x01046E jsr 0x00003C24 */
-    /* 0x010474 trap #5 ; 0x010476 bra.s 0x010474: yield forever. */
-    return 0x010476u;
+    push_trap_argument(m, r, 0xFFFEu);
+    return 0x010438u;                           /* TRAP #2 */
 }
 
-/* 0x010236..0x010282: rebuild the machine and spawn the two init tasks. */
-static uint32_t pass_10236(const f3mem_t *m, f3regs_t *r)
+static uint32_t pass_1044E(const f3mem_t *m, f3regs_t *r)
 {
     uint32_t a5 = r->a[5];
 
-    (void)Fn_005A3A(m, r);                      /* 0x010236 jsr 0x00005A3A */
-    wr8(m, a5 - 0x144Cu, 0x00u);                /* 0x01023C sf.b */
-    wr8(m, a5 - 0x144Bu, 0x00u);                /* 0x010240 */
-    wr8(m, a5 - 0x1452u, 0x00u);                /* 0x010244 */
-    Sound_StopAll(m);                           /* 0x010248 jsr 0x00003C24 */
-    Sprite_InitBuffers(m);                      /* 0x01024E jsr 0x00001070 */
-    Sprite_ClearAll(m);                         /* 0x010252 jsr 0x0000117E */
-    Gfx_ClearAllLayers(m);                      /* 0x010256 jsr 0x00005A12 */
-    Gfx_InitLineRam(m);                         /* 0x01025A jsr 0x00005B0C */
-    SoundBank0_0014DA_Regs(m, r);               /* 0x01025E jsr 0x000014DA */
-    trap01(m, r, 4u, 0x00010488u, 0x010270u);   /* 0x010262..0x01026E */
-    trap01(m, r, 0x0Fu, 0x000038ACu, 0x010280u);/* 0x010272..0x01027E */
-    return 0x010284u;                           /* 0x010282 trap #5 */
+    r->a[7] += 12u;
+    wr8(m, a5 - 0x5DC7u, 0);
+    wr8(m, a5 - 0x5DCCu, 0);
+    wr8(m, a5 - 0x1444u, 0);
+    clear_sprites(m, r, 0x010462u);
+    (void)clear_layers(m, r, 0x010466u, 0);
+    load_sound_bank(m, r, 0x01046Eu);
+    stop_sound(m, r, 0x010474u);
+    return 0x010474u;                           /* TRAP #5 */
+}
+
+/* 0x010236..0x01026E: rebuild the machine before spawning the init tasks. */
+static uint32_t pass_10236(const f3mem_t *m, f3regs_t *r, task0_checkpoint_t checkpoint)
+{
+    uint32_t a5 = r->a[5];
+
+    load_font(m, r, 0x01023Cu);
+    wr8(m, a5 - 0x144Cu, 0);
+    wr8(m, a5 - 0x144Bu, 0);
+    wr8(m, a5 - 0x1452u, 0);
+    stop_sound(m, r, 0x01024Eu);
+    wr32(m, r->a[7] - 4u, 0x010252u);
+    (void)Fn_001070(m, r);
+    clear_sprites(m, r, 0x010256u);
+    if (clear_layers(m, r, 0x01025Au, checkpoint) < 0)
+        return SEG_LEAVE;
+    wr32(m, r->a[7] - 4u, 0x01025Eu);
+    wr32(m, r->a[7] - 8u, 0x005B40u);           /* 0x005B0C's final fill call */
+    Gfx_InitLineRam_Regs(m, r);
+    r->sr &= (uint16_t)~0x10u;                  /* 0x005B72 addi.w #0x400,D0 */
+    load_sound_bank(m, r, 0x010262u);
+    push_spawn(m, r, 4u, 0x010488u);
+    return 0x01026Eu;                           /* TRAP #1 */
 }
 
 /* 0x01008A-style startup, first half: font, settings check, "WAIT A MOMENT"
@@ -221,21 +225,22 @@ static uint32_t pass_10174(const f3mem_t *m, f3regs_t *r)
 {
     uint32_t sp = r->a[7];
 
-    (void)Fn_005A3A(m, r);                      /* 0x010174 jsr 0x00005A3A */
+    load_font(m, r, 0x01017Au);
     push_long(m, r, 0x010180u);                 /* 0x01017A jsr 0x000050DC */
     int rc = Fn_0050DC(m, r);
     r->a[7] = sp;
     if (rc < 0)
-        return 0u;                              /* settings recovery: untranslated */
+        return SEG_LEAVE;                       /* settings recovery: untranslated */
     if (r->d[0] != 0u)                          /* 0x010180 tst.l D0 / bne */
         return pass_10432(m, r);
 
-    draw_string(m, r, 0x001047Au, 0x0061C79Cu, 7u, 0x01019Cu); /* 0x010186 */
+    draw_text(m, r, 0x01019Cu, 0x01047Au, 0x61C79Cu, 7u);
+    r->sr &= (uint16_t)~0x10u;                  /* 0x00567A add.w D7,D7 */
     /* 0x0101A0 move.l #0xB4,-(A7) ; 0x0101A6 trap #4: sleep 180 frames. The
      * CPU frame and the handler (0x001F30) belong to the scheduler, as with
      * every other yield; 0x0101A8 addq.l #4,A7 pops the argument on wake. */
-    push_long(m, r, 0x000000B4u);
-    return 0x0101A8u;
+    push_trap_argument(m, r, 0xB4u);
+    return 0x0101A6u;
 }
 
 /* 0x0101A8: the two sound cues, the service-switch latch and the second
@@ -245,8 +250,8 @@ static uint32_t pass_101A8(const f3mem_t *m, f3regs_t *r)
     uint32_t a5 = r->a[5];
 
     r->a[7] += 4u;                              /* 0x0101A8 addq.l #4,A7 */
-    play_sound(m, 0x0000u);                     /* 0x0101AA..0x0101BA */
-    play_sound(m, 0x0094u);                     /* 0x0101BE..0x0101CE */
+    play_sound(m, r, 0x0000u, 0x0101BAu);                     /* 0x0101AA..0x0101BA */
+    play_sound(m, r, 0x0094u, 0x0101CEu);                     /* 0x0101BE..0x0101CE */
 
     /* 0x0101D2 sf.b ; 0x0101D6 btst #4 / seq / bfins {0:1} ;
      * 0x0101E4 btst #3 / seq / bfins {1:1}: the two switch bits, inverted
@@ -261,54 +266,68 @@ static uint32_t pass_101A8(const f3mem_t *m, f3regs_t *r)
     r->d[0] = (r->d[0] & 0xFFFFFF00u) | (uint8_t)((flags & 0x08u) ? 0x00u : 0xFFu);
 
     /* 0x0101F2 move.l #0xB4,-(A7) ; 0x0101F8 trap #4: sleep 180 frames. */
-    push_long(m, r, 0x000000B4u);
-    return 0x0101FAu;
+    push_trap_argument(m, r, 0xB4u);
+    return 0x0101F8u;
 }
 
-/* 0x0101FA: third sound cue, cache enable, volume, text clear, then the
- * 0x010236 rebuild. */
-static uint32_t pass_101FA(const f3mem_t *m, f3regs_t *r)
+/* 0x0101FA: sound cue, cache enable, volume, text clear and rebuild. */
+static uint32_t pass_101FA(const f3mem_t *m, f3regs_t *r, task0_checkpoint_t checkpoint)
 {
     uint32_t a5 = r->a[5];
-    uint8_t vol;
-
-    r->a[7] += 4u;                              /* 0x0101FA addq.l #4,A7 */
-    play_sound(m, 0x0095u);                     /* 0x0101FC..0x01020C */
-    r->d[0] = 1u;                               /* 0x010210 moveq #1,D0 ;
-                                                 * 0x010212 movec D0,CACR */
-    /* 0x010216..0x010222: the word at A5-0x5DC0 pushed four times; 0x003CBA
-     * copies the low byte of each copy to 0xC007F8..FB. */
+    r->a[7] += 4u;
+    play_sound(m, r, 0x0095u, 0x01020Cu);
+    r->d[0] = 1u;                               /* 0x010210 moveq; 0x010212 movec to CACR */
+    uint16_t volume = rd16(m, a5 - 0x5DC0u);
     for (unsigned i = 0; i < 4u; ++i)
-        push_word(m, r, rd16(m, a5 - 0x5DC0u));
-    vol = rd8(m, a5 - 0x5DBFu);                 /* = the low byte pushed above */
-    Sound_SetVolume(m, vol, vol, vol, vol);     /* 0x010226 jsr 0x003CBA */
-    r->a[7] += 8u;                              /* 0x01022C lea (8,A7),A7 */
-    Gfx_ClearTextLayer(m);                      /* 0x010230 jsr 0x00005880 */
-    return pass_10236(m, r);                    /* 0x010236 */
+        push_word(m, r, volume);
+    push_long(m, r, 0x01022Cu);
+    wr32(m, r->a[7] - 4u, r->a[0]);             /* 0x003CBA saves A0 */
+    (void)Fn_003CBA(m, r);
+    r->a[7] += 12u;
+    (void)clear_text(m, r, 0x010236u, 0);
+    return pass_10236(m, r, checkpoint);
 }
 
-/* 0x010284: latch the start-ready flag and spawn the object runner. */
+/* 0x010284: latch the start-ready flag and prepare to spawn the object runner. */
 static uint32_t pass_10284(const f3mem_t *m, f3regs_t *r)
 {
     uint32_t a5 = r->a[5];
 
-    wr8(m, a5 - 0x1444u, rd8(m, a5 - 0x5DC5u)); /* 0x010284 move.b (A5-0x5DC5) */
-    trap01(m, r, 1u, 0x000B8404u, 0x010298u);   /* 0x01028A..0x010296 */
-    return 0x01029Cu;                           /* 0x01029A trap #5 */
+    wr8(m, a5 - 0x1444u, rd8(m, a5 - 0x5DC5u));
+    push_spawn(m, r, 1u, 0x0B8404u);
+    return 0x010296u;                           /* TRAP #1 */
 }
 
-/* 0x0102EE: full reset of the screen state, then spawn the next routine. */
+/* 0x0102EE: clear the screen, then stop at the task kill. */
 static uint32_t pass_scene_reset(const f3mem_t *m, f3regs_t *r)
 {
-    uint32_t a5 = r->a[5];
+    stop_sound(m, r, 0x0102F4u);
+    clear_sprites(m, r, 0x0102FAu);
+    (void)clear_layers(m, r, 0x010300u, 0);
+    push_trap_argument(m, r, 0x7FFEu);
+    return 0x010306u;                           /* TRAP #2 */
+}
 
-    Sound_StopAll(m);                           /* 0x0102EE jsr 0x00003C24 */
-    Sprite_ClearAll(m);                         /* 0x0102F4 jsr 0x0000117E */
-    Gfx_ClearAllLayers(m);                      /* 0x0102FA jsr 0x00005A12 */
-    trap02(m, r, 0x00007FFEu, 0x010308u);       /* 0x010300..0x010308 */
-    trap01(m, r, 1u, 0x00004146u, 0x010318u);   /* 0x01030A..0x010316 */
-    wr8(m, a5 - 0x1444u, 0x00u);                /* 0x01031A move.b #0 */
-    return 0x010322u;                           /* 0x010320 trap #5 */
+/* 0x000FEC returns through three different operand sizes in D0. */
+static void check_start_ready(const f3mem_t *m, f3regs_t *r)
+{
+    uint32_t a5 = r->a[5];
+    wr32(m, r->a[7] - 4u, 0x0102EAu);
+    if (!rd16(m, a5 - 0x7F5Eu)) {
+        r->d[0] = (r->d[0] & ~0xFFu) | Coin_CheckStartReady(m);
+    } else if (rd16(m, a5 - 0x7F70u)) {
+        r->d[0] = 0;
+    } else {
+        uint16_t paid = rd16(m, a5 - 0x7F6Eu);
+        if (paid == 0u) {
+            r->d[0] = 0xFFFFFF00u | Coin_CheckStartReady(m);
+        } else {
+            uint16_t change = rd16(m, a5 - 0x7F5Cu);
+            r->d[0] = set_word(r->d[0], (uint16_t)(change - paid));
+            r->sr = (uint16_t)((r->sr & ~0x10u) | (change >= paid ? 0x10u : 0u));
+        }
+    }
+    move_flags(r, (int8_t)r->d[0]);              /* 0x0102EA tst.b D0 */
 }
 
 /* 0x01029C: the per-frame coin/credit select. Every "not yet" branch lands on
@@ -328,9 +347,9 @@ static uint32_t pass_1029C(const f3mem_t *m, f3regs_t *r)
     }
 
     if (rd8(m, a5 - 0x5DC1u) == 0u) {           /* 0x0102B4 tst.b / beq 0x0102E4 */
-        r->d[0] = set_word(r->d[0], Coin_CheckStartReady(m)); /* 0x0102E4 jsr */
+        check_start_ready(m, r);                   /* 0x0102E4 jsr */
         if ((int8_t)r->d[0] < 0)                /* 0x0102EA tst.b / blt 0x01029A */
-            return 0x01029Cu;
+            return 0x01029Au;
         return pass_scene_reset(m, r);
     }
 
@@ -338,11 +357,11 @@ static uint32_t pass_1029C(const f3mem_t *m, f3regs_t *r)
     if ((rd8(m, a5 - 0x5DDBu) & 0x80u) == 0u)   /* 0x0102C2 btst #7 / beq */
         return pass_scene_reset(m, r);
     if (rd8(m, a5 - 0x5DC6u) != 0u)             /* 0x0102CC tst.b / bne 0x01029A */
-        return 0x01029Cu;
+        return 0x01029Au;
     wr16(m, a5 + 0x1D38u, 1u);                  /* 0x0102D2 move.w #1 */
     if ((rd8(m, a5 - 0x5DD7u) & 0x80u) == 0u)   /* 0x0102D8 btst #7 / beq */
         return pass_scene_reset(m, r);
-    return 0x01029Cu;                           /* 0x0102E2 bra 0x01029A */
+    return 0x01029Au;                           /* 0x0102E2 bra 0x01029A */
 }
 
 /* 0x010322: after the reset pass, wait for A5-0x144B bit 0, then kill the
@@ -354,9 +373,9 @@ static uint32_t pass_10322(const f3mem_t *m, f3regs_t *r)
     if (call_01033C(m, r, 0x010326u) < 0)
         return pass_10432(m, r);
     if ((rd8(m, a5 - 0x144Bu) & 0x01u) == 0u)   /* 0x010326 btst #0 / beq 0x010320 */
-        return 0x010322u;
-    trap02(m, r, 0x0000FFFEu, 0x010336u);       /* 0x01032E..0x010336 */
-    return pass_10236(m, r);                    /* 0x010338 bra.w 0x010236 */
+        return 0x010320u;
+    push_trap_argument(m, r, 0xFFFEu);
+    return 0x010334u;
 }
 
 int Fn_010172(const f3mem_t *m, f3regs_t *r)
@@ -368,18 +387,62 @@ int Fn_010172(const f3mem_t *m, f3regs_t *r)
     return 0;
 }
 
-uint32_t Task0_Main_Frame(const f3mem_t *m, f3regs_t *r, uint32_t pc)
+/* ROM 0x010172: code between Task0_Main's traps. */
+uint32_t Seg_Task0_Main(const f3mem_t *m, f3regs_t *r, uint32_t pc,
+                        task0_checkpoint_t checkpoint)
 {
     switch (pc) {
     case 0x010174u: return pass_10174(m, r);
     case 0x0101A8u: return pass_101A8(m, r);
-    case 0x0101FAu: return pass_101FA(m, r);
-    case 0x010236u: return pass_10236(m, r);
+    case 0x0101FAu: return pass_101FA(m, r, checkpoint);
+    case 0x010236u: return pass_10236(m, r, checkpoint);
+    case 0x010270u:
+        r->a[7] += 8u;
+        push_spawn(m, r, 0x0Fu, 0x0038ACu);
+        return 0x01027Eu;
+    case 0x010280u:
+        r->a[7] += 8u;
+        return 0x010282u;
     case 0x010284u: return pass_10284(m, r);
+    case 0x010298u:
+        r->a[7] += 8u;
+        return 0x01029Au;
     case 0x01029Cu: return pass_1029C(m, r);
+    case 0x010308u:
+        r->a[7] += 4u;
+        push_spawn(m, r, 1u, 0x004146u);
+        return 0x010316u;
+    case 0x010318u:
+        r->a[7] += 8u;
+        wr8(m, r->a[5] - 0x1444u, 0);
+        move_flags(r, 0);
+        return 0x010320u;
     case 0x010322u: return pass_10322(m, r);
+    case 0x010336u:
+        r->a[7] += 4u;
+        return pass_10236(m, r, checkpoint);
     case 0x010432u: return pass_10432(m, r);
-    case 0x010476u: return 0x010476u;   /* 0x010476 bra.s 0x010474: yields forever */
-    default: return 0u;
+    case 0x01043Au:
+        r->a[7] += 4u;
+        push_trap_argument(m, r, rd32(m, 0));
+        push_spawn(m, r, 1u, 0x1A1A26u);
+        return 0x01044Cu;
+    case 0x01044Eu: return pass_1044E(m, r);
+    case 0x010476u: return 0x010474u;
+    default: return SEG_LEAVE;
+    }
+}
+
+uint32_t Task0_Main_Frame(const f3mem_t *m, f3regs_t *r, uint32_t pc)
+{
+    for (;;) {
+        uint32_t trap = Seg_Task0_Main(m, r, pc, 0);
+        if (trap == SEG_LEAVE)
+            return 0;
+        pc = trap + 2u;
+        unsigned vector = rd16(m, trap) & 0x0Fu;
+        if (vector != 1u && vector != 2u)
+            return pc;
+        run_trap(m, r, trap, vector);
     }
 }

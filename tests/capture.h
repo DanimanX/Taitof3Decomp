@@ -191,20 +191,28 @@ static inline void cap_free(capture_t *c)
 #define CAP_ARTIFACT_DPRAM_LO 0xC00482u
 #define CAP_ARTIFACT_DPRAM_HI 0xC00484u
 
-static inline int cap_diff(const char *tag, int pair, uint32_t base, const uint8_t *got,
-                           const uint8_t *want, uint32_t n, uint32_t lo, uint32_t hi, int *budget)
+static inline int cap_diff_region(const char *tag, int pair, uint32_t base, const uint8_t *got,
+                                  const uint8_t *want, uint32_t n, uint32_t lo, uint32_t hi,
+                                  int allow_artifacts, int *budget)
 {
     int d = 0;
     for (uint32_t o = 0; o < n; o++) {
         uint32_t a = base + o;
         if (a >= lo && a < hi) continue;
-        if (a >= CAP_ARTIFACT_LO && a < CAP_ARTIFACT_HI) continue;
-        if (a >= CAP_ARTIFACT_DPRAM_LO && a < CAP_ARTIFACT_DPRAM_HI) continue;
+        if (allow_artifacts &&
+            ((a >= CAP_ARTIFACT_LO && a < CAP_ARTIFACT_HI) ||
+             (a >= CAP_ARTIFACT_DPRAM_LO && a < CAP_ARTIFACT_DPRAM_HI))) continue;
         if (got[o] != want[o]) {
             if ((*budget)-- > 0) printf("  %s pair %d @%06X got=%02X want=%02X\n", tag, pair, a, got[o], want[o]);
             d++;
         }
     }
     return d;
+}
+
+static inline int cap_diff(const char *tag, int pair, uint32_t base, const uint8_t *got,
+                           const uint8_t *want, uint32_t n, uint32_t lo, uint32_t hi, int *budget)
+{
+    return cap_diff_region(tag, pair, base, got, want, n, lo, hi, 1, budget);
 }
 #endif

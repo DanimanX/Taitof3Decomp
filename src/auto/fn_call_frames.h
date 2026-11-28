@@ -21,6 +21,14 @@ static inline void push_long(const f3mem_t *m, f3regs_t *r, uint32_t value)
     wr32(m, r->a[7], value);
 }
 
+/* A predecrement MOVEM.L writes the highest selected register first. */
+static inline void push_movem(const f3mem_t *m, f3regs_t *r, uint16_t mask)
+{
+    for (int i = 14; i >= 0; --i)
+        if (mask & (1u << i))
+            push_long(m, r, i < 8 ? r->d[i] : r->a[i - 8]);
+}
+
 /* 0x01057C saves D1-D4/A0-A2 and returns the allocation in D0. */
 static inline void call_spawn(const f3mem_t *m, f3regs_t *r, uint32_t ret,
                               uint32_t fn, uint16_t group, uint16_t count,

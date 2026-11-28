@@ -349,9 +349,13 @@ uint32_t Gfx_DrawDecimal(const f3mem_t *m, uint32_t val, uint16_t digits, uint32
 /* ROM 0x005880 */
 void Gfx_ClearTextLayer(const f3mem_t *m)
 {
-    for (uint32_t i = 0; i < 0x800u; i++) {
-        wr32(m, 0x0061C000u + i * 4u, 0u);
-    }
+    Gfx_ClearTextLayerFrom(m, 0x0061C000u);
+}
+
+void Gfx_ClearTextLayerFrom(const f3mem_t *m, uint32_t addr)
+{
+    for (; addr < 0x0061E000u; addr += 4u)
+        wr32(m, addr, 0u);
     wr32(m, F3_A5 - 0x5D88u, 0u);
     wr16(m, F3_A5 - 0x5D84u, 0u);
     wr32(m, F3_A5 - 0x5D60u, 0u);
@@ -442,6 +446,11 @@ void Gfx_ClearPf2AndLineRam(const f3mem_t *m)
 void Gfx_ClearAllLayers(const f3mem_t *m)
 {
     Gfx_ClearTextLayer(m);
+    Gfx_ClearPlayfields(m);
+}
+
+void Gfx_ClearPlayfields(const f3mem_t *m)
+{
     Gfx_ClearPf0(m);
     Gfx_ClearPf0b(m);
     Gfx_ClearPf1AndLineRam(m);

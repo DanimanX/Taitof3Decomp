@@ -12,8 +12,8 @@
  * segment to the next, a[7] = SP) and keep the 68k stack in memory for the
  * return addresses they cross: a jsr pushes its return PC (seg_push32) and
  * the callee's segment continues; an rts pops it and Seg_Run dispatches the
- * caller's continuation. Stack bytes below SP (saved registers, pushed
- * arguments) are only written where a later segment reads them.
+ * caller's continuation. Task 0 also stops before TRAP #1/#2 and replays
+ * stack writes below SP for comparison with the power-on captures.
  *
  * Verified with scripts/seg_capture.sh <resume> <yields> (one capture per
  * resume PC, the exit PC in the regs.tsv PC column) and test_fn's SEGREGS
@@ -24,8 +24,14 @@
 /* segment left translated code (unknown resume PC or a path not translated) */
 #define SEG_LEAVE 0xFFFFFFFFu
 
-/* run one segment from pc; returns the PC of the TRAP #4/#5 reached */
+/* Run one segment from pc and return the PC of the TRAP reached. */
 uint32_t Seg_Run(const f3mem_t *m, f3regs_t *r, uint32_t pc);
+
+/* Task 0 also stops at the synchronous TRAP #1/#2 call sites. The optional
+ * checkpoint runs between a text clear's MOVE.L and DBRA at 0x005892. */
+typedef int (*task0_checkpoint_t)(const f3mem_t *m, f3regs_t *r);
+uint32_t Seg_Task0_Main(const f3mem_t *m, f3regs_t *r, uint32_t pc,
+                        task0_checkpoint_t checkpoint);
 
 /* one group per routine whose code yields; each returns as Seg_Run */
 uint32_t Seg_13F5B8(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* stage outro */

@@ -18,6 +18,7 @@ static void draw_string(const f3mem_t *m, f3regs_t *r, uint32_t src,
     push_long(m, r, r->a[0]);
     push_long(m, r, r->d[7]);
     r->d[0] = Text_DrawString(m, src, 0x61CE3Eu, attr);
+    r->sr &= (uint16_t)~0x10u;                       /* 0x00567A add.w D7,D7 */
     r->a[7] = sp;
 }
 
@@ -36,6 +37,7 @@ static void draw_credit_digit(const f3mem_t *m, f3regs_t *r)
     push_long(m, r, r->d[2]);
     push_long(m, r, r->d[1]);
     r->d[0] = Gfx_DrawHex(m, r->d[0], 1u, 0x61CE4Cu, 7u);
+    r->sr |= 0x10u;                                  /* 0x0056B6 subq.w #1 from zero */
     r->a[7] = sp;
 }
 

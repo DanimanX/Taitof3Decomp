@@ -25,6 +25,8 @@ uint32_t Gfx_DrawHex(const f3mem_t *m, uint32_t val, uint16_t digits, uint32_t d
 uint32_t Gfx_DrawDecimal(const f3mem_t *m, uint32_t val, uint16_t digits, uint32_t dst, uint16_t attr); /* ROM 0x00571A */
 void Gfx_ClearPf3(const f3mem_t *m);                  /* ROM 0x0058AE */
 void Gfx_ClearTextLayer(const f3mem_t *m);            /* ROM 0x005880 */
+void Gfx_ClearTextLayerFrom(const f3mem_t *m, uint32_t addr);
+void Gfx_ClearPlayfields(const f3mem_t *m);
 void Gfx_ClearPf0(const f3mem_t *m);                  /* ROM 0x0058DA */
 void Gfx_ClearPf0b(const f3mem_t *m);                 /* ROM 0x005918 */
 void Gfx_ClearPf1AndLineRam(const f3mem_t *m);        /* ROM 0x005956 */

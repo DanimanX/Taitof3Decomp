@@ -1,4 +1,4 @@
-/* ROM 0x0C966E: UNVERIFIED (no usable capture - the only pair is
+/* ROM 0x0C966E: (recipe capture fnk_, work/zcap/recipes15.tsv): (no usable capture - the only pair is
  * VBlank-interrupted and the test harness rejects it): turret/gun object tick
  * with a queue push (A0 = object).
  * Queues {0x20, 0x0C982C[+0x22 of parent], (parent +0x0C) << 6 | 0x4000} via

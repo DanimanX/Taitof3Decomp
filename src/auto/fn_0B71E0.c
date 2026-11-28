@@ -1,6 +1,6 @@
 #include "fn_auto.h"
 
-/* ROM 0x0B71E0: UNVERIFIED (weak capture): clear the 39-by-28 text region. */
+/* ROM 0x0B71E0: (recipe capture fnk_, work/zcap/recipes15.tsv): clear the 39-by-28 text region. */
 #include "fn_call_frames.h"
 
 int Fn_0B71E0(const f3mem_t *m, f3regs_t *r)

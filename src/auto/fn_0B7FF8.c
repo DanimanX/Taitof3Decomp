@@ -1,4 +1,4 @@
-/* ROM 0x0B7FF8: UNVERIFIED (capture spans a VBlank): toggle the playfield
+/* ROM 0x0B7FF8: (recipe capture fnk_, work/zcap/recipes15.tsv): toggle the playfield
  * row-interleave and rotate every row.
  * The capture work/ram/fn_0B7FF8 has every post snapshot one frame later than
  * its pre (0x6DD -> 0x6DE, ...), so the harness skips all 30 pairs as

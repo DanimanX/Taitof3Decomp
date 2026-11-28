@@ -1,4 +1,4 @@
-/* ROM 0x0C1B3C: UNVERIFIED (no capture): object tick that subtracts
+/* ROM 0x0C1B3C: (recipe capture fnk_, work/zcap/recipes15.tsv): object tick that subtracts
  * 0x4000 from the long at +0x18, draws the sprite (0x001282) and re-arms
  * itself (0x0C1B3C). Its only capture pair spans ~0x2A6 frames, so
  * tests/test_fn.c skips it as VBlank-interrupted and the routine cannot be

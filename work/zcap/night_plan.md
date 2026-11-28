@@ -83,3 +83,10 @@ Push: temp GIT_ASKPASS script printing ~/.token.bak, deleted after. Commits end 
   34 no capture, 12 weak. wt_CW2 cw2_r3: register-level Fn_ wrappers + test lines for the 87
   (work/zcap/notest_r1.tsv). Integrate with cw_integrate.sh, run ALL suites.
 - Next: injected captures for the 34 nocap (non-task ones), recapture the 12 weak (NOIRQ/DPRAM/POKE).
+
+## Update 08:20
+- fd4d7c5: 100% decompiled / 95.3% verified. capture_fn has F3_INJECT_REGS / F3_INJECT_STACK (a95fd1a).
+- wt_CW cw_r14: writes work/zcap/recipes15.tsv in wt_CW (ADDR, RECIPE|UNVERIFIABLE, F3 env, reason) for the
+  unverified routines (work/zcap/unver15.tsv). Then: run each RECIPE with $S/inj1.sh-style command into fnk_<ADDR>
+  (F3_NOIRQ=1 F3_REMASK=16A4 F3_GFX=1 F3_SPR=1 F3_INJECT=<A> ... Z10_001000), check_capture.sh <A> fnk_<A>,
+  repoint strong ones' test lines, fix headers, unverified.tsv, all suites, commit.

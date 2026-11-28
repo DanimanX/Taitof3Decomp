@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x0C676E: UNVERIFIED (weak capture): draw debug hitboxes for the collision lists and active players. */
+/* ROM 0x0C676E: (recipe capture fnk_, work/zcap/recipes15.tsv): draw debug hitboxes for the collision lists and active players. */
 #include "fn_call_frames.h"
 
 /* 0x0C6836: append one corner sprite and publish the new write cursor. */

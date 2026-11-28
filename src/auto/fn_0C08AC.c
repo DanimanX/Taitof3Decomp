@@ -1,4 +1,4 @@
-/* ROM 0x0C08AC: UNVERIFIED (no usable capture): animation-driven effect object
+/* ROM 0x0C08AC: (recipe capture fnk_, work/zcap/recipes15.tsv): animation-driven effect object
  * tick (A0 = object).
  * Steps the {dur.w, sprdef.l} animation table at +0x5C via 0x0CBD24, draws the
  * sprite (0x001282), decrements +0x60 and re-arms 0x0C08AC while it stays >= 0;

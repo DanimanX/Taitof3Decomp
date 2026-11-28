@@ -1,4 +1,4 @@
-/* ROM 0x1319FE: UNVERIFIED (weak capture): boss projectile / beam tick
+/* ROM 0x1319FE: (recipe capture fnk_, work/zcap/recipes15.tsv): boss projectile / beam tick
  * (A0 = object). The only captured pair spans frames 0x06DD->0x0992 and its
  * entry state is degenerate (+0x0C points at the unmapped 0x118F0000, +0x10 is
  * 0), so the sprite draw walks ROM 0x000000 as a 0x82D-column frame and the

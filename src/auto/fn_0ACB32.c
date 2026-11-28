@@ -1,4 +1,4 @@
-/* ROM 0x0ACB32: UNVERIFIED (no capture): draw the bank/debug tilemap into the
+/* ROM 0x0ACB32: (recipe capture fnk_, work/zcap/recipes15.tsv): draw the bank/debug tilemap into the
  * text layer. `movem.l d0-d7/a0-a1,-(a7)` then the three stack args
  * (word 0, long 0x610084, long A0) and `jsr 0x0053B2`, which is the
  * run-length compressed-tilemap blitter Gfx_DrawCompressedTilemap:

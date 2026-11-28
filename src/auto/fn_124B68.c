@@ -1,4 +1,4 @@
-/* ROM 0x124B68: UNVERIFIED (no capture): stage-boss camera advance tick with
+/* ROM 0x124B68: (recipe capture fnk_, work/zcap/recipes15.tsv): stage-boss camera advance tick with
  * a randomised ring of child objects (A0 = object).
  * While the camera x counter A5+0x30D2 is below 0x1AE it is advanced by the
  * phase word +0x06 >> 3; the object then takes the camera position

@@ -1,4 +1,4 @@
-/* ROM 0x0E2CA0: UNVERIFIED (no capture): spawn/attach initialiser of a
+/* ROM 0x0E2CA0: (recipe capture fnk_, work/zcap/recipes15.tsv): spawn/attach initialiser of a
  * projectile-like enemy (A0 = object).
  * A1 = object->parent->parent; when that grandparent's +0x06 phase byte is 4
  * the object starts dying (0x0CEE74). Otherwise it places itself at the

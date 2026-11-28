@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x091F0C: UNVERIFIED (weak capture): draw one NORMAL/CENT option label.
+/* ROM 0x091F0C: (recipe capture fnk_, work/zcap/recipes15.tsv): draw one NORMAL/CENT option label.
  * D1.W selects the text
  * (non-zero -> "CENT" at 0x091F51, zero -> "NORM" at 0x091F4C), both in
  * colour 6; D0 is the text-RAM cursor it is drawn at. D0 is saved and

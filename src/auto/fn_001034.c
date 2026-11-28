@@ -1,4 +1,4 @@
-/* ROM 0x001034: UNVERIFIED (no capture): one-frame countdown of the word at
+/* ROM 0x001034: (recipe capture fnk_, work/zcap/recipes15.tsv): one-frame countdown of the word at
  * A5-0x7F70 (0x400090). The whole routine is `subq.w #1,-0x7f70(a5) ; rts`
  * (bytes 53 6D 80 90 / 4E 75); the code from 0x00103A on is the next routine. */
 #include "fn_auto.h"

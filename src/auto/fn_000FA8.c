@@ -1,5 +1,5 @@
 #include "fn_auto.h"
-/* ROM 0x000FA8: UNVERIFIED (weak capture): pace and play pending coin sounds. */
+/* ROM 0x000FA8: (recipe capture fnk_, work/zcap/recipes15.tsv): pace and play pending coin sounds. */
 #include "fn_sound_frames.h"
 
 int Fn_000FA8(const f3mem_t *m, f3regs_t *r)

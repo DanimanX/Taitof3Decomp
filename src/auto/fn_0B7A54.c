@@ -1,4 +1,4 @@
-/* ROM 0x0B7A54: UNVERIFIED (no capture): draw the 16-glyph hex legend of the
+/* ROM 0x0B7A54: (recipe capture fnk_, work/zcap/recipes15.tsv): draw the 16-glyph hex legend of the
  * sound/option editor twice (at row D2 and row D2+3) and an attribute ramp bar
  * underneath, all in text RAM 0x61C000.
  *

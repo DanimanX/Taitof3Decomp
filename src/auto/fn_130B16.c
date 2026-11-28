@@ -1,4 +1,4 @@
-/* ROM 0x130B16: UNVERIFIED (no usable capture): 3D (z-depth) scaled object
+/* ROM 0x130B16: (recipe capture fnk_, work/zcap/recipes15.tsv): 3D (z-depth) scaled object
  * tick. Integrates the (+0x56,+0x5A,+0x5E) position by the (+0x44,+0x46,+0x48)
  * velocities << 8, and when the depth goes negative frees the object (0x0105EC,
  * like the A5-0x144B bit 4 "bomb clear" flag which skips straight there).

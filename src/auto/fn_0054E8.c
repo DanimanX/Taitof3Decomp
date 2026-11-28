@@ -1,4 +1,4 @@
-/* ROM 0x0054E8: UNVERIFIED (no capture): run-length tile-row unpacker.
+/* ROM 0x0054E8: (recipe capture fnk_, work/zcap/recipes15.tsv): run-length tile-row unpacker.
  * A0 points at {count.b, count.b, ops...}; the two counts are stored as words
  * into the scratch buffer A5-0x12F0 (0x406D10) and their product is the total
  * number of 32-bit cells to write. Each op is {kind.b, run.b, ...} dispatched

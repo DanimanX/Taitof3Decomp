@@ -1,4 +1,4 @@
-/* ROM 0x1843AE: UNVERIFIED (no capture): scripted boss-part object tick
+/* ROM 0x1843AE: (recipe capture fnk_, work/zcap/recipes15.tsv): scripted boss-part object tick
  * (A0 = object). Clears +0x24 when A5-0x144C bit 4 (0x10) is set; while
  * +0x24 <= 0 it runs the vanish path (0x184482 -> 0x17C59A: freeze, shrink by
  * +0x1E/+0x1F in 0x17C662, or explode 0x0CBB2C). Otherwise: score/explode

@@ -1,4 +1,4 @@
-/* ROM 0x0C1A56: UNVERIFIED (no capture): zoom/scale-in-out sprite tick with a
+/* ROM 0x0C1A56: (recipe capture fnk_, work/zcap/recipes15.tsv): zoom/scale-in-out sprite tick with a
  * looping animation table (A0 = object). Sibling of 0x0C1998 (Fn_0C1998).
  * Writes +0x60 into both zoom bytes (+0x1E, +0x1F), places (+0x14,+0x18) at
  * (+0x44,+0x48) + (+0x60 * 0x38 << 8), steps the looping animation table at

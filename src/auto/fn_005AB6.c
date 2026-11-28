@@ -1,4 +1,4 @@
-/* ROM 0x005AB6: UNVERIFIED (no capture): expand a packed tile stream into playfield RAM.
+/* ROM 0x005AB6: (recipe capture fnk_, work/zcap/recipes15.tsv): expand a packed tile stream into playfield RAM.
  * D0.w selects (D0.w * 8 + 1) tile words and D1.w adds a signed * 16 offset to the
  * byte plane at 0x61E000. Each tile word is split into two 4-bit groups that are
  * rotated through X into two bit planes (D2 even bits, D3 odd bits) and the two

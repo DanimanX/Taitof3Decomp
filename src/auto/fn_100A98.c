@@ -1,4 +1,4 @@
-/* ROM 0x100A98: UNVERIFIED (no capture): scrolling-enemy tick that draws its
+/* ROM 0x100A98: (recipe capture fnk_, work/zcap/recipes15.tsv): scrolling-enemy tick that draws its
  * sprite three times at successive heights (A0 = object).
  * Subtracts the camera scroll A5+0x4224/A5+0x4228 from (+0x14,+0x18), steps the
  * 6-byte script at +0x48 through 0x0D0690, and when the step timer +0x4C hits 0

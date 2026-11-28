@@ -1,4 +1,4 @@
-/* ROM 0x0E48FA: UNVERIFIED (weak capture): scripted flying enemy tick
+/* ROM 0x0E48FA: (recipe capture fnk_, work/zcap/recipes15.tsv): scripted flying enemy tick
  * (A0 = object). The only captured pair spans frames 0x06DD->0x0992, so the
  * harness skips it and the translation is verified against the bytes only;
  * it is the twin of

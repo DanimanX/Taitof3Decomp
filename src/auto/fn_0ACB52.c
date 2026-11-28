@@ -1,6 +1,6 @@
 #include "fn_auto.h"
 
-/* ROM 0x0ACB52: UNVERIFIED (weak capture): clear a sized rectangle in playfield RAM. */
+/* ROM 0x0ACB52: (recipe capture fnk_, work/zcap/recipes15.tsv): clear a sized rectangle in playfield RAM. */
 #include "fn_call_frames.h"
 #include "../objects/obj_common.h"
 

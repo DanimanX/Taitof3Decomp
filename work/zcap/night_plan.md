@@ -57,3 +57,11 @@ Push: temp GIT_ASKPASS script printing ~/.token.bak, deleted after. Commits end 
 - wt_CW2 next: DIFFICULTY 0x1A1282 (see Update 02:50). wt_CW next: leftovers 13F436 0B7B52 (callee sets untranslated),
   boot 010000/000402/010172, 006020, 004D06, 005080, 144894.
 - codewhale noted test-mode segs push jsr_pc+2 as the return address where the jsr is 4/6 bytes: check against captures.
+
+## Update 04:30
+- 2d10e62 (18 bit-exact 129xxx family) and 41d3eac (DIFFICULTY + menu dispatch). 97.6% / 89.4%.
+- wt_CW: batch 11 = last 24 of the Strata queue (log cw_r11.log). wt_CW2: the 20 before those ($S/cw2_r1.list,
+  log cw2_r1.log). Strata keeps the head of the queue; strata_fn skips files that already exist.
+- cw_integrate.sh now applies edits to existing src/auto files too (wt_CW2 integrations still need the patch route
+  for Makefile/seg.c/test_fn.c when it touches src/test).
+- After the undecompiled ones: the 129 decompiled-but-unverified routines (weak/no capture) are what moves verified %.

@@ -1010,5 +1010,32 @@ int Fn_12A18E(const f3mem_t *m, f3regs_t *r); /* ROM 0x12A18E */
 int Fn_12A1CC(const f3mem_t *m, f3regs_t *r); /* ROM 0x12A1CC */
 int Fn_12A1FA(const f3mem_t *m, f3regs_t *r); /* ROM 0x12A1FA */
 int Fn_0CC1A2(const f3mem_t *m, f3regs_t *r); /* ROM 0x0CC1A2 */
+int Fn_1381E0(const f3mem_t *m, f3regs_t *r); /* ROM 0x1381E0 */
+int Fn_176208(const f3mem_t *m, f3regs_t *r); /* ROM 0x176208 */
+int Fn_0C06AE(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C06AE */
+int Fn_0D63A8(const f3mem_t *m, f3regs_t *r); /* ROM 0x0D63A8 */
+int Fn_0DF972(const f3mem_t *m, f3regs_t *r); /* ROM 0x0DF972 */
+int Fn_100A32(const f3mem_t *m, f3regs_t *r); /* ROM 0x100A32 */
+int Fn_0E4440(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E4440 */
+int Fn_17D96C(const f3mem_t *m, f3regs_t *r); /* ROM 0x17D96C */
+int Fn_0E0180(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E0180 */
+int Fn_0E44A6(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E44A6 */
+int Fn_091984(const f3mem_t *m, f3regs_t *r); /* ROM 0x091984 */
+int Fn_1245E0(const f3mem_t *m, f3regs_t *r); /* ROM 0x1245E0 */
+int Fn_091466(const f3mem_t *m, f3regs_t *r); /* ROM 0x091466 */
+int Fn_11CDF8(const f3mem_t *m, f3regs_t *r); /* ROM 0x11CDF8 */
+int Fn_13E82C(const f3mem_t *m, f3regs_t *r); /* ROM 0x13E82C */
+int Fn_11CE6E(const f3mem_t *m, f3regs_t *r); /* ROM 0x11CE6E */
+int Fn_0E405C(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E405C */
+int Fn_111EA8(const f3mem_t *m, f3regs_t *r); /* ROM 0x111EA8 */
+int Fn_162D98(const f3mem_t *m, f3regs_t *r); /* ROM 0x162D98 */
+int Fn_184322(const f3mem_t *m, f3regs_t *r); /* ROM 0x184322 */
+int Fn_0C2DF2(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C2DF2 */
+int Fn_0C95DE(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C95DE */
+int Fn_18098C(const f3mem_t *m, f3regs_t *r); /* ROM 0x18098C */
+int Fn_0B7FF8(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7FF8 */
+int Fn_130A72(const f3mem_t *m, f3regs_t *r); /* ROM 0x130A72 */
+int Fn_0B7332(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7332 */
+int Fn_1318F2(const f3mem_t *m, f3regs_t *r); /* ROM 0x1318F2 */
 /* END generated */
 #endif

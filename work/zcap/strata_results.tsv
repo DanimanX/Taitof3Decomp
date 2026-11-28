@@ -1311,3 +1311,17 @@
 0CC1A2	0	fail	0/30 undec=0 try=3 813s
 11A966	0	accepted	30/30 undec=0 try=3 825s
 129EDE	0	fail	0/30 undec=0 try=3 882s
+129F0C	0	fail	6/30 undec=0 try=3 1074s
+129F3A	0	fail	0/30 undec=0 try=2 920s
+129F68	0	fail	5/30 undec=0 try=2 950s
+129F96	0	fail	COMPILE ERROR (project flags): try=2 714s
+129FC4	0	fail	COMPILE ERROR (project flags): try=3 743s
+129FF2	0	fail	0/30 undec=0 try=2 575s
+1381E0	0	accepted	30/30 undec=0 try=1 164s
+176208	0	accepted	30/30 undec=0 try=0 150s
+0E353A	0	fail	0/30 undec=0 try=3 535s
+14477C	0	fail	1/30 undec=0 try=3 391s
+0C06AE	0	accepted	30/30 undec=0 try=0 85s
+129E0C	0	fail	COMPILE ERROR (project flags): try=3 936s
+0C7B48	0	fail	COMPILE ERROR (project flags): try=3 719s
+129EA6	0	fail	0/30 undec=0 try=3 775s

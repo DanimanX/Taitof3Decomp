@@ -1,3 +1,4 @@
+#include <string.h>
 #include "f3mem.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +24,9 @@ uint8_t *f3_ptr(const f3mem_t *m, uint32_t a)
      * took 118B74 down and hid every later verdict). The write is discarded,
      * so the owning routine reports a mismatch instead of crashing the run. */
     static uint8_t unmapped[8];
+    /* cleared on every access: a write stored here must not leak into a
+     * later read (another routine, another test entry) of unmapped space */
+    memset(unmapped, 0, sizeof unmapped);
     fprintf(stderr, "f3mem: access outside RAM/ROM at %06X\n", a);
     return unmapped;
 }
@@ -37,9 +41,18 @@ uint32_t rd32(const f3mem_t *m, uint32_t a)
 {
     return (uint32_t)rd16(m, a) << 16 | rd16(m, a + 2);
 }
-void wr8(const f3mem_t *m, uint32_t a, uint8_t v) { *f3_ptr(m, a) = v; }
+/* Writes to ROM are ignored by the hardware. f3_ptr hands back a pointer into
+ * the ROM image, which every test entry shares: storing through it would let a
+ * routine that strays into ROM corrupt the code/data later entries read. */
+static int is_rom(uint32_t a) { return (a & 0xFFFFFFu) < F3_ROM_SIZE; }
+void wr8(const f3mem_t *m, uint32_t a, uint8_t v)
+{
+    if (is_rom(a)) return;
+    *f3_ptr(m, a) = v;
+}
 void wr16(const f3mem_t *m, uint32_t a, uint16_t v)
 {
+    if (is_rom(a)) return;
     uint8_t *p = f3_ptr(m, a);
     p[0] = (uint8_t)(v >> 8);
     p[1] = (uint8_t)v;

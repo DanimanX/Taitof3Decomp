@@ -31,9 +31,10 @@
  * of its own that yields inside. The wrapper pushes the return PC 0x1A1B9A and
  * lets Seg_Run run the screen's group; when the screen returns, 0x1A1B9A runs
  * 0x005A3A (the character/font upload) and 0x1A1BA0 branches back to the
- * yield. Every captured frame has bit 4 set and never takes this path; the one
- * table entry without a group yet (0x1A1282 DIFFICULTY) makes Seg_Run report
- * SEG_LEAVE. */
+ * yield. Every captured frame has bit 4 set and never takes this path, so the
+ * dispatch is verified only synthetically (see the note in seg.h); all seven
+ * fn pointers of the table are segment groups Seg_Run routes -
+ * 0x19F504, 0x19F708, 0x1A0942, 0x1A0A52, 0x1A1282, 0x1A1856 and 0x1A1944. */
 #include "../kernel/seg.h"
 #include "../enemy/obj_1194C2.h"   /* Text_DrawString (ROM 0x005666) */
 #include "../video/sprite.h"        /* Gfx_ClearAllLayers (ROM 0x005A12) */
@@ -92,8 +93,8 @@ static void draw_format(const f3mem_t *m, f3regs_t *r, uint32_t jsr_pc,
     wr16(m, r->a[7], col);
     r->a[7] -= 4u;                      /* dst.l */
     wr32(m, r->a[7], dst);
-    r->a[7] -= 4u;                      /* jsr 0x1A1BA6 */
-    wr32(m, r->a[7], jsr_pc + 2u);
+    r->a[7] -= 4u;                      /* jsr 0x1A1BA6.l (six bytes) */
+    wr32(m, r->a[7], jsr_pc + 6u);
     Fn_1A1BA6(m, r);                    /* leaves SP at dst */
 }
 

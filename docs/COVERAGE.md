@@ -1,13 +1,13 @@
 # Decompilation coverage — Darius Gaiden (maincpu)
 
-**97.5% decompiled · 2.5% remaining**  
+**97.6% decompiled · 2.4% remaining**  
 `███████████████████████████████████████░`
 
 | | functions | code bytes | % of code in functions |
 |---|---:|---:|---:|
-| Decompiled to C | 2534 / 2606 | 316,974 / 325,124 | **97.5%** |
-| …of which verified bit-exact vs MAME | 2405 | 290,268 | 89.3% |
-| **Remaining** | 72 | 8,150 | **2.5%** |
+| Decompiled to C | 2535 / 2606 | 317,374 / 325,124 | **97.6%** |
+| …of which verified bit-exact vs MAME | 2406 | 290,668 | 89.4% |
+| **Remaining** | 71 | 7,750 | **2.4%** |
 
 ## Map by 64 KiB ROM bank
 
@@ -34,6 +34,6 @@
 | `0x170000` | 185/187 | 15,622 |  99.0% | `████████████████████` |
 | `0x180000` | 153/157 | 15,458 |  97.1% | `███████████████████░` |
 | `0x190000` | 113/115 | 20,264 |  99.2% | `████████████████████` |
-| `0x1A0000` | 10/11 | 5,144 |  92.2% | `██████████████████░░` |
+| `0x1A0000` | 11/11 | 5,144 | 100.0% | `████████████████████` |
 
 Code bytes = instruction bytes of the 2606 Ghidra functions in maincpu (325,124 of 403,578 disassembled bytes; the rest is code Ghidra has not assigned to a function yet). A function counts as decompiled when its entry address is annotated `ROM 0x…` in `src/`. Regenerate with `make coverage`.

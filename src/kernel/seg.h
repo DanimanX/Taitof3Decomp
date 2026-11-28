@@ -40,6 +40,7 @@ uint32_t Seg_1A043C(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode 
 uint32_t Seg_1A0942(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode SOUND TEST wrapper (0x1A0942) */
 uint32_t Seg_1A095E(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode HI-SCORE RESET (0x1A095E) */
 uint32_t Seg_1A0A52(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode CONFIGURATION */
+uint32_t Seg_1A1282(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode DIFFICULTY */
 uint32_t Seg_1A1856(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode FACTORY SETTING */
 uint32_t Seg_1A1A26(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode main menu (Task_TestModeMenu) */
 uint32_t Seg_1A1944(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode EXIT */

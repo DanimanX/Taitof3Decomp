@@ -73,8 +73,9 @@ static uint32_t restore_frame(const f3mem_t *m, f3regs_t *r)
 /* jsr (A4) -> 0x5666: the three arguments stay on the stack until the
  * caller's lea, the callee's frame and return PC are written below them, and
  * only D0 (the end of the line) survives. The colour is the pushed immediate
- * (D2 for the menu rows). */
-static void draw_text1(const f3mem_t *m, f3regs_t *r, uint32_t ret,
+ * (D2 for the menu rows). jsr_pc is the two-byte jsr, so its return PC is
+ * jsr_pc+2. */
+static void draw_text1(const f3mem_t *m, f3regs_t *r, uint32_t jsr_pc,
                        uint32_t dst, uint32_t str, uint16_t col)
 {
     uint32_t sp = r->a[7] - 10u;
@@ -82,7 +83,7 @@ static void draw_text1(const f3mem_t *m, f3regs_t *r, uint32_t ret,
     wr32(m, sp, str);
     wr32(m, sp + 4u, dst);
     wr16(m, sp + 8u, col);
-    wr32(m, sp - 4u, ret + 2u);
+    wr32(m, sp - 4u, jsr_pc + 2u);
     wr32(m, sp - 8u, r->a[6]);
     wr32(m, sp - 20u, r->d[7]);
     wr32(m, sp - 16u, r->a[0]);
@@ -91,9 +92,10 @@ static void draw_text1(const f3mem_t *m, f3regs_t *r, uint32_t ret,
     r->a[7] = sp;
 }
 
-/* jsr 0x1A1BA6 with the colour in D2 and one long argument: the caller pushes
- * the argument first, then fmt/col/dst and the return PC (see seg_1A1A26). */
-static void draw_fmt1(const f3mem_t *m, f3regs_t *r, uint32_t ret,
+/* jsr 0x1A1BA6.l (six bytes) with the colour in D2 and one long argument: the
+ * caller pushes the argument first, then fmt/col/dst and the return PC (see
+ * seg_1A1A26). */
+static void draw_fmt1(const f3mem_t *m, f3regs_t *r, uint32_t jsr_pc,
                       uint32_t dst, uint32_t fmt)
 {
     r->a[7] -= 4u;
@@ -103,14 +105,15 @@ static void draw_fmt1(const f3mem_t *m, f3regs_t *r, uint32_t ret,
     r->a[7] -= 4u;
     wr32(m, r->a[7], dst);
     r->a[7] -= 4u;
-    wr32(m, r->a[7], ret + 2u);
+    wr32(m, r->a[7], jsr_pc + 6u);
     Fn_1A1BA6(m, r);                        /* leaves SP at dst */
 }
 
 /* 0x19FFF0: the shared value editor (see seg_1A1944.c). The five argument
  * words and the callee's frame stay on the stack for the caller's
- * lea 0xA(SP); D0.w is the new value. */
-static void edit_value(const f3mem_t *m, f3regs_t *r, uint32_t ret,
+ * lea 0xA(SP); D0.w is the new value. jsr_pc is the two-byte jsr (A0) the row
+ * does after loading D7 into A0, so its return PC is jsr_pc+2. */
+static void edit_value(const f3mem_t *m, f3regs_t *r, uint32_t jsr_pc,
                        uint16_t in, uint16_t cur, uint16_t lo, uint16_t hi,
                        uint16_t step)
 {
@@ -121,7 +124,7 @@ static void edit_value(const f3mem_t *m, f3regs_t *r, uint32_t ret,
     wr16(m, sp + 4u, lo);
     wr16(m, sp + 6u, hi);
     wr16(m, sp + 8u, step);
-    wr32(m, sp - 4u, ret + 2u);
+    wr32(m, sp - 4u, jsr_pc + 2u);
     wr32(m, sp - 8u, r->d[5]);              /* movem.l d3-d5,-(SP) */
     wr32(m, sp - 12u, r->d[4]);
     wr32(m, sp - 16u, r->d[3]);
@@ -179,7 +182,7 @@ static void row_body(const f3mem_t *m, f3regs_t *r, uint32_t row)
     case 0u:                                    /* 0x1A0B3A GAME STYLE */
         if (sel) {
             uint16_t cur = (uint16_t)ee_bfget(m, SETTINGS + 0xAu, 11u, 3u);
-            edit_value(m, r, 0x001A0B58u, in, cur, 0u, 1u, 1u);
+            edit_value(m, r, 0x001A0B5Au, in, cur, 0u, 1u, 1u);
             r->a[7] += 0xAu;
             r->d[0] = (uint32_t)(int32_t)(int16_t)(uint16_t)r->d[0]; /* ext.l */
             ee_bfput(m, SETTINGS + 0xAu, 11u, 3u, r->d[0]);

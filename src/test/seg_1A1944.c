@@ -82,7 +82,7 @@ static void editor_19FFF0(const f3mem_t *m, f3regs_t *r, uint32_t jsr_pc,
     wr16(m, sp + 4u, 0u);               /* clr.w -(a7) */
     wr16(m, sp + 6u, 1u);               /* move.w #1,-(a7) */
     wr16(m, sp + 8u, 1u);               /* move.w #1,-(a7) */
-    wr32(m, sp - 4u, jsr_pc + 2u);
+    wr32(m, sp - 4u, jsr_pc + 4u);      /* jsr 0x0019FFF0(pc), four bytes */
     wr32(m, sp - 8u, r->d[5]);          /* movem.l d3-d5,-(SP) */
     wr32(m, sp - 12u, r->d[4]);
     wr32(m, sp - 16u, r->d[3]);

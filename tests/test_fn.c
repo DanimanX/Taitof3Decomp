@@ -306,6 +306,8 @@ static const fn_entry_t fns[] = {
     { "Seg 0x1A0168 1A00E6 group",  "work/ram/seg_1A0168", ad_seg, SEGREGS },
     { "Seg 0x1A0A52 1A0A52 group",  "work/ram/seg_1A0A52", ad_seg, SEGREGS },
     { "Seg 0x1A0AC6 1A0A52 group",  "work/ram/seg_1A0AC6", ad_seg, SEGREGS },
+    { "Seg 0x1A1282 1A1282 group",  "work/ram/seg_1A1282", ad_seg, SEGREGS },
+    { "Seg 0x1A12E2 1A1282 group",  "work/ram/seg_1A12E2", ad_seg, SEGREGS },
     { "Seg 0x1A1A26 1A1A26 group",  "work/ram/seg_1A1A26", ad_seg, SEGREGS },
     { "Seg 0x1A1A6E 1A1A26 group",  "work/ram/seg_1A1A6E", ad_seg, SEGREGS },
     { "Seg 0x1A1856 1A1856 group",  "work/ram/seg_1A1856", ad_seg, SEGREGS },

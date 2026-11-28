@@ -31,3 +31,4 @@
 0068C0	10	weak	empty function passes the capture
 003B9A	12	fail	0/30 undec=0 try=2 rel=- 422s
 003C3E	12	fail	COMPILE ERROR: try=2 rel=- 409s
+003D08	12	fail	0/20 undec=0 try=1 rel=- 111s

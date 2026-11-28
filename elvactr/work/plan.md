@@ -27,6 +27,15 @@ Push: temp GIT_ASKPASS script printing ~/.token.bak, deleted after. Commits end 
    Running (14:30): codewhale cw1/cw2/cw3 (PIDs 143982-4) on the 15 captured routines > 400 B,
    drafts in elvactr/work/drafts/ea_<A>.c, logs drafts/cw{1,2,3}.log. Accept the BIT-EXACT ones with
    `scripts/check_ea.py accept <A> elvactr/work/drafts/ea_<A>.c` (refuses weak captures), then make test-elvactr.
+   15:00: 5 accepted (0C6C18 refused: weak). cw4-6 (PIDs 303255/303530/303672) on 24 mid routines
+   150-400 B (list elvactr/work/drafts/mid.txt). codewhale >> Strata in throughput: keep feeding lanes
+   from captured, untried routines sorted by size.
    Second capture pass running -> elvactr/work/capture_log2.tsv (651 rows).
 4. Strata loop idle -> relaunch with --retries 2 on its "fail" rows once.
 5. Weak rows -> recapture with other states before giving up.
+
+## 16:10
+- Second capture pass done: 441/651 captured; 210 still without pairs (elvactr/work/capture_todo3.txt) -> injection.
+- Lanes cw1-6 finished. Wave 3: cw7-12 (PIDs 784920 785157 785523 785716 785819 786153) on 60 routines
+  (elvactr/work/drafts/wave3.txt, largest first; 409 captured untried routines = 64,678 B remain).
+- Each check: accept loop over elvactr/work/drafts/ea_*.c with scripts/check_ea.py accept, then refill lanes.

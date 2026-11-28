@@ -1037,5 +1037,25 @@ int Fn_0B7FF8(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7FF8 */
 int Fn_130A72(const f3mem_t *m, f3regs_t *r); /* ROM 0x130A72 */
 int Fn_0B7332(const f3mem_t *m, f3regs_t *r); /* ROM 0x0B7332 */
 int Fn_1318F2(const f3mem_t *m, f3regs_t *r); /* ROM 0x1318F2 */
+int Fn_19F6C6(const f3mem_t *m, f3regs_t *r); /* ROM 0x19F6C6 */
+int Fn_133002(const f3mem_t *m, f3regs_t *r); /* ROM 0x133002 */
+int Fn_0C2E80(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C2E80 */
+int Fn_0C8C64(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C8C64 */
+int Fn_0C67EA(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C67EA */
+int Fn_12325A(const f3mem_t *m, f3regs_t *r); /* ROM 0x12325A */
+int Fn_129DC0(const f3mem_t *m, f3regs_t *r); /* ROM 0x129DC0 */
+int Fn_0D8F4C(const f3mem_t *m, f3regs_t *r); /* ROM 0x0D8F4C */
+int Fn_0C22E0(const f3mem_t *m, f3regs_t *r); /* ROM 0x0C22E0 */
+int Fn_0E432C(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E432C */
+int Fn_12B17A(const f3mem_t *m, f3regs_t *r); /* ROM 0x12B17A */
+int Fn_0E2C4C(const f3mem_t *m, f3regs_t *r); /* ROM 0x0E2C4C */
+int Fn_121DAC(const f3mem_t *m, f3regs_t *r); /* ROM 0x121DAC */
+int Fn_178502(const f3mem_t *m, f3regs_t *r); /* ROM 0x178502 */
+int Fn_17855A(const f3mem_t *m, f3regs_t *r); /* ROM 0x17855A */
+int Fn_144720(const f3mem_t *m, f3regs_t *r); /* ROM 0x144720 */
+int Fn_19F4A6(const f3mem_t *m, f3regs_t *r); /* ROM 0x19F4A6 */
+int Fn_131272(const f3mem_t *m, f3regs_t *r); /* ROM 0x131272 */
+int Fn_091E42(const f3mem_t *m, f3regs_t *r); /* ROM 0x091E42 */
+int Fn_180670(const f3mem_t *m, f3regs_t *r); /* ROM 0x180670 */
 /* END generated */
 #endif

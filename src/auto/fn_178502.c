@@ -1,0 +1,44 @@
+#include "fn_auto.h"
+/* ROM 0x178502: advance one counter of the per-row test/screen byte grid.
+ * Row = ((A5+0x4AB4) + (A5+0x4AB8)) * 8 added to A5+0x42B4, column comes from
+ * the word table 0x1788C2 indexed by (A5+0x4AB6); the byte compared against
+ * the mirror table 0x1788D6 is a word while that index stays below 6 and a
+ * byte after that. If the cell has not reached the mirror value it is
+ * incremented. */
+static uint32_t setw(uint32_t reg, uint16_t w)
+{
+    return (reg & 0xFFFF0000u) | w;
+}
+
+int Fn_178502(const f3mem_t *m, f3regs_t *r)
+{
+    uint32_t a0 = F3_A5 + 0x42B4u;                 /* 0x178502 lea (0x42B4,A5),A0 */
+    uint32_t a1 = 0x001788C2u;                     /* 0x178506 lea (0x3BA,PC),A1 */
+    uint32_t a2 = 0x001788D6u;                     /* 0x17850C lea (0x3C8,PC),A2 */
+    uint16_t d6w = rd16(m, F3_A5 + 0x4AB4u);       /* 0x178512 */
+    uint16_t d5w = rd16(m, F3_A5 + 0x4AB8u);       /* 0x178516 */
+    uint16_t d4w = rd16(m, F3_A5 + 0x4AB6u);       /* 0x17851A */
+
+    r->d[3] = setw(r->d[3], rd16(m, a1 + (uint32_t)(int32_t)(int16_t)d4w * 2u)); /* 0x17851E */
+    d6w = (uint16_t)(d6w + d5w);                   /* 0x178522 add.w D5w,D6w */
+    r->d[6] = (uint32_t)((int32_t)(int16_t)d6w * 8); /* 0x178524 muls.w #8,D6 */
+    a0 += (uint32_t)(int32_t)(int16_t)d6w;         /* 0x178528 lea (0,A0,D6w),A0 */
+    r->d[4] = setw(r->d[4], d4w);
+    r->d[5] = setw(r->d[5], d5w);
+
+    uint32_t idx = (uint32_t)(int32_t)(int16_t)(uint16_t)r->d[3];
+    r->a[0] = a0;
+    r->a[1] = a1;
+    r->a[2] = a2;
+
+    if ((int16_t)d4w >= 6) {                       /* 0x17852C bge.w 0x178548 */
+        r->d[1] = (r->d[1] & 0xFFFFFF00u) | rd8(m, a0 + idx); /* 0x178548 move.b */
+        if (rd8(m, a0 + idx) != rd8(m, a2 + idx))  /* 0x17854C cmp.b ; beq */
+            wr8(m, a0 + idx, (uint8_t)(rd8(m, a0 + idx) + 1u)); /* 0x178554 */
+    } else {
+        r->d[1] = setw(r->d[1], rd16(m, a0 + idx)); /* 0x178534 move.w */
+        if (rd16(m, a0 + idx) != rd16(m, a2 + idx)) /* 0x178538 cmp.w ; beq */
+            wr16(m, a0 + idx, (uint16_t)(rd16(m, a0 + idx) + 1u)); /* 0x178540 */
+    }
+    return 0;                                      /* 0x178558 rts */
+}

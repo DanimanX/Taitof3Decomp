@@ -1,13 +1,13 @@
 # Decompilation coverage — Darius Gaiden (maincpu)
 
-**94.2% decompiled · 5.8% remaining**  
+**95.2% decompiled · 4.8% remaining**  
 `██████████████████████████████████████░░`
 
 | | functions | code bytes | % of code in functions |
 |---|---:|---:|---:|
-| Decompiled to C | 2487 / 2606 | 306,248 / 325,124 | **94.2%** |
-| …of which verified bit-exact vs MAME | 2372 | 285,154 | 87.7% |
-| **Remaining** | 119 | 18,876 | **5.8%** |
+| Decompiled to C | 2493 / 2606 | 309,418 / 325,124 | **95.2%** |
+| …of which verified bit-exact vs MAME | 2380 | 288,696 | 88.8% |
+| **Remaining** | 113 | 15,706 | **4.8%** |
 
 ## Map by 64 KiB ROM bank
 
@@ -15,7 +15,7 @@
 
 | ROM bank | functions (done/total) | code bytes | decompiled | map |
 |---|---:|---:|---:|---|
-| `0x000000` | 140/144 | 11,860 |  95.2% | `███████████████████░` |
+| `0x000000` | 141/144 | 11,860 |  97.1% | `███████████████████░` |
 | `0x010000` | 12/14 | 1,332 |  55.3% | `███████████░░░░░░░░░` |
 | `0x090000` | 1/9 | 1,138 |   2.6% | `█░░░░░░░░░░░░░░░░░░░` |
 | `0x0A0000` | 3/3 | 116 | 100.0% | `████████████████████` |
@@ -33,7 +33,7 @@
 | `0x160000` | 70/71 | 9,756 |  98.6% | `████████████████████` |
 | `0x170000` | 184/187 | 15,622 |  97.2% | `███████████████████░` |
 | `0x180000` | 152/157 | 15,458 |  94.1% | `███████████████████░` |
-| `0x190000` | 112/115 | 20,264 |  97.3% | `███████████████████░` |
-| `0x1A0000` | 2/11 | 5,144 |   1.4% | `░░░░░░░░░░░░░░░░░░░░` |
+| `0x190000` | 113/115 | 20,264 |  99.2% | `████████████████████` |
+| `0x1A0000` | 6/11 | 5,144 |  51.1% | `██████████░░░░░░░░░░` |
 
 Code bytes = instruction bytes of the 2606 Ghidra functions in maincpu (325,124 of 403,578 disassembled bytes; the rest is code Ghidra has not assigned to a function yet). A function counts as decompiled when its entry address is annotated `ROM 0x…` in `src/`. Regenerate with `make coverage`.

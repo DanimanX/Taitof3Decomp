@@ -239,4 +239,93 @@ static inline int settings_refresh_4DEE(const f3mem_t *m, f3regs_t *r)
     return 0;                                     /* 0x004E42 movea.l (SP)+,A2 */
 }
 
+
+/* 68020 bit field access on a memory operand: the offset counts from the MSB of
+ * the byte at addr (extension bits 11-6), the width is bits 5-0. */
+static inline uint32_t ee_bfget(const f3mem_t *m, uint32_t addr, unsigned off,
+                                unsigned w)
+{
+    unsigned need = off + w;
+    unsigned top = need <= 16u ? 16u : 32u;
+    uint32_t v = need <= 16u ? rd16(m, addr) : rd32(m, addr);
+    return (v >> (top - need)) & ((1u << w) - 1u);
+}
+
+static inline void ee_bfput(const f3mem_t *m, uint32_t addr, unsigned off,
+                            unsigned w, uint32_t val)
+{
+    unsigned need = off + w;
+    unsigned top = need <= 16u ? 16u : 32u;
+    uint32_t mask = ((1u << w) - 1u) << (top - need);
+    uint32_t v = need <= 16u ? rd16(m, addr) : rd32(m, addr);
+    v = (v & ~mask) | ((val << (top - need)) & mask);
+    if (need <= 16u)
+        wr16(m, addr, (uint16_t)v);
+    else
+        wr32(m, addr, v);
+}
+
+/* ROM 0x004D06: read the settings block and publish it into the RAM globals
+ * (0x402237-0x402240, 0x4022A8, 0x409D3A/3C), then rescale the two derived
+ * tables (0x004C78, 0x004C12). Pops its own return address and A2.
+ *
+ * The block read through 0x00466E is NOT modelled: it clocks the serial device
+ * and the harness has no I/O space, where a read returns zeros and would wipe
+ * the block the captures keep (the device returns the bytes it already holds,
+ * so the block is unchanged there). D1 is always overwritten below and the
+ * callers never read A0, so the skipped read is invisible to the register
+ * comparison; every checkable side effect is modelled. */
+static inline void settings_apply_4D06(const f3mem_t *m, f3regs_t *r)
+{
+    const uint32_t a2 = EE_SETTINGS;
+    r->a[7] -= 4u;                              /* 0x004D06 move.l A2,-(SP) */
+    wr32(m, r->a[7], r->a[2]);
+    r->a[2] = a2;
+    /* 0x004D0E..0x004D16: jsr 0x00466E block read (not modelled, see above) */
+
+    r->d[0] = 0u;                               /* 0x004D18 moveq #0,D0 */
+    r->d[0] = (r->d[0] & 0xFFFFFF00u) | ((rd8(m, a2 + 0xAu) & 0x80u) ? 1u : 0u);
+    r->d[0] *= 0xFFFFFFFFu;                     /* 0x004D24 muls.l #-1 */
+    wr16(m, 0x004022A8u, (uint16_t)r->d[0]);    /* 0x004D2C */
+    r->d[0] = ee_bfget(m, a2 + 0xAu, 11u, 3u);  /* 0x004D32 {11:3} */
+    wr8(m, 0x0040223Au, (uint8_t)r->d[0]);      /* 0x004D38 */
+    r->d[0] = (rd8(m, a2 + 0x18u) & 0x40u) ? 1u : 0u;   /* 0x004D3E btst #6 */
+    wr8(m, 0x0040223Du, (uint8_t)r->d[0]);      /* 0x004D48 */
+    r->d[0] = ee_bfget(m, a2 + 0xAu, 14u, 2u);  /* 0x004D4E {14:2} */
+    wr8(m, 0x0040223Cu, (uint8_t)r->d[0]);      /* 0x004D54 */
+    r->d[0] = (rd8(m, a2 + 0x18u) & 0x80u) ? 1u : 0u;   /* 0x004D5A btst #7 */
+    wr8(m, 0x0040223Fu, (uint8_t)r->d[0]);      /* 0x004D64 */
+    r->d[0] = (rd8(m, a2 + 0xAu) & 0x20u) ? 1u : 0u;    /* 0x004D6A btst #5 */
+    wr8(m, 0x0040223Eu, (uint8_t)r->d[0]);      /* 0x004D74 */
+    r->d[0] = ee_bfget(m, a2 + 0xCu, 0u, 4u) << 4;      /* 0x004D7A..0x004D80 */
+    r->d[1] = ee_bfget(m, a2 + 0xCu, 4u, 4u);   /* 0x004D82 */
+    r->d[0] |= r->d[1];
+    wr8(m, 0x00402237u, (uint8_t)r->d[0]);      /* 0x004D8A */
+    r->d[0] = ee_bfget(m, a2 + 0xCu, 8u, 4u) << 4;      /* 0x004D90..0x004D96 */
+    r->d[1] = ee_bfget(m, a2 + 0xCu, 12u, 4u);  /* 0x004D98 */
+    r->d[0] |= r->d[1];
+    wr8(m, 0x00402238u, (uint8_t)r->d[0]);      /* 0x004DA0 */
+    r->d[0] = rd8(m, a2 + 0xEu);                /* 0x004DA6 */
+    wr16(m, 0x00402240u, (uint16_t)r->d[0]);    /* 0x004DAC */
+    r->d[0] = ee_bfget(m, a2 + 0x18u, 2u, 3u);  /* 0x004DB2 {2:3} */
+    wr16(m, 0x00409D3Au, (uint16_t)r->d[0]);    /* 0x004DB8 */
+    r->d[0] = ee_bfget(m, a2 + 0x18u, 5u, 3u);  /* 0x004DBE {5:3} */
+    wr16(m, 0x00409D3Cu, (uint16_t)r->d[0]);    /* 0x004DC4 */
+
+    r->a[7] -= 4u;                              /* 0x004DCA jsr 0x004C78 */
+    wr32(m, r->a[7], 0x004DD0u);
+    Fn_004C78(m, r);
+    r->a[7] -= 4u;                              /* 0x004DCE jsr 0x004C12 */
+    wr32(m, r->a[7], 0x004DD4u);
+    Fn_004C12(m, r);
+
+    if ((rd8(m, a2 + 0xAu) & 0x40u) != 0u)      /* 0x004DD2 btst #6 */
+        wr8(m, 0x0040223Bu, 0u);                /* 0x004DE4 clr.b */
+    else
+        wr8(m, 0x0040223Bu, 1u);                /* 0x004DDA move.b #1 */
+    r->a[2] = rd32(m, r->a[7]);                 /* 0x004DEA movea.l (SP)+,A2 */
+    r->a[7] += 4u;
+    r->a[7] += 4u;                              /* rts */
+}
+
 #endif

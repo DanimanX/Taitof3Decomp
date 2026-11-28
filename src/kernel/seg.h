@@ -33,7 +33,12 @@ uint32_t Seg_13DAD4(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* stage end 
 uint32_t Seg_13D69A(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* high-score name entry */
 uint32_t Seg_0B935A(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* ending task 0x0B935A */
 uint32_t Seg_0B8404(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* attract / title sequencer (Task_Attract) */
+uint32_t Seg_19F504(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode MONITOR TEST */
 uint32_t Seg_19F708(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode screen (yields via jsr 0x1F62) */
+uint32_t Seg_1A0A52(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode CONFIGURATION */
+uint32_t Seg_1A1856(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode FACTORY SETTING */
+uint32_t Seg_1A1A26(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode main menu (Task_TestModeMenu) */
+uint32_t Seg_1A1944(const f3mem_t *m, f3regs_t *r, uint32_t pc);   /* test-mode EXIT */
 
 static inline void seg_push32(const f3mem_t *m, f3regs_t *r, uint32_t v)
 {
